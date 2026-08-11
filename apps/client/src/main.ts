@@ -1,20 +1,6 @@
 import Phaser from "phaser";
 import "./style.css";
-
-class GameScene extends Phaser.Scene {
-  constructor() {
-    super("GameScene");
-  }
-
-  create() {
-    this.add.text(20, 20, "Pokemon MMO - Cesar Edition", {
-      fontSize: "24px",
-      color: "#ffffff",
-    });
-
-    this.add.rectangle(400, 300, 40, 40, 0x3498db);
-  }
-}
+import { GameScene } from "./game/GameScene";
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -24,7 +10,7 @@ const config: Phaser.Types.Core.GameConfig = {
 
   backgroundColor: "#1e1e1e",
 
-  scene: GameScene,
+  scene: [GameScene],
 };
 
 new Phaser.Game(config);
