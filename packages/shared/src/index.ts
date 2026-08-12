@@ -1,2 +1,10 @@
-export * from "./game.types.js";
-export * from "./game.constants.js";
+export type { Player, PlayerInput } from "./game.types.js";
+
+export {
+  GAME_HEIGHT,
+  GAME_WIDTH,
+  PLAYER_COLORS,
+  PLAYER_SIZE,
+  PLAYER_SPEED,
+  SERVER_TICK_RATE,
+} from "./game.constants.js";

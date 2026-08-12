@@ -1,5 +1,6 @@
 import {
   ConnectedSocket,
+  OnGatewayInit,
   OnGatewayConnection,
   OnGatewayDisconnect,
   SubscribeMessage,
@@ -8,6 +9,8 @@ import {
   MessageBody,
 } from '@nestjs/websockets';
 
+import { OnModuleDestroy } from '@nestjs/common';
+
 import { Server, Socket } from 'socket.io';
 
 import {
@@ -15,22 +18,44 @@ import {
   GAME_WIDTH,
   PLAYER_COLORS,
   PLAYER_SIZE,
-  type Player,
-  type PlayerPosition,
+  PLAYER_SPEED,
+  SERVER_TICK_RATE,
 } from '@cesar-mmo/shared';
+
+import type { Player, PlayerInput } from '@cesar-mmo/shared';
 
 @WebSocketGateway({
   cors: {
     origin: 'http://localhost:5173',
   },
 })
-export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class GameGateway
+  implements
+    OnGatewayInit,
+    OnGatewayConnection,
+    OnGatewayDisconnect,
+    OnModuleDestroy
+{
   @WebSocketServer()
-  server: Server;
+  server!: Server;
 
   private players: Record<string, Player> = {};
 
+  private playerInputs: Record<string, PlayerInput> = {};
+
   private nextColorIndex = 0;
+
+  private gameLoop?: ReturnType<typeof setInterval>;
+
+  afterInit() {
+    this.startGameLoop();
+  }
+
+  onModuleDestroy() {
+    if (this.gameLoop) {
+      clearInterval(this.gameLoop);
+    }
+  }
 
   handleConnection(client: Socket) {
     const color = PLAYER_COLORS[this.nextColorIndex % PLAYER_COLORS.length];
@@ -45,6 +70,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     };
 
     this.players[client.id] = newPlayer;
+
+    this.playerInputs[client.id] = {
+      up: false,
+      down: false,
+      left: false,
+      right: false,
+    };
 
     console.log(`Player connected: ${client.id}`);
 
@@ -61,29 +93,95 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.emit('playerDisconnected', client.id);
   }
 
-  @SubscribeMessage('playerMove')
-  handlePlayerMove(
+  @SubscribeMessage('playerInput')
+  handlePlayerInput(
     @ConnectedSocket() client: Socket,
-    @MessageBody() position: PlayerPosition,
+    @MessageBody() input: PlayerInput,
   ) {
-    const player = this.players[client.id];
-
-    if (!player) {
+    if (!this.players[client.id]) {
       return;
     }
 
+    this.playerInputs[client.id] = input;
+  }
+
+  private startGameLoop() {
+    const tickInterval = 1000 / SERVER_TICK_RATE;
+
+    this.gameLoop = setInterval(() => {
+      this.updatePlayers(tickInterval);
+    }, tickInterval);
+  }
+
+  private updatePlayers(deltaMs: number) {
+    const deltaSeconds = deltaMs / 1000;
+
+    for (const [playerId, player] of Object.entries(this.players)) {
+      const input = this.playerInputs[playerId];
+
+      if (!input) {
+        continue;
+      }
+
+      this.updatePlayer(player, input, deltaSeconds);
+    }
+
+    this.server.emit('playersState', this.players);
+  }
+
+  private updatePlayer(
+    player: Player,
+    input: PlayerInput,
+    deltaSeconds: number,
+  ) {
+    let directionX = 0;
+    let directionY = 0;
+
+    if (input.left) {
+      directionX -= 1;
+    }
+
+    if (input.right) {
+      directionX += 1;
+    }
+
+    if (input.up) {
+      directionY -= 1;
+    }
+
+    if (input.down) {
+      directionY += 1;
+    }
+
+    if (directionX === 0 && directionY === 0) {
+      return;
+    }
+
+    const magnitude = Math.sqrt(
+      directionX * directionX + directionY * directionY,
+    );
+
+    directionX /= magnitude;
+    directionY /= magnitude;
+
+    player.x += directionX * PLAYER_SPEED * deltaSeconds;
+
+    player.y += directionY * PLAYER_SPEED * deltaSeconds;
+
+    this.clampPlayerPosition(player);
+  }
+
+  private clampPlayerPosition(player: Player) {
     const halfPlayerSize = PLAYER_SIZE / 2;
 
     player.x = Math.max(
       halfPlayerSize,
-      Math.min(GAME_WIDTH - halfPlayerSize, position.x),
+      Math.min(GAME_WIDTH - halfPlayerSize, player.x),
     );
 
     player.y = Math.max(
       halfPlayerSize,
-      Math.min(GAME_HEIGHT - halfPlayerSize, position.y),
+      Math.min(GAME_HEIGHT - halfPlayerSize, player.y),
     );
-
-    client.broadcast.emit('playerMoved', player);
   }
 }

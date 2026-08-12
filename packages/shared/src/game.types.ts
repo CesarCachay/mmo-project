@@ -5,7 +5,9 @@ export type Player = {
   color: number;
 };
 
-export type PlayerPosition = {
-  x: number;
-  y: number;
+export type PlayerInput = {
+  up: boolean;
+  down: boolean;
+  left: boolean;
+  right: boolean;
 };

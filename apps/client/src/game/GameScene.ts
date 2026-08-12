@@ -4,24 +4,33 @@ import { io, Socket } from "socket.io-client";
 import {
   GAME_HEIGHT,
   GAME_WIDTH,
-  PLAYER_COLORS,
   PLAYER_SPEED,
   PLAYER_SIZE,
-  type Player,
 } from "@cesar-mmo/shared";
+
+import type { Player, PlayerInput } from "@cesar-mmo/shared";
 
 export class GameScene extends Phaser.Scene {
   private player!: Phaser.GameObjects.Rectangle;
 
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
 
+  private wasd!: Record<
+    "up" | "down" | "left" | "right",
+    Phaser.Input.Keyboard.Key
+  >;
+
   private socket!: Socket;
 
   private otherPlayers = new Map<string, Phaser.GameObjects.Rectangle>();
 
-  private lastSentPosition = {
-    x: 0,
-    y: 0,
+  private otherPlayerTargets = new Map<string, { x: number; y: number }>();
+
+  private lastInput: PlayerInput = {
+    up: false,
+    down: false,
+    left: false,
+    right: false,
   };
 
   constructor() {
@@ -39,10 +48,9 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  private speed = 200;
-
   update(_: number, delta: number) {
-    this.handleMovement(delta);
+    this.handleInput();
+    this.interpolateOtherPlayers(delta);
   }
 
   private createPlayer() {
@@ -66,84 +74,31 @@ export class GameScene extends Phaser.Scene {
     }) as Record<"up" | "down" | "left" | "right", Phaser.Input.Keyboard.Key>;
   }
 
-  private handleMovement(delta: number) {
-    let directionX = 0;
-    let directionY = 0;
+  private handleInput() {
+    const input: PlayerInput = {
+      left: this.cursors.left.isDown || this.wasd.left.isDown,
 
-    const movingLeft = this.cursors.left.isDown || this.wasd.left.isDown;
-    const movingRight = this.cursors.right.isDown || this.wasd.right.isDown;
-    const movingUp = this.cursors.up.isDown || this.wasd.up.isDown;
-    const movingDown = this.cursors.down.isDown || this.wasd.down.isDown;
+      right: this.cursors.right.isDown || this.wasd.right.isDown,
 
-    if (movingLeft) {
-      directionX -= 1;
-    }
+      up: this.cursors.up.isDown || this.wasd.up.isDown,
 
-    if (movingRight) {
-      directionX += 1;
-    }
-
-    if (movingUp) {
-      directionY -= 1;
-    }
-
-    if (movingDown) {
-      directionY += 1;
-    }
-
-    if (directionX === 0 && directionY === 0) {
-      return;
-    }
-
-    const direction = new Phaser.Math.Vector2(
-      directionX,
-      directionY,
-    ).normalize();
-
-    const distance = PLAYER_SPEED * (delta / 1000);
-
-    this.player.x += direction.x * distance;
-
-    this.player.y += direction.y * distance;
-
-    this.clampPlayerPosition();
-
-    this.sendPlayerPosition();
-  }
-
-  private clampPlayerPosition() {
-    const halfPlayerSize = PLAYER_SIZE / 2;
-
-    this.player.x = Phaser.Math.Clamp(
-      this.player.x,
-      halfPlayerSize,
-      GAME_WIDTH - halfPlayerSize,
-    );
-
-    this.player.y = Phaser.Math.Clamp(
-      this.player.y,
-      halfPlayerSize,
-      GAME_HEIGHT - halfPlayerSize,
-    );
-  }
-
-  private sendPlayerPosition() {
-    const x = Math.round(this.player.x);
-    const y = Math.round(this.player.y);
-
-    if (x === this.lastSentPosition.x && y === this.lastSentPosition.y) {
-      return;
-    }
-
-    this.lastSentPosition = {
-      x,
-      y,
+      down: this.cursors.down.isDown || this.wasd.down.isDown,
     };
 
-    this.socket.emit("playerMove", {
-      x,
-      y,
-    });
+    if (this.hasInputChanged(input)) {
+      this.socket.emit("playerInput", input);
+
+      this.lastInput = input;
+    }
+  }
+
+  private hasInputChanged(input: PlayerInput) {
+    return (
+      input.up !== this.lastInput.up ||
+      input.down !== this.lastInput.down ||
+      input.left !== this.lastInput.left ||
+      input.right !== this.lastInput.right
+    );
   }
 
   private connectToServer() {
@@ -169,14 +124,27 @@ export class GameScene extends Phaser.Scene {
       this.addOtherPlayer(player);
     });
 
-    this.socket.on("playerMoved", (player: Player) => {
-      const otherPlayer = this.otherPlayers.get(player.id);
+    this.socket.on("playersState", (players: Record<string, Player>) => {
+      Object.values(players).forEach((player) => {
+        if (player.id === this.socket.id) {
+          this.updateLocalPlayer(player);
 
-      if (!otherPlayer) {
-        return;
-      }
+          return;
+        }
 
-      otherPlayer.setPosition(player.x, player.y);
+        const otherPlayer = this.otherPlayers.get(player.id);
+
+        if (!otherPlayer) {
+          this.addOtherPlayer(player);
+
+          return;
+        }
+
+        this.otherPlayerTargets.set(player.id, {
+          x: player.x,
+          y: player.y,
+        });
+      });
     });
 
     this.socket.on("playerDisconnected", (playerId: string) => {
@@ -189,7 +157,15 @@ export class GameScene extends Phaser.Scene {
       player.destroy();
 
       this.otherPlayers.delete(playerId);
+
+      this.otherPlayerTargets.delete(playerId);
     });
+  }
+
+  private updateLocalPlayer(player: Player) {
+    this.player.setPosition(player.x, player.y);
+
+    this.player.setFillStyle(player.color);
   }
 
   private addOtherPlayer(player: Player) {
@@ -206,5 +182,28 @@ export class GameScene extends Phaser.Scene {
     );
 
     this.otherPlayers.set(player.id, rectangle);
+
+    this.otherPlayerTargets.set(player.id, {
+      x: player.x,
+      y: player.y,
+    });
+  }
+
+  private interpolateOtherPlayers(delta: number) {
+    const interpolationRate = 12;
+
+    const alpha = 1 - Math.exp(-interpolationRate * (delta / 1000));
+
+    for (const [playerId, gameObject] of this.otherPlayers) {
+      const target = this.otherPlayerTargets.get(playerId);
+
+      if (!target) {
+        continue;
+      }
+
+      gameObject.x = Phaser.Math.Linear(gameObject.x, target.x, alpha);
+
+      gameObject.y = Phaser.Math.Linear(gameObject.y, target.y, alpha);
+    }
   }
 }
