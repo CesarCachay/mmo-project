@@ -1,11 +1,14 @@
 import Phaser from "phaser";
 import { io, Socket } from "socket.io-client";
 
-type Player = {
-  id: string;
-  x: number;
-  y: number;
-};
+import {
+  GAME_HEIGHT,
+  GAME_WIDTH,
+  PLAYER_COLORS,
+  PLAYER_SPEED,
+  PLAYER_SIZE,
+  type Player,
+} from "@cesar-mmo/shared";
 
 export class GameScene extends Phaser.Scene {
   private player!: Phaser.GameObjects.Rectangle;
@@ -16,7 +19,10 @@ export class GameScene extends Phaser.Scene {
 
   private otherPlayers = new Map<string, Phaser.GameObjects.Rectangle>();
 
-  private speed = 200;
+  private lastSentPosition = {
+    x: 0,
+    y: 0,
+  };
 
   constructor() {
     super("GameScene");
@@ -24,60 +30,120 @@ export class GameScene extends Phaser.Scene {
 
   create() {
     this.createPlayer();
-
     this.createControls();
-
     this.connectToServer();
 
-    this.add.text(20, 20, "MMO Client - Cesar Edition", {
+    this.add.text(20, 20, "MMO - Cesar Edition", {
       fontSize: "24px",
       color: "#ffffff",
     });
   }
+
+  private speed = 200;
 
   update(_: number, delta: number) {
     this.handleMovement(delta);
   }
 
   private createPlayer() {
-    this.player = this.add.rectangle(400, 300, 32, 32, 0x3498db);
+    this.player = this.add.rectangle(
+      GAME_WIDTH / 2,
+      GAME_HEIGHT / 2,
+      PLAYER_SIZE,
+      PLAYER_SIZE,
+      0x3498db,
+    );
   }
 
   private createControls() {
     this.cursors = this.input.keyboard!.createCursorKeys();
+
+    this.wasd = this.input.keyboard!.addKeys({
+      up: Phaser.Input.Keyboard.KeyCodes.W,
+      down: Phaser.Input.Keyboard.KeyCodes.S,
+      left: Phaser.Input.Keyboard.KeyCodes.A,
+      right: Phaser.Input.Keyboard.KeyCodes.D,
+    }) as Record<"up" | "down" | "left" | "right", Phaser.Input.Keyboard.Key>;
   }
 
   private handleMovement(delta: number) {
-    const distance = this.speed * (delta / 1000);
+    let directionX = 0;
+    let directionY = 0;
 
-    let moved = false;
+    const movingLeft = this.cursors.left.isDown || this.wasd.left.isDown;
+    const movingRight = this.cursors.right.isDown || this.wasd.right.isDown;
+    const movingUp = this.cursors.up.isDown || this.wasd.up.isDown;
+    const movingDown = this.cursors.down.isDown || this.wasd.down.isDown;
 
-    if (this.cursors.left.isDown) {
-      this.player.x -= distance;
-      moved = true;
+    if (movingLeft) {
+      directionX -= 1;
     }
 
-    if (this.cursors.right.isDown) {
-      this.player.x += distance;
-      moved = true;
+    if (movingRight) {
+      directionX += 1;
     }
 
-    if (this.cursors.up.isDown) {
-      this.player.y -= distance;
-      moved = true;
+    if (movingUp) {
+      directionY -= 1;
     }
 
-    if (this.cursors.down.isDown) {
-      this.player.y += distance;
-      moved = true;
+    if (movingDown) {
+      directionY += 1;
     }
 
-    if (moved) {
-      this.socket.emit("playerMove", {
-        x: this.player.x,
-        y: this.player.y,
-      });
+    if (directionX === 0 && directionY === 0) {
+      return;
     }
+
+    const direction = new Phaser.Math.Vector2(
+      directionX,
+      directionY,
+    ).normalize();
+
+    const distance = PLAYER_SPEED * (delta / 1000);
+
+    this.player.x += direction.x * distance;
+
+    this.player.y += direction.y * distance;
+
+    this.clampPlayerPosition();
+
+    this.sendPlayerPosition();
+  }
+
+  private clampPlayerPosition() {
+    const halfPlayerSize = PLAYER_SIZE / 2;
+
+    this.player.x = Phaser.Math.Clamp(
+      this.player.x,
+      halfPlayerSize,
+      GAME_WIDTH - halfPlayerSize,
+    );
+
+    this.player.y = Phaser.Math.Clamp(
+      this.player.y,
+      halfPlayerSize,
+      GAME_HEIGHT - halfPlayerSize,
+    );
+  }
+
+  private sendPlayerPosition() {
+    const x = Math.round(this.player.x);
+    const y = Math.round(this.player.y);
+
+    if (x === this.lastSentPosition.x && y === this.lastSentPosition.y) {
+      return;
+    }
+
+    this.lastSentPosition = {
+      x,
+      y,
+    };
+
+    this.socket.emit("playerMove", {
+      x,
+      y,
+    });
   }
 
   private connectToServer() {
@@ -131,7 +197,13 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    const rectangle = this.add.rectangle(player.x, player.y, 32, 32, 0xe74c3c);
+    const rectangle = this.add.rectangle(
+      player.x,
+      player.y,
+      PLAYER_SIZE,
+      PLAYER_SIZE,
+      player.color,
+    );
 
     this.otherPlayers.set(player.id, rectangle);
   }

@@ -10,11 +10,14 @@ import {
 
 import { Server, Socket } from 'socket.io';
 
-type Player = {
-  id: string;
-  x: number;
-  y: number;
-};
+import {
+  GAME_HEIGHT,
+  GAME_WIDTH,
+  PLAYER_COLORS,
+  PLAYER_SIZE,
+  type Player,
+  type PlayerPosition,
+} from '@cesar-mmo/shared';
 
 @WebSocketGateway({
   cors: {
@@ -27,16 +30,23 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private players: Record<string, Player> = {};
 
+  private nextColorIndex = 0;
+
   handleConnection(client: Socket) {
-    console.log(`Player connected: ${client.id}`);
+    const color = PLAYER_COLORS[this.nextColorIndex % PLAYER_COLORS.length];
+
+    this.nextColorIndex++;
 
     const newPlayer: Player = {
       id: client.id,
-      x: 400,
-      y: 300,
+      x: GAME_WIDTH / 2,
+      y: GAME_HEIGHT / 2,
+      color,
     };
 
     this.players[client.id] = newPlayer;
+
+    console.log(`Player connected: ${client.id}`);
 
     client.emit('currentPlayers', this.players);
 
@@ -54,7 +64,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('playerMove')
   handlePlayerMove(
     @ConnectedSocket() client: Socket,
-    @MessageBody() position: { x: number; y: number },
+    @MessageBody() position: PlayerPosition,
   ) {
     const player = this.players[client.id];
 
@@ -62,8 +72,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
 
-    player.x = position.x;
-    player.y = position.y;
+    const halfPlayerSize = PLAYER_SIZE / 2;
+
+    player.x = Math.max(
+      halfPlayerSize,
+      Math.min(GAME_WIDTH - halfPlayerSize, position.x),
+    );
+
+    player.y = Math.max(
+      halfPlayerSize,
+      Math.min(GAME_HEIGHT - halfPlayerSize, position.y),
+    );
 
     client.broadcast.emit('playerMoved', player);
   }

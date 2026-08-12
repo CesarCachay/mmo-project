@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "dev": "pnpm --filter @cesar-mmo/shared build && pnpm -r --parallel --filter client --filter server --filter @cesar-mmo/shared run dev",
     "dev:client": "pnpm --filter client dev",
-    "dev:server": "pnpm --filter server start:dev"
+    "dev:server": "pnpm --filter server dev",
+    "dev:shared": "pnpm --filter @cesar-mmo/shared dev"
   }
 }
