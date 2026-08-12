@@ -17,9 +17,8 @@ import {
   GAME_HEIGHT,
   GAME_WIDTH,
   PLAYER_COLORS,
-  PLAYER_SIZE,
-  PLAYER_SPEED,
   SERVER_TICK_RATE,
+  applyPlayerMovement,
 } from '@cesar-mmo/shared';
 
 import type { Player, PlayerInput } from '@cesar-mmo/shared';
@@ -67,11 +66,13 @@ export class GameGateway
       x: GAME_WIDTH / 2,
       y: GAME_HEIGHT / 2,
       color,
+      lastProcessedInputSequence: 0,
     };
 
     this.players[client.id] = newPlayer;
 
     this.playerInputs[client.id] = {
+      sequence: 0,
       up: false,
       down: false,
       left: false,
@@ -98,11 +99,19 @@ export class GameGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() input: PlayerInput,
   ) {
-    if (!this.players[client.id]) {
+    const player = this.players[client.id];
+
+    if (!player) {
+      return;
+    }
+
+    if (input.sequence <= player.lastProcessedInputSequence) {
       return;
     }
 
     this.playerInputs[client.id] = input;
+
+    player.lastProcessedInputSequence = input.sequence;
   }
 
   private startGameLoop() {
@@ -134,54 +143,9 @@ export class GameGateway
     input: PlayerInput,
     deltaSeconds: number,
   ) {
-    let directionX = 0;
-    let directionY = 0;
+    const updatedPlayer = applyPlayerMovement(player, input, deltaSeconds);
 
-    if (input.left) {
-      directionX -= 1;
-    }
-
-    if (input.right) {
-      directionX += 1;
-    }
-
-    if (input.up) {
-      directionY -= 1;
-    }
-
-    if (input.down) {
-      directionY += 1;
-    }
-
-    if (directionX === 0 && directionY === 0) {
-      return;
-    }
-
-    const magnitude = Math.sqrt(
-      directionX * directionX + directionY * directionY,
-    );
-
-    directionX /= magnitude;
-    directionY /= magnitude;
-
-    player.x += directionX * PLAYER_SPEED * deltaSeconds;
-
-    player.y += directionY * PLAYER_SPEED * deltaSeconds;
-
-    this.clampPlayerPosition(player);
-  }
-
-  private clampPlayerPosition(player: Player) {
-    const halfPlayerSize = PLAYER_SIZE / 2;
-
-    player.x = Math.max(
-      halfPlayerSize,
-      Math.min(GAME_WIDTH - halfPlayerSize, player.x),
-    );
-
-    player.y = Math.max(
-      halfPlayerSize,
-      Math.min(GAME_HEIGHT - halfPlayerSize, player.y),
-    );
+    player.x = updatedPlayer.x;
+    player.y = updatedPlayer.y;
   }
 }
