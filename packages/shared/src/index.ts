@@ -1,8 +1,8 @@
 export type { Player, PlayerInput } from "./game.types.js";
 
 export {
-  GAME_HEIGHT,
-  GAME_WIDTH,
+  VIEWPORT_HEIGHT,
+  VIEWPORT_WIDTH,
   PLAYER_COLORS,
   PLAYER_SIZE,
   PLAYER_SPEED,
@@ -14,3 +14,9 @@ export {
   clampPlayerPosition,
   applyPlayerMovement,
 } from "./game.movement.js";
+
+export { TOWN_01_MAP } from "./maps/generated/town-01.js";
+
+export { isPositionWalkable, resolveMapCollision } from "./maps/collision.js";
+
+export type { CollisionMap, Position } from "./maps/collision.js";

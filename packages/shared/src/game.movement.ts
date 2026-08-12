@@ -1,6 +1,6 @@
 import {
-  GAME_HEIGHT,
-  GAME_WIDTH,
+  VIEWPORT_HEIGHT,
+  VIEWPORT_WIDTH,
   PLAYER_SIZE,
   PLAYER_SPEED,
 } from "./game.constants.js";
@@ -63,12 +63,12 @@ export function clampPlayerPosition(position: { x: number; y: number }) {
   return {
     x: Math.max(
       halfPlayerSize,
-      Math.min(GAME_WIDTH - halfPlayerSize, position.x),
+      Math.min(VIEWPORT_WIDTH - halfPlayerSize, position.x),
     ),
 
     y: Math.max(
       halfPlayerSize,
-      Math.min(GAME_HEIGHT - halfPlayerSize, position.y),
+      Math.min(VIEWPORT_HEIGHT - halfPlayerSize, position.y),
     ),
   };
 }

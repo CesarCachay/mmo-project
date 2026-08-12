@@ -2,17 +2,21 @@ import Phaser from "phaser";
 import { io, Socket } from "socket.io-client";
 
 import {
-  GAME_HEIGHT,
-  GAME_WIDTH,
+  TOWN_01_MAP,
+  VIEWPORT_HEIGHT,
+  VIEWPORT_WIDTH,
   PLAYER_SIZE,
   getMovementDelta,
   clampPlayerPosition,
+  resolveMapCollision,
 } from "@cesar-mmo/shared";
 
 import type { Player, PlayerInput } from "@cesar-mmo/shared";
 
 export class GameScene extends Phaser.Scene {
   private player!: Phaser.GameObjects.Rectangle;
+
+  private map!: Phaser.Tilemaps.Tilemap;
 
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
 
@@ -38,15 +42,24 @@ export class GameScene extends Phaser.Scene {
   private inputSequence = 0;
 
   private serverPosition = {
-    x: GAME_WIDTH / 2,
-    y: GAME_HEIGHT / 2,
+    x: VIEWPORT_WIDTH / 2,
+    y: VIEWPORT_HEIGHT / 2,
   };
 
   constructor() {
     super("GameScene");
   }
 
+  preload() {
+    this.load.tilemapTiledJSON("town-01", "/assets/maps/town-01/town-01.json");
+
+    this.load.image("town-terrain", "/assets/maps/town-01/poke-sheet.png");
+
+    this.load.image("town-buildings", "/assets/maps/town-01/poke-assets.png");
+  }
+
   create() {
+    this.createMap();
     this.createPlayer();
     this.createControls();
     this.connectToServer();
@@ -70,13 +83,20 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createPlayer() {
+    const spawn = this.getPlayerSpawn();
+
     this.player = this.add.rectangle(
-      GAME_WIDTH / 2,
-      GAME_HEIGHT / 2,
+      spawn.x,
+      spawn.y,
       PLAYER_SIZE,
       PLAYER_SIZE,
       0x3498db,
     );
+
+    this.serverPosition = {
+      x: spawn.x,
+      y: spawn.y,
+    };
   }
 
   private createControls() {
@@ -245,7 +265,17 @@ export class GameScene extends Phaser.Scene {
       y: this.player.y + movement.y,
     });
 
-    this.player.setPosition(nextPosition.x, nextPosition.y);
+    const resolvedPosition = resolveMapCollision(
+      {
+        x: this.player.x,
+        y: this.player.y,
+      },
+      nextPosition,
+      PLAYER_SIZE,
+      TOWN_01_MAP,
+    );
+
+    this.player.setPosition(resolvedPosition.x, resolvedPosition.y);
   }
 
   private reconcileLocalPlayer(delta: number) {
@@ -284,5 +314,65 @@ export class GameScene extends Phaser.Scene {
       this.serverPosition.y,
       alpha,
     );
+  }
+
+  private createMap() {
+    this.map = this.make.tilemap({
+      key: "town-01",
+    });
+
+    const terrainTileset = this.map.addTilesetImage(
+      "town-terrain",
+      "town-terrain",
+    );
+
+    const buildingsTileset = this.map.addTilesetImage(
+      "town-buildings",
+      "town-buildings",
+    );
+
+    if (!terrainTileset || !buildingsTileset) {
+      throw new Error("Could not load Tiled tilesets");
+    }
+
+    const tilesets = [terrainTileset, buildingsTileset];
+
+    this.map.createLayer("Ground", tilesets, 0, 0);
+
+    this.map.createLayer("GroundDetails", tilesets, 0, 0);
+
+    this.map.createLayer("Buildings", tilesets, 0, 0);
+
+    this.cameras.main.setBounds(
+      0,
+      0,
+      this.map.widthInPixels,
+      this.map.heightInPixels,
+    );
+  }
+
+  private getPlayerSpawn() {
+    const objectsLayer = this.map.getObjectLayer("Objects");
+
+    if (!objectsLayer) {
+      throw new Error('Object layer "Objects" not found');
+    }
+
+    const playerSpawn = objectsLayer.objects.find(
+      (object) => object.name === "playerSpawn",
+    );
+
+    if (
+      !playerSpawn ||
+      playerSpawn.x === undefined ||
+      playerSpawn.y === undefined
+    ) {
+      throw new Error('Object "playerSpawn" not found');
+    }
+
+    return {
+      x: playerSpawn.x,
+      y: playerSpawn.y,
+    };
   }
 }

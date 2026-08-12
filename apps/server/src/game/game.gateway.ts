@@ -14,11 +14,12 @@ import { OnModuleDestroy } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 
 import {
-  GAME_HEIGHT,
-  GAME_WIDTH,
+  TOWN_01_MAP,
+  PLAYER_SIZE,
   PLAYER_COLORS,
   SERVER_TICK_RATE,
   applyPlayerMovement,
+  resolveMapCollision,
 } from '@cesar-mmo/shared';
 
 import type { Player, PlayerInput } from '@cesar-mmo/shared';
@@ -63,8 +64,8 @@ export class GameGateway
 
     const newPlayer: Player = {
       id: client.id,
-      x: GAME_WIDTH / 2,
-      y: GAME_HEIGHT / 2,
+      x: TOWN_01_MAP.spawn.x,
+      y: TOWN_01_MAP.spawn.y,
       color,
       lastProcessedInputSequence: 0,
     };
@@ -145,7 +146,20 @@ export class GameGateway
   ) {
     const updatedPlayer = applyPlayerMovement(player, input, deltaSeconds);
 
-    player.x = updatedPlayer.x;
-    player.y = updatedPlayer.y;
+    const resolvedPosition = resolveMapCollision(
+      {
+        x: player.x,
+        y: player.y,
+      },
+      {
+        x: updatedPlayer.x,
+        y: updatedPlayer.y,
+      },
+      PLAYER_SIZE,
+      TOWN_01_MAP,
+    );
+
+    player.x = resolvedPosition.x;
+    player.y = resolvedPosition.y;
   }
 }
