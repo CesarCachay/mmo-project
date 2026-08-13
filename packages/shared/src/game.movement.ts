@@ -1,11 +1,6 @@
-import {
-  VIEWPORT_HEIGHT,
-  VIEWPORT_WIDTH,
-  PLAYER_SIZE,
-  PLAYER_SPEED,
-} from "./game.constants.js";
+import { PLAYER_SPEED } from "./game.constants.js";
 
-import type { Player, PlayerInput } from "./game.types.js";
+import type { Player, PlayerInput, Direction } from "./game.types.js";
 
 export type MovementDelta = {
   x: number;
@@ -57,22 +52,6 @@ export function getMovementDelta(
   };
 }
 
-export function clampPlayerPosition(position: { x: number; y: number }) {
-  const halfPlayerSize = PLAYER_SIZE / 2;
-
-  return {
-    x: Math.max(
-      halfPlayerSize,
-      Math.min(VIEWPORT_WIDTH - halfPlayerSize, position.x),
-    ),
-
-    y: Math.max(
-      halfPlayerSize,
-      Math.min(VIEWPORT_HEIGHT - halfPlayerSize, position.y),
-    ),
-  };
-}
-
 export function applyPlayerMovement(
   player: Player,
   input: PlayerInput,
@@ -80,14 +59,36 @@ export function applyPlayerMovement(
 ) {
   const movement = getMovementDelta(input, deltaSeconds);
 
-  const nextPosition = clampPlayerPosition({
-    x: player.x + movement.x,
-    y: player.y + movement.y,
-  });
-
   return {
     ...player,
-    x: nextPosition.x,
-    y: nextPosition.y,
+    x: player.x + movement.x,
+    y: player.y + movement.y,
   };
+}
+
+export function getDirectionFromInput(
+  input: PlayerInput,
+  currentDirection: Direction,
+): Direction {
+  if (input.left) {
+    return "left";
+  }
+
+  if (input.right) {
+    return "right";
+  }
+
+  if (input.up) {
+    return "up";
+  }
+
+  if (input.down) {
+    return "down";
+  }
+
+  return currentDirection;
+}
+
+export function isPlayerMoving(input: PlayerInput): boolean {
+  return input.up || input.down || input.left || input.right;
 }

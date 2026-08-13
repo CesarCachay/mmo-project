@@ -3,18 +3,17 @@ import { io, Socket } from "socket.io-client";
 
 import {
   TOWN_01_MAP,
-  VIEWPORT_HEIGHT,
-  VIEWPORT_WIDTH,
   PLAYER_SIZE,
   getMovementDelta,
-  clampPlayerPosition,
   resolveMapCollision,
+  isPlayerMoving,
+  getDirectionFromInput,
 } from "@cesar-mmo/shared";
 
-import type { Player, PlayerInput } from "@cesar-mmo/shared";
+import type { Player, PlayerInput, Direction } from "@cesar-mmo/shared";
 
 export class GameScene extends Phaser.Scene {
-  private player!: Phaser.GameObjects.Rectangle;
+  private player!: Phaser.GameObjects.Sprite;
 
   private map!: Phaser.Tilemaps.Tilemap;
 
@@ -27,7 +26,7 @@ export class GameScene extends Phaser.Scene {
 
   private socket!: Socket;
 
-  private otherPlayers = new Map<string, Phaser.GameObjects.Rectangle>();
+  private otherPlayers = new Map<string, Phaser.GameObjects.Sprite>();
 
   private otherPlayerTargets = new Map<string, { x: number; y: number }>();
 
@@ -41,10 +40,12 @@ export class GameScene extends Phaser.Scene {
 
   private inputSequence = 0;
 
-  private serverPosition = {
-    x: VIEWPORT_WIDTH / 2,
-    y: VIEWPORT_HEIGHT / 2,
+  private serverPosition!: {
+    x: number;
+    y: number;
   };
+
+  private playerDirection: Direction = "down";
 
   constructor() {
     super("GameScene");
@@ -56,11 +57,46 @@ export class GameScene extends Phaser.Scene {
     this.load.image("town-terrain", "/assets/maps/town-01/poke-sheet.png");
 
     this.load.image("town-buildings", "/assets/maps/town-01/poke-assets.png");
+
+    this.load.spritesheet(
+      "player-walk-down",
+      "/assets/characters/player/walk-down.png",
+      {
+        frameWidth: 24,
+        frameHeight: 24,
+      },
+    );
+    this.load.spritesheet(
+      "player-walk-left",
+      "/assets/characters/player/walk-left.png",
+      {
+        frameWidth: 24,
+        frameHeight: 24,
+      },
+    );
+    this.load.spritesheet(
+      "player-walk-right",
+      "/assets/characters/player/walk-right.png",
+      {
+        frameWidth: 24,
+        frameHeight: 24,
+      },
+    );
+    this.load.spritesheet(
+      "player-walk-up",
+      "/assets/characters/player/walk-up.png",
+      {
+        frameWidth: 24,
+        frameHeight: 24,
+      },
+    );
   }
 
   create() {
     this.createMap();
+    this.createPlayerAnimations();
     this.createPlayer();
+    this.setupCamera();
     this.createControls();
     this.connectToServer();
 
@@ -72,6 +108,8 @@ export class GameScene extends Phaser.Scene {
 
   update(_: number, delta: number) {
     const input = this.getCurrentInput();
+
+    this.updatePlayerAnimation(input);
 
     this.sendInputIfChanged(input);
 
@@ -85,13 +123,9 @@ export class GameScene extends Phaser.Scene {
   private createPlayer() {
     const spawn = this.getPlayerSpawn();
 
-    this.player = this.add.rectangle(
-      spawn.x,
-      spawn.y,
-      PLAYER_SIZE,
-      PLAYER_SIZE,
-      0x3498db,
-    );
+    this.player = this.add.sprite(spawn.x, spawn.y, "player-walk-down", 0);
+
+    this.player.setDepth(5);
 
     this.serverPosition = {
       x: spawn.x,
@@ -191,6 +225,8 @@ export class GameScene extends Phaser.Scene {
           x: player.x,
           y: player.y,
         });
+
+        this.updateRemotePlayerAnimation(otherPlayer, player);
       });
     });
 
@@ -214,8 +250,6 @@ export class GameScene extends Phaser.Scene {
       x: player.x,
       y: player.y,
     };
-
-    this.player.setFillStyle(player.color);
   }
 
   private addOtherPlayer(player: Player) {
@@ -223,20 +257,23 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    const rectangle = this.add.rectangle(
+    const sprite = this.add.sprite(
       player.x,
       player.y,
-      PLAYER_SIZE,
-      PLAYER_SIZE,
-      player.color,
+      `player-walk-${player.direction}`,
+      0,
     );
 
-    this.otherPlayers.set(player.id, rectangle);
+    sprite.setDepth(5);
+
+    this.otherPlayers.set(player.id, sprite);
 
     this.otherPlayerTargets.set(player.id, {
       x: player.x,
       y: player.y,
     });
+
+    this.updateRemotePlayerAnimation(sprite, player);
   }
 
   private interpolateOtherPlayers(delta: number) {
@@ -260,10 +297,10 @@ export class GameScene extends Phaser.Scene {
   private predictLocalMovement(input: PlayerInput, delta: number) {
     const movement = getMovementDelta(input, delta / 1000);
 
-    const nextPosition = clampPlayerPosition({
+    const nextPosition = {
       x: this.player.x + movement.x,
       y: this.player.y + movement.y,
-    });
+    };
 
     const resolvedPosition = resolveMapCollision(
       {
@@ -343,12 +380,28 @@ export class GameScene extends Phaser.Scene {
 
     this.map.createLayer("Buildings", tilesets, 0, 0);
 
-    this.cameras.main.setBounds(
+    const groundLayer = this.map.createLayer("Ground", tilesets, 0, 0);
+
+    const groundDetailsLayer = this.map.createLayer(
+      "GroundDetails",
+      tilesets,
       0,
       0,
-      this.map.widthInPixels,
-      this.map.heightInPixels,
     );
+
+    const buildingsLayer = this.map.createLayer("Buildings", tilesets, 0, 0);
+
+    const abovePlayerLayer = this.map.createLayer(
+      "AbovePlayer",
+      tilesets,
+      0,
+      0,
+    );
+
+    groundLayer?.setDepth(0);
+    groundDetailsLayer?.setDepth(1);
+    buildingsLayer?.setDepth(2);
+    abovePlayerLayer?.setDepth(10);
   }
 
   private getPlayerSpawn() {
@@ -374,5 +427,92 @@ export class GameScene extends Phaser.Scene {
       x: playerSpawn.x,
       y: playerSpawn.y,
     };
+  }
+
+  private createPlayerAnimations() {
+    this.anims.create({
+      key: "walk-down",
+      frames: this.anims.generateFrameNumbers("player-walk-down", {
+        start: 0,
+        end: 11,
+      }),
+      frameRate: 12,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "walk-left",
+      frames: this.anims.generateFrameNumbers("player-walk-left", {
+        start: 0,
+        end: 11,
+      }),
+      frameRate: 12,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "walk-right",
+      frames: this.anims.generateFrameNumbers("player-walk-right", {
+        start: 0,
+        end: 11,
+      }),
+      frameRate: 12,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "walk-up",
+      frames: this.anims.generateFrameNumbers("player-walk-up", {
+        start: 0,
+        end: 11,
+      }),
+      frameRate: 12,
+      repeat: -1,
+    });
+  }
+
+  private updatePlayerAnimation(input: PlayerInput) {
+    this.playerDirection = getDirectionFromInput(input, this.playerDirection);
+
+    const moving = isPlayerMoving(input);
+
+    if (!moving) {
+      this.setPlayerIdle();
+
+      return;
+    }
+
+    this.player.play(`walk-${this.playerDirection}`, true);
+  }
+
+  private setPlayerIdle() {
+    this.player.anims.stop();
+
+    this.player.setTexture(`player-walk-${this.playerDirection}`, 0);
+  }
+
+  private updateRemotePlayerAnimation(
+    sprite: Phaser.GameObjects.Sprite,
+    player: Player,
+  ) {
+    if (player.isMoving) {
+      sprite.play(`walk-${player.direction}`, true);
+
+      return;
+    }
+
+    sprite.anims.stop();
+    sprite.setTexture(`player-walk-${player.direction}`, 0);
+  }
+
+  private setupCamera() {
+    this.cameras.main.setBounds(
+      0,
+      0,
+      this.map.widthInPixels,
+      this.map.heightInPixels,
+    );
+
+    this.cameras.main.startFollow(this.player, true);
   }
 }

@@ -20,6 +20,8 @@ import {
   SERVER_TICK_RATE,
   applyPlayerMovement,
   resolveMapCollision,
+  isPlayerMoving,
+  getDirectionFromInput,
 } from '@cesar-mmo/shared';
 
 import type { Player, PlayerInput } from '@cesar-mmo/shared';
@@ -67,6 +69,8 @@ export class GameGateway
       x: TOWN_01_MAP.spawn.x,
       y: TOWN_01_MAP.spawn.y,
       color,
+      direction: 'down',
+      isMoving: false,
       lastProcessedInputSequence: 0,
     };
 
@@ -144,6 +148,9 @@ export class GameGateway
     input: PlayerInput,
     deltaSeconds: number,
   ) {
+    player.direction = getDirectionFromInput(input, player.direction);
+    player.isMoving = isPlayerMoving(input);
+
     const updatedPlayer = applyPlayerMovement(player, input, deltaSeconds);
 
     const resolvedPosition = resolveMapCollision(

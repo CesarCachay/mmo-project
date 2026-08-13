@@ -3,6 +3,8 @@ export type Player = {
   x: number;
   y: number;
   color: number;
+  direction: Direction;
+  isMoving: boolean;
   lastProcessedInputSequence: number;
 };
 
@@ -13,3 +15,5 @@ export type PlayerInput = {
   left: boolean;
   right: boolean;
 };
+
+export type Direction = "up" | "down" | "left" | "right";

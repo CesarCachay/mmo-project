@@ -1,6 +1,3 @@
-export const VIEWPORT_WIDTH = 800;
-export const VIEWPORT_HEIGHT = 600;
-
 export const PLAYER_SIZE = 16;
 export const PLAYER_SPEED = 200;
 

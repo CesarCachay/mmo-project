@@ -1,9 +1,9 @@
 import Phaser from "phaser";
 import "./style.css";
 
-import { VIEWPORT_HEIGHT, VIEWPORT_WIDTH } from "@cesar-mmo/shared";
-
 import { GameScene } from "./game/GameScene";
+
+import { VIEWPORT_HEIGHT, VIEWPORT_WIDTH } from "./game/game.constants";
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
