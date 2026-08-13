@@ -60,12 +60,33 @@ export class GameGateway
   }
 
   handleConnection(client: Socket) {
+    const displayName = this.getRequestedDisplayName(client);
+
+    if (!displayName) {
+      client.emit('connectionRejected', {
+        code: 'INVALID_DISPLAY_NAME',
+        message: 'Player name must contain between 3 and 16 characters.',
+      });
+      client.disconnect(true);
+      return;
+    }
+
+    if (this.isDisplayNameInUse(displayName)) {
+      client.emit('connectionRejected', {
+        code: 'NAME_ALREADY_IN_USE',
+        message: 'That player name is already in use.',
+      });
+      client.disconnect(true);
+      return;
+    }
+
     const color = PLAYER_COLORS[this.nextColorIndex % PLAYER_COLORS.length];
 
     this.nextColorIndex++;
 
     const newPlayer: Player = {
       id: client.id,
+      displayName,
       x: TOWN_01_MAP.spawn.x,
       y: TOWN_01_MAP.spawn.y,
       color,
@@ -94,7 +115,15 @@ export class GameGateway
   handleDisconnect(client: Socket) {
     console.log(`Player disconnected: ${client.id}`);
 
+    const player = this.players[client.id];
+    if (!player) {
+      return;
+    }
+
+    console.log(`Player disconnected: ${client.id}`);
+
     delete this.players[client.id];
+    delete this.playerInputs[client.id];
 
     this.server.emit('playerDisconnected', client.id);
   }
@@ -168,5 +197,36 @@ export class GameGateway
 
     player.x = resolvedPosition.x;
     player.y = resolvedPosition.y;
+  }
+
+  private getRequestedDisplayName(client: Socket): string | null {
+    const auth: unknown = client.handshake.auth;
+
+    if (typeof auth !== 'object' || auth === null) {
+      return null;
+    }
+
+    const { displayName } = auth as Record<string, unknown>;
+
+    if (typeof displayName !== 'string') {
+      return null;
+    }
+
+    const normalizedDisplayName = displayName.trim();
+
+    if (normalizedDisplayName.length < 3 || normalizedDisplayName.length > 16) {
+      return null;
+    }
+
+    return normalizedDisplayName;
+  }
+
+  private isDisplayNameInUse(displayName: string): boolean {
+    const normalizedDisplayName = displayName.trim().toLowerCase();
+
+    return Object.values(this.players).some(
+      (player) =>
+        player.displayName.trim().toLowerCase() === normalizedDisplayName,
+    );
   }
 }

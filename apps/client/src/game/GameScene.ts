@@ -27,8 +27,10 @@ export class GameScene extends Phaser.Scene {
   private socket!: Socket;
 
   private otherPlayers = new Map<string, Phaser.GameObjects.Sprite>();
-
   private otherPlayerTargets = new Map<string, { x: number; y: number }>();
+
+  private playerNameLabel?: Phaser.GameObjects.Text;
+  private otherPlayerNameLabels = new Map<string, Phaser.GameObjects.Text>();
 
   private lastInput: PlayerInput = {
     sequence: 0,
@@ -47,8 +49,14 @@ export class GameScene extends Phaser.Scene {
 
   private playerDirection: Direction = "down";
 
+  private displayName = "";
+
   constructor() {
     super("GameScene");
+  }
+
+  init(data: { displayName: string }) {
+    this.displayName = data.displayName;
   }
 
   preload() {
@@ -100,8 +108,8 @@ export class GameScene extends Phaser.Scene {
     this.createControls();
     this.connectToServer();
 
-    this.add.text(20, 20, "MMO - Cesar Edition", {
-      fontSize: "24px",
+    this.add.text(8, 8, "MMO - Cesar Edition", {
+      fontSize: "16px",
       color: "#ffffff",
     });
   }
@@ -118,6 +126,8 @@ export class GameScene extends Phaser.Scene {
     this.reconcileLocalPlayer(delta);
 
     this.interpolateOtherPlayers(delta);
+
+    this.updateLocalPlayerNamePosition();
   }
 
   private createPlayer() {
@@ -134,6 +144,14 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createControls() {
+    const keyboard = this.input.keyboard;
+
+    if (!keyboard) {
+      throw new Error("Keyboard input is not available");
+    }
+
+    keyboard.enableGlobalCapture();
+
     this.cursors = this.input.keyboard!.createCursorKeys();
 
     this.wasd = this.input.keyboard!.addKeys({
@@ -185,17 +203,35 @@ export class GameScene extends Phaser.Scene {
   }
 
   private connectToServer() {
-    this.socket = io("http://localhost:3000");
+    this.socket = io("http://localhost:3000", {
+      auth: {
+        displayName: this.displayName,
+      },
+    });
+
+    this.socket.on(
+      "connectionRejected",
+      (error: { code: string; message: string }) => {
+        this.socket.disconnect();
+
+        this.scene.start("JoinScene", {
+          errorMessage: error.message,
+          displayName: this.displayName,
+        });
+      },
+    );
 
     this.socket.on("connect", () => {
       console.log("Connected:", this.socket.id);
     });
 
     this.socket.on("currentPlayers", (players: Record<string, Player>) => {
+      console.log("Numero de players:", players);
+
       Object.values(players).forEach((player) => {
         if (player.id === this.socket.id) {
           this.player.setPosition(player.x, player.y);
-
+          this.playerNameLabel = this.createPlayerNameLabel(player.displayName);
           return;
         }
 
@@ -239,9 +275,12 @@ export class GameScene extends Phaser.Scene {
 
       player.destroy();
 
-      this.otherPlayers.delete(playerId);
+      const nameLabel = this.otherPlayerNameLabels.get(playerId);
+      nameLabel?.destroy();
 
+      this.otherPlayers.delete(playerId);
       this.otherPlayerTargets.delete(playerId);
+      this.otherPlayerNameLabels.delete(playerId);
     });
   }
 
@@ -250,6 +289,17 @@ export class GameScene extends Phaser.Scene {
       x: player.x,
       y: player.y,
     };
+  }
+
+  private updateLocalPlayerNamePosition() {
+    if (!this.playerNameLabel) {
+      return;
+    }
+
+    this.playerNameLabel.setPosition(
+      Math.round(this.player.x),
+      Math.round(this.player.y - 14),
+    );
   }
 
   private addOtherPlayer(player: Player) {
@@ -267,6 +317,10 @@ export class GameScene extends Phaser.Scene {
     sprite.setDepth(5);
 
     this.otherPlayers.set(player.id, sprite);
+
+    const nameLabel = this.createPlayerNameLabel(player.displayName);
+
+    this.otherPlayerNameLabels.set(player.id, nameLabel);
 
     this.otherPlayerTargets.set(player.id, {
       x: player.x,
@@ -289,8 +343,16 @@ export class GameScene extends Phaser.Scene {
       }
 
       gameObject.x = Phaser.Math.Linear(gameObject.x, target.x, alpha);
-
       gameObject.y = Phaser.Math.Linear(gameObject.y, target.y, alpha);
+
+      const nameLabel = this.otherPlayerNameLabels.get(playerId);
+
+      if (nameLabel) {
+        nameLabel.setPosition(
+          Math.round(gameObject.x),
+          Math.round(gameObject.y - 14),
+        );
+      }
     }
   }
 
@@ -373,12 +435,6 @@ export class GameScene extends Phaser.Scene {
     }
 
     const tilesets = [terrainTileset, buildingsTileset];
-
-    this.map.createLayer("Ground", tilesets, 0, 0);
-
-    this.map.createLayer("GroundDetails", tilesets, 0, 0);
-
-    this.map.createLayer("Buildings", tilesets, 0, 0);
 
     const groundLayer = this.map.createLayer("Ground", tilesets, 0, 0);
 
@@ -514,5 +570,18 @@ export class GameScene extends Phaser.Scene {
     );
 
     this.cameras.main.startFollow(this.player, true);
+  }
+
+  private createPlayerNameLabel(displayName: string): Phaser.GameObjects.Text {
+    return this.add
+      .text(0, 0, displayName, {
+        fontFamily: "Arial",
+        fontSize: "10px",
+        color: "#ffffff",
+        stroke: "#000000",
+        strokeThickness: 1,
+      })
+      .setOrigin(0.5, 1)
+      .setDepth(20);
   }
 }

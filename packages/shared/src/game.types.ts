@@ -3,8 +3,9 @@ export type Player = {
   x: number;
   y: number;
   color: number;
-  direction: Direction;
   isMoving: boolean;
+  direction: Direction;
+  displayName: string;
   lastProcessedInputSequence: number;
 };
 
