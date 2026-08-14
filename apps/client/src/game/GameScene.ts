@@ -19,6 +19,8 @@ import {
   getNpcTextureKey,
 } from "./config/npcAssets";
 
+import { DialogueBox } from "./ui/DialogueBox";
+
 type NpcDirection = "up" | "down" | "left" | "right";
 
 type TiledCustomProperty = {
@@ -54,6 +56,8 @@ export class GameScene extends Phaser.Scene {
     Phaser.Input.Keyboard.Key
   >;
 
+  private interactKey!: Phaser.Input.Keyboard.Key;
+
   private socket!: Socket;
 
   private otherPlayers = new Map<string, Phaser.GameObjects.Sprite>();
@@ -63,6 +67,9 @@ export class GameScene extends Phaser.Scene {
   private otherPlayerNameLabels = new Map<string, Phaser.GameObjects.Text>();
 
   private npcs = new Map<string, NpcInstance>();
+  private nearbyNpc?: NpcInstance;
+  private readonly npcInteractionDistance = 36;
+  private dialogueBox!: DialogueBox;
 
   private lastInput: PlayerInput = {
     sequence: 0,
@@ -140,6 +147,7 @@ export class GameScene extends Phaser.Scene {
     this.createPlayer();
     this.createNpcs();
     this.setupCamera();
+    this.createDialogueUi();
     this.createControls();
     this.connectToServer();
 
@@ -150,19 +158,20 @@ export class GameScene extends Phaser.Scene {
   }
 
   update(_: number, delta: number) {
+    this.updateNearbyNpc();
+    this.handleNpcInteraction();
+
     const input = this.getCurrentInput();
-
     this.updatePlayerAnimation(input);
-
     this.sendInputIfChanged(input);
-
     this.predictLocalMovement(input, delta);
-
     this.reconcileLocalPlayer(delta);
-
     this.interpolateOtherPlayers(delta);
-
     this.updateLocalPlayerNamePosition();
+  }
+
+  private createDialogueUi() {
+    this.dialogueBox = new DialogueBox(this);
   }
 
   private createPlayer() {
@@ -176,6 +185,18 @@ export class GameScene extends Phaser.Scene {
       x: spawn.x,
       y: spawn.y,
     };
+  }
+
+  private updateNearbyNpc() {
+    const previousNpc = this.nearbyNpc;
+    this.nearbyNpc = this.findNearbyNpc();
+    if (previousNpc?.definition.id !== this.nearbyNpc?.definition.id) {
+      console.log("Nearby NPC:", this.nearbyNpc?.definition.id ?? "none");
+    }
+  }
+
+  private interactWithNpc(npc: NpcInstance) {
+    this.dialogueBox.show(npc.definition.displayName, npc.definition.dialogue);
   }
 
   private createControls() {
@@ -195,6 +216,8 @@ export class GameScene extends Phaser.Scene {
       left: Phaser.Input.Keyboard.KeyCodes.A,
       right: Phaser.Input.Keyboard.KeyCodes.D,
     }) as Record<"up" | "down" | "left" | "right", Phaser.Input.Keyboard.Key>;
+
+    this.interactKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
   }
 
   private preloadNpcSprites() {
@@ -215,15 +238,21 @@ export class GameScene extends Phaser.Scene {
   }
 
   private getCurrentInput(): PlayerInput {
+    if (this.dialogueBox.isOpen()) {
+      return {
+        sequence: this.inputSequence,
+        up: false,
+        down: false,
+        left: false,
+        right: false,
+      };
+    }
+
     return {
       sequence: this.inputSequence,
-
       left: this.cursors.left.isDown || this.wasd.left.isDown,
-
       right: this.cursors.right.isDown || this.wasd.right.isDown,
-
       up: this.cursors.up.isDown || this.wasd.up.isDown,
-
       down: this.cursors.down.isDown || this.wasd.down.isDown,
     };
   }
@@ -717,5 +746,41 @@ export class GameScene extends Phaser.Scene {
         nameLabel,
       });
     }
+  }
+
+  private findNearbyNpc(): NpcInstance | undefined {
+    let nearestNpc: NpcInstance | undefined;
+    let nearestDistance = this.npcInteractionDistance;
+
+    for (const npc of this.npcs.values()) {
+      const distance = Phaser.Math.Distance.Between(
+        this.player.x,
+        this.player.y,
+        npc.sprite.x,
+        npc.sprite.y,
+      );
+
+      if (distance <= nearestDistance) {
+        nearestNpc = npc;
+        nearestDistance = distance;
+      }
+    }
+
+    return nearestNpc;
+  }
+
+  private handleNpcInteraction() {
+    if (!Phaser.Input.Keyboard.JustDown(this.interactKey)) {
+      return;
+    }
+    if (this.dialogueBox.isOpen()) {
+      this.dialogueBox.hide();
+      return;
+    }
+    if (!this.nearbyNpc) {
+      return;
+    }
+
+    this.interactWithNpc(this.nearbyNpc);
   }
 }
