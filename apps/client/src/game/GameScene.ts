@@ -12,6 +12,36 @@ import {
 
 import type { Player, PlayerInput, Direction } from "@cesar-mmo/shared";
 
+import {
+  NPC_ASSETS,
+  NPC_FRAME_HEIGHT,
+  NPC_FRAME_WIDTH,
+  getNpcTextureKey,
+} from "./config/npcAssets";
+
+type NpcDirection = "up" | "down" | "left" | "right";
+
+type TiledCustomProperty = {
+  name: string;
+  value: unknown;
+};
+
+type NpcDefinition = {
+  id: string;
+  x: number;
+  y: number;
+  displayName: string;
+  direction: NpcDirection;
+  sprite: string;
+  dialogue: string;
+};
+
+type NpcInstance = {
+  definition: NpcDefinition;
+  sprite: Phaser.GameObjects.Sprite;
+  nameLabel: Phaser.GameObjects.Text;
+};
+
 export class GameScene extends Phaser.Scene {
   private player!: Phaser.GameObjects.Sprite;
 
@@ -31,6 +61,8 @@ export class GameScene extends Phaser.Scene {
 
   private playerNameLabel?: Phaser.GameObjects.Text;
   private otherPlayerNameLabels = new Map<string, Phaser.GameObjects.Text>();
+
+  private npcs = new Map<string, NpcInstance>();
 
   private lastInput: PlayerInput = {
     sequence: 0,
@@ -66,6 +98,7 @@ export class GameScene extends Phaser.Scene {
 
     this.load.image("town-buildings", "/assets/maps/town-01/poke-assets.png");
 
+    // Player
     this.load.spritesheet(
       "player-walk-down",
       "/assets/characters/player/walk-down.png",
@@ -98,12 +131,14 @@ export class GameScene extends Phaser.Scene {
         frameHeight: 24,
       },
     );
+    this.preloadNpcSprites();
   }
 
   create() {
     this.createMap();
     this.createPlayerAnimations();
     this.createPlayer();
+    this.createNpcs();
     this.setupCamera();
     this.createControls();
     this.connectToServer();
@@ -160,6 +195,23 @@ export class GameScene extends Phaser.Scene {
       left: Phaser.Input.Keyboard.KeyCodes.A,
       right: Phaser.Input.Keyboard.KeyCodes.D,
     }) as Record<"up" | "down" | "left" | "right", Phaser.Input.Keyboard.Key>;
+  }
+
+  private preloadNpcSprites() {
+    for (const [spriteId, definition] of Object.entries(NPC_ASSETS)) {
+      for (const direction of definition.directions) {
+        const textureKey = getNpcTextureKey(spriteId, direction);
+
+        this.load.spritesheet(
+          textureKey,
+          `${definition.folder}/walk-${direction}.png`,
+          {
+            frameWidth: NPC_FRAME_WIDTH,
+            frameHeight: NPC_FRAME_HEIGHT,
+          },
+        );
+      }
+    }
   }
 
   private getCurrentInput(): PlayerInput {
@@ -583,5 +635,87 @@ export class GameScene extends Phaser.Scene {
       })
       .setOrigin(0.5, 1)
       .setDepth(20);
+  }
+
+  private getNpcDefinitions(): NpcDefinition[] {
+    const objectsLayer = this.map.getObjectLayer("Objects");
+
+    if (!objectsLayer) {
+      throw new Error('Object layer "Objects" not found');
+    }
+
+    return objectsLayer.objects
+      .filter((object) => object.type === "npc")
+      .map((object) => {
+        const properties = (object.properties ?? []) as TiledCustomProperty[];
+
+        const getProperty = (name: string): unknown =>
+          properties.find((property) => property.name === name)?.value;
+
+        const displayName = getProperty("displayName");
+
+        const direction = getProperty("direction");
+
+        const sprite = getProperty("sprite");
+
+        const dialogue = getProperty("dialogue");
+
+        if (
+          typeof object.x !== "number" ||
+          typeof object.y !== "number" ||
+          typeof object.name !== "string" ||
+          typeof displayName !== "string" ||
+          typeof direction !== "string" ||
+          typeof sprite !== "string" ||
+          typeof dialogue !== "string"
+        ) {
+          throw new Error(`Invalid NPC definition: ${object.name}`);
+        }
+
+        if (
+          direction !== "up" &&
+          direction !== "down" &&
+          direction !== "left" &&
+          direction !== "right"
+        ) {
+          throw new Error(`Invalid NPC direction: ${direction}`);
+        }
+
+        return {
+          id: object.name,
+          x: object.x,
+          y: object.y,
+          displayName,
+          direction,
+          sprite,
+          dialogue,
+        };
+      });
+  }
+
+  private createNpcs() {
+    const npcDefinitions = this.getNpcDefinitions();
+
+    for (const npc of npcDefinitions) {
+      const textureKey = getNpcTextureKey(npc.sprite, npc.direction);
+
+      if (!this.textures.exists(textureKey)) {
+        throw new Error(`NPC texture not found: ${textureKey}`);
+      }
+
+      const sprite = this.add.sprite(npc.x, npc.y, textureKey, 0);
+
+      sprite.setDepth(5);
+
+      const nameLabel = this.createPlayerNameLabel(npc.displayName);
+
+      nameLabel.setPosition(Math.round(npc.x), Math.round(npc.y - 14));
+
+      this.npcs.set(npc.id, {
+        definition: npc,
+        sprite,
+        nameLabel,
+      });
+    }
   }
 }

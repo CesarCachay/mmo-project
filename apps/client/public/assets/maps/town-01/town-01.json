@@ -119,6 +119,7 @@
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
          "height":30,
          "id":3,
+         "locked":true,
          "name":"Buildings",
          "opacity":1,
          "type":"tilelayer",
@@ -160,6 +161,7 @@
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
          "height":30,
          "id":6,
+         "locked":true,
          "name":"AbovePlayer",
          "opacity":1,
          "type":"tilelayer",
@@ -201,6 +203,7 @@
             20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20],
          "height":30,
          "id":4,
+         "locked":true,
          "name":"Collision",
          "opacity":0.5,
          "type":"tilelayer",
@@ -212,7 +215,6 @@
         {
          "draworder":"topdown",
          "id":5,
-         "locked":true,
          "name":"Objects",
          "objects":[
                 {
@@ -227,6 +229,40 @@
                  "width":0,
                  "x":320,
                  "y":380
+                }, 
+                {
+                 "height":0,
+                 "id":2,
+                 "name":"professorOak",
+                 "opacity":1,
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"dialogue",
+                         "type":"string",
+                         "value":"Welcome to StoneBridge City!"
+                        }, 
+                        {
+                         "name":"direction",
+                         "type":"string",
+                         "value":"down"
+                        }, 
+                        {
+                         "name":"displayName",
+                         "type":"string",
+                         "value":"Prof. Juan"
+                        }, 
+                        {
+                         "name":"sprite",
+                         "type":"string",
+                         "value":"professor-oak"
+                        }],
+                 "rotation":0,
+                 "type":"npc",
+                 "visible":true,
+                 "width":0,
+                 "x":342.762549296308,
+                 "y":62.3204635086758
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -235,7 +271,7 @@
          "y":0
         }],
  "nextlayerid":7,
- "nextobjectid":2,
+ "nextobjectid":4,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",
@@ -244,7 +280,7 @@
         {
          "columns":11,
          "firstgid":1,
-         "image":"..\/Downloads\/poke-sheet.png",
+         "image":"..\/..\/..\/Downloads\/poke-sheet.png",
          "imageheight":160,
          "imagewidth":176,
          "margin":0,
@@ -257,7 +293,7 @@
         {
          "columns":17,
          "firstgid":111,
-         "image":"..\/Downloads\/poke-assets.png",
+         "image":"..\/..\/..\/Downloads\/poke-assets.png",
          "imageheight":112,
          "imagewidth":272,
          "margin":0,
