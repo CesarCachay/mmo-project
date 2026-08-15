@@ -1,18 +1,26 @@
 import Phaser from "phaser";
+import { PLAYER_AVATARS } from "./config/playerAssets";
+import type { PlayerAvatarId } from "@cesar-mmo/shared";
 
 export class JoinScene extends Phaser.Scene {
   private errorMessage = "";
 
   private initialDisplayName = "";
 
+  private selectedAvatar: PlayerAvatarId = "male-01";
+
   constructor() {
     super("JoinScene");
   }
 
-  init(data?: { errorMessage?: string; displayName?: string }) {
+  init(data?: {
+    errorMessage?: string;
+    displayName?: string;
+    avatarId?: PlayerAvatarId;
+  }) {
     this.errorMessage = data?.errorMessage ?? "";
-
     this.initialDisplayName = data?.displayName ?? "";
+    this.selectedAvatar = data?.avatarId ?? "male-01";
   }
 
   create() {
@@ -64,6 +72,52 @@ export class JoinScene extends Phaser.Scene {
           data-error
         ></div>
 
+        <div class="join-avatar-field">
+          <span class="join-label">
+            Choose your character
+          </span>
+
+          <div class="join-avatar-options">
+
+            <button
+              class="join-avatar-option selected"
+              type="button"
+              data-avatar="male-01"
+            >
+              <div
+                class="join-avatar-preview"
+                style="
+                  background-image:
+                    url('/${PLAYER_AVATARS["male-01"].path}/walk-down.png');
+                "
+              ></div>
+
+              <span class="join-avatar-label">
+                ${PLAYER_AVATARS["male-01"].label}
+              </span>
+            </button>
+
+            <button
+              class="join-avatar-option"
+              type="button"
+              data-avatar="female-01"
+            >
+              <div
+                class="join-avatar-preview"
+                style="
+                  background-image:
+                    url('/${PLAYER_AVATARS["female-01"].path}/walk-down.png');
+                "
+              ></div>
+
+              <span class="join-avatar-label">
+                ${PLAYER_AVATARS["female-01"].label}
+              </span>
+            </button>
+
+          </div>
+        </div>
+
         <button
           class="join-button"
           type="submit"
@@ -85,12 +139,40 @@ export class JoinScene extends Phaser.Scene {
 
     const errorText = container.querySelector<HTMLDivElement>("[data-error]");
 
+    const avatarButtons =
+      container.querySelectorAll<HTMLButtonElement>(".join-avatar-option");
+
     if (!form || !input || !errorText) {
       throw new Error("Could not create join form");
     }
 
     input.value = this.initialDisplayName;
     errorText.textContent = this.errorMessage;
+
+    const updateAvatarSelection = () => {
+      avatarButtons.forEach((button) => {
+        button.classList.toggle(
+          "selected",
+          button.dataset.avatar === this.selectedAvatar
+        );
+      });
+    };
+
+    avatarButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const avatarId = button.dataset.avatar;
+
+        if (avatarId !== "male-01" && avatarId !== "female-01") {
+          return;
+        }
+
+        this.selectedAvatar = avatarId;
+
+        updateAvatarSelection();
+      });
+    });
+
+    updateAvatarSelection();
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();
@@ -115,6 +197,7 @@ export class JoinScene extends Phaser.Scene {
 
       this.scene.start("GameScene", {
         displayName,
+        avatarId: this.selectedAvatar,
       });
     });
 

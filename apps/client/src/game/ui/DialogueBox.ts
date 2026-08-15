@@ -11,6 +11,10 @@ export class DialogueBox {
 
   private open = false;
 
+  private currentSpeaker = "";
+  private currentLines: readonly string[] = [];
+  private currentLineIndex = 0;
+
   constructor(scene: Phaser.Scene) {
     const width = scene.scale.width;
     const height = scene.scale.height;
@@ -61,22 +65,62 @@ export class DialogueBox {
     this.container.setScrollFactor(0).setDepth(1000).setVisible(false);
   }
 
-  show(speaker: string, dialogue: string) {
-    this.speakerText.setText(speaker);
-    this.dialogueText.setText(dialogue);
+  start(speaker: string, lines: readonly string[]) {
+    if (lines.length === 0) {
+      return;
+    }
 
-    this.container.setVisible(true);
+    this.currentSpeaker = speaker;
+    this.currentLines = lines;
+    this.currentLineIndex = 0;
 
     this.open = true;
+    this.container.setVisible(true);
+
+    this.renderCurrentLine();
+  }
+
+  advance() {
+    if (!this.open) {
+      return;
+    }
+
+    const isLastLine = this.currentLineIndex >= this.currentLines.length - 1;
+
+    if (isLastLine) {
+      this.hide();
+
+      return;
+    }
+
+    this.currentLineIndex++;
+
+    this.renderCurrentLine();
   }
 
   hide() {
     this.container.setVisible(false);
 
     this.open = false;
+
+    this.currentSpeaker = "";
+    this.currentLines = [];
+    this.currentLineIndex = 0;
   }
 
   isOpen() {
     return this.open;
+  }
+
+  private renderCurrentLine() {
+    const currentLine = this.currentLines[this.currentLineIndex];
+
+    this.speakerText.setText(this.currentSpeaker);
+
+    this.dialogueText.setText(currentLine);
+
+    const isLastLine = this.currentLineIndex === this.currentLines.length - 1;
+
+    this.hintText.setText(isLastLine ? "E to close" : "E to continue");
   }
 }

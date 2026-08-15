@@ -238,9 +238,9 @@
                  "point":true,
                  "properties":[
                         {
-                         "name":"dialogue",
+                         "name":"dialogueId",
                          "type":"string",
-                         "value":"Welcome to StoneBridge City!"
+                         "value":"professor-oak-greet"
                         }, 
                         {
                          "name":"direction",
@@ -253,6 +253,11 @@
                          "value":"Prof. Juan"
                         }, 
                         {
+                         "name":"interactionType",
+                         "type":"string",
+                         "value":"dialogue"
+                        }, 
+                        {
                          "name":"sprite",
                          "type":"string",
                          "value":"professor-oak"
@@ -261,8 +266,59 @@
                  "type":"npc",
                  "visible":true,
                  "width":0,
-                 "x":342.762549296308,
-                 "y":62.3204635086758
+                 "x":309.599669146134,
+                 "y":89.3032661242833
+                }, 
+                {
+                 "height":1.24641,
+                 "id":4,
+                 "name":"",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0.623205,
+                 "x":270.471,
+                 "y":86.0022
+                }, 
+                {
+                 "height":0,
+                 "id":7,
+                 "name":"draGianela",
+                 "opacity":1,
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"dialogueId",
+                         "type":"string",
+                         "value":"dra-gianela-intro"
+                        }, 
+                        {
+                         "name":"direction",
+                         "type":"string",
+                         "value":"down"
+                        }, 
+                        {
+                         "name":"displayName",
+                         "type":"string",
+                         "value":"Dra. Gianela"
+                        }, 
+                        {
+                         "name":"interactionType",
+                         "type":"string",
+                         "value":"dialogue"
+                        }, 
+                        {
+                         "name":"sprite",
+                         "type":"string",
+                         "value":"dra-gianela"
+                        }],
+                 "rotation":0,
+                 "type":"npc",
+                 "visible":true,
+                 "width":0,
+                 "x":151.867348520068,
+                 "y":192.933519293352
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -271,7 +327,7 @@
          "y":0
         }],
  "nextlayerid":7,
- "nextobjectid":4,
+ "nextobjectid":8,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",
@@ -280,7 +336,7 @@
         {
          "columns":11,
          "firstgid":1,
-         "image":"..\/..\/..\/Downloads\/poke-sheet.png",
+         "image":"..\/..\/..\/Downloads\/mmo-cesar-edition\/mmo-project\/apps\/client\/public\/assets\/tilesets\/town-terrain.png",
          "imageheight":160,
          "imagewidth":176,
          "margin":0,
@@ -293,7 +349,7 @@
         {
          "columns":17,
          "firstgid":111,
-         "image":"..\/..\/..\/Downloads\/poke-assets.png",
+         "image":"..\/..\/..\/Downloads\/mmo-cesar-edition\/mmo-project\/apps\/client\/public\/assets\/tilesets\/town-building.png",
          "imageheight":112,
          "imagewidth":272,
          "margin":0,

@@ -14,11 +14,12 @@ export const NPC_ASSETS = {
     folder: "/assets/characters/npcs/professor-oak",
     directions: ["down"],
   },
+  "dra-gianela": {
+    folder: "/assets/characters/npcs/dra-gianela",
+    directions: ["down"],
+  },
 } satisfies Record<string, NpcAssetDefinition>;
 
-export const getNpcTextureKey = (
-  sprite: string,
-  direction: NpcDirection,
-): string => {
+export const getNpcTextureKey = (sprite: string, direction: NpcDirection): string => {
   return `npc-${sprite}-walk-${direction}`;
 };

@@ -22,6 +22,7 @@ import {
   resolveMapCollision,
   isPlayerMoving,
   getDirectionFromInput,
+  isPlayerAvatarId,
 } from '@cesar-mmo/shared';
 
 import type { Player, PlayerInput } from '@cesar-mmo/shared';
@@ -61,6 +62,18 @@ export class GameGateway
 
   handleConnection(client: Socket) {
     const displayName = this.getRequestedDisplayName(client);
+    const avatarId: unknown = client.handshake.auth.avatarId;
+
+    if (!isPlayerAvatarId(avatarId)) {
+      client.emit('connectionRejected', {
+        code: 'INVALID_AVATAR',
+        message: 'Invalid character selected.',
+      });
+
+      client.disconnect();
+
+      return;
+    }
 
     if (!displayName) {
       client.emit('connectionRejected', {
@@ -87,6 +100,7 @@ export class GameGateway
     const newPlayer: Player = {
       id: client.id,
       displayName,
+      avatarId,
       x: TOWN_01_MAP.spawn.x,
       y: TOWN_01_MAP.spawn.y,
       color,

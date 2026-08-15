@@ -19,3 +19,6 @@ export { TOWN_01_MAP } from "./maps/generated/town-01.js";
 export { isPositionWalkable, resolveMapCollision } from "./maps/collision.js";
 
 export type { CollisionMap, Position } from "./maps/collision.js";
+
+export { PLAYER_AVATAR_IDS, isPlayerAvatarId } from "./player/avatar.js";
+export type { PlayerAvatarId } from "./player/avatar.js";

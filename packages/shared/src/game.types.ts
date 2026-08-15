@@ -1,3 +1,5 @@
+import { PlayerAvatarId } from "./player/avatar.js";
+
 export type Player = {
   id: string;
   x: number;
@@ -6,6 +8,7 @@ export type Player = {
   isMoving: boolean;
   direction: Direction;
   displayName: string;
+  avatarId: PlayerAvatarId;
   lastProcessedInputSequence: number;
 };
 

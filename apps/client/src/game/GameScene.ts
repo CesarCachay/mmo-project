@@ -10,8 +10,6 @@ import {
   getDirectionFromInput,
 } from "@cesar-mmo/shared";
 
-import type { Player, PlayerInput, Direction } from "@cesar-mmo/shared";
-
 import {
   NPC_ASSETS,
   NPC_FRAME_HEIGHT,
@@ -19,7 +17,17 @@ import {
   getNpcTextureKey,
 } from "./config/npcAssets";
 
+import {
+  PLAYER_AVATARS,
+  PLAYER_DIRECTIONS,
+  getPlayerTextureKey,
+  getPlayerAnimationKey,
+} from "./config/playerAssets";
+
 import { DialogueBox } from "./ui/DialogueBox";
+import { getDialogue } from "./dialogue/dialogues";
+import type { NpcInteractionType } from "./npc/types";
+import type { Player, PlayerInput, Direction, PlayerAvatarId } from "@cesar-mmo/shared";
 
 type NpcDirection = "up" | "down" | "left" | "right";
 
@@ -35,7 +43,8 @@ type NpcDefinition = {
   displayName: string;
   direction: NpcDirection;
   sprite: string;
-  dialogue: string;
+  interactionType: NpcInteractionType;
+  dialogueId?: string;
 };
 
 type NpcInstance = {
@@ -51,10 +60,7 @@ export class GameScene extends Phaser.Scene {
 
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
 
-  private wasd!: Record<
-    "up" | "down" | "left" | "right",
-    Phaser.Input.Keyboard.Key
-  >;
+  private wasd!: Record<"up" | "down" | "left" | "right", Phaser.Input.Keyboard.Key>;
 
   private interactKey!: Phaser.Input.Keyboard.Key;
 
@@ -87,57 +93,40 @@ export class GameScene extends Phaser.Scene {
   };
 
   private playerDirection: Direction = "down";
-
   private displayName = "";
+  private avatarId: PlayerAvatarId = "male-01";
 
   constructor() {
     super("GameScene");
   }
 
-  init(data: { displayName: string }) {
+  init(data: { displayName: string; avatarId: PlayerAvatarId }) {
     this.displayName = data.displayName;
+    this.avatarId = data.avatarId;
   }
 
   preload() {
+    const defaultPlayerPath = PLAYER_AVATARS["male-01"].path;
+
     this.load.tilemapTiledJSON("town-01", "/assets/maps/town-01/town-01.json");
-
     this.load.image("town-terrain", "/assets/maps/town-01/poke-sheet.png");
-
     this.load.image("town-buildings", "/assets/maps/town-01/poke-assets.png");
 
-    // Player
-    this.load.spritesheet(
-      "player-walk-down",
-      "/assets/characters/player/walk-down.png",
-      {
-        frameWidth: 24,
-        frameHeight: 24,
-      },
-    );
-    this.load.spritesheet(
-      "player-walk-left",
-      "/assets/characters/player/walk-left.png",
-      {
-        frameWidth: 24,
-        frameHeight: 24,
-      },
-    );
-    this.load.spritesheet(
-      "player-walk-right",
-      "/assets/characters/player/walk-right.png",
-      {
-        frameWidth: 24,
-        frameHeight: 24,
-      },
-    );
-    this.load.spritesheet(
-      "player-walk-up",
-      "/assets/characters/player/walk-up.png",
-      {
-        frameWidth: 24,
-        frameHeight: 24,
-      },
-    );
+    // Players spritesheets
+    Object.values(PLAYER_AVATARS).forEach((avatar) => {
+      PLAYER_DIRECTIONS.forEach((direction) => {
+        this.load.spritesheet(
+          getPlayerTextureKey(avatar.id, direction),
+          `/${avatar.path}/walk-${direction}.png`,
+          {
+            frameWidth: 24,
+            frameHeight: 24,
+          }
+        );
+      });
+    });
+
+    // NPCs
     this.preloadNpcSprites();
   }
 
@@ -177,7 +166,12 @@ export class GameScene extends Phaser.Scene {
   private createPlayer() {
     const spawn = this.getPlayerSpawn();
 
-    this.player = this.add.sprite(spawn.x, spawn.y, "player-walk-down", 0);
+    this.player = this.add.sprite(
+      spawn.x,
+      spawn.y,
+      getPlayerTextureKey(this.avatarId, "down"),
+      0
+    );
 
     this.player.setDepth(5);
 
@@ -196,7 +190,38 @@ export class GameScene extends Phaser.Scene {
   }
 
   private interactWithNpc(npc: NpcInstance) {
-    this.dialogueBox.show(npc.definition.displayName, npc.definition.dialogue);
+    switch (npc.definition.interactionType) {
+      case "dialogue":
+        this.startNpcDialogue(npc);
+        return;
+
+      case "shop":
+        console.warn("Shop interactions are not implemented yet");
+        return;
+
+      case "quest":
+        console.warn("Quest interactions are not implemented yet");
+        return;
+    }
+  }
+
+  private startNpcDialogue(npc: NpcInstance) {
+    const { dialogueId } = npc.definition;
+
+    if (!dialogueId) {
+      console.warn(`NPC ${npc.definition.id} has no dialogueId`);
+
+      return;
+    }
+    const dialogue = getDialogue(dialogueId);
+
+    if (!dialogue) {
+      console.warn(`Dialogue not found: ${npc.definition.dialogueId}`);
+
+      return;
+    }
+
+    this.dialogueBox.start(npc.definition.displayName, dialogue.lines);
   }
 
   private createControls() {
@@ -225,14 +250,10 @@ export class GameScene extends Phaser.Scene {
       for (const direction of definition.directions) {
         const textureKey = getNpcTextureKey(spriteId, direction);
 
-        this.load.spritesheet(
-          textureKey,
-          `${definition.folder}/walk-${direction}.png`,
-          {
-            frameWidth: NPC_FRAME_WIDTH,
-            frameHeight: NPC_FRAME_HEIGHT,
-          },
-        );
+        this.load.spritesheet(textureKey, `${definition.folder}/walk-${direction}.png`, {
+          frameWidth: NPC_FRAME_WIDTH,
+          frameHeight: NPC_FRAME_HEIGHT,
+        });
       }
     }
   }
@@ -287,20 +308,19 @@ export class GameScene extends Phaser.Scene {
     this.socket = io("http://localhost:3000", {
       auth: {
         displayName: this.displayName,
+        avatarId: this.avatarId,
       },
     });
 
-    this.socket.on(
-      "connectionRejected",
-      (error: { code: string; message: string }) => {
-        this.socket.disconnect();
+    this.socket.on("connectionRejected", (error: { code: string; message: string }) => {
+      this.socket.disconnect();
 
-        this.scene.start("JoinScene", {
-          errorMessage: error.message,
-          displayName: this.displayName,
-        });
-      },
-    );
+      this.scene.start("JoinScene", {
+        errorMessage: error.message,
+        displayName: this.displayName,
+        avatarId: this.avatarId,
+      });
+    });
 
     this.socket.on("connect", () => {
       console.log("Connected:", this.socket.id);
@@ -379,7 +399,7 @@ export class GameScene extends Phaser.Scene {
 
     this.playerNameLabel.setPosition(
       Math.round(this.player.x),
-      Math.round(this.player.y - 14),
+      Math.round(this.player.y - 14)
     );
   }
 
@@ -391,8 +411,8 @@ export class GameScene extends Phaser.Scene {
     const sprite = this.add.sprite(
       player.x,
       player.y,
-      `player-walk-${player.direction}`,
-      0,
+      getPlayerTextureKey(player.avatarId, player.direction),
+      0
     );
 
     sprite.setDepth(5);
@@ -429,10 +449,7 @@ export class GameScene extends Phaser.Scene {
       const nameLabel = this.otherPlayerNameLabels.get(playerId);
 
       if (nameLabel) {
-        nameLabel.setPosition(
-          Math.round(gameObject.x),
-          Math.round(gameObject.y - 14),
-        );
+        nameLabel.setPosition(Math.round(gameObject.x), Math.round(gameObject.y - 14));
       }
     }
   }
@@ -452,7 +469,7 @@ export class GameScene extends Phaser.Scene {
       },
       nextPosition,
       PLAYER_SIZE,
-      TOWN_01_MAP,
+      TOWN_01_MAP
     );
 
     this.player.setPosition(resolvedPosition.x, resolvedPosition.y);
@@ -483,17 +500,9 @@ export class GameScene extends Phaser.Scene {
 
     const alpha = 1 - Math.exp(-reconciliationRate * (delta / 1000));
 
-    this.player.x = Phaser.Math.Linear(
-      this.player.x,
-      this.serverPosition.x,
-      alpha,
-    );
+    this.player.x = Phaser.Math.Linear(this.player.x, this.serverPosition.x, alpha);
 
-    this.player.y = Phaser.Math.Linear(
-      this.player.y,
-      this.serverPosition.y,
-      alpha,
-    );
+    this.player.y = Phaser.Math.Linear(this.player.y, this.serverPosition.y, alpha);
   }
 
   private createMap() {
@@ -501,15 +510,9 @@ export class GameScene extends Phaser.Scene {
       key: "town-01",
     });
 
-    const terrainTileset = this.map.addTilesetImage(
-      "town-terrain",
-      "town-terrain",
-    );
+    const terrainTileset = this.map.addTilesetImage("town-terrain", "town-terrain");
 
-    const buildingsTileset = this.map.addTilesetImage(
-      "town-buildings",
-      "town-buildings",
-    );
+    const buildingsTileset = this.map.addTilesetImage("town-buildings", "town-buildings");
 
     if (!terrainTileset || !buildingsTileset) {
       throw new Error("Could not load Tiled tilesets");
@@ -519,21 +522,11 @@ export class GameScene extends Phaser.Scene {
 
     const groundLayer = this.map.createLayer("Ground", tilesets, 0, 0);
 
-    const groundDetailsLayer = this.map.createLayer(
-      "GroundDetails",
-      tilesets,
-      0,
-      0,
-    );
+    const groundDetailsLayer = this.map.createLayer("GroundDetails", tilesets, 0, 0);
 
     const buildingsLayer = this.map.createLayer("Buildings", tilesets, 0, 0);
 
-    const abovePlayerLayer = this.map.createLayer(
-      "AbovePlayer",
-      tilesets,
-      0,
-      0,
-    );
+    const abovePlayerLayer = this.map.createLayer("AbovePlayer", tilesets, 0, 0);
 
     groundLayer?.setDepth(0);
     groundDetailsLayer?.setDepth(1);
@@ -549,14 +542,10 @@ export class GameScene extends Phaser.Scene {
     }
 
     const playerSpawn = objectsLayer.objects.find(
-      (object) => object.name === "playerSpawn",
+      (object) => object.name === "playerSpawn"
     );
 
-    if (
-      !playerSpawn ||
-      playerSpawn.x === undefined ||
-      playerSpawn.y === undefined
-    ) {
+    if (!playerSpawn || playerSpawn.x === undefined || playerSpawn.y === undefined) {
       throw new Error('Object "playerSpawn" not found');
     }
 
@@ -567,44 +556,29 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createPlayerAnimations() {
-    this.anims.create({
-      key: "walk-down",
-      frames: this.anims.generateFrameNumbers("player-walk-down", {
-        start: 0,
-        end: 11,
-      }),
-      frameRate: 12,
-      repeat: -1,
-    });
+    Object.values(PLAYER_AVATARS).forEach((avatar) => {
+      PLAYER_DIRECTIONS.forEach((direction) => {
+        const animationKey = getPlayerAnimationKey(avatar.id, direction);
 
-    this.anims.create({
-      key: "walk-left",
-      frames: this.anims.generateFrameNumbers("player-walk-left", {
-        start: 0,
-        end: 11,
-      }),
-      frameRate: 12,
-      repeat: -1,
-    });
+        if (this.anims.exists(animationKey)) {
+          return;
+        }
 
-    this.anims.create({
-      key: "walk-right",
-      frames: this.anims.generateFrameNumbers("player-walk-right", {
-        start: 0,
-        end: 11,
-      }),
-      frameRate: 12,
-      repeat: -1,
-    });
+        this.anims.create({
+          key: animationKey,
 
-    this.anims.create({
-      key: "walk-up",
-      frames: this.anims.generateFrameNumbers("player-walk-up", {
-        start: 0,
-        end: 11,
-      }),
-      frameRate: 12,
-      repeat: -1,
+          frames: this.anims.generateFrameNumbers(
+            getPlayerTextureKey(avatar.id, direction),
+            {
+              start: 0,
+              end: 11,
+            }
+          ),
+
+          frameRate: 12,
+          repeat: -1,
+        });
+      });
     });
   }
 
@@ -612,43 +586,31 @@ export class GameScene extends Phaser.Scene {
     this.playerDirection = getDirectionFromInput(input, this.playerDirection);
 
     const moving = isPlayerMoving(input);
-
     if (!moving) {
       this.setPlayerIdle();
-
       return;
     }
 
-    this.player.play(`walk-${this.playerDirection}`, true);
+    this.player.play(getPlayerAnimationKey(this.avatarId, this.playerDirection), true);
   }
 
   private setPlayerIdle() {
     this.player.anims.stop();
 
-    this.player.setTexture(`player-walk-${this.playerDirection}`, 0);
+    this.player.setTexture(getPlayerTextureKey(this.avatarId, this.playerDirection), 0);
   }
 
-  private updateRemotePlayerAnimation(
-    sprite: Phaser.GameObjects.Sprite,
-    player: Player,
-  ) {
+  private updateRemotePlayerAnimation(sprite: Phaser.GameObjects.Sprite, player: Player) {
     if (player.isMoving) {
-      sprite.play(`walk-${player.direction}`, true);
-
+      sprite.play(getPlayerAnimationKey(player.avatarId, player.direction), true);
       return;
     }
-
     sprite.anims.stop();
-    sprite.setTexture(`player-walk-${player.direction}`, 0);
+    sprite.setTexture(getPlayerTextureKey(player.avatarId, player.direction), 0);
   }
 
   private setupCamera() {
-    this.cameras.main.setBounds(
-      0,
-      0,
-      this.map.widthInPixels,
-      this.map.heightInPixels,
-    );
+    this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
 
     this.cameras.main.startFollow(this.player, true);
   }
@@ -680,14 +642,11 @@ export class GameScene extends Phaser.Scene {
 
         const getProperty = (name: string): unknown =>
           properties.find((property) => property.name === name)?.value;
-
         const displayName = getProperty("displayName");
-
         const direction = getProperty("direction");
-
         const sprite = getProperty("sprite");
-
-        const dialogue = getProperty("dialogue");
+        const dialogueId = getProperty("dialogueId");
+        const interactionType = getProperty("interactionType");
 
         if (
           typeof object.x !== "number" ||
@@ -696,7 +655,7 @@ export class GameScene extends Phaser.Scene {
           typeof displayName !== "string" ||
           typeof direction !== "string" ||
           typeof sprite !== "string" ||
-          typeof dialogue !== "string"
+          typeof dialogueId !== "string"
         ) {
           throw new Error(`Invalid NPC definition: ${object.name}`);
         }
@@ -709,6 +668,13 @@ export class GameScene extends Phaser.Scene {
         ) {
           throw new Error(`Invalid NPC direction: ${direction}`);
         }
+        if (
+          interactionType !== "dialogue" &&
+          interactionType !== "shop" &&
+          interactionType !== "quest"
+        ) {
+          throw new Error(`Invalid NPC interaction type: ${String(interactionType)}`);
+        }
 
         return {
           id: object.name,
@@ -717,7 +683,8 @@ export class GameScene extends Phaser.Scene {
           displayName,
           direction,
           sprite,
-          dialogue,
+          interactionType,
+          dialogueId,
         };
       });
   }
@@ -757,7 +724,7 @@ export class GameScene extends Phaser.Scene {
         this.player.x,
         this.player.y,
         npc.sprite.x,
-        npc.sprite.y,
+        npc.sprite.y
       );
 
       if (distance <= nearestDistance) {
@@ -774,7 +741,7 @@ export class GameScene extends Phaser.Scene {
       return;
     }
     if (this.dialogueBox.isOpen()) {
-      this.dialogueBox.hide();
+      this.dialogueBox.advance();
       return;
     }
     if (!this.nearbyNpc) {
