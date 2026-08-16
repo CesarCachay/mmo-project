@@ -8,6 +8,8 @@ import {
   resolveMapCollision,
   isPlayerMoving,
   getDirectionFromInput,
+  CHAT_EVENTS,
+  isChatMessageInput,
 } from "@cesar-mmo/shared";
 
 import {
@@ -24,10 +26,18 @@ import {
   getPlayerAnimationKey,
 } from "./config/playerAssets";
 
+import { ChatBox } from "./ui/ChatBox";
 import { DialogueBox } from "./ui/DialogueBox";
 import { getDialogue } from "./dialogue/dialogues";
 import type { NpcInteractionType } from "./npc/types";
-import type { Player, PlayerInput, Direction, PlayerAvatarId } from "@cesar-mmo/shared";
+import type {
+  Player,
+  PlayerInput,
+  Direction,
+  PlayerAvatarId,
+  ChatMessage,
+  ChatMessageInput,
+} from "@cesar-mmo/shared";
 
 type NpcDirection = "up" | "down" | "left" | "right";
 
@@ -55,14 +65,12 @@ type NpcInstance = {
 
 export class GameScene extends Phaser.Scene {
   private player!: Phaser.GameObjects.Sprite;
-
   private map!: Phaser.Tilemaps.Tilemap;
-
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
-
   private wasd!: Record<"up" | "down" | "left" | "right", Phaser.Input.Keyboard.Key>;
-
   private interactKey!: Phaser.Input.Keyboard.Key;
+
+  private chatKey!: Phaser.Input.Keyboard.Key;
 
   private socket!: Socket;
 
@@ -76,6 +84,8 @@ export class GameScene extends Phaser.Scene {
   private nearbyNpc?: NpcInstance;
   private readonly npcInteractionDistance = 36;
   private dialogueBox!: DialogueBox;
+
+  private chatBox!: ChatBox;
 
   private lastInput: PlayerInput = {
     sequence: 0,
@@ -106,8 +116,6 @@ export class GameScene extends Phaser.Scene {
   }
 
   preload() {
-    const defaultPlayerPath = PLAYER_AVATARS["male-01"].path;
-
     this.load.tilemapTiledJSON("town-01", "/assets/maps/town-01/town-01.json");
     this.load.image("town-terrain", "/assets/maps/town-01/poke-sheet.png");
     this.load.image("town-buildings", "/assets/maps/town-01/poke-assets.png");
@@ -137,6 +145,7 @@ export class GameScene extends Phaser.Scene {
     this.createNpcs();
     this.setupCamera();
     this.createDialogueUi();
+    this.createChatUi();
     this.createControls();
     this.connectToServer();
 
@@ -147,6 +156,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   update(_: number, delta: number) {
+    this.handleChatFocus();
+
     this.updateNearbyNpc();
     this.handleNpcInteraction();
 
@@ -161,6 +172,10 @@ export class GameScene extends Phaser.Scene {
 
   private createDialogueUi() {
     this.dialogueBox = new DialogueBox(this);
+  }
+
+  private createChatUi() {
+    this.chatBox = new ChatBox(this, (text) => this.sendChatMessage(text));
   }
 
   private createPlayer() {
@@ -243,6 +258,7 @@ export class GameScene extends Phaser.Scene {
     }) as Record<"up" | "down" | "left" | "right", Phaser.Input.Keyboard.Key>;
 
     this.interactKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+    this.chatKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
   }
 
   private preloadNpcSprites() {
@@ -259,7 +275,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private getCurrentInput(): PlayerInput {
-    if (this.dialogueBox.isOpen()) {
+    if (this.dialogueBox.isOpen() || this.chatBox.isTyping()) {
       return {
         sequence: this.inputSequence,
         up: false,
@@ -324,6 +340,10 @@ export class GameScene extends Phaser.Scene {
 
     this.socket.on("connect", () => {
       console.log("Connected:", this.socket.id);
+    });
+
+    this.socket.on(CHAT_EVENTS.MESSAGE_RECEIVED, (message: ChatMessage) => {
+      this.handleChatMessageReceived(message);
     });
 
     this.socket.on("currentPlayers", (players: Record<string, Player>) => {
@@ -737,6 +757,10 @@ export class GameScene extends Phaser.Scene {
   }
 
   private handleNpcInteraction() {
+    if (this.chatBox.isTyping()) {
+      return;
+    }
+
     if (!Phaser.Input.Keyboard.JustDown(this.interactKey)) {
       return;
     }
@@ -749,5 +773,38 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.interactWithNpc(this.nearbyNpc);
+  }
+
+  public sendChatMessage(text: string): void {
+    if (!this.socket.connected) {
+      return;
+    }
+    const payload: ChatMessageInput = {
+      text,
+    };
+    if (!isChatMessageInput(payload)) {
+      return;
+    }
+
+    this.socket.emit(CHAT_EVENTS.SEND_MESSAGE, payload);
+  }
+
+  private handleChatMessageReceived(message: ChatMessage): void {
+    const isOwnMessage = message.sender.playerId === this.socket.id;
+    this.chatBox.addMessage(message, isOwnMessage);
+  }
+
+  private handleChatFocus(): void {
+    if (this.chatBox.isTyping()) {
+      return;
+    }
+    if (this.dialogueBox.isOpen()) {
+      return;
+    }
+    if (!Phaser.Input.Keyboard.JustDown(this.chatKey)) {
+      return;
+    }
+
+    this.chatBox.focusInput();
   }
 }

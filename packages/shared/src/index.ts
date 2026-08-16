@@ -22,3 +22,6 @@ export type { CollisionMap, Position } from "./maps/collision.js";
 
 export { PLAYER_AVATAR_IDS, isPlayerAvatarId } from "./player/avatar.js";
 export type { PlayerAvatarId } from "./player/avatar.js";
+
+export type { ChatMessage, ChatMessageInput, ChatMessageSender } from "./chat.js";
+export { CHAT_EVENTS, CHAT_MESSAGE_MAX_LENGTH, isChatMessageInput } from "./chat.js";

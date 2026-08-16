@@ -23,7 +23,10 @@ import {
   isPlayerMoving,
   getDirectionFromInput,
   isPlayerAvatarId,
+  CHAT_EVENTS,
+  isChatMessageInput,
 } from '@cesar-mmo/shared';
+import { ChatService } from 'src/chat/chat.service';
 
 import type { Player, PlayerInput } from '@cesar-mmo/shared';
 
@@ -49,6 +52,8 @@ export class GameGateway
   private nextColorIndex = 0;
 
   private gameLoop?: ReturnType<typeof setInterval>;
+
+  constructor(private readonly chatService: ChatService) {}
 
   afterInit() {
     this.startGameLoop();
@@ -160,6 +165,26 @@ export class GameGateway
     this.playerInputs[client.id] = input;
 
     player.lastProcessedInputSequence = input.sequence;
+  }
+
+  @SubscribeMessage(CHAT_EVENTS.SEND_MESSAGE)
+  handleChatMessage(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: unknown,
+  ): void {
+    if (!isChatMessageInput(payload)) {
+      return;
+    }
+
+    const player = this.players[client.id];
+
+    if (!player) {
+      return;
+    }
+
+    const message = this.chatService.createMessage(player, payload);
+
+    this.server.emit(CHAT_EVENTS.MESSAGE_RECEIVED, message);
   }
 
   private startGameLoop() {
