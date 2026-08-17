@@ -1,7 +1,9 @@
 import { PlayerAvatarId } from "./player/avatar.js";
+import { MapId } from "./map.js";
 
 export type Player = {
   id: string;
+  mapId: MapId;
   x: number;
   y: number;
   color: number;

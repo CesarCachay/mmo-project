@@ -10,6 +10,7 @@ import {
   getDirectionFromInput,
   CHAT_EVENTS,
   isChatMessageInput,
+  DEFAULT_MAP_ID,
 } from "@cesar-mmo/shared";
 
 import {
@@ -29,6 +30,9 @@ import {
 import { ChatBox } from "./ui/ChatBox";
 import { DialogueBox } from "./ui/DialogueBox";
 import { getDialogue } from "./dialogue/dialogues";
+
+import { MAP_REGISTRY } from "./maps/mapRegistry";
+
 import type { NpcInteractionType } from "./npc/types";
 import type {
   Player,
@@ -37,6 +41,7 @@ import type {
   PlayerAvatarId,
   ChatMessage,
   ChatMessageInput,
+  MapId,
 } from "@cesar-mmo/shared";
 
 type NpcDirection = "up" | "down" | "left" | "right";
@@ -64,6 +69,8 @@ type NpcInstance = {
 };
 
 export class GameScene extends Phaser.Scene {
+  private currentMapId: MapId = DEFAULT_MAP_ID;
+
   private player!: Phaser.GameObjects.Sprite;
   private map!: Phaser.Tilemaps.Tilemap;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -116,9 +123,11 @@ export class GameScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.tilemapTiledJSON("town-01", "/assets/maps/town-01/town-01.json");
-    this.load.image("town-terrain", "/assets/maps/town-01/poke-sheet.png");
-    this.load.image("town-buildings", "/assets/maps/town-01/poke-assets.png");
+    const mapConfig = MAP_REGISTRY[this.currentMapId];
+    this.load.tilemapTiledJSON(mapConfig.key, mapConfig.path);
+    for (const tileset of mapConfig.tilesets) {
+      this.load.image(tileset.key, tileset.path);
+    }
 
     // Players spritesheets
     Object.values(PLAYER_AVATARS).forEach((avatar) => {
@@ -526,8 +535,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createMap() {
+    const mapConfig = MAP_REGISTRY[this.currentMapId];
     this.map = this.make.tilemap({
-      key: "town-01",
+      key: mapConfig.key,
     });
 
     const terrainTileset = this.map.addTilesetImage("town-terrain", "town-terrain");

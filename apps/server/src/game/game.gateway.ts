@@ -14,6 +14,7 @@ import { OnModuleDestroy } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 
 import {
+  DEFAULT_MAP_ID,
   TOWN_01_MAP,
   PLAYER_SIZE,
   PLAYER_COLORS,
@@ -104,6 +105,7 @@ export class GameGateway
 
     const newPlayer: Player = {
       id: client.id,
+      mapId: DEFAULT_MAP_ID,
       displayName,
       avatarId,
       x: TOWN_01_MAP.spawn.x,
