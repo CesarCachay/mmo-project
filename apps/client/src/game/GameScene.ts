@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import { io, Socket } from "socket.io-client";
 
 import {
-  TOWN_01_MAP,
+  MAP_DATA_REGISTRY,
   PLAYER_SIZE,
   getMovementDelta,
   resolveMapCollision,
@@ -11,6 +11,7 @@ import {
   CHAT_EVENTS,
   isChatMessageInput,
   DEFAULT_MAP_ID,
+  MAP_EVENTS,
 } from "@cesar-mmo/shared";
 
 import {
@@ -42,6 +43,8 @@ import type {
   ChatMessage,
   ChatMessageInput,
   MapId,
+  MapTransitionInput,
+  MapTransitionResolved,
 } from "@cesar-mmo/shared";
 
 type NpcDirection = "up" | "down" | "left" | "right";
@@ -66,6 +69,11 @@ type NpcInstance = {
   definition: NpcDefinition;
   sprite: Phaser.GameObjects.Sprite;
   nameLabel: Phaser.GameObjects.Text;
+};
+
+type MapExitZone = {
+  id: string;
+  bounds: Phaser.Geom.Rectangle;
 };
 
 export class GameScene extends Phaser.Scene {
@@ -93,6 +101,13 @@ export class GameScene extends Phaser.Scene {
   private dialogueBox!: DialogueBox;
 
   private chatBox!: ChatBox;
+
+  // For transitions
+  private mapExitZones: MapExitZone[] = [];
+  private activeMapExitId: string | null = null;
+  private lastMapTransitionRequestAt = 0;
+  private readonly mapTransitionRetryDelayMs = 200;
+  private mapLayers: Phaser.Tilemaps.TilemapLayerBase[] = [];
 
   private lastInput: PlayerInput = {
     sequence: 0,
@@ -123,10 +138,15 @@ export class GameScene extends Phaser.Scene {
   }
 
   preload() {
-    const mapConfig = MAP_REGISTRY[this.currentMapId];
-    this.load.tilemapTiledJSON(mapConfig.key, mapConfig.path);
-    for (const tileset of mapConfig.tilesets) {
-      this.load.image(tileset.key, tileset.path);
+    // Assets and tilesets
+    for (const mapConfig of Object.values(MAP_REGISTRY)) {
+      this.load.tilemapTiledJSON(mapConfig.key, mapConfig.path);
+
+      for (const tileset of mapConfig.tilesets) {
+        if (!this.textures.exists(tileset.key)) {
+          this.load.image(tileset.key, tileset.path);
+        }
+      }
     }
 
     // Players spritesheets
@@ -148,7 +168,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   create() {
-    this.createMap();
+    this.createMap(this.currentMapId);
     this.createPlayerAnimations();
     this.createPlayer();
     this.createNpcs();
@@ -177,6 +197,7 @@ export class GameScene extends Phaser.Scene {
     this.reconcileLocalPlayer(delta);
     this.interpolateOtherPlayers(delta);
     this.updateLocalPlayerNamePosition();
+    this.updateMapExitZones();
   }
 
   private createDialogueUi() {
@@ -361,27 +382,45 @@ export class GameScene extends Phaser.Scene {
       Object.values(players).forEach((player) => {
         if (player.id === this.socket.id) {
           this.player.setPosition(player.x, player.y);
+          this.serverPosition = { x: player.x, y: player.y };
           this.playerNameLabel = this.createPlayerNameLabel(player.displayName);
           return;
         }
 
+        if (player.mapId !== this.currentMapId) {
+          return;
+        }
         this.addOtherPlayer(player);
       });
     });
 
     this.socket.on("playerJoined", (player: Player) => {
+      if (player.mapId !== this.currentMapId) {
+        return;
+      }
       this.addOtherPlayer(player);
     });
 
     this.socket.on("playersState", (players: Record<string, Player>) => {
       Object.values(players).forEach((player) => {
+        // LOCAL PLAYER
         if (player.id === this.socket.id) {
+          // Nunca aplicar coordenadas de otro mapa
+          if (player.mapId !== this.currentMapId) {
+            return;
+          }
           this.updateLocalPlayer(player);
           return;
         }
 
-        const otherPlayer = this.otherPlayers.get(player.id);
+        // REMOTE PLAYER DE OTRO MAPA
+        if (player.mapId !== this.currentMapId) {
+          this.removeOtherPlayer(player.id);
+          return;
+        }
 
+        // REMOTE PLAYER DEL MISMO MAPA
+        const otherPlayer = this.otherPlayers.get(player.id);
         if (!otherPlayer) {
           this.addOtherPlayer(player);
           return;
@@ -396,21 +435,19 @@ export class GameScene extends Phaser.Scene {
       });
     });
 
-    this.socket.on("playerDisconnected", (playerId: string) => {
-      const player = this.otherPlayers.get(playerId);
-
-      if (!player) {
-        return;
+    this.socket.on(
+      MAP_EVENTS.TRANSITION_RESOLVED,
+      (transition: MapTransitionResolved) => {
+        this.handleMapTransitionResolved(transition);
       }
+    );
 
-      player.destroy();
+    this.socket.on("playerDisconnected", (playerId: string) => {
+      this.removeOtherPlayer(playerId);
+    });
 
-      const nameLabel = this.otherPlayerNameLabels.get(playerId);
-      nameLabel?.destroy();
-
-      this.otherPlayers.delete(playerId);
-      this.otherPlayerTargets.delete(playerId);
-      this.otherPlayerNameLabels.delete(playerId);
+    this.socket.on(MAP_EVENTS.PLAYER_LEFT, (playerId: string) => {
+      this.removeOtherPlayer(playerId);
     });
   }
 
@@ -419,6 +456,36 @@ export class GameScene extends Phaser.Scene {
       x: player.x,
       y: player.y,
     };
+  }
+
+  private handleMapTransitionResolved(transition: MapTransitionResolved): void {
+    if (transition.fromMapId !== this.currentMapId) {
+      return;
+    }
+    console.log("[MapTransition] changing map", transition);
+
+    this.activeMapExitId = null;
+    this.lastMapTransitionRequestAt = 0;
+
+    this.changeCurrentMap(transition.targetMapId);
+
+    this.player.setPosition(transition.x, transition.y);
+    this.serverPosition = {
+      x: transition.x,
+      y: transition.y,
+    };
+    this.updateCameraBounds();
+
+    this.lastInput = {
+      sequence: this.inputSequence,
+      up: false,
+      down: false,
+      left: false,
+      right: false,
+    };
+
+    this.setPlayerIdle();
+    this.updateLocalPlayerNamePosition();
   }
 
   private updateLocalPlayerNamePosition() {
@@ -432,7 +499,10 @@ export class GameScene extends Phaser.Scene {
     );
   }
 
-  private addOtherPlayer(player: Player) {
+  private addOtherPlayer(player: Player): void {
+    if (player.mapId !== this.currentMapId) {
+      return;
+    }
     if (this.otherPlayers.has(player.id)) {
       return;
     }
@@ -443,13 +513,10 @@ export class GameScene extends Phaser.Scene {
       getPlayerTextureKey(player.avatarId, player.direction),
       0
     );
-
     sprite.setDepth(5);
 
     this.otherPlayers.set(player.id, sprite);
-
     const nameLabel = this.createPlayerNameLabel(player.displayName);
-
     this.otherPlayerNameLabels.set(player.id, nameLabel);
 
     this.otherPlayerTargets.set(player.id, {
@@ -458,6 +525,19 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.updateRemotePlayerAnimation(sprite, player);
+  }
+
+  private removeOtherPlayer(playerId: string): void {
+    const player = this.otherPlayers.get(playerId);
+
+    player?.destroy();
+
+    const nameLabel = this.otherPlayerNameLabels.get(playerId);
+    nameLabel?.destroy();
+
+    this.otherPlayers.delete(playerId);
+    this.otherPlayerTargets.delete(playerId);
+    this.otherPlayerNameLabels.delete(playerId);
   }
 
   private interpolateOtherPlayers(delta: number) {
@@ -484,8 +564,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private predictLocalMovement(input: PlayerInput, delta: number) {
-    const movement = getMovementDelta(input, delta / 1000);
+    const mapData = MAP_DATA_REGISTRY[this.currentMapId];
 
+    const movement = getMovementDelta(input, delta / 1000);
     const nextPosition = {
       x: this.player.x + movement.x,
       y: this.player.y + movement.y,
@@ -498,7 +579,7 @@ export class GameScene extends Phaser.Scene {
       },
       nextPosition,
       PLAYER_SIZE,
-      TOWN_01_MAP
+      mapData
     );
 
     this.player.setPosition(resolvedPosition.x, resolvedPosition.y);
@@ -506,9 +587,7 @@ export class GameScene extends Phaser.Scene {
 
   private reconcileLocalPlayer(delta: number) {
     const errorX = this.serverPosition.x - this.player.x;
-
     const errorY = this.serverPosition.y - this.player.y;
-
     const distance = Math.sqrt(errorX * errorX + errorY * errorY);
 
     const reconciliationThreshold = 2;
@@ -521,47 +600,57 @@ export class GameScene extends Phaser.Scene {
 
     if (distance > hardSnapDistance) {
       this.player.setPosition(this.serverPosition.x, this.serverPosition.y);
-
       return;
     }
 
     const reconciliationRate = 5;
-
     const alpha = 1 - Math.exp(-reconciliationRate * (delta / 1000));
-
     this.player.x = Phaser.Math.Linear(this.player.x, this.serverPosition.x, alpha);
-
     this.player.y = Phaser.Math.Linear(this.player.y, this.serverPosition.y, alpha);
   }
 
-  private createMap() {
-    const mapConfig = MAP_REGISTRY[this.currentMapId];
+  private createMap(mapId: MapId): void {
+    const mapConfig = MAP_REGISTRY[mapId];
     this.map = this.make.tilemap({
       key: mapConfig.key,
     });
 
-    const terrainTileset = this.map.addTilesetImage("town-terrain", "town-terrain");
+    const mapTilesets = mapConfig.tilesets.map((tilesetConfig) => {
+      const tileset = this.map.addTilesetImage(tilesetConfig.key, tilesetConfig.key);
 
-    const buildingsTileset = this.map.addTilesetImage("town-buildings", "town-buildings");
+      if (!tileset) {
+        throw new Error(
+          `Could not load tileset "${tilesetConfig.key}" for map "${mapId}"`
+        );
+      }
 
-    if (!terrainTileset || !buildingsTileset) {
-      throw new Error("Could not load Tiled tilesets");
-    }
+      return tileset;
+    });
 
-    const tilesets = [terrainTileset, buildingsTileset];
-
-    const groundLayer = this.map.createLayer("Ground", tilesets, 0, 0);
-
-    const groundDetailsLayer = this.map.createLayer("GroundDetails", tilesets, 0, 0);
-
-    const buildingsLayer = this.map.createLayer("Buildings", tilesets, 0, 0);
-
-    const abovePlayerLayer = this.map.createLayer("AbovePlayer", tilesets, 0, 0);
+    const groundLayer = this.map.createLayer("Ground", mapTilesets, 0, 0);
+    const groundDetailsLayer = this.map.createLayer("GroundDetails", mapTilesets, 0, 0);
+    const buildingsLayer = this.map.createLayer("Buildings", mapTilesets, 0, 0);
+    const abovePlayerLayer = this.map.createLayer("AbovePlayer", mapTilesets, 0, 0);
 
     groundLayer?.setDepth(0);
     groundDetailsLayer?.setDepth(1);
     buildingsLayer?.setDepth(2);
     abovePlayerLayer?.setDepth(10);
+
+    if (groundLayer) {
+      this.mapLayers.push(groundLayer);
+    }
+    if (groundDetailsLayer) {
+      this.mapLayers.push(groundDetailsLayer);
+    }
+    if (buildingsLayer) {
+      this.mapLayers.push(buildingsLayer);
+    }
+    if (abovePlayerLayer) {
+      this.mapLayers.push(abovePlayerLayer);
+    }
+
+    this.createMapExitZones();
   }
 
   private getPlayerSpawn() {
@@ -639,9 +728,26 @@ export class GameScene extends Phaser.Scene {
     sprite.setTexture(getPlayerTextureKey(player.avatarId, player.direction), 0);
   }
 
-  private setupCamera() {
-    this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
+  private updateCameraBounds(): void {
+    const camera = this.cameras.main;
+    const mapWidth = this.map.widthInPixels;
+    const mapHeight = this.map.heightInPixels;
+    const viewportWidth = camera.width / camera.zoom;
+    const viewportHeight = camera.height / camera.zoom;
 
+    const horizontalPadding = Math.max(0, (viewportWidth - mapWidth) / 2);
+    const verticalPadding = Math.max(0, (viewportHeight - mapHeight) / 2);
+
+    camera.setBounds(
+      -horizontalPadding,
+      -verticalPadding,
+      mapWidth + horizontalPadding * 2,
+      mapHeight + verticalPadding * 2
+    );
+  }
+
+  private setupCamera(): void {
+    this.updateCameraBounds();
     this.cameras.main.startFollow(this.player, true);
   }
 
@@ -724,17 +830,14 @@ export class GameScene extends Phaser.Scene {
 
     for (const npc of npcDefinitions) {
       const textureKey = getNpcTextureKey(npc.sprite, npc.direction);
-
       if (!this.textures.exists(textureKey)) {
         throw new Error(`NPC texture not found: ${textureKey}`);
       }
 
       const sprite = this.add.sprite(npc.x, npc.y, textureKey, 0);
-
       sprite.setDepth(5);
 
       const nameLabel = this.createPlayerNameLabel(npc.displayName);
-
       nameLabel.setPosition(Math.round(npc.x), Math.round(npc.y - 14));
 
       this.npcs.set(npc.id, {
@@ -743,6 +846,17 @@ export class GameScene extends Phaser.Scene {
         nameLabel,
       });
     }
+  }
+
+  private destroyNpcs(): void {
+    this.nearbyNpc = undefined;
+
+    for (const npc of this.npcs.values()) {
+      npc.sprite.destroy();
+      npc.nameLabel.destroy();
+    }
+
+    this.npcs.clear();
   }
 
   private findNearbyNpc(): NpcInstance | undefined {
@@ -816,5 +930,126 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.chatBox.focusInput();
+  }
+
+  private createMapExitZones(): void {
+    this.mapExitZones = [];
+    this.activeMapExitId = null;
+
+    const objectsLayer = this.map.getObjectLayer("Objects");
+
+    if (!objectsLayer) {
+      console.log("[MapExit] Objects layer not found");
+      return;
+    }
+
+    for (const object of objectsLayer.objects) {
+      if (object.type !== "mapExit") {
+        continue;
+      }
+
+      if (
+        !object.name ||
+        typeof object.x !== "number" ||
+        typeof object.y !== "number" ||
+        typeof object.width !== "number" ||
+        typeof object.height !== "number"
+      ) {
+        continue;
+      }
+
+      if (object.width <= 0 || object.height <= 0) {
+        continue;
+      }
+
+      this.mapExitZones.push({
+        id: object.name,
+        bounds: new Phaser.Geom.Rectangle(
+          object.x,
+          object.y,
+          object.width,
+          object.height
+        ),
+      });
+    }
+
+    console.log("[MapExit] zones loaded", this.mapExitZones);
+  }
+
+  private updateMapExitZones(): void {
+    if (!this.player) {
+      return;
+    }
+    const playerX = this.player.x;
+    const playerY = this.player.y;
+
+    const currentExit = this.mapExitZones.find((exitZone) =>
+      exitZone.bounds.contains(playerX, playerY)
+    );
+
+    if (!currentExit) {
+      this.activeMapExitId = null;
+      this.lastMapTransitionRequestAt = 0;
+      return;
+    }
+
+    const now = this.time.now;
+
+    if (this.activeMapExitId === currentExit.id) {
+      this.activeMapExitId = currentExit.id;
+      this.lastMapTransitionRequestAt = now;
+      console.log("[MapExit] entered", currentExit.id);
+      this.requestMapTransition(currentExit.id);
+      return;
+    }
+
+    if (now - this.lastMapTransitionRequestAt < this.mapTransitionRetryDelayMs) {
+      return;
+    }
+
+    this.lastMapTransitionRequestAt = now;
+    console.log("[MapExit] entered", currentExit.id);
+    this.requestMapTransition(currentExit.id);
+  }
+
+  private requestMapTransition(transitionId: string): void {
+    if (!this.socket.connected) {
+      return;
+    }
+    const input: MapTransitionInput = {
+      transitionId,
+    };
+    this.socket.emit(MAP_EVENTS.REQUEST_TRANSITION, input);
+  }
+
+  private destroyCurrentMap(): void {
+    this.destroyNpcs();
+
+    for (const layer of this.mapLayers) {
+      layer.destroy();
+    }
+
+    this.mapLayers = [];
+    this.mapExitZones = [];
+    this.activeMapExitId = null;
+  }
+
+  private changeCurrentMap(mapId: MapId): void {
+    if (mapId === this.currentMapId) {
+      return;
+    }
+
+    this.destroyCurrentMap();
+    this.clearOtherPlayers();
+
+    this.currentMapId = mapId;
+    this.createMap(this.currentMapId);
+    this.createNpcs();
+  }
+
+  private clearOtherPlayers(): void {
+    for (const playerId of this.otherPlayers.keys()) {
+      this.removeOtherPlayer(playerId);
+    }
   }
 }

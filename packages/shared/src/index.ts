@@ -26,5 +26,19 @@ export type { PlayerAvatarId } from "./player/avatar.js";
 export type { ChatMessage, ChatMessageInput, ChatMessageSender } from "./chat.js";
 export { CHAT_EVENTS, CHAT_MESSAGE_MAX_LENGTH, isChatMessageInput } from "./chat.js";
 
-export type { MapId } from "./map.js";
-export { MAP_IDS, DEFAULT_MAP_ID } from "./map.js";
+export type { MapId, MapTransitionInput, MapTransitionResolved } from "./map.js";
+export {
+  MAP_IDS,
+  DEFAULT_MAP_ID,
+  MAP_TRANSITION_ID_MAX_LENGTH,
+  MAP_EVENTS,
+  isMapTransitionInput,
+} from "./map.js";
+
+export type {
+  SharedMapData,
+  SharedMapSpawn,
+  SharedMapTransition,
+  SharedMapTransitionTrigger,
+} from "./mapDataRegistry.js";
+export { MAP_DATA_REGISTRY } from "./mapDataRegistry.js";

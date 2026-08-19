@@ -29,4 +29,28 @@ export const MAP_REGISTRY: Record<MapId, GameMapConfig> = {
       },
     ],
   },
+  [MAP_IDS.HOUSE_01]: {
+    id: MAP_IDS.HOUSE_01,
+    key: MAP_IDS.HOUSE_01,
+    path: "/assets/maps/house-01/house-01.json",
+
+    tilesets: [
+      {
+        key: "interior-floors-walls",
+        path: "/assets/maps/tilesets/interiors/bitglow-lrk/interior-floors-walls.png",
+      },
+      {
+        key: "interior-cabinets",
+        path: "/assets/maps/tilesets/interiors/bitglow-lrk/interior-cabinets.png",
+      },
+      {
+        key: "interior-decorations",
+        path: "/assets/maps/tilesets/interiors/bitglow-lrk/interior-decorations.png",
+      },
+      {
+        key: "interior-living-room",
+        path: "/assets/maps/tilesets/interiors/bitglow-lrk/interior-living-room.png",
+      },
+    ],
+  },
 };

@@ -15,7 +15,6 @@ import { Server, Socket } from 'socket.io';
 
 import {
   DEFAULT_MAP_ID,
-  TOWN_01_MAP,
   PLAYER_SIZE,
   PLAYER_COLORS,
   SERVER_TICK_RATE,
@@ -26,10 +25,23 @@ import {
   isPlayerAvatarId,
   CHAT_EVENTS,
   isChatMessageInput,
+  isMapTransitionInput,
+  MAP_EVENTS,
+  MAP_DATA_REGISTRY,
 } from '@cesar-mmo/shared';
+import {
+  getServerMapSpawn,
+  getServerMapTransition,
+  isPlayerInsideMapTransition,
+} from './maps/serverMapRegistry';
 import { ChatService } from 'src/chat/chat.service';
 
-import type { Player, PlayerInput } from '@cesar-mmo/shared';
+import type {
+  Player,
+  PlayerInput,
+  MapTransitionResolved,
+  MapId,
+} from '@cesar-mmo/shared';
 
 @WebSocketGateway({
   cors: {
@@ -66,7 +78,7 @@ export class GameGateway
     }
   }
 
-  handleConnection(client: Socket) {
+  async handleConnection(client: Socket): Promise<void> {
     const displayName = this.getRequestedDisplayName(client);
     const avatarId: unknown = client.handshake.auth.avatarId;
 
@@ -108,8 +120,8 @@ export class GameGateway
       mapId: DEFAULT_MAP_ID,
       displayName,
       avatarId,
-      x: TOWN_01_MAP.spawn.x,
-      y: TOWN_01_MAP.spawn.y,
+      x: MAP_DATA_REGISTRY[DEFAULT_MAP_ID].spawn.x,
+      y: MAP_DATA_REGISTRY[DEFAULT_MAP_ID].spawn.y,
       color,
       direction: 'down',
       isMoving: false,
@@ -126,16 +138,15 @@ export class GameGateway
       right: false,
     };
 
+    const mapRoom = this.getMapRoom(newPlayer.mapId);
+    await client.join(mapRoom);
+
     console.log(`Player connected: ${client.id}`);
-
-    client.emit('currentPlayers', this.players);
-
-    client.broadcast.emit('playerJoined', newPlayer);
+    client.emit('currentPlayers', this.getPlayersInMap(newPlayer.mapId));
+    client.to(mapRoom).emit('playerJoined', newPlayer);
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`Player disconnected: ${client.id}`);
-
     const player = this.players[client.id];
     if (!player) {
       return;
@@ -143,10 +154,11 @@ export class GameGateway
 
     console.log(`Player disconnected: ${client.id}`);
 
+    const mapRoom = this.getMapRoom(player.mapId);
     delete this.players[client.id];
     delete this.playerInputs[client.id];
 
-    this.server.emit('playerDisconnected', client.id);
+    this.server.to(mapRoom).emit('playerDisconnected', client.id);
   }
 
   @SubscribeMessage('playerInput')
@@ -189,6 +201,95 @@ export class GameGateway
     this.server.emit(CHAT_EVENTS.MESSAGE_RECEIVED, message);
   }
 
+  @SubscribeMessage(MAP_EVENTS.REQUEST_TRANSITION)
+  async handleMapTransitionRequest(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: unknown,
+  ): Promise<void> {
+    if (!isMapTransitionInput(payload)) {
+      return;
+    }
+
+    const player = this.players[client.id];
+
+    if (!player) {
+      return;
+    }
+
+    const transition = getServerMapTransition(
+      player.mapId,
+      payload.transitionId,
+    );
+
+    if (!transition) {
+      return;
+    }
+
+    const isInsideTransition = isPlayerInsideMapTransition(
+      player.x,
+      player.y,
+      transition,
+    );
+
+    if (!isInsideTransition) {
+      console.warn('[MapTransition] rejected: player outside trigger', {
+        playerId: player.id,
+        mapId: player.mapId,
+        transitionId: payload.transitionId.trim(),
+        x: player.x,
+        y: player.y,
+      });
+
+      return;
+    }
+
+    const targetSpawn = getServerMapSpawn(
+      transition.targetMapId,
+      transition.targetSpawn,
+    );
+    if (!targetSpawn) {
+      return;
+    }
+
+    const fromMapId = player.mapId;
+    const resolvedTransition: MapTransitionResolved = {
+      transitionId: payload.transitionId.trim(),
+      fromMapId,
+      targetMapId: transition.targetMapId,
+      targetSpawn: transition.targetSpawn,
+      x: targetSpawn.x,
+      y: targetSpawn.y,
+    };
+
+    const fromRoom = this.getMapRoom(fromMapId);
+    const targetRoom = this.getMapRoom(transition.targetMapId);
+
+    /* Informamos inmediatamente a los demás jugadores del mapa anterior */
+    client.to(fromRoom).emit(MAP_EVENTS.PLAYER_LEFT, player.id);
+    await client.leave(fromRoom);
+
+    player.mapId = transition.targetMapId;
+    player.x = targetSpawn.x;
+    player.y = targetSpawn.y;
+    player.isMoving = false;
+
+    this.playerInputs[client.id] = {
+      sequence: player.lastProcessedInputSequence,
+      up: false,
+      down: false,
+      left: false,
+      right: false,
+    };
+
+    /* Entramos al nuevo room */
+    await client.join(targetRoom);
+
+    /* Los jugadores que ya estaban en el destino deben saber que llegamos */
+    client.to(targetRoom).emit('playerJoined', player);
+
+    client.emit(MAP_EVENTS.TRANSITION_RESOLVED, resolvedTransition);
+  }
+
   private startGameLoop() {
     const tickInterval = 1000 / SERVER_TICK_RATE;
 
@@ -210,7 +311,7 @@ export class GameGateway
       this.updatePlayer(player, input, deltaSeconds);
     }
 
-    this.server.emit('playersState', this.players);
+    this.emitPlayersStateByMap();
   }
 
   private updatePlayer(
@@ -221,8 +322,9 @@ export class GameGateway
     player.direction = getDirectionFromInput(input, player.direction);
     player.isMoving = isPlayerMoving(input);
 
-    const updatedPlayer = applyPlayerMovement(player, input, deltaSeconds);
+    const mapData = MAP_DATA_REGISTRY[player.mapId];
 
+    const updatedPlayer = applyPlayerMovement(player, input, deltaSeconds);
     const resolvedPosition = resolveMapCollision(
       {
         x: player.x,
@@ -233,7 +335,7 @@ export class GameGateway
         y: updatedPlayer.y,
       },
       PLAYER_SIZE,
-      TOWN_01_MAP,
+      mapData,
     );
 
     player.x = resolvedPosition.x;
@@ -269,5 +371,36 @@ export class GameGateway
       (player) =>
         player.displayName.trim().toLowerCase() === normalizedDisplayName,
     );
+  }
+
+  private getMapRoom(mapId: MapId): string {
+    return `map:${mapId}`;
+  }
+
+  private getPlayersInMap(mapId: MapId): Record<string, Player> {
+    const playersInMap: Record<string, Player> = {};
+
+    for (const [playerId, player] of Object.entries(this.players)) {
+      if (player.mapId !== mapId) {
+        continue;
+      }
+      playersInMap[playerId] = player;
+    }
+
+    return playersInMap;
+  }
+
+  private emitPlayersStateByMap(): void {
+    const activeMapIds = new Set<MapId>();
+
+    for (const player of Object.values(this.players)) {
+      activeMapIds.add(player.mapId);
+    }
+
+    for (const mapId of activeMapIds) {
+      const room = this.getMapRoom(mapId);
+      const players = this.getPlayersInMap(mapId);
+      this.server.to(room).emit('playersState', players);
+    }
   }
 }
