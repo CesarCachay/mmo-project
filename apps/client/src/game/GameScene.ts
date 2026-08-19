@@ -98,6 +98,8 @@ export class GameScene extends Phaser.Scene {
   private npcs = new Map<string, NpcInstance>();
   private nearbyNpc?: NpcInstance;
   private readonly npcInteractionDistance = 36;
+  private npcInteractionPrompt?: Phaser.GameObjects.Text;
+
   private dialogueBox!: DialogueBox;
 
   private chatBox!: ChatBox;
@@ -172,6 +174,7 @@ export class GameScene extends Phaser.Scene {
     this.createPlayerAnimations();
     this.createPlayer();
     this.createNpcs();
+    this.createNpcInteractionPrompt();
     this.setupCamera();
     this.createDialogueUi();
     this.createChatUi();
@@ -188,6 +191,7 @@ export class GameScene extends Phaser.Scene {
     this.handleChatFocus();
 
     this.updateNearbyNpc();
+    this.updateNpcInteractionPrompt();
     this.handleNpcInteraction();
 
     const input = this.getCurrentInput();
@@ -255,17 +259,17 @@ export class GameScene extends Phaser.Scene {
 
     if (!dialogueId) {
       console.warn(`NPC ${npc.definition.id} has no dialogueId`);
-
       return;
     }
-    const dialogue = getDialogue(dialogueId);
 
+    const dialogue = getDialogue(dialogueId);
     if (!dialogue) {
       console.warn(`Dialogue not found: ${npc.definition.dialogueId}`);
-
       return;
     }
+    this.dialogueBox.start(npc.definition.displayName, dialogue.lines);
 
+    this.chatBox.setVisible(false);
     this.dialogueBox.start(npc.definition.displayName, dialogue.lines);
   }
 
@@ -715,7 +719,6 @@ export class GameScene extends Phaser.Scene {
 
   private setPlayerIdle() {
     this.player.anims.stop();
-
     this.player.setTexture(getPlayerTextureKey(this.avatarId, this.playerDirection), 0);
   }
 
@@ -890,6 +893,10 @@ export class GameScene extends Phaser.Scene {
     }
     if (this.dialogueBox.isOpen()) {
       this.dialogueBox.advance();
+
+      if (!this.dialogueBox.isOpen()) {
+        this.chatBox.setVisible(true);
+      }
       return;
     }
     if (!this.nearbyNpc) {
@@ -897,6 +904,41 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.interactWithNpc(this.nearbyNpc);
+  }
+
+  private createNpcInteractionPrompt(): void {
+    this.npcInteractionPrompt = this.add
+      .text(40, 0, "", {
+        fontFamily: "Arial",
+        fontSize: "9px",
+        color: "#ffffff",
+        backgroundColor: "rgba(0, 0, 0, 0.35)",
+        padding: {
+          x: 5,
+          y: 3,
+        },
+      })
+      .setOrigin(0.5, 1)
+      .setDepth(30)
+      .setVisible(false)
+      .setResolution(2);
+  }
+
+  private updateNpcInteractionPrompt(): void {
+    const prompt = this.npcInteractionPrompt;
+    if (!prompt) {
+      return;
+    }
+    if (!this.nearbyNpc || this.dialogueBox.isOpen() || this.chatBox.isTyping()) {
+      prompt.setVisible(false);
+      return;
+    }
+    const npc = this.nearbyNpc;
+
+    prompt
+      .setText("[E] Hablar")
+      .setPosition(Math.round(npc.sprite.x), Math.round(npc.sprite.y - 28))
+      .setVisible(true);
   }
 
   public sendChatMessage(text: string): void {

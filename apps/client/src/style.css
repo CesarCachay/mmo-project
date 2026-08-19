@@ -1,45 +1,53 @@
 html,
 body {
+  width: 100%;
+  min-height: 100%;
   margin: 0;
   padding: 0;
   background: #111;
 }
 
 body {
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-
-  min-width: 100vw;
-  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 24px 0;
+  overflow: hidden;
 }
 
 canvas {
-  border: 1px solid #333;
+  display: block;
+  border: 0;
+  image-rendering: pixelated;
+}
+
+#app {
+  width: min(100vw, calc((100vh - 48px) * 4 / 3));
+  /* Respeta el aspect ratio lógico del juego: 640 / 480 = 4 / 3 */
+  aspect-ratio: 4 / 3;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 4px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
 }
 
 .join-panel {
   box-sizing: border-box;
-
   width: 320px;
-
-  padding: 32px;
-
+  padding: 24px 32px;
   border: 1px solid #334155;
   border-radius: 8px;
-
   background: #1e293b;
-
   font-family: Arial, Helvetica, sans-serif;
-
   color: #ffffff;
-
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
 }
 
 .join-header {
-  margin-bottom: 32px;
-
+  margin-bottom: 24px;
   text-align: center;
 }
 
@@ -66,45 +74,32 @@ canvas {
 
 .join-form {
   display: flex;
-
   flex-direction: column;
 }
 
 .join-field {
   display: flex;
-
   flex-direction: column;
-
   gap: 8px;
 }
 
 .join-label {
   font-size: 12px;
-
   color: #cbd5e1;
 }
 
 .join-input {
   box-sizing: border-box;
-
   width: 100%;
   height: 40px;
-
   padding: 0 12px;
-
   border: 1px solid #475569;
   border-radius: 5px;
-
   background: #0f172a;
-
   color: #f8fafc;
-
   font-family: Arial, Helvetica, sans-serif;
-
   font-size: 14px;
-
   outline: none;
-
   transition: border-color 150ms ease;
 }
 
@@ -117,40 +112,27 @@ canvas {
 }
 
 .join-error {
-  min-height: 28px;
-
-  padding-top: 6px;
-
+  min-height: 20px;
+  padding-top: 4px;
   color: #f87171;
-
   font-size: 11px;
-
   line-height: 16px;
 }
 
 .join-button {
   box-sizing: border-box;
-
   width: 100%;
   height: 40px;
-
   border: 0;
   border-radius: 5px;
-
   background: #2563eb;
-
   color: #ffffff;
-
   font-family: Arial, Helvetica, sans-serif;
-
   font-size: 12px;
   font-weight: 700;
-
   letter-spacing: 0.4px;
-
   cursor: pointer;
-
-  margin-top: 20px;
+  margin-top: 16px;
   transition: background 150ms ease;
 }
 
@@ -163,19 +145,16 @@ canvas {
 }
 
 .join-hint {
-  margin: 12px 0 0;
-
+  margin: 8px 0 0;
   color: #64748b;
-
   font-size: 10px;
-
   text-align: center;
 }
 
 .join-avatar-field {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .join-avatar-options {

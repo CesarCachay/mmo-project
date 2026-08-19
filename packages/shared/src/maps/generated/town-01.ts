@@ -21,8 +21,8 @@ export const TOWN_01_MAP = {
 
   spawns: {
     "house01Door": {
-      x: 360,
-      y: 186,
+      x: 464,
+      y: 210,
     },
   },
 

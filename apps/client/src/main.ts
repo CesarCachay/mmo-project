@@ -9,10 +9,17 @@ import { VIEWPORT_HEIGHT, VIEWPORT_WIDTH } from "./game/game.constants";
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
 
-  parent: "app",
-
   width: VIEWPORT_WIDTH,
   height: VIEWPORT_HEIGHT,
+
+  parent: "app",
+
+  scale: {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    width: VIEWPORT_WIDTH,
+    height: VIEWPORT_HEIGHT,
+  },
 
   pixelArt: true,
 

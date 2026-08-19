@@ -131,7 +131,7 @@ export class JoinScene extends Phaser.Scene {
       </form>
     `;
 
-    const domElement = this.add.dom(width / 2, height / 2, container);
+    const domElement = this.add.dom(width / 2, height / 2, container).setOrigin(0.5, 0.5);
 
     const form = container.querySelector<HTMLFormElement>(".join-form");
 
