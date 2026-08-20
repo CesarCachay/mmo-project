@@ -97,6 +97,7 @@ export class GameScene extends Phaser.Scene {
 
   private npcs = new Map<string, NpcInstance>();
   private nearbyNpc?: NpcInstance;
+  private activeDialogueNpc?: NpcInstance;
   private readonly npcInteractionDistance = 36;
   private npcInteractionPrompt?: Phaser.GameObjects.Text;
 
@@ -110,6 +111,9 @@ export class GameScene extends Phaser.Scene {
   private lastMapTransitionRequestAt = 0;
   private readonly mapTransitionRetryDelayMs = 200;
   private mapLayers: Phaser.Tilemaps.TilemapLayerBase[] = [];
+
+  private isMapTransitioning = false;
+  private readonly mapTransitionFadeDurationMs = 250;
 
   private lastInput: PlayerInput = {
     sequence: 0,
@@ -267,10 +271,68 @@ export class GameScene extends Phaser.Scene {
       console.warn(`Dialogue not found: ${npc.definition.dialogueId}`);
       return;
     }
-    this.dialogueBox.start(npc.definition.displayName, dialogue.lines);
 
+    this.activeDialogueNpc = npc;
+    this.facePlayerAndNpc(npc);
     this.chatBox.setVisible(false);
     this.dialogueBox.start(npc.definition.displayName, dialogue.lines);
+  }
+
+  private getFacingDirection(
+    fromX: number,
+    fromY: number,
+    targetX: number,
+    targetY: number,
+    fallback: NpcDirection
+  ): NpcDirection {
+    const deltaX = targetX - fromX;
+    const deltaY = targetY - fromY;
+
+    if (deltaX === 0 && deltaY === 0) {
+      return fallback;
+    }
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      return deltaX > 0 ? "right" : "left";
+    }
+
+    return deltaY > 0 ? "down" : "up";
+  }
+
+  private facePlayerAndNpc(npc: NpcInstance): void {
+    const playerDirection = this.getFacingDirection(
+      this.player.x,
+      this.player.y,
+      npc.sprite.x,
+      npc.sprite.y,
+      this.playerDirection
+    );
+    const npcDirection = this.getFacingDirection(
+      npc.sprite.x,
+      npc.sprite.y,
+      this.player.x,
+      this.player.y,
+      npc.definition.direction
+    );
+
+    this.playerDirection = playerDirection;
+    this.setPlayerIdle();
+
+    npc.sprite.anims.stop();
+    npc.sprite.setTexture(getNpcTextureKey(npc.definition.sprite, npcDirection), 0);
+  }
+
+  private restoreActiveDialogueNpcDirection(): void {
+    const npc = this.activeDialogueNpc;
+    if (!npc) {
+      return;
+    }
+    npc.sprite.anims.stop();
+    npc.sprite.setTexture(
+      getNpcTextureKey(npc.definition.sprite, npc.definition.direction),
+      0
+    );
+
+    this.activeDialogueNpc = undefined;
   }
 
   private createControls() {
@@ -309,7 +371,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private getCurrentInput(): PlayerInput {
-    if (this.dialogueBox.isOpen() || this.chatBox.isTyping()) {
+    const { isMapTransitioning, dialogueBox, chatBox } = this;
+    const condition = isMapTransitioning || dialogueBox.isOpen() || chatBox.isTyping();
+    if (condition) {
       return {
         sequence: this.inputSequence,
         up: false,
@@ -442,7 +506,15 @@ export class GameScene extends Phaser.Scene {
     this.socket.on(
       MAP_EVENTS.TRANSITION_RESOLVED,
       (transition: MapTransitionResolved) => {
-        this.handleMapTransitionResolved(transition);
+        if (transition.fromMapId !== this.currentMapId) {
+          return;
+        }
+
+        if (!this.beginMapTransition()) {
+          return;
+        }
+
+        this.startMapTransitionFade(transition);
       }
     );
 
@@ -568,6 +640,10 @@ export class GameScene extends Phaser.Scene {
   }
 
   private predictLocalMovement(input: PlayerInput, delta: number) {
+    if (this.isMapTransitioning) {
+      return;
+    }
+
     const mapData = MAP_DATA_REGISTRY[this.currentMapId];
 
     const movement = getMovementDelta(input, delta / 1000);
@@ -884,25 +960,34 @@ export class GameScene extends Phaser.Scene {
   }
 
   private handleNpcInteraction() {
+    if (this.isMapTransitioning) {
+      return;
+    }
     if (this.chatBox.isTyping()) {
       return;
     }
-
     if (!Phaser.Input.Keyboard.JustDown(this.interactKey)) {
       return;
     }
     if (this.dialogueBox.isOpen()) {
       this.dialogueBox.advance();
-
       if (!this.dialogueBox.isOpen()) {
+        this.restoreActiveDialogueNpcDirection();
         this.chatBox.setVisible(true);
       }
       return;
     }
+
     if (!this.nearbyNpc) {
       return;
     }
 
+    const interactionPrompt = this.getNpcInteractionPromptText(
+      this.nearbyNpc.definition.interactionType
+    );
+    if (!interactionPrompt) {
+      return;
+    }
     this.interactWithNpc(this.nearbyNpc);
   }
 
@@ -929,16 +1014,40 @@ export class GameScene extends Phaser.Scene {
     if (!prompt) {
       return;
     }
-    if (!this.nearbyNpc || this.dialogueBox.isOpen() || this.chatBox.isTyping()) {
+    if (
+      this.isMapTransitioning ||
+      !this.nearbyNpc ||
+      this.dialogueBox.isOpen() ||
+      this.chatBox.isTyping()
+    ) {
       prompt.setVisible(false);
       return;
     }
     const npc = this.nearbyNpc;
 
+    const promptText = this.getNpcInteractionPromptText(npc.definition.interactionType);
+    if (!promptText) {
+      prompt.setVisible(false);
+      return;
+    }
+
     prompt
-      .setText("[E] Hablar")
+      .setText(promptText)
       .setPosition(Math.round(npc.sprite.x), Math.round(npc.sprite.y - 28))
       .setVisible(true);
+  }
+
+  private getNpcInteractionPromptText(
+    interactionType: NpcInteractionType
+  ): string | undefined {
+    switch (interactionType) {
+      case "dialogue":
+        return "[E] Hablar";
+
+      case "shop":
+      case "quest":
+        return undefined;
+    }
   }
 
   public sendChatMessage(text: string): void {
@@ -961,6 +1070,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private handleChatFocus(): void {
+    if (this.isMapTransitioning) {
+      return;
+    }
     if (this.chatBox.isTyping()) {
       return;
     }
@@ -1019,7 +1131,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private updateMapExitZones(): void {
-    if (!this.player) {
+    if (!this.player || this.isMapTransitioning) {
       return;
     }
     const playerX = this.player.x;
@@ -1037,7 +1149,8 @@ export class GameScene extends Phaser.Scene {
 
     const now = this.time.now;
 
-    if (this.activeMapExitId === currentExit.id) {
+    // Primera entrada a este exit
+    if (this.activeMapExitId !== currentExit.id) {
       this.activeMapExitId = currentExit.id;
       this.lastMapTransitionRequestAt = now;
       console.log("[MapExit] entered", currentExit.id);
@@ -1045,23 +1158,23 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
+    // Seguimos dentro del mismo exit, permite el retry si el server aún no resolvió.
     if (now - this.lastMapTransitionRequestAt < this.mapTransitionRetryDelayMs) {
       return;
     }
 
     this.lastMapTransitionRequestAt = now;
-    console.log("[MapExit] entered", currentExit.id);
     this.requestMapTransition(currentExit.id);
   }
 
   private requestMapTransition(transitionId: string): void {
-    if (!this.socket.connected) {
+    if (this.isMapTransitioning) {
       return;
     }
-    const input: MapTransitionInput = {
+    const payload: MapTransitionInput = {
       transitionId,
     };
-    this.socket.emit(MAP_EVENTS.REQUEST_TRANSITION, input);
+    this.socket.emit(MAP_EVENTS.REQUEST_TRANSITION, payload);
   }
 
   private destroyCurrentMap(): void {
@@ -1093,5 +1206,47 @@ export class GameScene extends Phaser.Scene {
     for (const playerId of this.otherPlayers.keys()) {
       this.removeOtherPlayer(playerId);
     }
+  }
+
+  private beginMapTransition(): boolean {
+    if (this.isMapTransitioning) {
+      return false;
+    }
+    this.isMapTransitioning = true;
+    return true;
+  }
+
+  private finishMapTransition(): void {
+    this.isMapTransitioning = false;
+  }
+
+  private startMapTransitionFade(transition: MapTransitionResolved): void {
+    const camera = this.cameras.main;
+    const duration = this.mapTransitionFadeDurationMs;
+
+    this.setPlayerIdle();
+
+    camera.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+      try {
+        this.handleMapTransitionResolved(transition);
+      } catch (error) {
+        console.error("[MapTransition] Failed while changing map", error);
+      }
+
+      this.fadeInAfterMapTransition();
+    });
+
+    camera.fadeOut(duration, 0, 0, 0);
+  }
+
+  private fadeInAfterMapTransition(): void {
+    const camera = this.cameras.main;
+    const duration = this.mapTransitionFadeDurationMs;
+
+    camera.once(Phaser.Cameras.Scene2D.Events.FADE_IN_COMPLETE, () => {
+      this.finishMapTransition();
+    });
+
+    camera.fadeIn(duration, 0, 0, 0);
   }
 }

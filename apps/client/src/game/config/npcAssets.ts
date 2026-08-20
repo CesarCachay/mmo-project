@@ -12,11 +12,11 @@ type NpcAssetDefinition = {
 export const NPC_ASSETS = {
   "professor-oak": {
     folder: "/assets/characters/npcs/professor-oak",
-    directions: ["down"],
+    directions: ["down", "up", "left", "right"],
   },
   "dra-gianela": {
     folder: "/assets/characters/npcs/dra-gianela",
-    directions: ["down"],
+    directions: ["down", "up", "left", "right"],
   },
 } satisfies Record<string, NpcAssetDefinition>;
 
