@@ -31,10 +31,14 @@ import {
 import { ChatBox } from "./ui/ChatBox";
 import { DialogueBox } from "./ui/DialogueBox";
 import { getDialogue } from "./dialogue/dialogues";
-
 import { MAP_REGISTRY } from "./maps/mapRegistry";
+// remote players
+import { RemotePlayerManager } from "./player/RemotePlayerManager";
+// npc
+import { NpcManager } from "./npc/NpcManager";
+import type { NpcDirection, NpcInstance, NpcInteractionType } from "./npc/types";
 
-import type { NpcInteractionType } from "./npc/types";
+// types
 import type {
   Player,
   PlayerInput,
@@ -46,30 +50,6 @@ import type {
   MapTransitionInput,
   MapTransitionResolved,
 } from "@cesar-mmo/shared";
-
-type NpcDirection = "up" | "down" | "left" | "right";
-
-type TiledCustomProperty = {
-  name: string;
-  value: unknown;
-};
-
-type NpcDefinition = {
-  id: string;
-  x: number;
-  y: number;
-  displayName: string;
-  direction: NpcDirection;
-  sprite: string;
-  interactionType: NpcInteractionType;
-  dialogueId?: string;
-};
-
-type NpcInstance = {
-  definition: NpcDefinition;
-  sprite: Phaser.GameObjects.Sprite;
-  nameLabel: Phaser.GameObjects.Text;
-};
 
 type MapExitZone = {
   id: string;
@@ -89,13 +69,8 @@ export class GameScene extends Phaser.Scene {
 
   private socket!: Socket;
 
-  private otherPlayers = new Map<string, Phaser.GameObjects.Sprite>();
-  private otherPlayerTargets = new Map<string, { x: number; y: number }>();
-
   private playerNameLabel?: Phaser.GameObjects.Text;
-  private otherPlayerNameLabels = new Map<string, Phaser.GameObjects.Text>();
 
-  private npcs = new Map<string, NpcInstance>();
   private nearbyNpc?: NpcInstance;
   private activeDialogueNpc?: NpcInstance;
   private readonly npcInteractionDistance = 36;
@@ -104,6 +79,10 @@ export class GameScene extends Phaser.Scene {
   private dialogueBox!: DialogueBox;
 
   private chatBox!: ChatBox;
+
+  private npcManager!: NpcManager;
+
+  private remotePlayerManager!: RemotePlayerManager;
 
   // For transitions
   private mapExitZones: MapExitZone[] = [];
@@ -177,7 +156,15 @@ export class GameScene extends Phaser.Scene {
     this.createMap(this.currentMapId);
     this.createPlayerAnimations();
     this.createPlayer();
-    this.createNpcs();
+
+    this.remotePlayerManager = new RemotePlayerManager(this, (displayName) =>
+      this.createPlayerNameLabel(displayName)
+    );
+    this.npcManager = new NpcManager(this, (displayName) =>
+      this.createPlayerNameLabel(displayName)
+    );
+
+    this.npcManager.create(this.map);
     this.createNpcInteractionPrompt();
     this.setupCamera();
     this.createDialogueUi();
@@ -203,7 +190,7 @@ export class GameScene extends Phaser.Scene {
     this.sendInputIfChanged(input);
     this.predictLocalMovement(input, delta);
     this.reconcileLocalPlayer(delta);
-    this.interpolateOtherPlayers(delta);
+    this.remotePlayerManager.interpolate(delta);
     this.updateLocalPlayerNamePosition();
     this.updateMapExitZones();
   }
@@ -236,7 +223,13 @@ export class GameScene extends Phaser.Scene {
 
   private updateNearbyNpc() {
     const previousNpc = this.nearbyNpc;
-    this.nearbyNpc = this.findNearbyNpc();
+
+    this.nearbyNpc = this.npcManager.findNearby(
+      this.player.x,
+      this.player.y,
+      this.npcInteractionDistance
+    );
+
     if (previousNpc?.definition.id !== this.nearbyNpc?.definition.id) {
       console.log("Nearby NPC:", this.nearbyNpc?.definition.id ?? "none");
     }
@@ -458,7 +451,7 @@ export class GameScene extends Phaser.Scene {
         if (player.mapId !== this.currentMapId) {
           return;
         }
-        this.addOtherPlayer(player);
+        this.remotePlayerManager.add(player);
       });
     });
 
@@ -466,7 +459,7 @@ export class GameScene extends Phaser.Scene {
       if (player.mapId !== this.currentMapId) {
         return;
       }
-      this.addOtherPlayer(player);
+      this.remotePlayerManager.add(player);
     });
 
     this.socket.on("playersState", (players: Record<string, Player>) => {
@@ -483,23 +476,18 @@ export class GameScene extends Phaser.Scene {
 
         // REMOTE PLAYER DE OTRO MAPA
         if (player.mapId !== this.currentMapId) {
-          this.removeOtherPlayer(player.id);
+          this.remotePlayerManager.remove(player.id);
           return;
         }
 
         // REMOTE PLAYER DEL MISMO MAPA
-        const otherPlayer = this.otherPlayers.get(player.id);
-        if (!otherPlayer) {
-          this.addOtherPlayer(player);
+        if (player.mapId !== this.currentMapId) {
+          this.remotePlayerManager.remove(player.id);
           return;
         }
 
-        this.otherPlayerTargets.set(player.id, {
-          x: player.x,
-          y: player.y,
-        });
-
-        this.updateRemotePlayerAnimation(otherPlayer, player);
+        // REMOTE PLAYER DEL MISMO MAPA
+        this.remotePlayerManager.update(player);
       });
     });
 
@@ -519,11 +507,11 @@ export class GameScene extends Phaser.Scene {
     );
 
     this.socket.on("playerDisconnected", (playerId: string) => {
-      this.removeOtherPlayer(playerId);
+      this.remotePlayerManager.remove(playerId);
     });
 
     this.socket.on(MAP_EVENTS.PLAYER_LEFT, (playerId: string) => {
-      this.removeOtherPlayer(playerId);
+      this.remotePlayerManager.remove(playerId);
     });
   }
 
@@ -573,70 +561,6 @@ export class GameScene extends Phaser.Scene {
       Math.round(this.player.x),
       Math.round(this.player.y - 14)
     );
-  }
-
-  private addOtherPlayer(player: Player): void {
-    if (player.mapId !== this.currentMapId) {
-      return;
-    }
-    if (this.otherPlayers.has(player.id)) {
-      return;
-    }
-
-    const sprite = this.add.sprite(
-      player.x,
-      player.y,
-      getPlayerTextureKey(player.avatarId, player.direction),
-      0
-    );
-    sprite.setDepth(5);
-
-    this.otherPlayers.set(player.id, sprite);
-    const nameLabel = this.createPlayerNameLabel(player.displayName);
-    this.otherPlayerNameLabels.set(player.id, nameLabel);
-
-    this.otherPlayerTargets.set(player.id, {
-      x: player.x,
-      y: player.y,
-    });
-
-    this.updateRemotePlayerAnimation(sprite, player);
-  }
-
-  private removeOtherPlayer(playerId: string): void {
-    const player = this.otherPlayers.get(playerId);
-
-    player?.destroy();
-
-    const nameLabel = this.otherPlayerNameLabels.get(playerId);
-    nameLabel?.destroy();
-
-    this.otherPlayers.delete(playerId);
-    this.otherPlayerTargets.delete(playerId);
-    this.otherPlayerNameLabels.delete(playerId);
-  }
-
-  private interpolateOtherPlayers(delta: number) {
-    const interpolationRate = 12;
-
-    const alpha = 1 - Math.exp(-interpolationRate * (delta / 1000));
-
-    for (const [playerId, gameObject] of this.otherPlayers) {
-      const target = this.otherPlayerTargets.get(playerId);
-
-      if (!target) {
-        continue;
-      }
-
-      gameObject.x = Phaser.Math.Linear(gameObject.x, target.x, alpha);
-      gameObject.y = Phaser.Math.Linear(gameObject.y, target.y, alpha);
-
-      const nameLabel = this.otherPlayerNameLabels.get(playerId);
-
-      if (nameLabel) {
-        nameLabel.setPosition(Math.round(gameObject.x), Math.round(gameObject.y - 14));
-      }
-    }
   }
 
   private predictLocalMovement(input: PlayerInput, delta: number) {
@@ -798,15 +722,6 @@ export class GameScene extends Phaser.Scene {
     this.player.setTexture(getPlayerTextureKey(this.avatarId, this.playerDirection), 0);
   }
 
-  private updateRemotePlayerAnimation(sprite: Phaser.GameObjects.Sprite, player: Player) {
-    if (player.isMoving) {
-      sprite.play(getPlayerAnimationKey(player.avatarId, player.direction), true);
-      return;
-    }
-    sprite.anims.stop();
-    sprite.setTexture(getPlayerTextureKey(player.avatarId, player.direction), 0);
-  }
-
   private updateCameraBounds(): void {
     const camera = this.cameras.main;
     const mapWidth = this.map.widthInPixels;
@@ -841,122 +756,6 @@ export class GameScene extends Phaser.Scene {
       })
       .setOrigin(0.5, 1)
       .setDepth(20);
-  }
-
-  private getNpcDefinitions(): NpcDefinition[] {
-    const objectsLayer = this.map.getObjectLayer("Objects");
-
-    if (!objectsLayer) {
-      throw new Error('Object layer "Objects" not found');
-    }
-
-    return objectsLayer.objects
-      .filter((object) => object.type === "npc")
-      .map((object) => {
-        const properties = (object.properties ?? []) as TiledCustomProperty[];
-
-        const getProperty = (name: string): unknown =>
-          properties.find((property) => property.name === name)?.value;
-        const displayName = getProperty("displayName");
-        const direction = getProperty("direction");
-        const sprite = getProperty("sprite");
-        const dialogueId = getProperty("dialogueId");
-        const interactionType = getProperty("interactionType");
-
-        if (
-          typeof object.x !== "number" ||
-          typeof object.y !== "number" ||
-          typeof object.name !== "string" ||
-          typeof displayName !== "string" ||
-          typeof direction !== "string" ||
-          typeof sprite !== "string" ||
-          typeof dialogueId !== "string"
-        ) {
-          throw new Error(`Invalid NPC definition: ${object.name}`);
-        }
-
-        if (
-          direction !== "up" &&
-          direction !== "down" &&
-          direction !== "left" &&
-          direction !== "right"
-        ) {
-          throw new Error(`Invalid NPC direction: ${direction}`);
-        }
-        if (
-          interactionType !== "dialogue" &&
-          interactionType !== "shop" &&
-          interactionType !== "quest"
-        ) {
-          throw new Error(`Invalid NPC interaction type: ${String(interactionType)}`);
-        }
-
-        return {
-          id: object.name,
-          x: object.x,
-          y: object.y,
-          displayName,
-          direction,
-          sprite,
-          interactionType,
-          dialogueId,
-        };
-      });
-  }
-
-  private createNpcs() {
-    const npcDefinitions = this.getNpcDefinitions();
-
-    for (const npc of npcDefinitions) {
-      const textureKey = getNpcTextureKey(npc.sprite, npc.direction);
-      if (!this.textures.exists(textureKey)) {
-        throw new Error(`NPC texture not found: ${textureKey}`);
-      }
-
-      const sprite = this.add.sprite(npc.x, npc.y, textureKey, 0);
-      sprite.setDepth(5);
-
-      const nameLabel = this.createPlayerNameLabel(npc.displayName);
-      nameLabel.setPosition(Math.round(npc.x), Math.round(npc.y - 14));
-
-      this.npcs.set(npc.id, {
-        definition: npc,
-        sprite,
-        nameLabel,
-      });
-    }
-  }
-
-  private destroyNpcs(): void {
-    this.nearbyNpc = undefined;
-
-    for (const npc of this.npcs.values()) {
-      npc.sprite.destroy();
-      npc.nameLabel.destroy();
-    }
-
-    this.npcs.clear();
-  }
-
-  private findNearbyNpc(): NpcInstance | undefined {
-    let nearestNpc: NpcInstance | undefined;
-    let nearestDistance = this.npcInteractionDistance;
-
-    for (const npc of this.npcs.values()) {
-      const distance = Phaser.Math.Distance.Between(
-        this.player.x,
-        this.player.y,
-        npc.sprite.x,
-        npc.sprite.y
-      );
-
-      if (distance <= nearestDistance) {
-        nearestNpc = npc;
-        nearestDistance = distance;
-      }
-    }
-
-    return nearestNpc;
   }
 
   private handleNpcInteraction() {
@@ -1178,7 +977,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   private destroyCurrentMap(): void {
-    this.destroyNpcs();
+    this.nearbyNpc = undefined;
+    this.npcManager.destroy();
 
     for (const layer of this.mapLayers) {
       layer.destroy();
@@ -1195,17 +995,11 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.destroyCurrentMap();
-    this.clearOtherPlayers();
+    this.remotePlayerManager.clear();
 
     this.currentMapId = mapId;
     this.createMap(this.currentMapId);
-    this.createNpcs();
-  }
-
-  private clearOtherPlayers(): void {
-    for (const playerId of this.otherPlayers.keys()) {
-      this.removeOtherPlayer(playerId);
-    }
+    this.npcManager.create(this.map);
   }
 
   private beginMapTransition(): boolean {
