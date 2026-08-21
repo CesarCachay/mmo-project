@@ -19,10 +19,6 @@ export class RemotePlayerManager {
     this.createNameLabel = createNameLabel;
   }
 
-  public has(playerId: string): boolean {
-    return this.players.has(playerId);
-  }
-
   public add(player: Player): void {
     if (this.players.has(player.id)) {
       return;
