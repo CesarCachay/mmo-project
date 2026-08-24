@@ -28,6 +28,7 @@ import { GameNetworkClient } from "./network/GameNetworkClient";
 import { RemotePlayerManager } from "./player/RemotePlayerManager";
 import { LocalPlayerController } from "./player/LocalPlayerController";
 import { MapTransitionController } from "./maps/MapTransitionController";
+import { MovementInputController } from "./player/MovementInputController";
 import type { NpcDirection, NpcInstance, NpcInteractionType } from "./npc/types";
 
 // types
@@ -47,9 +48,8 @@ export class GameScene extends Phaser.Scene {
   private mapManager!: MapManager;
   private player!: Phaser.GameObjects.Sprite;
   private localPlayerController!: LocalPlayerController;
+  private movementInputController!: MovementInputController;
 
-  private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
-  private wasd!: Record<"up" | "down" | "left" | "right", Phaser.Input.Keyboard.Key>;
   private interactKey!: Phaser.Input.Keyboard.Key;
 
   private chatKey!: Phaser.Input.Keyboard.Key;
@@ -71,16 +71,6 @@ export class GameScene extends Phaser.Scene {
   private npcManager!: NpcManager;
   private remotePlayerManager!: RemotePlayerManager;
   private mapTransitionController!: MapTransitionController;
-
-  private lastInput: PlayerInput = {
-    sequence: 0,
-    up: false,
-    down: false,
-    left: false,
-    right: false,
-  };
-
-  private inputSequence = 0;
 
   private displayName = "";
   private avatarId: PlayerAvatarId = "male-01";
@@ -168,7 +158,9 @@ export class GameScene extends Phaser.Scene {
     this.updateNpcInteractionPrompt();
     this.handleNpcInteraction();
 
-    const input = this.getCurrentInput();
+    const input = this.movementInputController.getCurrentInput(
+      this.isMovementInputBlocked()
+    );
     this.localPlayerController.updateAnimation(input);
     this.sendInputIfChanged(input);
     this.localPlayerController.predictMovement(
@@ -177,6 +169,7 @@ export class GameScene extends Phaser.Scene {
       this.currentMapId,
       this.isMapTransitioning
     );
+
     this.localPlayerController.reconcile(delta);
 
     this.remotePlayerManager.interpolate(delta);
@@ -320,16 +313,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     keyboard.enableGlobalCapture();
-
-    this.cursors = this.input.keyboard!.createCursorKeys();
-
-    this.wasd = this.input.keyboard!.addKeys({
-      up: Phaser.Input.Keyboard.KeyCodes.W,
-      down: Phaser.Input.Keyboard.KeyCodes.S,
-      left: Phaser.Input.Keyboard.KeyCodes.A,
-      right: Phaser.Input.Keyboard.KeyCodes.D,
-    }) as Record<"up" | "down" | "left" | "right", Phaser.Input.Keyboard.Key>;
-
+    this.movementInputController = new MovementInputController(keyboard);
     this.interactKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
     this.chatKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
   }
@@ -347,52 +331,12 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  private getCurrentInput(): PlayerInput {
-    const { isMapTransitioning, dialogueBox, chatBox } = this;
-    const condition = isMapTransitioning || dialogueBox.isOpen() || chatBox.isTyping();
-    if (condition) {
-      return {
-        sequence: this.inputSequence,
-        up: false,
-        down: false,
-        left: false,
-        right: false,
-      };
-    }
-
-    return {
-      sequence: this.inputSequence,
-      left: this.cursors.left.isDown || this.wasd.left.isDown,
-      right: this.cursors.right.isDown || this.wasd.right.isDown,
-      up: this.cursors.up.isDown || this.wasd.up.isDown,
-      down: this.cursors.down.isDown || this.wasd.down.isDown,
-    };
-  }
-
   private sendInputIfChanged(input: PlayerInput) {
-    if (!this.hasInputChanged(input)) {
+    const inputToSend = this.movementInputController.getChangedInput(input);
+    if (!inputToSend) {
       return;
     }
-
-    this.inputSequence++;
-
-    const inputToSend: PlayerInput = {
-      ...input,
-      sequence: this.inputSequence,
-    };
-
     this.network.sendPlayerInput(inputToSend);
-
-    this.lastInput = inputToSend;
-  }
-
-  private hasInputChanged(input: PlayerInput) {
-    return (
-      input.up !== this.lastInput.up ||
-      input.down !== this.lastInput.down ||
-      input.left !== this.lastInput.left ||
-      input.right !== this.lastInput.right
-    );
   }
 
   private connectToServer(): void {
@@ -482,20 +426,10 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.mapTransitionController.resetExitTracking();
-
     this.changeCurrentMap(transition.targetMapId);
-
     this.localPlayerController.snapToPosition(transition.x, transition.y);
     this.updateCameraBounds();
-
-    this.lastInput = {
-      sequence: this.inputSequence,
-      up: false,
-      down: false,
-      left: false,
-      right: false,
-    };
-
+    this.movementInputController.resetLastInputToNeutral();
     this.localPlayerController.setIdle();
     this.updateLocalPlayerNamePosition();
   }
@@ -736,5 +670,11 @@ export class GameScene extends Phaser.Scene {
 
   private get isMapTransitioning(): boolean {
     return this.mapTransitionController.isTransitioning;
+  }
+
+  private isMovementInputBlocked(): boolean {
+    return (
+      this.isMapTransitioning || this.dialogueBox.isOpen() || this.chatBox.isTyping()
+    );
   }
 }
