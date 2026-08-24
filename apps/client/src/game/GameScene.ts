@@ -1,18 +1,6 @@
 import Phaser from "phaser";
-import { io, Socket } from "socket.io-client";
 
-import {
-  MAP_DATA_REGISTRY,
-  PLAYER_SIZE,
-  getMovementDelta,
-  resolveMapCollision,
-  isPlayerMoving,
-  getDirectionFromInput,
-  CHAT_EVENTS,
-  isChatMessageInput,
-  DEFAULT_MAP_ID,
-  MAP_EVENTS,
-} from "@cesar-mmo/shared";
+import { isChatMessageInput, DEFAULT_MAP_ID } from "@cesar-mmo/shared";
 
 import {
   NPC_ASSETS,
@@ -31,14 +19,21 @@ import {
 import { ChatBox } from "./ui/ChatBox";
 import { DialogueBox } from "./ui/DialogueBox";
 import { getDialogue } from "./dialogue/dialogues";
-
 import { MAP_REGISTRY } from "./maps/mapRegistry";
 
-import type { NpcInteractionType } from "./npc/types";
+// class managers
+import { NpcManager } from "./npc/NpcManager";
+import { MapManager } from "./maps/MapManager";
+import { GameNetworkClient } from "./network/GameNetworkClient";
+import { RemotePlayerManager } from "./player/RemotePlayerManager";
+import { LocalPlayerController } from "./player/LocalPlayerController";
+import { MapTransitionController } from "./maps/MapTransitionController";
+import { MovementInputController } from "./player/MovementInputController";
+import type { NpcDirection, NpcInstance, NpcInteractionType } from "./npc/types";
+
+// types
 import type {
-  Player,
   PlayerInput,
-  Direction,
   PlayerAvatarId,
   ChatMessage,
   ChatMessageInput,
@@ -47,55 +42,22 @@ import type {
   MapTransitionResolved,
 } from "@cesar-mmo/shared";
 
-type NpcDirection = "up" | "down" | "left" | "right";
-
-type TiledCustomProperty = {
-  name: string;
-  value: unknown;
-};
-
-type NpcDefinition = {
-  id: string;
-  x: number;
-  y: number;
-  displayName: string;
-  direction: NpcDirection;
-  sprite: string;
-  interactionType: NpcInteractionType;
-  dialogueId?: string;
-};
-
-type NpcInstance = {
-  definition: NpcDefinition;
-  sprite: Phaser.GameObjects.Sprite;
-  nameLabel: Phaser.GameObjects.Text;
-};
-
-type MapExitZone = {
-  id: string;
-  bounds: Phaser.Geom.Rectangle;
-};
-
 export class GameScene extends Phaser.Scene {
   private currentMapId: MapId = DEFAULT_MAP_ID;
 
+  private mapManager!: MapManager;
   private player!: Phaser.GameObjects.Sprite;
-  private map!: Phaser.Tilemaps.Tilemap;
-  private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
-  private wasd!: Record<"up" | "down" | "left" | "right", Phaser.Input.Keyboard.Key>;
+  private localPlayerController!: LocalPlayerController;
+  private movementInputController!: MovementInputController;
+
   private interactKey!: Phaser.Input.Keyboard.Key;
 
   private chatKey!: Phaser.Input.Keyboard.Key;
 
-  private socket!: Socket;
-
-  private otherPlayers = new Map<string, Phaser.GameObjects.Sprite>();
-  private otherPlayerTargets = new Map<string, { x: number; y: number }>();
+  private network!: GameNetworkClient;
 
   private playerNameLabel?: Phaser.GameObjects.Text;
-  private otherPlayerNameLabels = new Map<string, Phaser.GameObjects.Text>();
 
-  private npcs = new Map<string, NpcInstance>();
   private nearbyNpc?: NpcInstance;
   private activeDialogueNpc?: NpcInstance;
   private readonly npcInteractionDistance = 36;
@@ -105,32 +67,11 @@ export class GameScene extends Phaser.Scene {
 
   private chatBox!: ChatBox;
 
-  // For transitions
-  private mapExitZones: MapExitZone[] = [];
-  private activeMapExitId: string | null = null;
-  private lastMapTransitionRequestAt = 0;
-  private readonly mapTransitionRetryDelayMs = 200;
-  private mapLayers: Phaser.Tilemaps.TilemapLayerBase[] = [];
+  // managers
+  private npcManager!: NpcManager;
+  private remotePlayerManager!: RemotePlayerManager;
+  private mapTransitionController!: MapTransitionController;
 
-  private isMapTransitioning = false;
-  private readonly mapTransitionFadeDurationMs = 250;
-
-  private lastInput: PlayerInput = {
-    sequence: 0,
-    up: false,
-    down: false,
-    left: false,
-    right: false,
-  };
-
-  private inputSequence = 0;
-
-  private serverPosition!: {
-    x: number;
-    y: number;
-  };
-
-  private playerDirection: Direction = "down";
   private displayName = "";
   private avatarId: PlayerAvatarId = "male-01";
 
@@ -174,10 +115,29 @@ export class GameScene extends Phaser.Scene {
   }
 
   create() {
-    this.createMap(this.currentMapId);
+    this.mapManager = new MapManager(this);
+    this.mapManager.create(this.currentMapId);
+
     this.createPlayerAnimations();
     this.createPlayer();
-    this.createNpcs();
+    this.localPlayerController = new LocalPlayerController(this.player, this.avatarId);
+
+    this.mapTransitionController = new MapTransitionController(
+      this,
+      (transitionId) => this.requestMapTransition(transitionId),
+      (transition) => this.handleMapTransitionResolved(transition),
+      () => this.localPlayerController.setIdle()
+    );
+    this.mapTransitionController.loadZones(this.mapManager.map);
+
+    this.remotePlayerManager = new RemotePlayerManager(this, (displayName) =>
+      this.createPlayerNameLabel(displayName)
+    );
+    this.npcManager = new NpcManager(this, (displayName) =>
+      this.createPlayerNameLabel(displayName)
+    );
+
+    this.npcManager.create(this.mapManager.map);
     this.createNpcInteractionPrompt();
     this.setupCamera();
     this.createDialogueUi();
@@ -198,14 +158,23 @@ export class GameScene extends Phaser.Scene {
     this.updateNpcInteractionPrompt();
     this.handleNpcInteraction();
 
-    const input = this.getCurrentInput();
-    this.updatePlayerAnimation(input);
+    const input = this.movementInputController.getCurrentInput(
+      this.isMovementInputBlocked()
+    );
+    this.localPlayerController.updateAnimation(input);
     this.sendInputIfChanged(input);
-    this.predictLocalMovement(input, delta);
-    this.reconcileLocalPlayer(delta);
-    this.interpolateOtherPlayers(delta);
+    this.localPlayerController.predictMovement(
+      input,
+      delta,
+      this.currentMapId,
+      this.isMapTransitioning
+    );
+
+    this.localPlayerController.reconcile(delta);
+
+    this.remotePlayerManager.interpolate(delta);
     this.updateLocalPlayerNamePosition();
-    this.updateMapExitZones();
+    this.mapTransitionController.update(this.player.x, this.player.y);
   }
 
   private createDialogueUi() {
@@ -217,7 +186,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createPlayer() {
-    const spawn = this.getPlayerSpawn();
+    const spawn = this.mapManager.getPlayerSpawn();
 
     this.player = this.add.sprite(
       spawn.x,
@@ -227,16 +196,17 @@ export class GameScene extends Phaser.Scene {
     );
 
     this.player.setDepth(5);
-
-    this.serverPosition = {
-      x: spawn.x,
-      y: spawn.y,
-    };
   }
 
   private updateNearbyNpc() {
     const previousNpc = this.nearbyNpc;
-    this.nearbyNpc = this.findNearbyNpc();
+
+    this.nearbyNpc = this.npcManager.findNearby(
+      this.player.x,
+      this.player.y,
+      this.npcInteractionDistance
+    );
+
     if (previousNpc?.definition.id !== this.nearbyNpc?.definition.id) {
       console.log("Nearby NPC:", this.nearbyNpc?.definition.id ?? "none");
     }
@@ -304,7 +274,7 @@ export class GameScene extends Phaser.Scene {
       this.player.y,
       npc.sprite.x,
       npc.sprite.y,
-      this.playerDirection
+      this.localPlayerController.direction
     );
     const npcDirection = this.getFacingDirection(
       npc.sprite.x,
@@ -314,8 +284,8 @@ export class GameScene extends Phaser.Scene {
       npc.definition.direction
     );
 
-    this.playerDirection = playerDirection;
-    this.setPlayerIdle();
+    this.localPlayerController.setDirection(playerDirection);
+    this.localPlayerController.setIdle();
 
     npc.sprite.anims.stop();
     npc.sprite.setTexture(getNpcTextureKey(npc.definition.sprite, npcDirection), 0);
@@ -343,16 +313,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     keyboard.enableGlobalCapture();
-
-    this.cursors = this.input.keyboard!.createCursorKeys();
-
-    this.wasd = this.input.keyboard!.addKeys({
-      up: Phaser.Input.Keyboard.KeyCodes.W,
-      down: Phaser.Input.Keyboard.KeyCodes.S,
-      left: Phaser.Input.Keyboard.KeyCodes.A,
-      right: Phaser.Input.Keyboard.KeyCodes.D,
-    }) as Record<"up" | "down" | "left" | "right", Phaser.Input.Keyboard.Key>;
-
+    this.movementInputController = new MovementInputController(keyboard);
     this.interactKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
     this.chatKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
   }
@@ -370,64 +331,19 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  private getCurrentInput(): PlayerInput {
-    const { isMapTransitioning, dialogueBox, chatBox } = this;
-    const condition = isMapTransitioning || dialogueBox.isOpen() || chatBox.isTyping();
-    if (condition) {
-      return {
-        sequence: this.inputSequence,
-        up: false,
-        down: false,
-        left: false,
-        right: false,
-      };
-    }
-
-    return {
-      sequence: this.inputSequence,
-      left: this.cursors.left.isDown || this.wasd.left.isDown,
-      right: this.cursors.right.isDown || this.wasd.right.isDown,
-      up: this.cursors.up.isDown || this.wasd.up.isDown,
-      down: this.cursors.down.isDown || this.wasd.down.isDown,
-    };
-  }
-
   private sendInputIfChanged(input: PlayerInput) {
-    if (!this.hasInputChanged(input)) {
+    const inputToSend = this.movementInputController.getChangedInput(input);
+    if (!inputToSend) {
       return;
     }
-
-    this.inputSequence++;
-
-    const inputToSend: PlayerInput = {
-      ...input,
-      sequence: this.inputSequence,
-    };
-
-    this.socket.emit("playerInput", inputToSend);
-
-    this.lastInput = inputToSend;
+    this.network.sendPlayerInput(inputToSend);
   }
 
-  private hasInputChanged(input: PlayerInput) {
-    return (
-      input.up !== this.lastInput.up ||
-      input.down !== this.lastInput.down ||
-      input.left !== this.lastInput.left ||
-      input.right !== this.lastInput.right
-    );
-  }
+  private connectToServer(): void {
+    this.network = new GameNetworkClient(this.displayName, this.avatarId);
 
-  private connectToServer() {
-    this.socket = io("http://localhost:3000", {
-      auth: {
-        displayName: this.displayName,
-        avatarId: this.avatarId,
-      },
-    });
-
-    this.socket.on("connectionRejected", (error: { code: string; message: string }) => {
-      this.socket.disconnect();
+    this.network.onConnectionRejected((error) => {
+      this.network.disconnect();
 
       this.scene.start("JoinScene", {
         errorMessage: error.message,
@@ -436,21 +352,20 @@ export class GameScene extends Phaser.Scene {
       });
     });
 
-    this.socket.on("connect", () => {
-      console.log("Connected:", this.socket.id);
+    this.network.onConnect((socketId) => {
+      console.log("Connected:", socketId);
     });
 
-    this.socket.on(CHAT_EVENTS.MESSAGE_RECEIVED, (message: ChatMessage) => {
+    this.network.onChatMessage((message) => {
       this.handleChatMessageReceived(message);
     });
 
-    this.socket.on("currentPlayers", (players: Record<string, Player>) => {
+    this.network.onCurrentPlayers((players) => {
       console.log("Numero de players:", players);
 
       Object.values(players).forEach((player) => {
-        if (player.id === this.socket.id) {
-          this.player.setPosition(player.x, player.y);
-          this.serverPosition = { x: player.x, y: player.y };
+        if (player.id === this.network.id) {
+          this.localPlayerController.snapToPosition(player.x, player.y);
           this.playerNameLabel = this.createPlayerNameLabel(player.displayName);
           return;
         }
@@ -458,109 +373,64 @@ export class GameScene extends Phaser.Scene {
         if (player.mapId !== this.currentMapId) {
           return;
         }
-        this.addOtherPlayer(player);
+
+        this.remotePlayerManager.add(player);
       });
     });
 
-    this.socket.on("playerJoined", (player: Player) => {
+    this.network.onPlayerJoined((player) => {
       if (player.mapId !== this.currentMapId) {
         return;
       }
-      this.addOtherPlayer(player);
+      this.remotePlayerManager.add(player);
     });
 
-    this.socket.on("playersState", (players: Record<string, Player>) => {
+    this.network.onPlayersState((players) => {
       Object.values(players).forEach((player) => {
         // LOCAL PLAYER
-        if (player.id === this.socket.id) {
-          // Nunca aplicar coordenadas de otro mapa
+        if (player.id === this.network.id) {
           if (player.mapId !== this.currentMapId) {
             return;
           }
-          this.updateLocalPlayer(player);
+          this.localPlayerController.setServerPosition(player.x, player.y);
           return;
         }
 
         // REMOTE PLAYER DE OTRO MAPA
         if (player.mapId !== this.currentMapId) {
-          this.removeOtherPlayer(player.id);
+          this.remotePlayerManager.remove(player.id);
           return;
         }
 
         // REMOTE PLAYER DEL MISMO MAPA
-        const otherPlayer = this.otherPlayers.get(player.id);
-        if (!otherPlayer) {
-          this.addOtherPlayer(player);
-          return;
-        }
-
-        this.otherPlayerTargets.set(player.id, {
-          x: player.x,
-          y: player.y,
-        });
-
-        this.updateRemotePlayerAnimation(otherPlayer, player);
+        this.remotePlayerManager.update(player);
       });
     });
 
-    this.socket.on(
-      MAP_EVENTS.TRANSITION_RESOLVED,
-      (transition: MapTransitionResolved) => {
-        if (transition.fromMapId !== this.currentMapId) {
-          return;
-        }
-
-        if (!this.beginMapTransition()) {
-          return;
-        }
-
-        this.startMapTransitionFade(transition);
-      }
-    );
-
-    this.socket.on("playerDisconnected", (playerId: string) => {
-      this.removeOtherPlayer(playerId);
+    this.network.onTransitionResolved((transition) => {
+      this.mapTransitionController.handleResolved(transition, this.currentMapId);
     });
 
-    this.socket.on(MAP_EVENTS.PLAYER_LEFT, (playerId: string) => {
-      this.removeOtherPlayer(playerId);
+    this.network.onPlayerDisconnected((playerId) => {
+      this.remotePlayerManager.remove(playerId);
     });
-  }
 
-  private updateLocalPlayer(player: Player) {
-    this.serverPosition = {
-      x: player.x,
-      y: player.y,
-    };
+    this.network.onPlayerLeftMap((playerId) => {
+      this.remotePlayerManager.remove(playerId);
+    });
   }
 
   private handleMapTransitionResolved(transition: MapTransitionResolved): void {
     if (transition.fromMapId !== this.currentMapId) {
       return;
     }
-    console.log("[MapTransition] changing map", transition);
 
-    this.activeMapExitId = null;
-    this.lastMapTransitionRequestAt = 0;
-
+    this.mapTransitionController.resetExitTracking();
     this.changeCurrentMap(transition.targetMapId);
-
-    this.player.setPosition(transition.x, transition.y);
-    this.serverPosition = {
-      x: transition.x,
-      y: transition.y,
-    };
+    this.localPlayerController.snapToPosition(transition.x, transition.y);
     this.updateCameraBounds();
-
-    this.lastInput = {
-      sequence: this.inputSequence,
-      up: false,
-      down: false,
-      left: false,
-      right: false,
-    };
-
-    this.setPlayerIdle();
+    this.movementInputController.resetLastInputToNeutral();
+    this.localPlayerController.setIdle();
     this.updateLocalPlayerNamePosition();
   }
 
@@ -573,185 +443,6 @@ export class GameScene extends Phaser.Scene {
       Math.round(this.player.x),
       Math.round(this.player.y - 14)
     );
-  }
-
-  private addOtherPlayer(player: Player): void {
-    if (player.mapId !== this.currentMapId) {
-      return;
-    }
-    if (this.otherPlayers.has(player.id)) {
-      return;
-    }
-
-    const sprite = this.add.sprite(
-      player.x,
-      player.y,
-      getPlayerTextureKey(player.avatarId, player.direction),
-      0
-    );
-    sprite.setDepth(5);
-
-    this.otherPlayers.set(player.id, sprite);
-    const nameLabel = this.createPlayerNameLabel(player.displayName);
-    this.otherPlayerNameLabels.set(player.id, nameLabel);
-
-    this.otherPlayerTargets.set(player.id, {
-      x: player.x,
-      y: player.y,
-    });
-
-    this.updateRemotePlayerAnimation(sprite, player);
-  }
-
-  private removeOtherPlayer(playerId: string): void {
-    const player = this.otherPlayers.get(playerId);
-
-    player?.destroy();
-
-    const nameLabel = this.otherPlayerNameLabels.get(playerId);
-    nameLabel?.destroy();
-
-    this.otherPlayers.delete(playerId);
-    this.otherPlayerTargets.delete(playerId);
-    this.otherPlayerNameLabels.delete(playerId);
-  }
-
-  private interpolateOtherPlayers(delta: number) {
-    const interpolationRate = 12;
-
-    const alpha = 1 - Math.exp(-interpolationRate * (delta / 1000));
-
-    for (const [playerId, gameObject] of this.otherPlayers) {
-      const target = this.otherPlayerTargets.get(playerId);
-
-      if (!target) {
-        continue;
-      }
-
-      gameObject.x = Phaser.Math.Linear(gameObject.x, target.x, alpha);
-      gameObject.y = Phaser.Math.Linear(gameObject.y, target.y, alpha);
-
-      const nameLabel = this.otherPlayerNameLabels.get(playerId);
-
-      if (nameLabel) {
-        nameLabel.setPosition(Math.round(gameObject.x), Math.round(gameObject.y - 14));
-      }
-    }
-  }
-
-  private predictLocalMovement(input: PlayerInput, delta: number) {
-    if (this.isMapTransitioning) {
-      return;
-    }
-
-    const mapData = MAP_DATA_REGISTRY[this.currentMapId];
-
-    const movement = getMovementDelta(input, delta / 1000);
-    const nextPosition = {
-      x: this.player.x + movement.x,
-      y: this.player.y + movement.y,
-    };
-
-    const resolvedPosition = resolveMapCollision(
-      {
-        x: this.player.x,
-        y: this.player.y,
-      },
-      nextPosition,
-      PLAYER_SIZE,
-      mapData
-    );
-
-    this.player.setPosition(resolvedPosition.x, resolvedPosition.y);
-  }
-
-  private reconcileLocalPlayer(delta: number) {
-    const errorX = this.serverPosition.x - this.player.x;
-    const errorY = this.serverPosition.y - this.player.y;
-    const distance = Math.sqrt(errorX * errorX + errorY * errorY);
-
-    const reconciliationThreshold = 2;
-
-    if (distance < reconciliationThreshold) {
-      return;
-    }
-
-    const hardSnapDistance = 100;
-
-    if (distance > hardSnapDistance) {
-      this.player.setPosition(this.serverPosition.x, this.serverPosition.y);
-      return;
-    }
-
-    const reconciliationRate = 5;
-    const alpha = 1 - Math.exp(-reconciliationRate * (delta / 1000));
-    this.player.x = Phaser.Math.Linear(this.player.x, this.serverPosition.x, alpha);
-    this.player.y = Phaser.Math.Linear(this.player.y, this.serverPosition.y, alpha);
-  }
-
-  private createMap(mapId: MapId): void {
-    const mapConfig = MAP_REGISTRY[mapId];
-    this.map = this.make.tilemap({
-      key: mapConfig.key,
-    });
-
-    const mapTilesets = mapConfig.tilesets.map((tilesetConfig) => {
-      const tileset = this.map.addTilesetImage(tilesetConfig.key, tilesetConfig.key);
-
-      if (!tileset) {
-        throw new Error(
-          `Could not load tileset "${tilesetConfig.key}" for map "${mapId}"`
-        );
-      }
-
-      return tileset;
-    });
-
-    const groundLayer = this.map.createLayer("Ground", mapTilesets, 0, 0);
-    const groundDetailsLayer = this.map.createLayer("GroundDetails", mapTilesets, 0, 0);
-    const buildingsLayer = this.map.createLayer("Buildings", mapTilesets, 0, 0);
-    const abovePlayerLayer = this.map.createLayer("AbovePlayer", mapTilesets, 0, 0);
-
-    groundLayer?.setDepth(0);
-    groundDetailsLayer?.setDepth(1);
-    buildingsLayer?.setDepth(2);
-    abovePlayerLayer?.setDepth(10);
-
-    if (groundLayer) {
-      this.mapLayers.push(groundLayer);
-    }
-    if (groundDetailsLayer) {
-      this.mapLayers.push(groundDetailsLayer);
-    }
-    if (buildingsLayer) {
-      this.mapLayers.push(buildingsLayer);
-    }
-    if (abovePlayerLayer) {
-      this.mapLayers.push(abovePlayerLayer);
-    }
-
-    this.createMapExitZones();
-  }
-
-  private getPlayerSpawn() {
-    const objectsLayer = this.map.getObjectLayer("Objects");
-
-    if (!objectsLayer) {
-      throw new Error('Object layer "Objects" not found');
-    }
-
-    const playerSpawn = objectsLayer.objects.find(
-      (object) => object.name === "playerSpawn"
-    );
-
-    if (!playerSpawn || playerSpawn.x === undefined || playerSpawn.y === undefined) {
-      throw new Error('Object "playerSpawn" not found');
-    }
-
-    return {
-      x: playerSpawn.x,
-      y: playerSpawn.y,
-    };
   }
 
   private createPlayerAnimations() {
@@ -781,36 +472,12 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  private updatePlayerAnimation(input: PlayerInput) {
-    this.playerDirection = getDirectionFromInput(input, this.playerDirection);
-
-    const moving = isPlayerMoving(input);
-    if (!moving) {
-      this.setPlayerIdle();
-      return;
-    }
-
-    this.player.play(getPlayerAnimationKey(this.avatarId, this.playerDirection), true);
-  }
-
-  private setPlayerIdle() {
-    this.player.anims.stop();
-    this.player.setTexture(getPlayerTextureKey(this.avatarId, this.playerDirection), 0);
-  }
-
-  private updateRemotePlayerAnimation(sprite: Phaser.GameObjects.Sprite, player: Player) {
-    if (player.isMoving) {
-      sprite.play(getPlayerAnimationKey(player.avatarId, player.direction), true);
-      return;
-    }
-    sprite.anims.stop();
-    sprite.setTexture(getPlayerTextureKey(player.avatarId, player.direction), 0);
-  }
-
   private updateCameraBounds(): void {
+    const map = this.mapManager.map;
     const camera = this.cameras.main;
-    const mapWidth = this.map.widthInPixels;
-    const mapHeight = this.map.heightInPixels;
+
+    const mapWidth = map.widthInPixels;
+    const mapHeight = map.heightInPixels;
     const viewportWidth = camera.width / camera.zoom;
     const viewportHeight = camera.height / camera.zoom;
 
@@ -841,122 +508,6 @@ export class GameScene extends Phaser.Scene {
       })
       .setOrigin(0.5, 1)
       .setDepth(20);
-  }
-
-  private getNpcDefinitions(): NpcDefinition[] {
-    const objectsLayer = this.map.getObjectLayer("Objects");
-
-    if (!objectsLayer) {
-      throw new Error('Object layer "Objects" not found');
-    }
-
-    return objectsLayer.objects
-      .filter((object) => object.type === "npc")
-      .map((object) => {
-        const properties = (object.properties ?? []) as TiledCustomProperty[];
-
-        const getProperty = (name: string): unknown =>
-          properties.find((property) => property.name === name)?.value;
-        const displayName = getProperty("displayName");
-        const direction = getProperty("direction");
-        const sprite = getProperty("sprite");
-        const dialogueId = getProperty("dialogueId");
-        const interactionType = getProperty("interactionType");
-
-        if (
-          typeof object.x !== "number" ||
-          typeof object.y !== "number" ||
-          typeof object.name !== "string" ||
-          typeof displayName !== "string" ||
-          typeof direction !== "string" ||
-          typeof sprite !== "string" ||
-          typeof dialogueId !== "string"
-        ) {
-          throw new Error(`Invalid NPC definition: ${object.name}`);
-        }
-
-        if (
-          direction !== "up" &&
-          direction !== "down" &&
-          direction !== "left" &&
-          direction !== "right"
-        ) {
-          throw new Error(`Invalid NPC direction: ${direction}`);
-        }
-        if (
-          interactionType !== "dialogue" &&
-          interactionType !== "shop" &&
-          interactionType !== "quest"
-        ) {
-          throw new Error(`Invalid NPC interaction type: ${String(interactionType)}`);
-        }
-
-        return {
-          id: object.name,
-          x: object.x,
-          y: object.y,
-          displayName,
-          direction,
-          sprite,
-          interactionType,
-          dialogueId,
-        };
-      });
-  }
-
-  private createNpcs() {
-    const npcDefinitions = this.getNpcDefinitions();
-
-    for (const npc of npcDefinitions) {
-      const textureKey = getNpcTextureKey(npc.sprite, npc.direction);
-      if (!this.textures.exists(textureKey)) {
-        throw new Error(`NPC texture not found: ${textureKey}`);
-      }
-
-      const sprite = this.add.sprite(npc.x, npc.y, textureKey, 0);
-      sprite.setDepth(5);
-
-      const nameLabel = this.createPlayerNameLabel(npc.displayName);
-      nameLabel.setPosition(Math.round(npc.x), Math.round(npc.y - 14));
-
-      this.npcs.set(npc.id, {
-        definition: npc,
-        sprite,
-        nameLabel,
-      });
-    }
-  }
-
-  private destroyNpcs(): void {
-    this.nearbyNpc = undefined;
-
-    for (const npc of this.npcs.values()) {
-      npc.sprite.destroy();
-      npc.nameLabel.destroy();
-    }
-
-    this.npcs.clear();
-  }
-
-  private findNearbyNpc(): NpcInstance | undefined {
-    let nearestNpc: NpcInstance | undefined;
-    let nearestDistance = this.npcInteractionDistance;
-
-    for (const npc of this.npcs.values()) {
-      const distance = Phaser.Math.Distance.Between(
-        this.player.x,
-        this.player.y,
-        npc.sprite.x,
-        npc.sprite.y
-      );
-
-      if (distance <= nearestDistance) {
-        nearestNpc = npc;
-        nearestDistance = distance;
-      }
-    }
-
-    return nearestNpc;
   }
 
   private handleNpcInteraction() {
@@ -1051,7 +602,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   public sendChatMessage(text: string): void {
-    if (!this.socket.connected) {
+    if (!this.network.connected) {
       return;
     }
     const payload: ChatMessageInput = {
@@ -1061,11 +612,11 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    this.socket.emit(CHAT_EVENTS.SEND_MESSAGE, payload);
+    this.network.sendChatMessage(payload);
   }
 
   private handleChatMessageReceived(message: ChatMessage): void {
-    const isOwnMessage = message.sender.playerId === this.socket.id;
+    const isOwnMessage = message.sender.playerId === this.network.id;
     this.chatBox.addMessage(message, isOwnMessage);
   }
 
@@ -1086,87 +637,6 @@ export class GameScene extends Phaser.Scene {
     this.chatBox.focusInput();
   }
 
-  private createMapExitZones(): void {
-    this.mapExitZones = [];
-    this.activeMapExitId = null;
-
-    const objectsLayer = this.map.getObjectLayer("Objects");
-
-    if (!objectsLayer) {
-      console.log("[MapExit] Objects layer not found");
-      return;
-    }
-
-    for (const object of objectsLayer.objects) {
-      if (object.type !== "mapExit") {
-        continue;
-      }
-
-      if (
-        !object.name ||
-        typeof object.x !== "number" ||
-        typeof object.y !== "number" ||
-        typeof object.width !== "number" ||
-        typeof object.height !== "number"
-      ) {
-        continue;
-      }
-
-      if (object.width <= 0 || object.height <= 0) {
-        continue;
-      }
-
-      this.mapExitZones.push({
-        id: object.name,
-        bounds: new Phaser.Geom.Rectangle(
-          object.x,
-          object.y,
-          object.width,
-          object.height
-        ),
-      });
-    }
-
-    console.log("[MapExit] zones loaded", this.mapExitZones);
-  }
-
-  private updateMapExitZones(): void {
-    if (!this.player || this.isMapTransitioning) {
-      return;
-    }
-    const playerX = this.player.x;
-    const playerY = this.player.y;
-
-    const currentExit = this.mapExitZones.find((exitZone) =>
-      exitZone.bounds.contains(playerX, playerY)
-    );
-
-    if (!currentExit) {
-      this.activeMapExitId = null;
-      this.lastMapTransitionRequestAt = 0;
-      return;
-    }
-
-    const now = this.time.now;
-
-    // Primera entrada a este exit
-    if (this.activeMapExitId !== currentExit.id) {
-      this.activeMapExitId = currentExit.id;
-      this.lastMapTransitionRequestAt = now;
-      console.log("[MapExit] entered", currentExit.id);
-      this.requestMapTransition(currentExit.id);
-      return;
-    }
-
-    // Seguimos dentro del mismo exit, permite el retry si el server aún no resolvió.
-    if (now - this.lastMapTransitionRequestAt < this.mapTransitionRetryDelayMs) {
-      return;
-    }
-
-    this.lastMapTransitionRequestAt = now;
-    this.requestMapTransition(currentExit.id);
-  }
-
   private requestMapTransition(transitionId: string): void {
     if (this.isMapTransitioning) {
       return;
@@ -1174,19 +644,14 @@ export class GameScene extends Phaser.Scene {
     const payload: MapTransitionInput = {
       transitionId,
     };
-    this.socket.emit(MAP_EVENTS.REQUEST_TRANSITION, payload);
+    this.network.requestMapTransition(payload);
   }
 
   private destroyCurrentMap(): void {
-    this.destroyNpcs();
-
-    for (const layer of this.mapLayers) {
-      layer.destroy();
-    }
-
-    this.mapLayers = [];
-    this.mapExitZones = [];
-    this.activeMapExitId = null;
+    this.nearbyNpc = undefined;
+    this.npcManager.destroy();
+    this.mapTransitionController.clearZones();
+    this.mapManager.destroy();
   }
 
   private changeCurrentMap(mapId: MapId): void {
@@ -1195,58 +660,21 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.destroyCurrentMap();
-    this.clearOtherPlayers();
+    this.remotePlayerManager.clear();
 
     this.currentMapId = mapId;
-    this.createMap(this.currentMapId);
-    this.createNpcs();
+    this.mapManager.create(this.currentMapId);
+    this.mapTransitionController.loadZones(this.mapManager.map);
+    this.npcManager.create(this.mapManager.map);
   }
 
-  private clearOtherPlayers(): void {
-    for (const playerId of this.otherPlayers.keys()) {
-      this.removeOtherPlayer(playerId);
-    }
+  private get isMapTransitioning(): boolean {
+    return this.mapTransitionController.isTransitioning;
   }
 
-  private beginMapTransition(): boolean {
-    if (this.isMapTransitioning) {
-      return false;
-    }
-    this.isMapTransitioning = true;
-    return true;
-  }
-
-  private finishMapTransition(): void {
-    this.isMapTransitioning = false;
-  }
-
-  private startMapTransitionFade(transition: MapTransitionResolved): void {
-    const camera = this.cameras.main;
-    const duration = this.mapTransitionFadeDurationMs;
-
-    this.setPlayerIdle();
-
-    camera.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-      try {
-        this.handleMapTransitionResolved(transition);
-      } catch (error) {
-        console.error("[MapTransition] Failed while changing map", error);
-      }
-
-      this.fadeInAfterMapTransition();
-    });
-
-    camera.fadeOut(duration, 0, 0, 0);
-  }
-
-  private fadeInAfterMapTransition(): void {
-    const camera = this.cameras.main;
-    const duration = this.mapTransitionFadeDurationMs;
-
-    camera.once(Phaser.Cameras.Scene2D.Events.FADE_IN_COMPLETE, () => {
-      this.finishMapTransition();
-    });
-
-    camera.fadeIn(duration, 0, 0, 0);
+  private isMovementInputBlocked(): boolean {
+    return (
+      this.isMapTransitioning || this.dialogueBox.isOpen() || this.chatBox.isTyping()
+    );
   }
 }
