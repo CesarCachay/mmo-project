@@ -1,6 +1,6 @@
 import { io, type Socket } from "socket.io-client";
 
-import { CHAT_EVENTS, MAP_EVENTS } from "@cesar-mmo/shared";
+import { CHAT_EVENTS, MAP_EVENTS, POKEMON_EVENTS } from "@cesar-mmo/shared";
 
 import type {
   ChatMessage,
@@ -10,6 +10,7 @@ import type {
   Player,
   PlayerAvatarId,
   PlayerInput,
+  PokemonTrainerStatePayload,
 } from "@cesar-mmo/shared";
 
 type ConnectionRejectedError = {
@@ -53,6 +54,12 @@ export class GameNetworkClient {
 
   public onChatMessage(callback: (message: ChatMessage) => void): void {
     this.socket.on(CHAT_EVENTS.MESSAGE_RECEIVED, callback);
+  }
+
+  public onPokemonTrainerState(
+    callback: (payload: PokemonTrainerStatePayload) => void
+  ): void {
+    this.socket.on(POKEMON_EVENTS.TRAINER_STATE, callback);
   }
 
   public onCurrentPlayers(callback: (players: Record<string, Player>) => void): void {

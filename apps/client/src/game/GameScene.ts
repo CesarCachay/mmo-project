@@ -360,6 +360,19 @@ export class GameScene extends Phaser.Scene {
       this.handleChatMessageReceived(message);
     });
 
+    this.network.onPokemonTrainerState((payload) => {
+      const pokemon = payload.trainerState.party.pokemon[0];
+
+      console.log("[Pokemon 6.5]", {
+        partySize: payload.trainerState.party.pokemon.length,
+        instanceId: pokemon?.instanceId,
+        speciesId: pokemon?.speciesId,
+        level: pokemon?.level,
+        abilityId: pokemon?.abilityId,
+        moves: pokemon?.moves,
+      });
+    });
+
     this.network.onCurrentPlayers((players) => {
       console.log("Numero de players:", players);
 

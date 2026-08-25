@@ -58,7 +58,13 @@ export type {
   PokemonLearnset,
   PokemonLevelUpMove,
   PokemonTypeEffectiveness,
+  PokemonInstance,
+  PokemonInstanceMove,
+  PokemonParty,
+  PokemonTrainerState,
 } from "./pokemon/pokemon.types.js";
+export { MAX_POKEMON_PARTY_SIZE } from "./pokemon/pokemon.types.js";
+
 export { getPokemonSpecies } from "./pokemon/pokemon.registry.js";
 export {
   getTypeEffectiveness,
@@ -83,3 +89,21 @@ export {
   getAllPokemonMoves,
   getPokemonMoveCount,
 } from "./pokemon/pokemon-move.registry.js";
+export {
+  getAllPokemonAbilitySets,
+  getPokemonAbilitySet,
+  getPokemonAbilitySetCount,
+} from "./pokemon/pokemon-ability-set.registry.js";
+
+// Pokemon Party
+export { createPokemonInstance } from "./pokemon/pokemon-instance.factory.js";
+export {
+  createPokemonParty,
+  getPokemonPartySize,
+  isPokemonPartyFull,
+  hasPokemonInstance,
+  addPokemonToParty,
+  removePokemonFromParty,
+} from "./pokemon/pokemon-party.js";
+export { POKEMON_EVENTS } from "./pokemon/pokemon-network.js";
+export type { PokemonTrainerStatePayload } from "./pokemon/pokemon-network.js";

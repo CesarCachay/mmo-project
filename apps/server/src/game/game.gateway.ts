@@ -28,6 +28,7 @@ import {
   isMapTransitionInput,
   MAP_EVENTS,
   MAP_DATA_REGISTRY,
+  POKEMON_EVENTS,
 } from '@cesar-mmo/shared';
 import {
   getServerMapSpawn,
@@ -41,7 +42,11 @@ import type {
   PlayerInput,
   MapTransitionResolved,
   MapId,
+  PokemonTrainerStatePayload,
 } from '@cesar-mmo/shared';
+
+import { PokemonTrainerService } from 'src/pokemon/pokemon-trainer.service';
+import { PokemonTrainerStateStore } from 'src/pokemon/pokemon-trainer-state.store';
 
 @WebSocketGateway({
   cors: {
@@ -61,6 +66,11 @@ export class GameGateway
   private players: Record<string, Player> = {};
 
   private playerInputs: Record<string, PlayerInput> = {};
+
+  private readonly pokemonTrainerStateStore = new PokemonTrainerStateStore();
+  private readonly pokemonTrainerService = new PokemonTrainerService(
+    this.pokemonTrainerStateStore,
+  );
 
   private nextColorIndex = 0;
 
@@ -138,6 +148,17 @@ export class GameGateway
       right: false,
     };
 
+    this.pokemonTrainerStateStore.create(newPlayer.id);
+    const trainerState = this.pokemonTrainerService.addPokemon(
+      newPlayer.id,
+      25,
+      5,
+    );
+    const trainerStatePayload: PokemonTrainerStatePayload = {
+      trainerState,
+    };
+    client.emit(POKEMON_EVENTS.TRAINER_STATE, trainerStatePayload);
+
     const mapRoom = this.getMapRoom(newPlayer.mapId);
     await client.join(mapRoom);
 
@@ -148,6 +169,9 @@ export class GameGateway
 
   handleDisconnect(client: Socket) {
     const player = this.players[client.id];
+
+    this.pokemonTrainerStateStore.remove(client.id);
+
     if (!player) {
       return;
     }

@@ -110,3 +110,31 @@ export interface PokemonForm {
 }
 
 export type PokemonTypeEffectiveness = 0 | 0.5 | 1 | 2;
+
+export interface PokemonInstanceMove {
+  moveId: number;
+  currentPp: number;
+}
+
+export interface PokemonInstance {
+  instanceId: string;
+  speciesId: number;
+  formId: number;
+  nickname?: string;
+  level: number;
+  experience: number;
+  currentHp: number;
+  abilityId: number;
+  moves: PokemonInstanceMove[];
+}
+
+// Pokemon Party
+export const MAX_POKEMON_PARTY_SIZE = 6;
+
+export interface PokemonParty {
+  pokemon: PokemonInstance[];
+}
+
+export interface PokemonTrainerState {
+  party: PokemonParty;
+}
