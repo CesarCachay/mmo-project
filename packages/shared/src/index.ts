@@ -42,3 +42,44 @@ export type {
   SharedMapTransitionTrigger,
 } from "./mapDataRegistry.js";
 export { MAP_DATA_REGISTRY } from "./mapDataRegistry.js";
+
+export type {
+  PokemonType,
+  PokemonSpecies,
+  PokemonBaseStats,
+  PokemonEvolutionNode,
+  PokemonEvolutionChain,
+  PokemonMove,
+  PokemonDamageClass,
+  PokemonAbility,
+  PokemonAbilitySet,
+  PokemonAbilitySlot,
+  PokemonForm,
+  PokemonLearnset,
+  PokemonLevelUpMove,
+  PokemonTypeEffectiveness,
+} from "./pokemon/pokemon.types.js";
+export { getPokemonSpecies } from "./pokemon/pokemon.registry.js";
+export {
+  getTypeEffectiveness,
+  getCombinedTypeEffectiveness,
+} from "./pokemon/pokemon-type.registry.js";
+export {
+  getPokemonEvolutionChain,
+  getPokemonEvolutionChainCount,
+} from "./pokemon/pokemon-evolution.registry.js";
+export {
+  getPokemonForm,
+  getPokemonFormsBySpecies,
+  getAllPokemonForms,
+  getPokemonFormCount,
+} from "./pokemon/pokemon-form.registry.js";
+export {
+  getPokemonLearnset,
+  getPokemonLearnsetCount,
+} from "./pokemon/pokemon-learnset.registry.js";
+export {
+  getPokemonMove,
+  getAllPokemonMoves,
+  getPokemonMoveCount,
+} from "./pokemon/pokemon-move.registry.js";

@@ -11,6 +11,11 @@
     "dev": "pnpm --filter @cesar-mmo/shared build && pnpm -r --parallel --filter client --filter server --filter @cesar-mmo/shared run dev",
     "dev:client": "pnpm --filter client dev",
     "dev:server": "pnpm --filter server dev",
-    "dev:shared": "pnpm --filter @cesar-mmo/shared dev"
+    "dev:shared": "pnpm --filter @cesar-mmo/shared dev",
+    "pokemon:import": "node scripts/import-pokemon-data.mjs",
+    "pokemon:validate": "node scripts/validate-pokemon-data.mjs"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.6"
   }
 }

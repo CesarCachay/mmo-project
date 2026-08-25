@@ -1,0 +1,646 @@
+[
+  {
+    "id": 65,
+    "name": "overgrow"
+  },
+  {
+    "id": 34,
+    "name": "chlorophyll"
+  },
+  {
+    "id": 66,
+    "name": "blaze"
+  },
+  {
+    "id": 94,
+    "name": "solar-power"
+  },
+  {
+    "id": 67,
+    "name": "torrent"
+  },
+  {
+    "id": 44,
+    "name": "rain-dish"
+  },
+  {
+    "id": 19,
+    "name": "shield-dust"
+  },
+  {
+    "id": 50,
+    "name": "run-away"
+  },
+  {
+    "id": 61,
+    "name": "shed-skin"
+  },
+  {
+    "id": 14,
+    "name": "compound-eyes"
+  },
+  {
+    "id": 110,
+    "name": "tinted-lens"
+  },
+  {
+    "id": 68,
+    "name": "swarm"
+  },
+  {
+    "id": 97,
+    "name": "sniper"
+  },
+  {
+    "id": 51,
+    "name": "keen-eye"
+  },
+  {
+    "id": 77,
+    "name": "tangled-feet"
+  },
+  {
+    "id": 145,
+    "name": "big-pecks"
+  },
+  {
+    "id": 62,
+    "name": "guts"
+  },
+  {
+    "id": 55,
+    "name": "hustle"
+  },
+  {
+    "id": 22,
+    "name": "intimidate"
+  },
+  {
+    "id": 127,
+    "name": "unnerve"
+  },
+  {
+    "id": 9,
+    "name": "static"
+  },
+  {
+    "id": 31,
+    "name": "lightning-rod"
+  },
+  {
+    "id": 8,
+    "name": "sand-veil"
+  },
+  {
+    "id": 146,
+    "name": "sand-rush"
+  },
+  {
+    "id": 38,
+    "name": "poison-point"
+  },
+  {
+    "id": 79,
+    "name": "rivalry"
+  },
+  {
+    "id": 125,
+    "name": "sheer-force"
+  },
+  {
+    "id": 56,
+    "name": "cute-charm"
+  },
+  {
+    "id": 98,
+    "name": "magic-guard"
+  },
+  {
+    "id": 132,
+    "name": "friend-guard"
+  },
+  {
+    "id": 109,
+    "name": "unaware"
+  },
+  {
+    "id": 18,
+    "name": "flash-fire"
+  },
+  {
+    "id": 70,
+    "name": "drought"
+  },
+  {
+    "id": 172,
+    "name": "competitive"
+  },
+  {
+    "id": 119,
+    "name": "frisk"
+  },
+  {
+    "id": 39,
+    "name": "inner-focus"
+  },
+  {
+    "id": 151,
+    "name": "infiltrator"
+  },
+  {
+    "id": 1,
+    "name": "stench"
+  },
+  {
+    "id": 27,
+    "name": "effect-spore"
+  },
+  {
+    "id": 87,
+    "name": "dry-skin"
+  },
+  {
+    "id": 6,
+    "name": "damp"
+  },
+  {
+    "id": 147,
+    "name": "wonder-skin"
+  },
+  {
+    "id": 71,
+    "name": "arena-trap"
+  },
+  {
+    "id": 159,
+    "name": "sand-force"
+  },
+  {
+    "id": 53,
+    "name": "pickup"
+  },
+  {
+    "id": 101,
+    "name": "technician"
+  },
+  {
+    "id": 7,
+    "name": "limber"
+  },
+  {
+    "id": 13,
+    "name": "cloud-nine"
+  },
+  {
+    "id": 33,
+    "name": "swift-swim"
+  },
+  {
+    "id": 72,
+    "name": "vital-spirit"
+  },
+  {
+    "id": 83,
+    "name": "anger-point"
+  },
+  {
+    "id": 128,
+    "name": "defiant"
+  },
+  {
+    "id": 154,
+    "name": "justified"
+  },
+  {
+    "id": 11,
+    "name": "water-absorb"
+  },
+  {
+    "id": 28,
+    "name": "synchronize"
+  },
+  {
+    "id": 99,
+    "name": "no-guard"
+  },
+  {
+    "id": 80,
+    "name": "steadfast"
+  },
+  {
+    "id": 82,
+    "name": "gluttony"
+  },
+  {
+    "id": 29,
+    "name": "clear-body"
+  },
+  {
+    "id": 64,
+    "name": "liquid-ooze"
+  },
+  {
+    "id": 69,
+    "name": "rock-head"
+  },
+  {
+    "id": 5,
+    "name": "sturdy"
+  },
+  {
+    "id": 49,
+    "name": "flame-body"
+  },
+  {
+    "id": 12,
+    "name": "oblivious"
+  },
+  {
+    "id": 20,
+    "name": "own-tempo"
+  },
+  {
+    "id": 144,
+    "name": "regenerator"
+  },
+  {
+    "id": 42,
+    "name": "magnet-pull"
+  },
+  {
+    "id": 148,
+    "name": "analytic"
+  },
+  {
+    "id": 48,
+    "name": "early-bird"
+  },
+  {
+    "id": 47,
+    "name": "thick-fat"
+  },
+  {
+    "id": 93,
+    "name": "hydration"
+  },
+  {
+    "id": 115,
+    "name": "ice-body"
+  },
+  {
+    "id": 60,
+    "name": "sticky-hold"
+  },
+  {
+    "id": 143,
+    "name": "poison-touch"
+  },
+  {
+    "id": 75,
+    "name": "shell-armor"
+  },
+  {
+    "id": 92,
+    "name": "skill-link"
+  },
+  {
+    "id": 142,
+    "name": "overcoat"
+  },
+  {
+    "id": 26,
+    "name": "levitate"
+  },
+  {
+    "id": 130,
+    "name": "cursed-body"
+  },
+  {
+    "id": 133,
+    "name": "weak-armor"
+  },
+  {
+    "id": 15,
+    "name": "insomnia"
+  },
+  {
+    "id": 108,
+    "name": "forewarn"
+  },
+  {
+    "id": 52,
+    "name": "hyper-cutter"
+  },
+  {
+    "id": 43,
+    "name": "soundproof"
+  },
+  {
+    "id": 106,
+    "name": "aftermath"
+  },
+  {
+    "id": 139,
+    "name": "harvest"
+  },
+  {
+    "id": 4,
+    "name": "battle-armor"
+  },
+  {
+    "id": 120,
+    "name": "reckless"
+  },
+  {
+    "id": 84,
+    "name": "unburden"
+  },
+  {
+    "id": 89,
+    "name": "iron-fist"
+  },
+  {
+    "id": 256,
+    "name": "neutralizing-gas"
+  },
+  {
+    "id": 30,
+    "name": "natural-cure"
+  },
+  {
+    "id": 32,
+    "name": "serene-grace"
+  },
+  {
+    "id": 131,
+    "name": "healer"
+  },
+  {
+    "id": 102,
+    "name": "leaf-guard"
+  },
+  {
+    "id": 113,
+    "name": "scrappy"
+  },
+  {
+    "id": 41,
+    "name": "water-veil"
+  },
+  {
+    "id": 35,
+    "name": "illuminate"
+  },
+  {
+    "id": 111,
+    "name": "filter"
+  },
+  {
+    "id": 104,
+    "name": "mold-breaker"
+  },
+  {
+    "id": 153,
+    "name": "moxie"
+  },
+  {
+    "id": 155,
+    "name": "rattled"
+  },
+  {
+    "id": 150,
+    "name": "imposter"
+  },
+  {
+    "id": 91,
+    "name": "adaptability"
+  },
+  {
+    "id": 107,
+    "name": "anticipation"
+  },
+  {
+    "id": 10,
+    "name": "volt-absorb"
+  },
+  {
+    "id": 95,
+    "name": "quick-feet"
+  },
+  {
+    "id": 36,
+    "name": "trace"
+  },
+  {
+    "id": 88,
+    "name": "download"
+  },
+  {
+    "id": 46,
+    "name": "pressure"
+  },
+  {
+    "id": 17,
+    "name": "immunity"
+  },
+  {
+    "id": 81,
+    "name": "snow-cloak"
+  },
+  {
+    "id": 63,
+    "name": "marvel-scale"
+  },
+  {
+    "id": 136,
+    "name": "multiscale"
+  },
+  {
+    "id": 105,
+    "name": "super-luck"
+  },
+  {
+    "id": 156,
+    "name": "magic-bounce"
+  },
+  {
+    "id": 57,
+    "name": "plus"
+  },
+  {
+    "id": 37,
+    "name": "huge-power"
+  },
+  {
+    "id": 157,
+    "name": "sap-sipper"
+  },
+  {
+    "id": 2,
+    "name": "drizzle"
+  },
+  {
+    "id": 3,
+    "name": "speed-boost"
+  },
+  {
+    "id": 158,
+    "name": "prankster"
+  },
+  {
+    "id": 23,
+    "name": "shadow-tag"
+  },
+  {
+    "id": 140,
+    "name": "telepathy"
+  },
+  {
+    "id": 135,
+    "name": "light-metal"
+  },
+  {
+    "id": 126,
+    "name": "contrary"
+  },
+  {
+    "id": 124,
+    "name": "pickpocket"
+  },
+  {
+    "id": 118,
+    "name": "honey-gather"
+  },
+  {
+    "id": 40,
+    "name": "magma-armor"
+  },
+  {
+    "id": 141,
+    "name": "moody"
+  },
+  {
+    "id": 21,
+    "name": "suction-cups"
+  },
+  {
+    "id": 45,
+    "name": "sand-stream"
+  },
+  {
+    "id": 274,
+    "name": "wind-rider"
+  },
+  {
+    "id": 90,
+    "name": "poison-heal"
+  },
+  {
+    "id": 54,
+    "name": "truant"
+  },
+  {
+    "id": 25,
+    "name": "wonder-guard"
+  },
+  {
+    "id": 96,
+    "name": "normalize"
+  },
+  {
+    "id": 100,
+    "name": "stall"
+  },
+  {
+    "id": 134,
+    "name": "heavy-metal"
+  },
+  {
+    "id": 74,
+    "name": "pure-power"
+  },
+  {
+    "id": 58,
+    "name": "minus"
+  },
+  {
+    "id": 24,
+    "name": "rough-skin"
+  },
+  {
+    "id": 86,
+    "name": "simple"
+  },
+  {
+    "id": 116,
+    "name": "solid-rock"
+  },
+  {
+    "id": 73,
+    "name": "white-smoke"
+  },
+  {
+    "id": 137,
+    "name": "toxic-boost"
+  },
+  {
+    "id": 114,
+    "name": "storm-drain"
+  },
+  {
+    "id": 59,
+    "name": "forecast"
+  },
+  {
+    "id": 16,
+    "name": "color-change"
+  },
+  {
+    "id": 168,
+    "name": "protean"
+  },
+  {
+    "id": 76,
+    "name": "air-lock"
+  },
+  {
+    "id": 122,
+    "name": "flower-gift"
+  },
+  {
+    "id": 138,
+    "name": "flare-boost"
+  },
+  {
+    "id": 103,
+    "name": "klutz"
+  },
+  {
+    "id": 85,
+    "name": "heatproof"
+  },
+  {
+    "id": 117,
+    "name": "snow-warning"
+  },
+  {
+    "id": 78,
+    "name": "motor-drive"
+  },
+  {
+    "id": 292,
+    "name": "sharpness"
+  },
+  {
+    "id": 112,
+    "name": "slow-start"
+  },
+  {
+    "id": 123,
+    "name": "bad-dreams"
+  },
+  {
+    "id": 121,
+    "name": "multitype"
+  }
+]

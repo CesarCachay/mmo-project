@@ -1,0 +1,10097 @@
+[
+  {
+    "id": 1,
+    "name": "bulbasaur",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 49,
+      "defense": 49,
+      "specialAttack": 65,
+      "specialDefense": 65,
+      "speed": 45
+    },
+    "height": 7,
+    "weight": 69,
+    "baseExperience": 64,
+    "generation": 1,
+    "evolutionChainId": 1
+  },
+  {
+    "id": 2,
+    "name": "ivysaur",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 62,
+      "defense": 63,
+      "specialAttack": 80,
+      "specialDefense": 80,
+      "speed": 60
+    },
+    "height": 10,
+    "weight": 130,
+    "baseExperience": 142,
+    "generation": 1,
+    "evolutionChainId": 1
+  },
+  {
+    "id": 3,
+    "name": "venusaur",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 82,
+      "defense": 83,
+      "specialAttack": 100,
+      "specialDefense": 100,
+      "speed": 80
+    },
+    "height": 20,
+    "weight": 1000,
+    "baseExperience": 236,
+    "generation": 1,
+    "evolutionChainId": 1
+  },
+  {
+    "id": 4,
+    "name": "charmander",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 39,
+      "attack": 52,
+      "defense": 43,
+      "specialAttack": 60,
+      "specialDefense": 50,
+      "speed": 65
+    },
+    "height": 6,
+    "weight": 85,
+    "baseExperience": 62,
+    "generation": 1,
+    "evolutionChainId": 2
+  },
+  {
+    "id": 5,
+    "name": "charmeleon",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 58,
+      "attack": 64,
+      "defense": 58,
+      "specialAttack": 80,
+      "specialDefense": 65,
+      "speed": 80
+    },
+    "height": 11,
+    "weight": 190,
+    "baseExperience": 142,
+    "generation": 1,
+    "evolutionChainId": 2
+  },
+  {
+    "id": 6,
+    "name": "charizard",
+    "types": [
+      "fire",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 78,
+      "attack": 84,
+      "defense": 78,
+      "specialAttack": 109,
+      "specialDefense": 85,
+      "speed": 100
+    },
+    "height": 17,
+    "weight": 905,
+    "baseExperience": 240,
+    "generation": 1,
+    "evolutionChainId": 2
+  },
+  {
+    "id": 7,
+    "name": "squirtle",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 44,
+      "attack": 48,
+      "defense": 65,
+      "specialAttack": 50,
+      "specialDefense": 64,
+      "speed": 43
+    },
+    "height": 5,
+    "weight": 90,
+    "baseExperience": 63,
+    "generation": 1,
+    "evolutionChainId": 3
+  },
+  {
+    "id": 8,
+    "name": "wartortle",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 59,
+      "attack": 63,
+      "defense": 80,
+      "specialAttack": 65,
+      "specialDefense": 80,
+      "speed": 58
+    },
+    "height": 10,
+    "weight": 225,
+    "baseExperience": 142,
+    "generation": 1,
+    "evolutionChainId": 3
+  },
+  {
+    "id": 9,
+    "name": "blastoise",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 79,
+      "attack": 83,
+      "defense": 100,
+      "specialAttack": 85,
+      "specialDefense": 105,
+      "speed": 78
+    },
+    "height": 16,
+    "weight": 855,
+    "baseExperience": 239,
+    "generation": 1,
+    "evolutionChainId": 3
+  },
+  {
+    "id": 10,
+    "name": "caterpie",
+    "types": [
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 30,
+      "defense": 35,
+      "specialAttack": 20,
+      "specialDefense": 20,
+      "speed": 45
+    },
+    "height": 3,
+    "weight": 29,
+    "baseExperience": 39,
+    "generation": 1,
+    "evolutionChainId": 4
+  },
+  {
+    "id": 11,
+    "name": "metapod",
+    "types": [
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 20,
+      "defense": 55,
+      "specialAttack": 25,
+      "specialDefense": 25,
+      "speed": 30
+    },
+    "height": 7,
+    "weight": 99,
+    "baseExperience": 72,
+    "generation": 1,
+    "evolutionChainId": 4
+  },
+  {
+    "id": 12,
+    "name": "butterfree",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 45,
+      "defense": 50,
+      "specialAttack": 90,
+      "specialDefense": 80,
+      "speed": 70
+    },
+    "height": 11,
+    "weight": 320,
+    "baseExperience": 178,
+    "generation": 1,
+    "evolutionChainId": 4
+  },
+  {
+    "id": 13,
+    "name": "weedle",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 35,
+      "defense": 30,
+      "specialAttack": 20,
+      "specialDefense": 20,
+      "speed": 50
+    },
+    "height": 3,
+    "weight": 32,
+    "baseExperience": 39,
+    "generation": 1,
+    "evolutionChainId": 5
+  },
+  {
+    "id": 14,
+    "name": "kakuna",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 25,
+      "defense": 50,
+      "specialAttack": 25,
+      "specialDefense": 25,
+      "speed": 35
+    },
+    "height": 6,
+    "weight": 100,
+    "baseExperience": 72,
+    "generation": 1,
+    "evolutionChainId": 5
+  },
+  {
+    "id": 15,
+    "name": "beedrill",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 90,
+      "defense": 40,
+      "specialAttack": 45,
+      "specialDefense": 80,
+      "speed": 75
+    },
+    "height": 10,
+    "weight": 295,
+    "baseExperience": 178,
+    "generation": 1,
+    "evolutionChainId": 5
+  },
+  {
+    "id": 16,
+    "name": "pidgey",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 45,
+      "defense": 40,
+      "specialAttack": 35,
+      "specialDefense": 35,
+      "speed": 56
+    },
+    "height": 3,
+    "weight": 18,
+    "baseExperience": 50,
+    "generation": 1,
+    "evolutionChainId": 6
+  },
+  {
+    "id": 17,
+    "name": "pidgeotto",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 63,
+      "attack": 60,
+      "defense": 55,
+      "specialAttack": 50,
+      "specialDefense": 50,
+      "speed": 71
+    },
+    "height": 11,
+    "weight": 300,
+    "baseExperience": 122,
+    "generation": 1,
+    "evolutionChainId": 6
+  },
+  {
+    "id": 18,
+    "name": "pidgeot",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 83,
+      "attack": 80,
+      "defense": 75,
+      "specialAttack": 70,
+      "specialDefense": 70,
+      "speed": 101
+    },
+    "height": 15,
+    "weight": 395,
+    "baseExperience": 216,
+    "generation": 1,
+    "evolutionChainId": 6
+  },
+  {
+    "id": 19,
+    "name": "rattata",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "attack": 56,
+      "defense": 35,
+      "specialAttack": 25,
+      "specialDefense": 35,
+      "speed": 72
+    },
+    "height": 3,
+    "weight": 35,
+    "baseExperience": 51,
+    "generation": 1,
+    "evolutionChainId": 7
+  },
+  {
+    "id": 20,
+    "name": "raticate",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 81,
+      "defense": 60,
+      "specialAttack": 50,
+      "specialDefense": 70,
+      "speed": 97
+    },
+    "height": 7,
+    "weight": 185,
+    "baseExperience": 145,
+    "generation": 1,
+    "evolutionChainId": 7
+  },
+  {
+    "id": 21,
+    "name": "spearow",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 60,
+      "defense": 30,
+      "specialAttack": 31,
+      "specialDefense": 31,
+      "speed": 70
+    },
+    "height": 3,
+    "weight": 20,
+    "baseExperience": 52,
+    "generation": 1,
+    "evolutionChainId": 8
+  },
+  {
+    "id": 22,
+    "name": "fearow",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 90,
+      "defense": 65,
+      "specialAttack": 61,
+      "specialDefense": 61,
+      "speed": 100
+    },
+    "height": 12,
+    "weight": 380,
+    "baseExperience": 155,
+    "generation": 1,
+    "evolutionChainId": 8
+  },
+  {
+    "id": 23,
+    "name": "ekans",
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 60,
+      "defense": 44,
+      "specialAttack": 40,
+      "specialDefense": 54,
+      "speed": 55
+    },
+    "height": 20,
+    "weight": 69,
+    "baseExperience": 58,
+    "generation": 1,
+    "evolutionChainId": 9
+  },
+  {
+    "id": 24,
+    "name": "arbok",
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 95,
+      "defense": 69,
+      "specialAttack": 65,
+      "specialDefense": 79,
+      "speed": 80
+    },
+    "height": 35,
+    "weight": 650,
+    "baseExperience": 157,
+    "generation": 1,
+    "evolutionChainId": 9
+  },
+  {
+    "id": 25,
+    "name": "pikachu",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 55,
+      "defense": 40,
+      "specialAttack": 50,
+      "specialDefense": 50,
+      "speed": 90
+    },
+    "height": 4,
+    "weight": 60,
+    "baseExperience": 112,
+    "generation": 1,
+    "evolutionChainId": 10
+  },
+  {
+    "id": 26,
+    "name": "raichu",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 90,
+      "defense": 55,
+      "specialAttack": 90,
+      "specialDefense": 80,
+      "speed": 110
+    },
+    "height": 8,
+    "weight": 300,
+    "baseExperience": 218,
+    "generation": 1,
+    "evolutionChainId": 10
+  },
+  {
+    "id": 27,
+    "name": "sandshrew",
+    "types": [
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 75,
+      "defense": 85,
+      "specialAttack": 20,
+      "specialDefense": 30,
+      "speed": 40
+    },
+    "height": 6,
+    "weight": 120,
+    "baseExperience": 60,
+    "generation": 1,
+    "evolutionChainId": 11
+  },
+  {
+    "id": 28,
+    "name": "sandslash",
+    "types": [
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 100,
+      "defense": 110,
+      "specialAttack": 45,
+      "specialDefense": 55,
+      "speed": 65
+    },
+    "height": 10,
+    "weight": 295,
+    "baseExperience": 158,
+    "generation": 1,
+    "evolutionChainId": 11
+  },
+  {
+    "id": 29,
+    "name": "nidoran-f",
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 47,
+      "defense": 52,
+      "specialAttack": 40,
+      "specialDefense": 40,
+      "speed": 41
+    },
+    "height": 4,
+    "weight": 70,
+    "baseExperience": 55,
+    "generation": 1,
+    "evolutionChainId": 12
+  },
+  {
+    "id": 30,
+    "name": "nidorina",
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 62,
+      "defense": 67,
+      "specialAttack": 55,
+      "specialDefense": 55,
+      "speed": 56
+    },
+    "height": 8,
+    "weight": 200,
+    "baseExperience": 128,
+    "generation": 1,
+    "evolutionChainId": 12
+  },
+  {
+    "id": 31,
+    "name": "nidoqueen",
+    "types": [
+      "poison",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 92,
+      "defense": 87,
+      "specialAttack": 75,
+      "specialDefense": 85,
+      "speed": 76
+    },
+    "height": 13,
+    "weight": 600,
+    "baseExperience": 227,
+    "generation": 1,
+    "evolutionChainId": 12
+  },
+  {
+    "id": 32,
+    "name": "nidoran-m",
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 46,
+      "attack": 57,
+      "defense": 40,
+      "specialAttack": 40,
+      "specialDefense": 40,
+      "speed": 50
+    },
+    "height": 5,
+    "weight": 90,
+    "baseExperience": 55,
+    "generation": 1,
+    "evolutionChainId": 13
+  },
+  {
+    "id": 33,
+    "name": "nidorino",
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 61,
+      "attack": 72,
+      "defense": 57,
+      "specialAttack": 55,
+      "specialDefense": 55,
+      "speed": 65
+    },
+    "height": 9,
+    "weight": 195,
+    "baseExperience": 128,
+    "generation": 1,
+    "evolutionChainId": 13
+  },
+  {
+    "id": 34,
+    "name": "nidoking",
+    "types": [
+      "poison",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 81,
+      "attack": 102,
+      "defense": 77,
+      "specialAttack": 85,
+      "specialDefense": 75,
+      "speed": 85
+    },
+    "height": 14,
+    "weight": 620,
+    "baseExperience": 227,
+    "generation": 1,
+    "evolutionChainId": 13
+  },
+  {
+    "id": 35,
+    "name": "clefairy",
+    "types": [
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 45,
+      "defense": 48,
+      "specialAttack": 60,
+      "specialDefense": 65,
+      "speed": 35
+    },
+    "height": 6,
+    "weight": 75,
+    "baseExperience": 113,
+    "generation": 1,
+    "evolutionChainId": 14
+  },
+  {
+    "id": 36,
+    "name": "clefable",
+    "types": [
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 70,
+      "defense": 73,
+      "specialAttack": 95,
+      "specialDefense": 90,
+      "speed": 60
+    },
+    "height": 13,
+    "weight": 400,
+    "baseExperience": 217,
+    "generation": 1,
+    "evolutionChainId": 14
+  },
+  {
+    "id": 37,
+    "name": "vulpix",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 38,
+      "attack": 41,
+      "defense": 40,
+      "specialAttack": 50,
+      "specialDefense": 65,
+      "speed": 65
+    },
+    "height": 6,
+    "weight": 99,
+    "baseExperience": 60,
+    "generation": 1,
+    "evolutionChainId": 15
+  },
+  {
+    "id": 38,
+    "name": "ninetales",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 73,
+      "attack": 76,
+      "defense": 75,
+      "specialAttack": 81,
+      "specialDefense": 100,
+      "speed": 100
+    },
+    "height": 11,
+    "weight": 199,
+    "baseExperience": 177,
+    "generation": 1,
+    "evolutionChainId": 15
+  },
+  {
+    "id": 39,
+    "name": "jigglypuff",
+    "types": [
+      "normal",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 115,
+      "attack": 45,
+      "defense": 20,
+      "specialAttack": 45,
+      "specialDefense": 25,
+      "speed": 20
+    },
+    "height": 5,
+    "weight": 55,
+    "baseExperience": 95,
+    "generation": 1,
+    "evolutionChainId": 16
+  },
+  {
+    "id": 40,
+    "name": "wigglytuff",
+    "types": [
+      "normal",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 140,
+      "attack": 70,
+      "defense": 45,
+      "specialAttack": 85,
+      "specialDefense": 50,
+      "speed": 45
+    },
+    "height": 10,
+    "weight": 120,
+    "baseExperience": 196,
+    "generation": 1,
+    "evolutionChainId": 16
+  },
+  {
+    "id": 41,
+    "name": "zubat",
+    "types": [
+      "poison",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 45,
+      "defense": 35,
+      "specialAttack": 30,
+      "specialDefense": 40,
+      "speed": 55
+    },
+    "height": 8,
+    "weight": 75,
+    "baseExperience": 49,
+    "generation": 1,
+    "evolutionChainId": 17
+  },
+  {
+    "id": 42,
+    "name": "golbat",
+    "types": [
+      "poison",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 80,
+      "defense": 70,
+      "specialAttack": 65,
+      "specialDefense": 75,
+      "speed": 90
+    },
+    "height": 16,
+    "weight": 550,
+    "baseExperience": 159,
+    "generation": 1,
+    "evolutionChainId": 17
+  },
+  {
+    "id": 43,
+    "name": "oddish",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 50,
+      "defense": 55,
+      "specialAttack": 75,
+      "specialDefense": 65,
+      "speed": 30
+    },
+    "height": 5,
+    "weight": 54,
+    "baseExperience": 64,
+    "generation": 1,
+    "evolutionChainId": 18
+  },
+  {
+    "id": 44,
+    "name": "gloom",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 65,
+      "defense": 70,
+      "specialAttack": 85,
+      "specialDefense": 75,
+      "speed": 40
+    },
+    "height": 8,
+    "weight": 86,
+    "baseExperience": 138,
+    "generation": 1,
+    "evolutionChainId": 18
+  },
+  {
+    "id": 45,
+    "name": "vileplume",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 80,
+      "defense": 85,
+      "specialAttack": 110,
+      "specialDefense": 90,
+      "speed": 50
+    },
+    "height": 12,
+    "weight": 186,
+    "baseExperience": 221,
+    "generation": 1,
+    "evolutionChainId": 18
+  },
+  {
+    "id": 46,
+    "name": "paras",
+    "types": [
+      "bug",
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 70,
+      "defense": 55,
+      "specialAttack": 45,
+      "specialDefense": 55,
+      "speed": 25
+    },
+    "height": 3,
+    "weight": 54,
+    "baseExperience": 57,
+    "generation": 1,
+    "evolutionChainId": 19
+  },
+  {
+    "id": 47,
+    "name": "parasect",
+    "types": [
+      "bug",
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 95,
+      "defense": 80,
+      "specialAttack": 60,
+      "specialDefense": 80,
+      "speed": 30
+    },
+    "height": 10,
+    "weight": 295,
+    "baseExperience": 142,
+    "generation": 1,
+    "evolutionChainId": 19
+  },
+  {
+    "id": 48,
+    "name": "venonat",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 55,
+      "defense": 50,
+      "specialAttack": 40,
+      "specialDefense": 55,
+      "speed": 45
+    },
+    "height": 10,
+    "weight": 300,
+    "baseExperience": 61,
+    "generation": 1,
+    "evolutionChainId": 20
+  },
+  {
+    "id": 49,
+    "name": "venomoth",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 65,
+      "defense": 60,
+      "specialAttack": 90,
+      "specialDefense": 75,
+      "speed": 90
+    },
+    "height": 15,
+    "weight": 125,
+    "baseExperience": 158,
+    "generation": 1,
+    "evolutionChainId": 20
+  },
+  {
+    "id": 50,
+    "name": "diglett",
+    "types": [
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 10,
+      "attack": 55,
+      "defense": 25,
+      "specialAttack": 35,
+      "specialDefense": 45,
+      "speed": 95
+    },
+    "height": 2,
+    "weight": 8,
+    "baseExperience": 53,
+    "generation": 1,
+    "evolutionChainId": 21
+  },
+  {
+    "id": 51,
+    "name": "dugtrio",
+    "types": [
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 100,
+      "defense": 50,
+      "specialAttack": 50,
+      "specialDefense": 70,
+      "speed": 120
+    },
+    "height": 7,
+    "weight": 333,
+    "baseExperience": 149,
+    "generation": 1,
+    "evolutionChainId": 21
+  },
+  {
+    "id": 52,
+    "name": "meowth",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 45,
+      "defense": 35,
+      "specialAttack": 40,
+      "specialDefense": 40,
+      "speed": 90
+    },
+    "height": 4,
+    "weight": 42,
+    "baseExperience": 58,
+    "generation": 1,
+    "evolutionChainId": 22
+  },
+  {
+    "id": 53,
+    "name": "persian",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 70,
+      "defense": 60,
+      "specialAttack": 65,
+      "specialDefense": 65,
+      "speed": 115
+    },
+    "height": 10,
+    "weight": 320,
+    "baseExperience": 154,
+    "generation": 1,
+    "evolutionChainId": 22
+  },
+  {
+    "id": 54,
+    "name": "psyduck",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 52,
+      "defense": 48,
+      "specialAttack": 65,
+      "specialDefense": 50,
+      "speed": 55
+    },
+    "height": 8,
+    "weight": 196,
+    "baseExperience": 64,
+    "generation": 1,
+    "evolutionChainId": 23
+  },
+  {
+    "id": 55,
+    "name": "golduck",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 82,
+      "defense": 78,
+      "specialAttack": 95,
+      "specialDefense": 80,
+      "speed": 85
+    },
+    "height": 17,
+    "weight": 766,
+    "baseExperience": 175,
+    "generation": 1,
+    "evolutionChainId": 23
+  },
+  {
+    "id": 56,
+    "name": "mankey",
+    "types": [
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 80,
+      "defense": 35,
+      "specialAttack": 35,
+      "specialDefense": 45,
+      "speed": 70
+    },
+    "height": 5,
+    "weight": 280,
+    "baseExperience": 61,
+    "generation": 1,
+    "evolutionChainId": 24
+  },
+  {
+    "id": 57,
+    "name": "primeape",
+    "types": [
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 105,
+      "defense": 60,
+      "specialAttack": 60,
+      "specialDefense": 70,
+      "speed": 95
+    },
+    "height": 10,
+    "weight": 320,
+    "baseExperience": 159,
+    "generation": 1,
+    "evolutionChainId": 24
+  },
+  {
+    "id": 58,
+    "name": "growlithe",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 70,
+      "defense": 45,
+      "specialAttack": 70,
+      "specialDefense": 50,
+      "speed": 60
+    },
+    "height": 7,
+    "weight": 190,
+    "baseExperience": 70,
+    "generation": 1,
+    "evolutionChainId": 25
+  },
+  {
+    "id": 59,
+    "name": "arcanine",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 110,
+      "defense": 80,
+      "specialAttack": 100,
+      "specialDefense": 80,
+      "speed": 95
+    },
+    "height": 19,
+    "weight": 1550,
+    "baseExperience": 194,
+    "generation": 1,
+    "evolutionChainId": 25
+  },
+  {
+    "id": 60,
+    "name": "poliwag",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 50,
+      "defense": 40,
+      "specialAttack": 40,
+      "specialDefense": 40,
+      "speed": 90
+    },
+    "height": 6,
+    "weight": 124,
+    "baseExperience": 60,
+    "generation": 1,
+    "evolutionChainId": 26
+  },
+  {
+    "id": 61,
+    "name": "poliwhirl",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 65,
+      "defense": 65,
+      "specialAttack": 50,
+      "specialDefense": 50,
+      "speed": 90
+    },
+    "height": 10,
+    "weight": 200,
+    "baseExperience": 135,
+    "generation": 1,
+    "evolutionChainId": 26
+  },
+  {
+    "id": 62,
+    "name": "poliwrath",
+    "types": [
+      "water",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 95,
+      "defense": 95,
+      "specialAttack": 70,
+      "specialDefense": 90,
+      "speed": 70
+    },
+    "height": 13,
+    "weight": 540,
+    "baseExperience": 230,
+    "generation": 1,
+    "evolutionChainId": 26
+  },
+  {
+    "id": 63,
+    "name": "abra",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 25,
+      "attack": 20,
+      "defense": 15,
+      "specialAttack": 105,
+      "specialDefense": 55,
+      "speed": 90
+    },
+    "height": 9,
+    "weight": 195,
+    "baseExperience": 62,
+    "generation": 1,
+    "evolutionChainId": 27
+  },
+  {
+    "id": 64,
+    "name": "kadabra",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 35,
+      "defense": 30,
+      "specialAttack": 120,
+      "specialDefense": 70,
+      "speed": 105
+    },
+    "height": 13,
+    "weight": 565,
+    "baseExperience": 140,
+    "generation": 1,
+    "evolutionChainId": 27
+  },
+  {
+    "id": 65,
+    "name": "alakazam",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 50,
+      "defense": 45,
+      "specialAttack": 135,
+      "specialDefense": 95,
+      "speed": 120
+    },
+    "height": 15,
+    "weight": 480,
+    "baseExperience": 225,
+    "generation": 1,
+    "evolutionChainId": 27
+  },
+  {
+    "id": 66,
+    "name": "machop",
+    "types": [
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 80,
+      "defense": 50,
+      "specialAttack": 35,
+      "specialDefense": 35,
+      "speed": 35
+    },
+    "height": 8,
+    "weight": 195,
+    "baseExperience": 61,
+    "generation": 1,
+    "evolutionChainId": 28
+  },
+  {
+    "id": 67,
+    "name": "machoke",
+    "types": [
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 100,
+      "defense": 70,
+      "specialAttack": 50,
+      "specialDefense": 60,
+      "speed": 45
+    },
+    "height": 15,
+    "weight": 705,
+    "baseExperience": 142,
+    "generation": 1,
+    "evolutionChainId": 28
+  },
+  {
+    "id": 68,
+    "name": "machamp",
+    "types": [
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 130,
+      "defense": 80,
+      "specialAttack": 65,
+      "specialDefense": 85,
+      "speed": 55
+    },
+    "height": 16,
+    "weight": 1300,
+    "baseExperience": 227,
+    "generation": 1,
+    "evolutionChainId": 28
+  },
+  {
+    "id": 69,
+    "name": "bellsprout",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 75,
+      "defense": 35,
+      "specialAttack": 70,
+      "specialDefense": 30,
+      "speed": 40
+    },
+    "height": 7,
+    "weight": 40,
+    "baseExperience": 60,
+    "generation": 1,
+    "evolutionChainId": 29
+  },
+  {
+    "id": 70,
+    "name": "weepinbell",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 90,
+      "defense": 50,
+      "specialAttack": 85,
+      "specialDefense": 45,
+      "speed": 55
+    },
+    "height": 10,
+    "weight": 64,
+    "baseExperience": 137,
+    "generation": 1,
+    "evolutionChainId": 29
+  },
+  {
+    "id": 71,
+    "name": "victreebel",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 105,
+      "defense": 65,
+      "specialAttack": 100,
+      "specialDefense": 70,
+      "speed": 70
+    },
+    "height": 17,
+    "weight": 155,
+    "baseExperience": 221,
+    "generation": 1,
+    "evolutionChainId": 29
+  },
+  {
+    "id": 72,
+    "name": "tentacool",
+    "types": [
+      "water",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 40,
+      "defense": 35,
+      "specialAttack": 50,
+      "specialDefense": 100,
+      "speed": 70
+    },
+    "height": 9,
+    "weight": 455,
+    "baseExperience": 67,
+    "generation": 1,
+    "evolutionChainId": 30
+  },
+  {
+    "id": 73,
+    "name": "tentacruel",
+    "types": [
+      "water",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 70,
+      "defense": 65,
+      "specialAttack": 80,
+      "specialDefense": 120,
+      "speed": 100
+    },
+    "height": 16,
+    "weight": 550,
+    "baseExperience": 180,
+    "generation": 1,
+    "evolutionChainId": 30
+  },
+  {
+    "id": 74,
+    "name": "geodude",
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 80,
+      "defense": 100,
+      "specialAttack": 30,
+      "specialDefense": 30,
+      "speed": 20
+    },
+    "height": 4,
+    "weight": 200,
+    "baseExperience": 60,
+    "generation": 1,
+    "evolutionChainId": 31
+  },
+  {
+    "id": 75,
+    "name": "graveler",
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 95,
+      "defense": 115,
+      "specialAttack": 45,
+      "specialDefense": 45,
+      "speed": 35
+    },
+    "height": 10,
+    "weight": 1050,
+    "baseExperience": 137,
+    "generation": 1,
+    "evolutionChainId": 31
+  },
+  {
+    "id": 76,
+    "name": "golem",
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 120,
+      "defense": 130,
+      "specialAttack": 55,
+      "specialDefense": 65,
+      "speed": 45
+    },
+    "height": 14,
+    "weight": 3000,
+    "baseExperience": 223,
+    "generation": 1,
+    "evolutionChainId": 31
+  },
+  {
+    "id": 77,
+    "name": "ponyta",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 85,
+      "defense": 55,
+      "specialAttack": 65,
+      "specialDefense": 65,
+      "speed": 90
+    },
+    "height": 10,
+    "weight": 300,
+    "baseExperience": 82,
+    "generation": 1,
+    "evolutionChainId": 32
+  },
+  {
+    "id": 78,
+    "name": "rapidash",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 100,
+      "defense": 70,
+      "specialAttack": 80,
+      "specialDefense": 80,
+      "speed": 105
+    },
+    "height": 17,
+    "weight": 950,
+    "baseExperience": 175,
+    "generation": 1,
+    "evolutionChainId": 32
+  },
+  {
+    "id": 79,
+    "name": "slowpoke",
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 65,
+      "defense": 65,
+      "specialAttack": 40,
+      "specialDefense": 40,
+      "speed": 15
+    },
+    "height": 12,
+    "weight": 360,
+    "baseExperience": 63,
+    "generation": 1,
+    "evolutionChainId": 33
+  },
+  {
+    "id": 80,
+    "name": "slowbro",
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 75,
+      "defense": 110,
+      "specialAttack": 100,
+      "specialDefense": 80,
+      "speed": 30
+    },
+    "height": 16,
+    "weight": 785,
+    "baseExperience": 172,
+    "generation": 1,
+    "evolutionChainId": 33
+  },
+  {
+    "id": 81,
+    "name": "magnemite",
+    "types": [
+      "electric",
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 25,
+      "attack": 35,
+      "defense": 70,
+      "specialAttack": 95,
+      "specialDefense": 55,
+      "speed": 45
+    },
+    "height": 3,
+    "weight": 60,
+    "baseExperience": 65,
+    "generation": 1,
+    "evolutionChainId": 34
+  },
+  {
+    "id": 82,
+    "name": "magneton",
+    "types": [
+      "electric",
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 60,
+      "defense": 95,
+      "specialAttack": 120,
+      "specialDefense": 70,
+      "speed": 70
+    },
+    "height": 10,
+    "weight": 600,
+    "baseExperience": 163,
+    "generation": 1,
+    "evolutionChainId": 34
+  },
+  {
+    "id": 83,
+    "name": "farfetchd",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 52,
+      "attack": 90,
+      "defense": 55,
+      "specialAttack": 58,
+      "specialDefense": 62,
+      "speed": 60
+    },
+    "height": 8,
+    "weight": 150,
+    "baseExperience": 132,
+    "generation": 1,
+    "evolutionChainId": 35
+  },
+  {
+    "id": 84,
+    "name": "doduo",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 85,
+      "defense": 45,
+      "specialAttack": 35,
+      "specialDefense": 35,
+      "speed": 75
+    },
+    "height": 14,
+    "weight": 392,
+    "baseExperience": 62,
+    "generation": 1,
+    "evolutionChainId": 36
+  },
+  {
+    "id": 85,
+    "name": "dodrio",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 110,
+      "defense": 70,
+      "specialAttack": 60,
+      "specialDefense": 60,
+      "speed": 110
+    },
+    "height": 18,
+    "weight": 852,
+    "baseExperience": 165,
+    "generation": 1,
+    "evolutionChainId": 36
+  },
+  {
+    "id": 86,
+    "name": "seel",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 45,
+      "defense": 55,
+      "specialAttack": 45,
+      "specialDefense": 70,
+      "speed": 45
+    },
+    "height": 11,
+    "weight": 900,
+    "baseExperience": 65,
+    "generation": 1,
+    "evolutionChainId": 37
+  },
+  {
+    "id": 87,
+    "name": "dewgong",
+    "types": [
+      "water",
+      "ice"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 70,
+      "defense": 80,
+      "specialAttack": 70,
+      "specialDefense": 95,
+      "speed": 70
+    },
+    "height": 17,
+    "weight": 1200,
+    "baseExperience": 166,
+    "generation": 1,
+    "evolutionChainId": 37
+  },
+  {
+    "id": 88,
+    "name": "grimer",
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 80,
+      "defense": 50,
+      "specialAttack": 40,
+      "specialDefense": 50,
+      "speed": 25
+    },
+    "height": 9,
+    "weight": 300,
+    "baseExperience": 65,
+    "generation": 1,
+    "evolutionChainId": 38
+  },
+  {
+    "id": 89,
+    "name": "muk",
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 105,
+      "attack": 105,
+      "defense": 75,
+      "specialAttack": 65,
+      "specialDefense": 100,
+      "speed": 50
+    },
+    "height": 12,
+    "weight": 300,
+    "baseExperience": 175,
+    "generation": 1,
+    "evolutionChainId": 38
+  },
+  {
+    "id": 90,
+    "name": "shellder",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "attack": 65,
+      "defense": 100,
+      "specialAttack": 45,
+      "specialDefense": 25,
+      "speed": 40
+    },
+    "height": 3,
+    "weight": 40,
+    "baseExperience": 61,
+    "generation": 1,
+    "evolutionChainId": 39
+  },
+  {
+    "id": 91,
+    "name": "cloyster",
+    "types": [
+      "water",
+      "ice"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 95,
+      "defense": 180,
+      "specialAttack": 85,
+      "specialDefense": 45,
+      "speed": 70
+    },
+    "height": 15,
+    "weight": 1325,
+    "baseExperience": 184,
+    "generation": 1,
+    "evolutionChainId": 39
+  },
+  {
+    "id": 92,
+    "name": "gastly",
+    "types": [
+      "ghost",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "attack": 35,
+      "defense": 30,
+      "specialAttack": 100,
+      "specialDefense": 35,
+      "speed": 80
+    },
+    "height": 13,
+    "weight": 1,
+    "baseExperience": 62,
+    "generation": 1,
+    "evolutionChainId": 40
+  },
+  {
+    "id": 93,
+    "name": "haunter",
+    "types": [
+      "ghost",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 50,
+      "defense": 45,
+      "specialAttack": 115,
+      "specialDefense": 55,
+      "speed": 95
+    },
+    "height": 16,
+    "weight": 1,
+    "baseExperience": 142,
+    "generation": 1,
+    "evolutionChainId": 40
+  },
+  {
+    "id": 94,
+    "name": "gengar",
+    "types": [
+      "ghost",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 65,
+      "defense": 60,
+      "specialAttack": 130,
+      "specialDefense": 75,
+      "speed": 110
+    },
+    "height": 15,
+    "weight": 405,
+    "baseExperience": 225,
+    "generation": 1,
+    "evolutionChainId": 40
+  },
+  {
+    "id": 95,
+    "name": "onix",
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 45,
+      "defense": 160,
+      "specialAttack": 30,
+      "specialDefense": 45,
+      "speed": 70
+    },
+    "height": 88,
+    "weight": 2100,
+    "baseExperience": 77,
+    "generation": 1,
+    "evolutionChainId": 41
+  },
+  {
+    "id": 96,
+    "name": "drowzee",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 48,
+      "defense": 45,
+      "specialAttack": 43,
+      "specialDefense": 90,
+      "speed": 42
+    },
+    "height": 10,
+    "weight": 324,
+    "baseExperience": 66,
+    "generation": 1,
+    "evolutionChainId": 42
+  },
+  {
+    "id": 97,
+    "name": "hypno",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "attack": 73,
+      "defense": 70,
+      "specialAttack": 73,
+      "specialDefense": 115,
+      "speed": 67
+    },
+    "height": 16,
+    "weight": 756,
+    "baseExperience": 169,
+    "generation": 1,
+    "evolutionChainId": 42
+  },
+  {
+    "id": 98,
+    "name": "krabby",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "attack": 105,
+      "defense": 90,
+      "specialAttack": 25,
+      "specialDefense": 25,
+      "speed": 50
+    },
+    "height": 4,
+    "weight": 65,
+    "baseExperience": 65,
+    "generation": 1,
+    "evolutionChainId": 43
+  },
+  {
+    "id": 99,
+    "name": "kingler",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 130,
+      "defense": 115,
+      "specialAttack": 50,
+      "specialDefense": 50,
+      "speed": 75
+    },
+    "height": 13,
+    "weight": 600,
+    "baseExperience": 166,
+    "generation": 1,
+    "evolutionChainId": 43
+  },
+  {
+    "id": 100,
+    "name": "voltorb",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 30,
+      "defense": 50,
+      "specialAttack": 55,
+      "specialDefense": 55,
+      "speed": 100
+    },
+    "height": 5,
+    "weight": 104,
+    "baseExperience": 66,
+    "generation": 1,
+    "evolutionChainId": 44
+  },
+  {
+    "id": 101,
+    "name": "electrode",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 50,
+      "defense": 70,
+      "specialAttack": 80,
+      "specialDefense": 80,
+      "speed": 150
+    },
+    "height": 12,
+    "weight": 666,
+    "baseExperience": 172,
+    "generation": 1,
+    "evolutionChainId": 44
+  },
+  {
+    "id": 102,
+    "name": "exeggcute",
+    "types": [
+      "grass",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 40,
+      "defense": 80,
+      "specialAttack": 60,
+      "specialDefense": 45,
+      "speed": 40
+    },
+    "height": 4,
+    "weight": 25,
+    "baseExperience": 65,
+    "generation": 1,
+    "evolutionChainId": 45
+  },
+  {
+    "id": 103,
+    "name": "exeggutor",
+    "types": [
+      "grass",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 95,
+      "defense": 85,
+      "specialAttack": 125,
+      "specialDefense": 75,
+      "speed": 55
+    },
+    "height": 20,
+    "weight": 1200,
+    "baseExperience": 186,
+    "generation": 1,
+    "evolutionChainId": 45
+  },
+  {
+    "id": 104,
+    "name": "cubone",
+    "types": [
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 50,
+      "defense": 95,
+      "specialAttack": 40,
+      "specialDefense": 50,
+      "speed": 35
+    },
+    "height": 4,
+    "weight": 65,
+    "baseExperience": 64,
+    "generation": 1,
+    "evolutionChainId": 46
+  },
+  {
+    "id": 105,
+    "name": "marowak",
+    "types": [
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 80,
+      "defense": 110,
+      "specialAttack": 50,
+      "specialDefense": 80,
+      "speed": 45
+    },
+    "height": 10,
+    "weight": 450,
+    "baseExperience": 149,
+    "generation": 1,
+    "evolutionChainId": 46
+  },
+  {
+    "id": 106,
+    "name": "hitmonlee",
+    "types": [
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 120,
+      "defense": 53,
+      "specialAttack": 35,
+      "specialDefense": 110,
+      "speed": 87
+    },
+    "height": 15,
+    "weight": 498,
+    "baseExperience": 159,
+    "generation": 1,
+    "evolutionChainId": 47
+  },
+  {
+    "id": 107,
+    "name": "hitmonchan",
+    "types": [
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 105,
+      "defense": 79,
+      "specialAttack": 35,
+      "specialDefense": 110,
+      "speed": 76
+    },
+    "height": 14,
+    "weight": 502,
+    "baseExperience": 159,
+    "generation": 1,
+    "evolutionChainId": 47
+  },
+  {
+    "id": 108,
+    "name": "lickitung",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 55,
+      "defense": 75,
+      "specialAttack": 60,
+      "specialDefense": 75,
+      "speed": 30
+    },
+    "height": 12,
+    "weight": 655,
+    "baseExperience": 77,
+    "generation": 1,
+    "evolutionChainId": 48
+  },
+  {
+    "id": 109,
+    "name": "koffing",
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 65,
+      "defense": 95,
+      "specialAttack": 60,
+      "specialDefense": 45,
+      "speed": 35
+    },
+    "height": 6,
+    "weight": 10,
+    "baseExperience": 68,
+    "generation": 1,
+    "evolutionChainId": 49
+  },
+  {
+    "id": 110,
+    "name": "weezing",
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 90,
+      "defense": 120,
+      "specialAttack": 85,
+      "specialDefense": 70,
+      "speed": 60
+    },
+    "height": 12,
+    "weight": 95,
+    "baseExperience": 172,
+    "generation": 1,
+    "evolutionChainId": 49
+  },
+  {
+    "id": 111,
+    "name": "rhyhorn",
+    "types": [
+      "ground",
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 85,
+      "defense": 95,
+      "specialAttack": 30,
+      "specialDefense": 30,
+      "speed": 25
+    },
+    "height": 10,
+    "weight": 1150,
+    "baseExperience": 69,
+    "generation": 1,
+    "evolutionChainId": 50
+  },
+  {
+    "id": 112,
+    "name": "rhydon",
+    "types": [
+      "ground",
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 105,
+      "attack": 130,
+      "defense": 120,
+      "specialAttack": 45,
+      "specialDefense": 45,
+      "speed": 40
+    },
+    "height": 19,
+    "weight": 1200,
+    "baseExperience": 170,
+    "generation": 1,
+    "evolutionChainId": 50
+  },
+  {
+    "id": 113,
+    "name": "chansey",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 250,
+      "attack": 5,
+      "defense": 5,
+      "specialAttack": 35,
+      "specialDefense": 105,
+      "speed": 50
+    },
+    "height": 11,
+    "weight": 346,
+    "baseExperience": 395,
+    "generation": 1,
+    "evolutionChainId": 51
+  },
+  {
+    "id": 114,
+    "name": "tangela",
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 55,
+      "defense": 115,
+      "specialAttack": 100,
+      "specialDefense": 40,
+      "speed": 60
+    },
+    "height": 10,
+    "weight": 350,
+    "baseExperience": 87,
+    "generation": 1,
+    "evolutionChainId": 52
+  },
+  {
+    "id": 115,
+    "name": "kangaskhan",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 105,
+      "attack": 95,
+      "defense": 80,
+      "specialAttack": 40,
+      "specialDefense": 80,
+      "speed": 90
+    },
+    "height": 22,
+    "weight": 800,
+    "baseExperience": 172,
+    "generation": 1,
+    "evolutionChainId": 53
+  },
+  {
+    "id": 116,
+    "name": "horsea",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "attack": 40,
+      "defense": 70,
+      "specialAttack": 70,
+      "specialDefense": 25,
+      "speed": 60
+    },
+    "height": 4,
+    "weight": 80,
+    "baseExperience": 59,
+    "generation": 1,
+    "evolutionChainId": 54
+  },
+  {
+    "id": 117,
+    "name": "seadra",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 65,
+      "defense": 95,
+      "specialAttack": 95,
+      "specialDefense": 45,
+      "speed": 85
+    },
+    "height": 12,
+    "weight": 250,
+    "baseExperience": 154,
+    "generation": 1,
+    "evolutionChainId": 54
+  },
+  {
+    "id": 118,
+    "name": "goldeen",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 67,
+      "defense": 60,
+      "specialAttack": 35,
+      "specialDefense": 50,
+      "speed": 63
+    },
+    "height": 6,
+    "weight": 150,
+    "baseExperience": 64,
+    "generation": 1,
+    "evolutionChainId": 55
+  },
+  {
+    "id": 119,
+    "name": "seaking",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 92,
+      "defense": 65,
+      "specialAttack": 65,
+      "specialDefense": 80,
+      "speed": 68
+    },
+    "height": 13,
+    "weight": 390,
+    "baseExperience": 158,
+    "generation": 1,
+    "evolutionChainId": 55
+  },
+  {
+    "id": 120,
+    "name": "staryu",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "attack": 45,
+      "defense": 55,
+      "specialAttack": 70,
+      "specialDefense": 55,
+      "speed": 85
+    },
+    "height": 8,
+    "weight": 345,
+    "baseExperience": 68,
+    "generation": 1,
+    "evolutionChainId": 56
+  },
+  {
+    "id": 121,
+    "name": "starmie",
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 75,
+      "defense": 85,
+      "specialAttack": 100,
+      "specialDefense": 85,
+      "speed": 115
+    },
+    "height": 11,
+    "weight": 800,
+    "baseExperience": 182,
+    "generation": 1,
+    "evolutionChainId": 56
+  },
+  {
+    "id": 122,
+    "name": "mr-mime",
+    "types": [
+      "psychic",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 45,
+      "defense": 65,
+      "specialAttack": 100,
+      "specialDefense": 120,
+      "speed": 90
+    },
+    "height": 13,
+    "weight": 545,
+    "baseExperience": 161,
+    "generation": 1,
+    "evolutionChainId": 57
+  },
+  {
+    "id": 123,
+    "name": "scyther",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 110,
+      "defense": 80,
+      "specialAttack": 55,
+      "specialDefense": 80,
+      "speed": 105
+    },
+    "height": 15,
+    "weight": 560,
+    "baseExperience": 100,
+    "generation": 1,
+    "evolutionChainId": 58
+  },
+  {
+    "id": 124,
+    "name": "jynx",
+    "types": [
+      "ice",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 50,
+      "defense": 35,
+      "specialAttack": 115,
+      "specialDefense": 95,
+      "speed": 95
+    },
+    "height": 14,
+    "weight": 406,
+    "baseExperience": 159,
+    "generation": 1,
+    "evolutionChainId": 59
+  },
+  {
+    "id": 125,
+    "name": "electabuzz",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 83,
+      "defense": 57,
+      "specialAttack": 95,
+      "specialDefense": 85,
+      "speed": 105
+    },
+    "height": 11,
+    "weight": 300,
+    "baseExperience": 172,
+    "generation": 1,
+    "evolutionChainId": 60
+  },
+  {
+    "id": 126,
+    "name": "magmar",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 95,
+      "defense": 57,
+      "specialAttack": 100,
+      "specialDefense": 85,
+      "speed": 93
+    },
+    "height": 13,
+    "weight": 445,
+    "baseExperience": 173,
+    "generation": 1,
+    "evolutionChainId": 61
+  },
+  {
+    "id": 127,
+    "name": "pinsir",
+    "types": [
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 125,
+      "defense": 100,
+      "specialAttack": 55,
+      "specialDefense": 70,
+      "speed": 85
+    },
+    "height": 15,
+    "weight": 550,
+    "baseExperience": 175,
+    "generation": 1,
+    "evolutionChainId": 62
+  },
+  {
+    "id": 128,
+    "name": "tauros",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 100,
+      "defense": 95,
+      "specialAttack": 40,
+      "specialDefense": 70,
+      "speed": 110
+    },
+    "height": 14,
+    "weight": 884,
+    "baseExperience": 172,
+    "generation": 1,
+    "evolutionChainId": 63
+  },
+  {
+    "id": 129,
+    "name": "magikarp",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 20,
+      "attack": 10,
+      "defense": 55,
+      "specialAttack": 15,
+      "specialDefense": 20,
+      "speed": 80
+    },
+    "height": 9,
+    "weight": 100,
+    "baseExperience": 40,
+    "generation": 1,
+    "evolutionChainId": 64
+  },
+  {
+    "id": 130,
+    "name": "gyarados",
+    "types": [
+      "water",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 125,
+      "defense": 79,
+      "specialAttack": 60,
+      "specialDefense": 100,
+      "speed": 81
+    },
+    "height": 65,
+    "weight": 2350,
+    "baseExperience": 189,
+    "generation": 1,
+    "evolutionChainId": 64
+  },
+  {
+    "id": 131,
+    "name": "lapras",
+    "types": [
+      "water",
+      "ice"
+    ],
+    "baseStats": {
+      "hp": 130,
+      "attack": 85,
+      "defense": 80,
+      "specialAttack": 85,
+      "specialDefense": 95,
+      "speed": 60
+    },
+    "height": 25,
+    "weight": 2200,
+    "baseExperience": 187,
+    "generation": 1,
+    "evolutionChainId": 65
+  },
+  {
+    "id": 132,
+    "name": "ditto",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 48,
+      "attack": 48,
+      "defense": 48,
+      "specialAttack": 48,
+      "specialDefense": 48,
+      "speed": 48
+    },
+    "height": 3,
+    "weight": 40,
+    "baseExperience": 101,
+    "generation": 1,
+    "evolutionChainId": 66
+  },
+  {
+    "id": 133,
+    "name": "eevee",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 55,
+      "defense": 50,
+      "specialAttack": 45,
+      "specialDefense": 65,
+      "speed": 55
+    },
+    "height": 3,
+    "weight": 65,
+    "baseExperience": 65,
+    "generation": 1,
+    "evolutionChainId": 67
+  },
+  {
+    "id": 134,
+    "name": "vaporeon",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 130,
+      "attack": 65,
+      "defense": 60,
+      "specialAttack": 110,
+      "specialDefense": 95,
+      "speed": 65
+    },
+    "height": 10,
+    "weight": 290,
+    "baseExperience": 184,
+    "generation": 1,
+    "evolutionChainId": 67
+  },
+  {
+    "id": 135,
+    "name": "jolteon",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 65,
+      "defense": 60,
+      "specialAttack": 110,
+      "specialDefense": 95,
+      "speed": 130
+    },
+    "height": 8,
+    "weight": 245,
+    "baseExperience": 184,
+    "generation": 1,
+    "evolutionChainId": 67
+  },
+  {
+    "id": 136,
+    "name": "flareon",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 130,
+      "defense": 60,
+      "specialAttack": 95,
+      "specialDefense": 110,
+      "speed": 65
+    },
+    "height": 9,
+    "weight": 250,
+    "baseExperience": 184,
+    "generation": 1,
+    "evolutionChainId": 67
+  },
+  {
+    "id": 137,
+    "name": "porygon",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 60,
+      "defense": 70,
+      "specialAttack": 85,
+      "specialDefense": 75,
+      "speed": 40
+    },
+    "height": 8,
+    "weight": 365,
+    "baseExperience": 79,
+    "generation": 1,
+    "evolutionChainId": 68
+  },
+  {
+    "id": 138,
+    "name": "omanyte",
+    "types": [
+      "rock",
+      "water"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 40,
+      "defense": 100,
+      "specialAttack": 90,
+      "specialDefense": 55,
+      "speed": 35
+    },
+    "height": 4,
+    "weight": 75,
+    "baseExperience": 71,
+    "generation": 1,
+    "evolutionChainId": 69
+  },
+  {
+    "id": 139,
+    "name": "omastar",
+    "types": [
+      "rock",
+      "water"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 60,
+      "defense": 125,
+      "specialAttack": 115,
+      "specialDefense": 70,
+      "speed": 55
+    },
+    "height": 10,
+    "weight": 350,
+    "baseExperience": 173,
+    "generation": 1,
+    "evolutionChainId": 69
+  },
+  {
+    "id": 140,
+    "name": "kabuto",
+    "types": [
+      "rock",
+      "water"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "attack": 80,
+      "defense": 90,
+      "specialAttack": 55,
+      "specialDefense": 45,
+      "speed": 55
+    },
+    "height": 5,
+    "weight": 115,
+    "baseExperience": 71,
+    "generation": 1,
+    "evolutionChainId": 70
+  },
+  {
+    "id": 141,
+    "name": "kabutops",
+    "types": [
+      "rock",
+      "water"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 115,
+      "defense": 105,
+      "specialAttack": 65,
+      "specialDefense": 70,
+      "speed": 80
+    },
+    "height": 13,
+    "weight": 405,
+    "baseExperience": 173,
+    "generation": 1,
+    "evolutionChainId": 70
+  },
+  {
+    "id": 142,
+    "name": "aerodactyl",
+    "types": [
+      "rock",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 105,
+      "defense": 65,
+      "specialAttack": 60,
+      "specialDefense": 75,
+      "speed": 130
+    },
+    "height": 18,
+    "weight": 590,
+    "baseExperience": 180,
+    "generation": 1,
+    "evolutionChainId": 71
+  },
+  {
+    "id": 143,
+    "name": "snorlax",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 160,
+      "attack": 110,
+      "defense": 65,
+      "specialAttack": 65,
+      "specialDefense": 110,
+      "speed": 30
+    },
+    "height": 21,
+    "weight": 4600,
+    "baseExperience": 189,
+    "generation": 1,
+    "evolutionChainId": 72
+  },
+  {
+    "id": 144,
+    "name": "articuno",
+    "types": [
+      "ice",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 85,
+      "defense": 100,
+      "specialAttack": 95,
+      "specialDefense": 125,
+      "speed": 85
+    },
+    "height": 17,
+    "weight": 554,
+    "baseExperience": 261,
+    "generation": 1,
+    "evolutionChainId": 73
+  },
+  {
+    "id": 145,
+    "name": "zapdos",
+    "types": [
+      "electric",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 90,
+      "defense": 85,
+      "specialAttack": 125,
+      "specialDefense": 90,
+      "speed": 100
+    },
+    "height": 16,
+    "weight": 526,
+    "baseExperience": 261,
+    "generation": 1,
+    "evolutionChainId": 74
+  },
+  {
+    "id": 146,
+    "name": "moltres",
+    "types": [
+      "fire",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 100,
+      "defense": 90,
+      "specialAttack": 125,
+      "specialDefense": 85,
+      "speed": 90
+    },
+    "height": 20,
+    "weight": 600,
+    "baseExperience": 261,
+    "generation": 1,
+    "evolutionChainId": 75
+  },
+  {
+    "id": 147,
+    "name": "dratini",
+    "types": [
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 41,
+      "attack": 64,
+      "defense": 45,
+      "specialAttack": 50,
+      "specialDefense": 50,
+      "speed": 50
+    },
+    "height": 18,
+    "weight": 33,
+    "baseExperience": 60,
+    "generation": 1,
+    "evolutionChainId": 76
+  },
+  {
+    "id": 148,
+    "name": "dragonair",
+    "types": [
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 61,
+      "attack": 84,
+      "defense": 65,
+      "specialAttack": 70,
+      "specialDefense": 70,
+      "speed": 70
+    },
+    "height": 40,
+    "weight": 165,
+    "baseExperience": 147,
+    "generation": 1,
+    "evolutionChainId": 76
+  },
+  {
+    "id": 149,
+    "name": "dragonite",
+    "types": [
+      "dragon",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 91,
+      "attack": 134,
+      "defense": 95,
+      "specialAttack": 100,
+      "specialDefense": 100,
+      "speed": 80
+    },
+    "height": 22,
+    "weight": 2100,
+    "baseExperience": 270,
+    "generation": 1,
+    "evolutionChainId": 76
+  },
+  {
+    "id": 150,
+    "name": "mewtwo",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 106,
+      "attack": 110,
+      "defense": 90,
+      "specialAttack": 154,
+      "specialDefense": 90,
+      "speed": 130
+    },
+    "height": 20,
+    "weight": 1220,
+    "baseExperience": 306,
+    "generation": 1,
+    "evolutionChainId": 77
+  },
+  {
+    "id": 151,
+    "name": "mew",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 100,
+      "defense": 100,
+      "specialAttack": 100,
+      "specialDefense": 100,
+      "speed": 100
+    },
+    "height": 4,
+    "weight": 40,
+    "baseExperience": 270,
+    "generation": 1,
+    "evolutionChainId": 78
+  },
+  {
+    "id": 152,
+    "name": "chikorita",
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 49,
+      "defense": 65,
+      "specialAttack": 49,
+      "specialDefense": 65,
+      "speed": 45
+    },
+    "height": 9,
+    "weight": 64,
+    "baseExperience": 64,
+    "generation": 2,
+    "evolutionChainId": 79
+  },
+  {
+    "id": 153,
+    "name": "bayleef",
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 62,
+      "defense": 80,
+      "specialAttack": 63,
+      "specialDefense": 80,
+      "speed": 60
+    },
+    "height": 12,
+    "weight": 158,
+    "baseExperience": 142,
+    "generation": 2,
+    "evolutionChainId": 79
+  },
+  {
+    "id": 154,
+    "name": "meganium",
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 82,
+      "defense": 100,
+      "specialAttack": 83,
+      "specialDefense": 100,
+      "speed": 80
+    },
+    "height": 18,
+    "weight": 1005,
+    "baseExperience": 236,
+    "generation": 2,
+    "evolutionChainId": 79
+  },
+  {
+    "id": 155,
+    "name": "cyndaquil",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 39,
+      "attack": 52,
+      "defense": 43,
+      "specialAttack": 60,
+      "specialDefense": 50,
+      "speed": 65
+    },
+    "height": 5,
+    "weight": 79,
+    "baseExperience": 62,
+    "generation": 2,
+    "evolutionChainId": 80
+  },
+  {
+    "id": 156,
+    "name": "quilava",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 58,
+      "attack": 64,
+      "defense": 58,
+      "specialAttack": 80,
+      "specialDefense": 65,
+      "speed": 80
+    },
+    "height": 9,
+    "weight": 190,
+    "baseExperience": 142,
+    "generation": 2,
+    "evolutionChainId": 80
+  },
+  {
+    "id": 157,
+    "name": "typhlosion",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 78,
+      "attack": 84,
+      "defense": 78,
+      "specialAttack": 109,
+      "specialDefense": 85,
+      "speed": 100
+    },
+    "height": 17,
+    "weight": 795,
+    "baseExperience": 240,
+    "generation": 2,
+    "evolutionChainId": 80
+  },
+  {
+    "id": 158,
+    "name": "totodile",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 65,
+      "defense": 64,
+      "specialAttack": 44,
+      "specialDefense": 48,
+      "speed": 43
+    },
+    "height": 6,
+    "weight": 95,
+    "baseExperience": 63,
+    "generation": 2,
+    "evolutionChainId": 81
+  },
+  {
+    "id": 159,
+    "name": "croconaw",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 80,
+      "defense": 80,
+      "specialAttack": 59,
+      "specialDefense": 63,
+      "speed": 58
+    },
+    "height": 11,
+    "weight": 250,
+    "baseExperience": 142,
+    "generation": 2,
+    "evolutionChainId": 81
+  },
+  {
+    "id": 160,
+    "name": "feraligatr",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "attack": 105,
+      "defense": 100,
+      "specialAttack": 79,
+      "specialDefense": 83,
+      "speed": 78
+    },
+    "height": 23,
+    "weight": 888,
+    "baseExperience": 239,
+    "generation": 2,
+    "evolutionChainId": 81
+  },
+  {
+    "id": 161,
+    "name": "sentret",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 46,
+      "defense": 34,
+      "specialAttack": 35,
+      "specialDefense": 45,
+      "speed": 20
+    },
+    "height": 8,
+    "weight": 60,
+    "baseExperience": 43,
+    "generation": 2,
+    "evolutionChainId": 82
+  },
+  {
+    "id": 162,
+    "name": "furret",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "attack": 76,
+      "defense": 64,
+      "specialAttack": 45,
+      "specialDefense": 55,
+      "speed": 90
+    },
+    "height": 18,
+    "weight": 325,
+    "baseExperience": 145,
+    "generation": 2,
+    "evolutionChainId": 82
+  },
+  {
+    "id": 163,
+    "name": "hoothoot",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 30,
+      "defense": 30,
+      "specialAttack": 36,
+      "specialDefense": 56,
+      "speed": 50
+    },
+    "height": 7,
+    "weight": 212,
+    "baseExperience": 52,
+    "generation": 2,
+    "evolutionChainId": 83
+  },
+  {
+    "id": 164,
+    "name": "noctowl",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 50,
+      "defense": 50,
+      "specialAttack": 86,
+      "specialDefense": 96,
+      "speed": 70
+    },
+    "height": 16,
+    "weight": 408,
+    "baseExperience": 158,
+    "generation": 2,
+    "evolutionChainId": 83
+  },
+  {
+    "id": 165,
+    "name": "ledyba",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 20,
+      "defense": 30,
+      "specialAttack": 40,
+      "specialDefense": 80,
+      "speed": 55
+    },
+    "height": 10,
+    "weight": 108,
+    "baseExperience": 53,
+    "generation": 2,
+    "evolutionChainId": 84
+  },
+  {
+    "id": 166,
+    "name": "ledian",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 35,
+      "defense": 50,
+      "specialAttack": 55,
+      "specialDefense": 110,
+      "speed": 85
+    },
+    "height": 14,
+    "weight": 356,
+    "baseExperience": 137,
+    "generation": 2,
+    "evolutionChainId": 84
+  },
+  {
+    "id": 167,
+    "name": "spinarak",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 60,
+      "defense": 40,
+      "specialAttack": 40,
+      "specialDefense": 40,
+      "speed": 30
+    },
+    "height": 5,
+    "weight": 85,
+    "baseExperience": 50,
+    "generation": 2,
+    "evolutionChainId": 85
+  },
+  {
+    "id": 168,
+    "name": "ariados",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 90,
+      "defense": 70,
+      "specialAttack": 60,
+      "specialDefense": 70,
+      "speed": 40
+    },
+    "height": 11,
+    "weight": 335,
+    "baseExperience": 140,
+    "generation": 2,
+    "evolutionChainId": 85
+  },
+  {
+    "id": 169,
+    "name": "crobat",
+    "types": [
+      "poison",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "attack": 90,
+      "defense": 80,
+      "specialAttack": 70,
+      "specialDefense": 80,
+      "speed": 130
+    },
+    "height": 18,
+    "weight": 750,
+    "baseExperience": 241,
+    "generation": 2,
+    "evolutionChainId": 17
+  },
+  {
+    "id": 170,
+    "name": "chinchou",
+    "types": [
+      "water",
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 38,
+      "defense": 38,
+      "specialAttack": 56,
+      "specialDefense": 56,
+      "speed": 67
+    },
+    "height": 5,
+    "weight": 120,
+    "baseExperience": 66,
+    "generation": 2,
+    "evolutionChainId": 86
+  },
+  {
+    "id": 171,
+    "name": "lanturn",
+    "types": [
+      "water",
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 125,
+      "attack": 58,
+      "defense": 58,
+      "specialAttack": 76,
+      "specialDefense": 76,
+      "speed": 67
+    },
+    "height": 12,
+    "weight": 225,
+    "baseExperience": 161,
+    "generation": 2,
+    "evolutionChainId": 86
+  },
+  {
+    "id": 172,
+    "name": "pichu",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 20,
+      "attack": 40,
+      "defense": 15,
+      "specialAttack": 35,
+      "specialDefense": 35,
+      "speed": 60
+    },
+    "height": 3,
+    "weight": 20,
+    "baseExperience": 41,
+    "generation": 2,
+    "evolutionChainId": 10
+  },
+  {
+    "id": 173,
+    "name": "cleffa",
+    "types": [
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 25,
+      "defense": 28,
+      "specialAttack": 45,
+      "specialDefense": 55,
+      "speed": 15
+    },
+    "height": 3,
+    "weight": 30,
+    "baseExperience": 44,
+    "generation": 2,
+    "evolutionChainId": 14
+  },
+  {
+    "id": 174,
+    "name": "igglybuff",
+    "types": [
+      "normal",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 30,
+      "defense": 15,
+      "specialAttack": 40,
+      "specialDefense": 20,
+      "speed": 15
+    },
+    "height": 3,
+    "weight": 10,
+    "baseExperience": 42,
+    "generation": 2,
+    "evolutionChainId": 16
+  },
+  {
+    "id": 175,
+    "name": "togepi",
+    "types": [
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 20,
+      "defense": 65,
+      "specialAttack": 40,
+      "specialDefense": 65,
+      "speed": 20
+    },
+    "height": 3,
+    "weight": 15,
+    "baseExperience": 49,
+    "generation": 2,
+    "evolutionChainId": 87
+  },
+  {
+    "id": 176,
+    "name": "togetic",
+    "types": [
+      "fairy",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 40,
+      "defense": 85,
+      "specialAttack": 80,
+      "specialDefense": 105,
+      "speed": 40
+    },
+    "height": 6,
+    "weight": 32,
+    "baseExperience": 142,
+    "generation": 2,
+    "evolutionChainId": 87
+  },
+  {
+    "id": 177,
+    "name": "natu",
+    "types": [
+      "psychic",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 50,
+      "defense": 45,
+      "specialAttack": 70,
+      "specialDefense": 45,
+      "speed": 70
+    },
+    "height": 2,
+    "weight": 20,
+    "baseExperience": 64,
+    "generation": 2,
+    "evolutionChainId": 88
+  },
+  {
+    "id": 178,
+    "name": "xatu",
+    "types": [
+      "psychic",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 75,
+      "defense": 70,
+      "specialAttack": 95,
+      "specialDefense": 70,
+      "speed": 95
+    },
+    "height": 15,
+    "weight": 150,
+    "baseExperience": 165,
+    "generation": 2,
+    "evolutionChainId": 88
+  },
+  {
+    "id": 179,
+    "name": "mareep",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 40,
+      "defense": 40,
+      "specialAttack": 65,
+      "specialDefense": 45,
+      "speed": 35
+    },
+    "height": 6,
+    "weight": 78,
+    "baseExperience": 56,
+    "generation": 2,
+    "evolutionChainId": 89
+  },
+  {
+    "id": 180,
+    "name": "flaaffy",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 55,
+      "defense": 55,
+      "specialAttack": 80,
+      "specialDefense": 60,
+      "speed": 45
+    },
+    "height": 8,
+    "weight": 133,
+    "baseExperience": 128,
+    "generation": 2,
+    "evolutionChainId": 89
+  },
+  {
+    "id": 181,
+    "name": "ampharos",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 75,
+      "defense": 85,
+      "specialAttack": 115,
+      "specialDefense": 90,
+      "speed": 55
+    },
+    "height": 14,
+    "weight": 615,
+    "baseExperience": 230,
+    "generation": 2,
+    "evolutionChainId": 89
+  },
+  {
+    "id": 182,
+    "name": "bellossom",
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 80,
+      "defense": 95,
+      "specialAttack": 90,
+      "specialDefense": 100,
+      "speed": 50
+    },
+    "height": 4,
+    "weight": 58,
+    "baseExperience": 221,
+    "generation": 2,
+    "evolutionChainId": 18
+  },
+  {
+    "id": 183,
+    "name": "marill",
+    "types": [
+      "water",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 20,
+      "defense": 50,
+      "specialAttack": 20,
+      "specialDefense": 50,
+      "speed": 40
+    },
+    "height": 4,
+    "weight": 85,
+    "baseExperience": 88,
+    "generation": 2,
+    "evolutionChainId": 90
+  },
+  {
+    "id": 184,
+    "name": "azumarill",
+    "types": [
+      "water",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 50,
+      "defense": 80,
+      "specialAttack": 60,
+      "specialDefense": 80,
+      "speed": 50
+    },
+    "height": 8,
+    "weight": 285,
+    "baseExperience": 189,
+    "generation": 2,
+    "evolutionChainId": 90
+  },
+  {
+    "id": 185,
+    "name": "sudowoodo",
+    "types": [
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 100,
+      "defense": 115,
+      "specialAttack": 30,
+      "specialDefense": 65,
+      "speed": 30
+    },
+    "height": 12,
+    "weight": 380,
+    "baseExperience": 144,
+    "generation": 2,
+    "evolutionChainId": 91
+  },
+  {
+    "id": 186,
+    "name": "politoed",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 75,
+      "defense": 75,
+      "specialAttack": 90,
+      "specialDefense": 100,
+      "speed": 70
+    },
+    "height": 11,
+    "weight": 339,
+    "baseExperience": 225,
+    "generation": 2,
+    "evolutionChainId": 26
+  },
+  {
+    "id": 187,
+    "name": "hoppip",
+    "types": [
+      "grass",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 35,
+      "defense": 40,
+      "specialAttack": 35,
+      "specialDefense": 55,
+      "speed": 50
+    },
+    "height": 4,
+    "weight": 5,
+    "baseExperience": 50,
+    "generation": 2,
+    "evolutionChainId": 92
+  },
+  {
+    "id": 188,
+    "name": "skiploom",
+    "types": [
+      "grass",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 45,
+      "defense": 50,
+      "specialAttack": 45,
+      "specialDefense": 65,
+      "speed": 80
+    },
+    "height": 6,
+    "weight": 10,
+    "baseExperience": 119,
+    "generation": 2,
+    "evolutionChainId": 92
+  },
+  {
+    "id": 189,
+    "name": "jumpluff",
+    "types": [
+      "grass",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 55,
+      "defense": 70,
+      "specialAttack": 55,
+      "specialDefense": 95,
+      "speed": 110
+    },
+    "height": 8,
+    "weight": 30,
+    "baseExperience": 207,
+    "generation": 2,
+    "evolutionChainId": 92
+  },
+  {
+    "id": 190,
+    "name": "aipom",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 70,
+      "defense": 55,
+      "specialAttack": 40,
+      "specialDefense": 55,
+      "speed": 85
+    },
+    "height": 8,
+    "weight": 115,
+    "baseExperience": 72,
+    "generation": 2,
+    "evolutionChainId": 93
+  },
+  {
+    "id": 191,
+    "name": "sunkern",
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "attack": 30,
+      "defense": 30,
+      "specialAttack": 30,
+      "specialDefense": 30,
+      "speed": 30
+    },
+    "height": 3,
+    "weight": 18,
+    "baseExperience": 36,
+    "generation": 2,
+    "evolutionChainId": 94
+  },
+  {
+    "id": 192,
+    "name": "sunflora",
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 75,
+      "defense": 55,
+      "specialAttack": 105,
+      "specialDefense": 85,
+      "speed": 30
+    },
+    "height": 8,
+    "weight": 85,
+    "baseExperience": 149,
+    "generation": 2,
+    "evolutionChainId": 94
+  },
+  {
+    "id": 193,
+    "name": "yanma",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 65,
+      "defense": 45,
+      "specialAttack": 75,
+      "specialDefense": 45,
+      "speed": 95
+    },
+    "height": 12,
+    "weight": 380,
+    "baseExperience": 78,
+    "generation": 2,
+    "evolutionChainId": 95
+  },
+  {
+    "id": 194,
+    "name": "wooper",
+    "types": [
+      "water",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 45,
+      "defense": 45,
+      "specialAttack": 25,
+      "specialDefense": 25,
+      "speed": 15
+    },
+    "height": 4,
+    "weight": 85,
+    "baseExperience": 42,
+    "generation": 2,
+    "evolutionChainId": 96
+  },
+  {
+    "id": 195,
+    "name": "quagsire",
+    "types": [
+      "water",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 85,
+      "defense": 85,
+      "specialAttack": 65,
+      "specialDefense": 65,
+      "speed": 35
+    },
+    "height": 14,
+    "weight": 750,
+    "baseExperience": 151,
+    "generation": 2,
+    "evolutionChainId": 96
+  },
+  {
+    "id": 196,
+    "name": "espeon",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 65,
+      "defense": 60,
+      "specialAttack": 130,
+      "specialDefense": 95,
+      "speed": 110
+    },
+    "height": 9,
+    "weight": 265,
+    "baseExperience": 184,
+    "generation": 2,
+    "evolutionChainId": 67
+  },
+  {
+    "id": 197,
+    "name": "umbreon",
+    "types": [
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 65,
+      "defense": 110,
+      "specialAttack": 60,
+      "specialDefense": 130,
+      "speed": 65
+    },
+    "height": 10,
+    "weight": 270,
+    "baseExperience": 184,
+    "generation": 2,
+    "evolutionChainId": 67
+  },
+  {
+    "id": 198,
+    "name": "murkrow",
+    "types": [
+      "dark",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 85,
+      "defense": 42,
+      "specialAttack": 85,
+      "specialDefense": 42,
+      "speed": 91
+    },
+    "height": 5,
+    "weight": 21,
+    "baseExperience": 81,
+    "generation": 2,
+    "evolutionChainId": 97
+  },
+  {
+    "id": 199,
+    "name": "slowking",
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 75,
+      "defense": 80,
+      "specialAttack": 100,
+      "specialDefense": 110,
+      "speed": 30
+    },
+    "height": 20,
+    "weight": 795,
+    "baseExperience": 172,
+    "generation": 2,
+    "evolutionChainId": 33
+  },
+  {
+    "id": 200,
+    "name": "misdreavus",
+    "types": [
+      "ghost"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 60,
+      "defense": 60,
+      "specialAttack": 85,
+      "specialDefense": 85,
+      "speed": 85
+    },
+    "height": 7,
+    "weight": 10,
+    "baseExperience": 87,
+    "generation": 2,
+    "evolutionChainId": 98
+  },
+  {
+    "id": 201,
+    "name": "unown",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 48,
+      "attack": 72,
+      "defense": 48,
+      "specialAttack": 72,
+      "specialDefense": 48,
+      "speed": 48
+    },
+    "height": 5,
+    "weight": 50,
+    "baseExperience": 118,
+    "generation": 2,
+    "evolutionChainId": 99
+  },
+  {
+    "id": 202,
+    "name": "wobbuffet",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 190,
+      "attack": 33,
+      "defense": 58,
+      "specialAttack": 33,
+      "specialDefense": 58,
+      "speed": 33
+    },
+    "height": 13,
+    "weight": 285,
+    "baseExperience": 142,
+    "generation": 2,
+    "evolutionChainId": 100
+  },
+  {
+    "id": 203,
+    "name": "girafarig",
+    "types": [
+      "normal",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 80,
+      "defense": 65,
+      "specialAttack": 90,
+      "specialDefense": 65,
+      "speed": 85
+    },
+    "height": 15,
+    "weight": 415,
+    "baseExperience": 159,
+    "generation": 2,
+    "evolutionChainId": 101
+  },
+  {
+    "id": 204,
+    "name": "pineco",
+    "types": [
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 65,
+      "defense": 90,
+      "specialAttack": 35,
+      "specialDefense": 35,
+      "speed": 15
+    },
+    "height": 6,
+    "weight": 72,
+    "baseExperience": 58,
+    "generation": 2,
+    "evolutionChainId": 102
+  },
+  {
+    "id": 205,
+    "name": "forretress",
+    "types": [
+      "bug",
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 90,
+      "defense": 140,
+      "specialAttack": 60,
+      "specialDefense": 60,
+      "speed": 40
+    },
+    "height": 12,
+    "weight": 1258,
+    "baseExperience": 163,
+    "generation": 2,
+    "evolutionChainId": 102
+  },
+  {
+    "id": 206,
+    "name": "dunsparce",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 70,
+      "defense": 70,
+      "specialAttack": 65,
+      "specialDefense": 65,
+      "speed": 45
+    },
+    "height": 15,
+    "weight": 140,
+    "baseExperience": 145,
+    "generation": 2,
+    "evolutionChainId": 103
+  },
+  {
+    "id": 207,
+    "name": "gligar",
+    "types": [
+      "ground",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 75,
+      "defense": 105,
+      "specialAttack": 35,
+      "specialDefense": 65,
+      "speed": 85
+    },
+    "height": 11,
+    "weight": 648,
+    "baseExperience": 86,
+    "generation": 2,
+    "evolutionChainId": 104
+  },
+  {
+    "id": 208,
+    "name": "steelix",
+    "types": [
+      "steel",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 85,
+      "defense": 200,
+      "specialAttack": 55,
+      "specialDefense": 65,
+      "speed": 30
+    },
+    "height": 92,
+    "weight": 4000,
+    "baseExperience": 179,
+    "generation": 2,
+    "evolutionChainId": 41
+  },
+  {
+    "id": 209,
+    "name": "snubbull",
+    "types": [
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 80,
+      "defense": 50,
+      "specialAttack": 40,
+      "specialDefense": 40,
+      "speed": 30
+    },
+    "height": 6,
+    "weight": 78,
+    "baseExperience": 60,
+    "generation": 2,
+    "evolutionChainId": 105
+  },
+  {
+    "id": 210,
+    "name": "granbull",
+    "types": [
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 120,
+      "defense": 75,
+      "specialAttack": 60,
+      "specialDefense": 60,
+      "speed": 45
+    },
+    "height": 14,
+    "weight": 487,
+    "baseExperience": 158,
+    "generation": 2,
+    "evolutionChainId": 105
+  },
+  {
+    "id": 211,
+    "name": "qwilfish",
+    "types": [
+      "water",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 95,
+      "defense": 85,
+      "specialAttack": 55,
+      "specialDefense": 55,
+      "speed": 85
+    },
+    "height": 5,
+    "weight": 39,
+    "baseExperience": 88,
+    "generation": 2,
+    "evolutionChainId": 106
+  },
+  {
+    "id": 212,
+    "name": "scizor",
+    "types": [
+      "bug",
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 130,
+      "defense": 100,
+      "specialAttack": 55,
+      "specialDefense": 80,
+      "speed": 65
+    },
+    "height": 18,
+    "weight": 1180,
+    "baseExperience": 175,
+    "generation": 2,
+    "evolutionChainId": 58
+  },
+  {
+    "id": 213,
+    "name": "shuckle",
+    "types": [
+      "bug",
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 20,
+      "attack": 10,
+      "defense": 230,
+      "specialAttack": 10,
+      "specialDefense": 230,
+      "speed": 5
+    },
+    "height": 6,
+    "weight": 205,
+    "baseExperience": 177,
+    "generation": 2,
+    "evolutionChainId": 107
+  },
+  {
+    "id": 214,
+    "name": "heracross",
+    "types": [
+      "bug",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 125,
+      "defense": 75,
+      "specialAttack": 40,
+      "specialDefense": 95,
+      "speed": 85
+    },
+    "height": 15,
+    "weight": 540,
+    "baseExperience": 175,
+    "generation": 2,
+    "evolutionChainId": 108
+  },
+  {
+    "id": 215,
+    "name": "sneasel",
+    "types": [
+      "dark",
+      "ice"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 95,
+      "defense": 55,
+      "specialAttack": 35,
+      "specialDefense": 75,
+      "speed": 115
+    },
+    "height": 9,
+    "weight": 280,
+    "baseExperience": 86,
+    "generation": 2,
+    "evolutionChainId": 109
+  },
+  {
+    "id": 216,
+    "name": "teddiursa",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 80,
+      "defense": 50,
+      "specialAttack": 50,
+      "specialDefense": 50,
+      "speed": 40
+    },
+    "height": 6,
+    "weight": 88,
+    "baseExperience": 66,
+    "generation": 2,
+    "evolutionChainId": 110
+  },
+  {
+    "id": 217,
+    "name": "ursaring",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 130,
+      "defense": 75,
+      "specialAttack": 75,
+      "specialDefense": 75,
+      "speed": 55
+    },
+    "height": 18,
+    "weight": 1258,
+    "baseExperience": 175,
+    "generation": 2,
+    "evolutionChainId": 110
+  },
+  {
+    "id": 218,
+    "name": "slugma",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 40,
+      "defense": 40,
+      "specialAttack": 70,
+      "specialDefense": 40,
+      "speed": 20
+    },
+    "height": 7,
+    "weight": 350,
+    "baseExperience": 50,
+    "generation": 2,
+    "evolutionChainId": 111
+  },
+  {
+    "id": 219,
+    "name": "magcargo",
+    "types": [
+      "fire",
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 50,
+      "defense": 120,
+      "specialAttack": 90,
+      "specialDefense": 80,
+      "speed": 30
+    },
+    "height": 8,
+    "weight": 550,
+    "baseExperience": 151,
+    "generation": 2,
+    "evolutionChainId": 111
+  },
+  {
+    "id": 220,
+    "name": "swinub",
+    "types": [
+      "ice",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 50,
+      "defense": 40,
+      "specialAttack": 30,
+      "specialDefense": 30,
+      "speed": 50
+    },
+    "height": 4,
+    "weight": 65,
+    "baseExperience": 50,
+    "generation": 2,
+    "evolutionChainId": 112
+  },
+  {
+    "id": 221,
+    "name": "piloswine",
+    "types": [
+      "ice",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 100,
+      "defense": 80,
+      "specialAttack": 60,
+      "specialDefense": 60,
+      "speed": 50
+    },
+    "height": 11,
+    "weight": 558,
+    "baseExperience": 158,
+    "generation": 2,
+    "evolutionChainId": 112
+  },
+  {
+    "id": 222,
+    "name": "corsola",
+    "types": [
+      "water",
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 55,
+      "defense": 95,
+      "specialAttack": 65,
+      "specialDefense": 95,
+      "speed": 35
+    },
+    "height": 6,
+    "weight": 50,
+    "baseExperience": 144,
+    "generation": 2,
+    "evolutionChainId": 113
+  },
+  {
+    "id": 223,
+    "name": "remoraid",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 65,
+      "defense": 35,
+      "specialAttack": 65,
+      "specialDefense": 35,
+      "speed": 65
+    },
+    "height": 6,
+    "weight": 120,
+    "baseExperience": 60,
+    "generation": 2,
+    "evolutionChainId": 114
+  },
+  {
+    "id": 224,
+    "name": "octillery",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 105,
+      "defense": 75,
+      "specialAttack": 105,
+      "specialDefense": 75,
+      "speed": 45
+    },
+    "height": 9,
+    "weight": 285,
+    "baseExperience": 168,
+    "generation": 2,
+    "evolutionChainId": 114
+  },
+  {
+    "id": 225,
+    "name": "delibird",
+    "types": [
+      "ice",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 55,
+      "defense": 45,
+      "specialAttack": 65,
+      "specialDefense": 45,
+      "speed": 75
+    },
+    "height": 9,
+    "weight": 160,
+    "baseExperience": 116,
+    "generation": 2,
+    "evolutionChainId": 115
+  },
+  {
+    "id": 226,
+    "name": "mantine",
+    "types": [
+      "water",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "attack": 40,
+      "defense": 70,
+      "specialAttack": 80,
+      "specialDefense": 140,
+      "speed": 70
+    },
+    "height": 21,
+    "weight": 2200,
+    "baseExperience": 170,
+    "generation": 2,
+    "evolutionChainId": 116
+  },
+  {
+    "id": 227,
+    "name": "skarmory",
+    "types": [
+      "steel",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 80,
+      "defense": 140,
+      "specialAttack": 40,
+      "specialDefense": 70,
+      "speed": 70
+    },
+    "height": 17,
+    "weight": 505,
+    "baseExperience": 163,
+    "generation": 2,
+    "evolutionChainId": 117
+  },
+  {
+    "id": 228,
+    "name": "houndour",
+    "types": [
+      "dark",
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 60,
+      "defense": 30,
+      "specialAttack": 80,
+      "specialDefense": 50,
+      "speed": 65
+    },
+    "height": 6,
+    "weight": 108,
+    "baseExperience": 66,
+    "generation": 2,
+    "evolutionChainId": 118
+  },
+  {
+    "id": 229,
+    "name": "houndoom",
+    "types": [
+      "dark",
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 90,
+      "defense": 50,
+      "specialAttack": 110,
+      "specialDefense": 80,
+      "speed": 95
+    },
+    "height": 14,
+    "weight": 350,
+    "baseExperience": 175,
+    "generation": 2,
+    "evolutionChainId": 118
+  },
+  {
+    "id": 230,
+    "name": "kingdra",
+    "types": [
+      "water",
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 95,
+      "defense": 95,
+      "specialAttack": 95,
+      "specialDefense": 95,
+      "speed": 85
+    },
+    "height": 18,
+    "weight": 1520,
+    "baseExperience": 243,
+    "generation": 2,
+    "evolutionChainId": 54
+  },
+  {
+    "id": 231,
+    "name": "phanpy",
+    "types": [
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 60,
+      "defense": 60,
+      "specialAttack": 40,
+      "specialDefense": 40,
+      "speed": 40
+    },
+    "height": 5,
+    "weight": 335,
+    "baseExperience": 66,
+    "generation": 2,
+    "evolutionChainId": 119
+  },
+  {
+    "id": 232,
+    "name": "donphan",
+    "types": [
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 120,
+      "defense": 120,
+      "specialAttack": 60,
+      "specialDefense": 60,
+      "speed": 50
+    },
+    "height": 11,
+    "weight": 1200,
+    "baseExperience": 175,
+    "generation": 2,
+    "evolutionChainId": 119
+  },
+  {
+    "id": 233,
+    "name": "porygon2",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "attack": 80,
+      "defense": 90,
+      "specialAttack": 105,
+      "specialDefense": 95,
+      "speed": 60
+    },
+    "height": 6,
+    "weight": 325,
+    "baseExperience": 180,
+    "generation": 2,
+    "evolutionChainId": 68
+  },
+  {
+    "id": 234,
+    "name": "stantler",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 73,
+      "attack": 95,
+      "defense": 62,
+      "specialAttack": 85,
+      "specialDefense": 65,
+      "speed": 85
+    },
+    "height": 14,
+    "weight": 712,
+    "baseExperience": 163,
+    "generation": 2,
+    "evolutionChainId": 120
+  },
+  {
+    "id": 235,
+    "name": "smeargle",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 20,
+      "defense": 35,
+      "specialAttack": 20,
+      "specialDefense": 45,
+      "speed": 75
+    },
+    "height": 12,
+    "weight": 580,
+    "baseExperience": 88,
+    "generation": 2,
+    "evolutionChainId": 121
+  },
+  {
+    "id": 236,
+    "name": "tyrogue",
+    "types": [
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 35,
+      "defense": 35,
+      "specialAttack": 35,
+      "specialDefense": 35,
+      "speed": 35
+    },
+    "height": 7,
+    "weight": 210,
+    "baseExperience": 42,
+    "generation": 2,
+    "evolutionChainId": 47
+  },
+  {
+    "id": 237,
+    "name": "hitmontop",
+    "types": [
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 95,
+      "defense": 95,
+      "specialAttack": 35,
+      "specialDefense": 110,
+      "speed": 70
+    },
+    "height": 14,
+    "weight": 480,
+    "baseExperience": 159,
+    "generation": 2,
+    "evolutionChainId": 47
+  },
+  {
+    "id": 238,
+    "name": "smoochum",
+    "types": [
+      "ice",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 30,
+      "defense": 15,
+      "specialAttack": 85,
+      "specialDefense": 65,
+      "speed": 65
+    },
+    "height": 4,
+    "weight": 60,
+    "baseExperience": 61,
+    "generation": 2,
+    "evolutionChainId": 59
+  },
+  {
+    "id": 239,
+    "name": "elekid",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 63,
+      "defense": 37,
+      "specialAttack": 65,
+      "specialDefense": 55,
+      "speed": 95
+    },
+    "height": 6,
+    "weight": 235,
+    "baseExperience": 72,
+    "generation": 2,
+    "evolutionChainId": 60
+  },
+  {
+    "id": 240,
+    "name": "magby",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 75,
+      "defense": 37,
+      "specialAttack": 70,
+      "specialDefense": 55,
+      "speed": 83
+    },
+    "height": 7,
+    "weight": 214,
+    "baseExperience": 73,
+    "generation": 2,
+    "evolutionChainId": 61
+  },
+  {
+    "id": 241,
+    "name": "miltank",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 80,
+      "defense": 105,
+      "specialAttack": 40,
+      "specialDefense": 70,
+      "speed": 100
+    },
+    "height": 12,
+    "weight": 755,
+    "baseExperience": 172,
+    "generation": 2,
+    "evolutionChainId": 122
+  },
+  {
+    "id": 242,
+    "name": "blissey",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 255,
+      "attack": 10,
+      "defense": 10,
+      "specialAttack": 75,
+      "specialDefense": 135,
+      "speed": 55
+    },
+    "height": 15,
+    "weight": 468,
+    "baseExperience": 608,
+    "generation": 2,
+    "evolutionChainId": 51
+  },
+  {
+    "id": 243,
+    "name": "raikou",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 85,
+      "defense": 75,
+      "specialAttack": 115,
+      "specialDefense": 100,
+      "speed": 115
+    },
+    "height": 19,
+    "weight": 1780,
+    "baseExperience": 261,
+    "generation": 2,
+    "evolutionChainId": 123
+  },
+  {
+    "id": 244,
+    "name": "entei",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 115,
+      "attack": 115,
+      "defense": 85,
+      "specialAttack": 90,
+      "specialDefense": 75,
+      "speed": 100
+    },
+    "height": 21,
+    "weight": 1980,
+    "baseExperience": 261,
+    "generation": 2,
+    "evolutionChainId": 124
+  },
+  {
+    "id": 245,
+    "name": "suicune",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 75,
+      "defense": 115,
+      "specialAttack": 90,
+      "specialDefense": 115,
+      "speed": 85
+    },
+    "height": 20,
+    "weight": 1870,
+    "baseExperience": 261,
+    "generation": 2,
+    "evolutionChainId": 125
+  },
+  {
+    "id": 246,
+    "name": "larvitar",
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 64,
+      "defense": 50,
+      "specialAttack": 45,
+      "specialDefense": 50,
+      "speed": 41
+    },
+    "height": 6,
+    "weight": 720,
+    "baseExperience": 60,
+    "generation": 2,
+    "evolutionChainId": 126
+  },
+  {
+    "id": 247,
+    "name": "pupitar",
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 84,
+      "defense": 70,
+      "specialAttack": 65,
+      "specialDefense": 70,
+      "speed": 51
+    },
+    "height": 12,
+    "weight": 1520,
+    "baseExperience": 144,
+    "generation": 2,
+    "evolutionChainId": 126
+  },
+  {
+    "id": 248,
+    "name": "tyranitar",
+    "types": [
+      "rock",
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 134,
+      "defense": 110,
+      "specialAttack": 95,
+      "specialDefense": 100,
+      "speed": 61
+    },
+    "height": 20,
+    "weight": 2020,
+    "baseExperience": 270,
+    "generation": 2,
+    "evolutionChainId": 126
+  },
+  {
+    "id": 249,
+    "name": "lugia",
+    "types": [
+      "psychic",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 106,
+      "attack": 90,
+      "defense": 130,
+      "specialAttack": 90,
+      "specialDefense": 154,
+      "speed": 110
+    },
+    "height": 52,
+    "weight": 2160,
+    "baseExperience": 306,
+    "generation": 2,
+    "evolutionChainId": 127
+  },
+  {
+    "id": 250,
+    "name": "ho-oh",
+    "types": [
+      "fire",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 106,
+      "attack": 130,
+      "defense": 90,
+      "specialAttack": 110,
+      "specialDefense": 154,
+      "speed": 90
+    },
+    "height": 38,
+    "weight": 1990,
+    "baseExperience": 306,
+    "generation": 2,
+    "evolutionChainId": 128
+  },
+  {
+    "id": 251,
+    "name": "celebi",
+    "types": [
+      "psychic",
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 100,
+      "defense": 100,
+      "specialAttack": 100,
+      "specialDefense": 100,
+      "speed": 100
+    },
+    "height": 6,
+    "weight": 50,
+    "baseExperience": 270,
+    "generation": 2,
+    "evolutionChainId": 129
+  },
+  {
+    "id": 252,
+    "name": "treecko",
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 45,
+      "defense": 35,
+      "specialAttack": 65,
+      "specialDefense": 55,
+      "speed": 70
+    },
+    "height": 5,
+    "weight": 50,
+    "baseExperience": 62,
+    "generation": 3,
+    "evolutionChainId": 130
+  },
+  {
+    "id": 253,
+    "name": "grovyle",
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 65,
+      "defense": 45,
+      "specialAttack": 85,
+      "specialDefense": 65,
+      "speed": 95
+    },
+    "height": 9,
+    "weight": 216,
+    "baseExperience": 142,
+    "generation": 3,
+    "evolutionChainId": 130
+  },
+  {
+    "id": 254,
+    "name": "sceptile",
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 85,
+      "defense": 65,
+      "specialAttack": 105,
+      "specialDefense": 85,
+      "speed": 120
+    },
+    "height": 17,
+    "weight": 522,
+    "baseExperience": 239,
+    "generation": 3,
+    "evolutionChainId": 130
+  },
+  {
+    "id": 255,
+    "name": "torchic",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 60,
+      "defense": 40,
+      "specialAttack": 70,
+      "specialDefense": 50,
+      "speed": 45
+    },
+    "height": 4,
+    "weight": 25,
+    "baseExperience": 62,
+    "generation": 3,
+    "evolutionChainId": 131
+  },
+  {
+    "id": 256,
+    "name": "combusken",
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 85,
+      "defense": 60,
+      "specialAttack": 85,
+      "specialDefense": 60,
+      "speed": 55
+    },
+    "height": 9,
+    "weight": 195,
+    "baseExperience": 142,
+    "generation": 3,
+    "evolutionChainId": 131
+  },
+  {
+    "id": 257,
+    "name": "blaziken",
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 120,
+      "defense": 70,
+      "specialAttack": 110,
+      "specialDefense": 70,
+      "speed": 80
+    },
+    "height": 19,
+    "weight": 520,
+    "baseExperience": 239,
+    "generation": 3,
+    "evolutionChainId": 131
+  },
+  {
+    "id": 258,
+    "name": "mudkip",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 70,
+      "defense": 50,
+      "specialAttack": 50,
+      "specialDefense": 50,
+      "speed": 40
+    },
+    "height": 4,
+    "weight": 76,
+    "baseExperience": 62,
+    "generation": 3,
+    "evolutionChainId": 132
+  },
+  {
+    "id": 259,
+    "name": "marshtomp",
+    "types": [
+      "water",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 85,
+      "defense": 70,
+      "specialAttack": 60,
+      "specialDefense": 70,
+      "speed": 50
+    },
+    "height": 7,
+    "weight": 280,
+    "baseExperience": 142,
+    "generation": 3,
+    "evolutionChainId": 132
+  },
+  {
+    "id": 260,
+    "name": "swampert",
+    "types": [
+      "water",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 110,
+      "defense": 90,
+      "specialAttack": 85,
+      "specialDefense": 90,
+      "speed": 60
+    },
+    "height": 15,
+    "weight": 819,
+    "baseExperience": 241,
+    "generation": 3,
+    "evolutionChainId": 132
+  },
+  {
+    "id": 261,
+    "name": "poochyena",
+    "types": [
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 55,
+      "defense": 35,
+      "specialAttack": 30,
+      "specialDefense": 30,
+      "speed": 35
+    },
+    "height": 5,
+    "weight": 136,
+    "baseExperience": 56,
+    "generation": 3,
+    "evolutionChainId": 133
+  },
+  {
+    "id": 262,
+    "name": "mightyena",
+    "types": [
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 90,
+      "defense": 70,
+      "specialAttack": 60,
+      "specialDefense": 60,
+      "speed": 70
+    },
+    "height": 10,
+    "weight": 370,
+    "baseExperience": 147,
+    "generation": 3,
+    "evolutionChainId": 133
+  },
+  {
+    "id": 263,
+    "name": "zigzagoon",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 38,
+      "attack": 30,
+      "defense": 41,
+      "specialAttack": 30,
+      "specialDefense": 41,
+      "speed": 60
+    },
+    "height": 4,
+    "weight": 175,
+    "baseExperience": 56,
+    "generation": 3,
+    "evolutionChainId": 134
+  },
+  {
+    "id": 264,
+    "name": "linoone",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 78,
+      "attack": 70,
+      "defense": 61,
+      "specialAttack": 50,
+      "specialDefense": 61,
+      "speed": 100
+    },
+    "height": 5,
+    "weight": 325,
+    "baseExperience": 147,
+    "generation": 3,
+    "evolutionChainId": 134
+  },
+  {
+    "id": 265,
+    "name": "wurmple",
+    "types": [
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 45,
+      "defense": 35,
+      "specialAttack": 20,
+      "specialDefense": 30,
+      "speed": 20
+    },
+    "height": 3,
+    "weight": 36,
+    "baseExperience": 56,
+    "generation": 3,
+    "evolutionChainId": 135
+  },
+  {
+    "id": 266,
+    "name": "silcoon",
+    "types": [
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 35,
+      "defense": 55,
+      "specialAttack": 25,
+      "specialDefense": 25,
+      "speed": 15
+    },
+    "height": 6,
+    "weight": 100,
+    "baseExperience": 72,
+    "generation": 3,
+    "evolutionChainId": 135
+  },
+  {
+    "id": 267,
+    "name": "beautifly",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 70,
+      "defense": 50,
+      "specialAttack": 100,
+      "specialDefense": 50,
+      "speed": 65
+    },
+    "height": 10,
+    "weight": 284,
+    "baseExperience": 178,
+    "generation": 3,
+    "evolutionChainId": 135
+  },
+  {
+    "id": 268,
+    "name": "cascoon",
+    "types": [
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 35,
+      "defense": 55,
+      "specialAttack": 25,
+      "specialDefense": 25,
+      "speed": 15
+    },
+    "height": 7,
+    "weight": 115,
+    "baseExperience": 72,
+    "generation": 3,
+    "evolutionChainId": 135
+  },
+  {
+    "id": 269,
+    "name": "dustox",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 50,
+      "defense": 70,
+      "specialAttack": 50,
+      "specialDefense": 90,
+      "speed": 65
+    },
+    "height": 12,
+    "weight": 316,
+    "baseExperience": 173,
+    "generation": 3,
+    "evolutionChainId": 135
+  },
+  {
+    "id": 270,
+    "name": "lotad",
+    "types": [
+      "water",
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 30,
+      "defense": 30,
+      "specialAttack": 40,
+      "specialDefense": 50,
+      "speed": 30
+    },
+    "height": 5,
+    "weight": 26,
+    "baseExperience": 44,
+    "generation": 3,
+    "evolutionChainId": 136
+  },
+  {
+    "id": 271,
+    "name": "lombre",
+    "types": [
+      "water",
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 50,
+      "defense": 50,
+      "specialAttack": 60,
+      "specialDefense": 70,
+      "speed": 50
+    },
+    "height": 12,
+    "weight": 325,
+    "baseExperience": 119,
+    "generation": 3,
+    "evolutionChainId": 136
+  },
+  {
+    "id": 272,
+    "name": "ludicolo",
+    "types": [
+      "water",
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 70,
+      "defense": 70,
+      "specialAttack": 90,
+      "specialDefense": 100,
+      "speed": 70
+    },
+    "height": 15,
+    "weight": 550,
+    "baseExperience": 216,
+    "generation": 3,
+    "evolutionChainId": 136
+  },
+  {
+    "id": 273,
+    "name": "seedot",
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 40,
+      "defense": 50,
+      "specialAttack": 30,
+      "specialDefense": 30,
+      "speed": 30
+    },
+    "height": 5,
+    "weight": 40,
+    "baseExperience": 44,
+    "generation": 3,
+    "evolutionChainId": 137
+  },
+  {
+    "id": 274,
+    "name": "nuzleaf",
+    "types": [
+      "grass",
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 70,
+      "defense": 40,
+      "specialAttack": 60,
+      "specialDefense": 40,
+      "speed": 60
+    },
+    "height": 10,
+    "weight": 280,
+    "baseExperience": 119,
+    "generation": 3,
+    "evolutionChainId": 137
+  },
+  {
+    "id": 275,
+    "name": "shiftry",
+    "types": [
+      "grass",
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 100,
+      "defense": 60,
+      "specialAttack": 90,
+      "specialDefense": 60,
+      "speed": 80
+    },
+    "height": 13,
+    "weight": 596,
+    "baseExperience": 216,
+    "generation": 3,
+    "evolutionChainId": 137
+  },
+  {
+    "id": 276,
+    "name": "taillow",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 55,
+      "defense": 30,
+      "specialAttack": 30,
+      "specialDefense": 30,
+      "speed": 85
+    },
+    "height": 3,
+    "weight": 23,
+    "baseExperience": 54,
+    "generation": 3,
+    "evolutionChainId": 138
+  },
+  {
+    "id": 277,
+    "name": "swellow",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 85,
+      "defense": 60,
+      "specialAttack": 75,
+      "specialDefense": 50,
+      "speed": 125
+    },
+    "height": 7,
+    "weight": 198,
+    "baseExperience": 159,
+    "generation": 3,
+    "evolutionChainId": 138
+  },
+  {
+    "id": 278,
+    "name": "wingull",
+    "types": [
+      "water",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 30,
+      "defense": 30,
+      "specialAttack": 55,
+      "specialDefense": 30,
+      "speed": 85
+    },
+    "height": 6,
+    "weight": 95,
+    "baseExperience": 54,
+    "generation": 3,
+    "evolutionChainId": 139
+  },
+  {
+    "id": 279,
+    "name": "pelipper",
+    "types": [
+      "water",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 50,
+      "defense": 100,
+      "specialAttack": 95,
+      "specialDefense": 70,
+      "speed": 65
+    },
+    "height": 12,
+    "weight": 280,
+    "baseExperience": 154,
+    "generation": 3,
+    "evolutionChainId": 139
+  },
+  {
+    "id": 280,
+    "name": "ralts",
+    "types": [
+      "psychic",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 28,
+      "attack": 25,
+      "defense": 25,
+      "specialAttack": 45,
+      "specialDefense": 35,
+      "speed": 40
+    },
+    "height": 4,
+    "weight": 66,
+    "baseExperience": 40,
+    "generation": 3,
+    "evolutionChainId": 140
+  },
+  {
+    "id": 281,
+    "name": "kirlia",
+    "types": [
+      "psychic",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 38,
+      "attack": 35,
+      "defense": 35,
+      "specialAttack": 65,
+      "specialDefense": 55,
+      "speed": 50
+    },
+    "height": 8,
+    "weight": 202,
+    "baseExperience": 97,
+    "generation": 3,
+    "evolutionChainId": 140
+  },
+  {
+    "id": 282,
+    "name": "gardevoir",
+    "types": [
+      "psychic",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 68,
+      "attack": 65,
+      "defense": 65,
+      "specialAttack": 125,
+      "specialDefense": 115,
+      "speed": 80
+    },
+    "height": 16,
+    "weight": 484,
+    "baseExperience": 233,
+    "generation": 3,
+    "evolutionChainId": 140
+  },
+  {
+    "id": 283,
+    "name": "surskit",
+    "types": [
+      "bug",
+      "water"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 30,
+      "defense": 32,
+      "specialAttack": 50,
+      "specialDefense": 52,
+      "speed": 65
+    },
+    "height": 5,
+    "weight": 17,
+    "baseExperience": 54,
+    "generation": 3,
+    "evolutionChainId": 141
+  },
+  {
+    "id": 284,
+    "name": "masquerain",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 60,
+      "defense": 62,
+      "specialAttack": 100,
+      "specialDefense": 82,
+      "speed": 80
+    },
+    "height": 8,
+    "weight": 36,
+    "baseExperience": 159,
+    "generation": 3,
+    "evolutionChainId": 141
+  },
+  {
+    "id": 285,
+    "name": "shroomish",
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 40,
+      "defense": 60,
+      "specialAttack": 40,
+      "specialDefense": 60,
+      "speed": 35
+    },
+    "height": 4,
+    "weight": 45,
+    "baseExperience": 59,
+    "generation": 3,
+    "evolutionChainId": 142
+  },
+  {
+    "id": 286,
+    "name": "breloom",
+    "types": [
+      "grass",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 130,
+      "defense": 80,
+      "specialAttack": 60,
+      "specialDefense": 60,
+      "speed": 70
+    },
+    "height": 12,
+    "weight": 392,
+    "baseExperience": 161,
+    "generation": 3,
+    "evolutionChainId": 142
+  },
+  {
+    "id": 287,
+    "name": "slakoth",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 60,
+      "defense": 60,
+      "specialAttack": 35,
+      "specialDefense": 35,
+      "speed": 30
+    },
+    "height": 8,
+    "weight": 240,
+    "baseExperience": 56,
+    "generation": 3,
+    "evolutionChainId": 143
+  },
+  {
+    "id": 288,
+    "name": "vigoroth",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 80,
+      "defense": 80,
+      "specialAttack": 55,
+      "specialDefense": 55,
+      "speed": 90
+    },
+    "height": 14,
+    "weight": 465,
+    "baseExperience": 154,
+    "generation": 3,
+    "evolutionChainId": 143
+  },
+  {
+    "id": 289,
+    "name": "slaking",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 150,
+      "attack": 160,
+      "defense": 100,
+      "specialAttack": 95,
+      "specialDefense": 65,
+      "speed": 100
+    },
+    "height": 20,
+    "weight": 1305,
+    "baseExperience": 252,
+    "generation": 3,
+    "evolutionChainId": 143
+  },
+  {
+    "id": 290,
+    "name": "nincada",
+    "types": [
+      "bug",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 31,
+      "attack": 45,
+      "defense": 90,
+      "specialAttack": 30,
+      "specialDefense": 30,
+      "speed": 40
+    },
+    "height": 5,
+    "weight": 55,
+    "baseExperience": 53,
+    "generation": 3,
+    "evolutionChainId": 144
+  },
+  {
+    "id": 291,
+    "name": "ninjask",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 61,
+      "attack": 90,
+      "defense": 45,
+      "specialAttack": 50,
+      "specialDefense": 50,
+      "speed": 160
+    },
+    "height": 8,
+    "weight": 120,
+    "baseExperience": 160,
+    "generation": 3,
+    "evolutionChainId": 144
+  },
+  {
+    "id": 292,
+    "name": "shedinja",
+    "types": [
+      "bug",
+      "ghost"
+    ],
+    "baseStats": {
+      "hp": 1,
+      "attack": 90,
+      "defense": 45,
+      "specialAttack": 30,
+      "specialDefense": 30,
+      "speed": 40
+    },
+    "height": 8,
+    "weight": 12,
+    "baseExperience": 83,
+    "generation": 3,
+    "evolutionChainId": 144
+  },
+  {
+    "id": 293,
+    "name": "whismur",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 64,
+      "attack": 51,
+      "defense": 23,
+      "specialAttack": 51,
+      "specialDefense": 23,
+      "speed": 28
+    },
+    "height": 6,
+    "weight": 163,
+    "baseExperience": 48,
+    "generation": 3,
+    "evolutionChainId": 145
+  },
+  {
+    "id": 294,
+    "name": "loudred",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 84,
+      "attack": 71,
+      "defense": 43,
+      "specialAttack": 71,
+      "specialDefense": 43,
+      "speed": 48
+    },
+    "height": 10,
+    "weight": 405,
+    "baseExperience": 126,
+    "generation": 3,
+    "evolutionChainId": 145
+  },
+  {
+    "id": 295,
+    "name": "exploud",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 104,
+      "attack": 91,
+      "defense": 63,
+      "specialAttack": 91,
+      "specialDefense": 73,
+      "speed": 68
+    },
+    "height": 15,
+    "weight": 840,
+    "baseExperience": 221,
+    "generation": 3,
+    "evolutionChainId": 145
+  },
+  {
+    "id": 296,
+    "name": "makuhita",
+    "types": [
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 72,
+      "attack": 60,
+      "defense": 30,
+      "specialAttack": 20,
+      "specialDefense": 30,
+      "speed": 25
+    },
+    "height": 10,
+    "weight": 864,
+    "baseExperience": 47,
+    "generation": 3,
+    "evolutionChainId": 146
+  },
+  {
+    "id": 297,
+    "name": "hariyama",
+    "types": [
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 144,
+      "attack": 120,
+      "defense": 60,
+      "specialAttack": 40,
+      "specialDefense": 60,
+      "speed": 50
+    },
+    "height": 23,
+    "weight": 2538,
+    "baseExperience": 166,
+    "generation": 3,
+    "evolutionChainId": 146
+  },
+  {
+    "id": 298,
+    "name": "azurill",
+    "types": [
+      "normal",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 20,
+      "defense": 40,
+      "specialAttack": 20,
+      "specialDefense": 40,
+      "speed": 20
+    },
+    "height": 2,
+    "weight": 20,
+    "baseExperience": 38,
+    "generation": 3,
+    "evolutionChainId": 90
+  },
+  {
+    "id": 299,
+    "name": "nosepass",
+    "types": [
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "attack": 45,
+      "defense": 135,
+      "specialAttack": 45,
+      "specialDefense": 90,
+      "speed": 30
+    },
+    "height": 10,
+    "weight": 970,
+    "baseExperience": 75,
+    "generation": 3,
+    "evolutionChainId": 147
+  },
+  {
+    "id": 300,
+    "name": "skitty",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 45,
+      "defense": 45,
+      "specialAttack": 35,
+      "specialDefense": 35,
+      "speed": 50
+    },
+    "height": 6,
+    "weight": 110,
+    "baseExperience": 52,
+    "generation": 3,
+    "evolutionChainId": 148
+  },
+  {
+    "id": 301,
+    "name": "delcatty",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 65,
+      "defense": 65,
+      "specialAttack": 55,
+      "specialDefense": 55,
+      "speed": 90
+    },
+    "height": 11,
+    "weight": 326,
+    "baseExperience": 140,
+    "generation": 3,
+    "evolutionChainId": 148
+  },
+  {
+    "id": 302,
+    "name": "sableye",
+    "types": [
+      "dark",
+      "ghost"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 75,
+      "defense": 75,
+      "specialAttack": 65,
+      "specialDefense": 65,
+      "speed": 50
+    },
+    "height": 5,
+    "weight": 110,
+    "baseExperience": 133,
+    "generation": 3,
+    "evolutionChainId": 149
+  },
+  {
+    "id": 303,
+    "name": "mawile",
+    "types": [
+      "steel",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 85,
+      "defense": 85,
+      "specialAttack": 55,
+      "specialDefense": 55,
+      "speed": 50
+    },
+    "height": 6,
+    "weight": 115,
+    "baseExperience": 133,
+    "generation": 3,
+    "evolutionChainId": 150
+  },
+  {
+    "id": 304,
+    "name": "aron",
+    "types": [
+      "steel",
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 70,
+      "defense": 100,
+      "specialAttack": 40,
+      "specialDefense": 40,
+      "speed": 30
+    },
+    "height": 4,
+    "weight": 600,
+    "baseExperience": 66,
+    "generation": 3,
+    "evolutionChainId": 151
+  },
+  {
+    "id": 305,
+    "name": "lairon",
+    "types": [
+      "steel",
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 90,
+      "defense": 140,
+      "specialAttack": 50,
+      "specialDefense": 50,
+      "speed": 40
+    },
+    "height": 9,
+    "weight": 1200,
+    "baseExperience": 151,
+    "generation": 3,
+    "evolutionChainId": 151
+  },
+  {
+    "id": 306,
+    "name": "aggron",
+    "types": [
+      "steel",
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 110,
+      "defense": 180,
+      "specialAttack": 60,
+      "specialDefense": 60,
+      "speed": 50
+    },
+    "height": 21,
+    "weight": 3600,
+    "baseExperience": 239,
+    "generation": 3,
+    "evolutionChainId": 151
+  },
+  {
+    "id": 307,
+    "name": "meditite",
+    "types": [
+      "fighting",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "attack": 40,
+      "defense": 55,
+      "specialAttack": 40,
+      "specialDefense": 55,
+      "speed": 60
+    },
+    "height": 6,
+    "weight": 112,
+    "baseExperience": 56,
+    "generation": 3,
+    "evolutionChainId": 152
+  },
+  {
+    "id": 308,
+    "name": "medicham",
+    "types": [
+      "fighting",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 60,
+      "defense": 75,
+      "specialAttack": 60,
+      "specialDefense": 75,
+      "speed": 80
+    },
+    "height": 13,
+    "weight": 315,
+    "baseExperience": 144,
+    "generation": 3,
+    "evolutionChainId": 152
+  },
+  {
+    "id": 309,
+    "name": "electrike",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 45,
+      "defense": 40,
+      "specialAttack": 65,
+      "specialDefense": 40,
+      "speed": 65
+    },
+    "height": 6,
+    "weight": 152,
+    "baseExperience": 59,
+    "generation": 3,
+    "evolutionChainId": 153
+  },
+  {
+    "id": 310,
+    "name": "manectric",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 75,
+      "defense": 60,
+      "specialAttack": 105,
+      "specialDefense": 60,
+      "speed": 105
+    },
+    "height": 15,
+    "weight": 402,
+    "baseExperience": 166,
+    "generation": 3,
+    "evolutionChainId": 153
+  },
+  {
+    "id": 311,
+    "name": "plusle",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 50,
+      "defense": 40,
+      "specialAttack": 85,
+      "specialDefense": 75,
+      "speed": 95
+    },
+    "height": 4,
+    "weight": 42,
+    "baseExperience": 142,
+    "generation": 3,
+    "evolutionChainId": 154
+  },
+  {
+    "id": 312,
+    "name": "minun",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 40,
+      "defense": 50,
+      "specialAttack": 75,
+      "specialDefense": 85,
+      "speed": 95
+    },
+    "height": 4,
+    "weight": 42,
+    "baseExperience": 142,
+    "generation": 3,
+    "evolutionChainId": 155
+  },
+  {
+    "id": 313,
+    "name": "volbeat",
+    "types": [
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 73,
+      "defense": 75,
+      "specialAttack": 47,
+      "specialDefense": 85,
+      "speed": 85
+    },
+    "height": 7,
+    "weight": 177,
+    "baseExperience": 151,
+    "generation": 3,
+    "evolutionChainId": 156
+  },
+  {
+    "id": 314,
+    "name": "illumise",
+    "types": [
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 47,
+      "defense": 75,
+      "specialAttack": 73,
+      "specialDefense": 85,
+      "speed": 85
+    },
+    "height": 6,
+    "weight": 177,
+    "baseExperience": 151,
+    "generation": 3,
+    "evolutionChainId": 157
+  },
+  {
+    "id": 315,
+    "name": "roselia",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 60,
+      "defense": 45,
+      "specialAttack": 100,
+      "specialDefense": 80,
+      "speed": 65
+    },
+    "height": 3,
+    "weight": 20,
+    "baseExperience": 140,
+    "generation": 3,
+    "evolutionChainId": 158
+  },
+  {
+    "id": 316,
+    "name": "gulpin",
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 43,
+      "defense": 53,
+      "specialAttack": 43,
+      "specialDefense": 53,
+      "speed": 40
+    },
+    "height": 4,
+    "weight": 103,
+    "baseExperience": 60,
+    "generation": 3,
+    "evolutionChainId": 159
+  },
+  {
+    "id": 317,
+    "name": "swalot",
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 73,
+      "defense": 83,
+      "specialAttack": 73,
+      "specialDefense": 83,
+      "speed": 55
+    },
+    "height": 17,
+    "weight": 800,
+    "baseExperience": 163,
+    "generation": 3,
+    "evolutionChainId": 159
+  },
+  {
+    "id": 318,
+    "name": "carvanha",
+    "types": [
+      "water",
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 90,
+      "defense": 20,
+      "specialAttack": 65,
+      "specialDefense": 20,
+      "speed": 65
+    },
+    "height": 8,
+    "weight": 208,
+    "baseExperience": 61,
+    "generation": 3,
+    "evolutionChainId": 160
+  },
+  {
+    "id": 319,
+    "name": "sharpedo",
+    "types": [
+      "water",
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 120,
+      "defense": 40,
+      "specialAttack": 95,
+      "specialDefense": 40,
+      "speed": 95
+    },
+    "height": 18,
+    "weight": 888,
+    "baseExperience": 161,
+    "generation": 3,
+    "evolutionChainId": 160
+  },
+  {
+    "id": 320,
+    "name": "wailmer",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 130,
+      "attack": 70,
+      "defense": 35,
+      "specialAttack": 70,
+      "specialDefense": 35,
+      "speed": 60
+    },
+    "height": 20,
+    "weight": 1300,
+    "baseExperience": 80,
+    "generation": 3,
+    "evolutionChainId": 161
+  },
+  {
+    "id": 321,
+    "name": "wailord",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 170,
+      "attack": 90,
+      "defense": 45,
+      "specialAttack": 90,
+      "specialDefense": 45,
+      "speed": 60
+    },
+    "height": 145,
+    "weight": 3980,
+    "baseExperience": 175,
+    "generation": 3,
+    "evolutionChainId": 161
+  },
+  {
+    "id": 322,
+    "name": "numel",
+    "types": [
+      "fire",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 60,
+      "defense": 40,
+      "specialAttack": 65,
+      "specialDefense": 45,
+      "speed": 35
+    },
+    "height": 7,
+    "weight": 240,
+    "baseExperience": 61,
+    "generation": 3,
+    "evolutionChainId": 162
+  },
+  {
+    "id": 323,
+    "name": "camerupt",
+    "types": [
+      "fire",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 100,
+      "defense": 70,
+      "specialAttack": 105,
+      "specialDefense": 75,
+      "speed": 40
+    },
+    "height": 19,
+    "weight": 2200,
+    "baseExperience": 161,
+    "generation": 3,
+    "evolutionChainId": 162
+  },
+  {
+    "id": 324,
+    "name": "torkoal",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 85,
+      "defense": 140,
+      "specialAttack": 85,
+      "specialDefense": 70,
+      "speed": 20
+    },
+    "height": 5,
+    "weight": 804,
+    "baseExperience": 165,
+    "generation": 3,
+    "evolutionChainId": 163
+  },
+  {
+    "id": 325,
+    "name": "spoink",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 25,
+      "defense": 35,
+      "specialAttack": 70,
+      "specialDefense": 80,
+      "speed": 60
+    },
+    "height": 7,
+    "weight": 306,
+    "baseExperience": 66,
+    "generation": 3,
+    "evolutionChainId": 164
+  },
+  {
+    "id": 326,
+    "name": "grumpig",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 45,
+      "defense": 65,
+      "specialAttack": 90,
+      "specialDefense": 110,
+      "speed": 80
+    },
+    "height": 9,
+    "weight": 715,
+    "baseExperience": 165,
+    "generation": 3,
+    "evolutionChainId": 164
+  },
+  {
+    "id": 327,
+    "name": "spinda",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 60,
+      "defense": 60,
+      "specialAttack": 60,
+      "specialDefense": 60,
+      "speed": 60
+    },
+    "height": 11,
+    "weight": 50,
+    "baseExperience": 126,
+    "generation": 3,
+    "evolutionChainId": 165
+  },
+  {
+    "id": 328,
+    "name": "trapinch",
+    "types": [
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 100,
+      "defense": 45,
+      "specialAttack": 45,
+      "specialDefense": 45,
+      "speed": 10
+    },
+    "height": 7,
+    "weight": 150,
+    "baseExperience": 58,
+    "generation": 3,
+    "evolutionChainId": 166
+  },
+  {
+    "id": 329,
+    "name": "vibrava",
+    "types": [
+      "ground",
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 70,
+      "defense": 50,
+      "specialAttack": 50,
+      "specialDefense": 50,
+      "speed": 70
+    },
+    "height": 11,
+    "weight": 153,
+    "baseExperience": 119,
+    "generation": 3,
+    "evolutionChainId": 166
+  },
+  {
+    "id": 330,
+    "name": "flygon",
+    "types": [
+      "ground",
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 100,
+      "defense": 80,
+      "specialAttack": 80,
+      "specialDefense": 80,
+      "speed": 100
+    },
+    "height": 20,
+    "weight": 820,
+    "baseExperience": 234,
+    "generation": 3,
+    "evolutionChainId": 166
+  },
+  {
+    "id": 331,
+    "name": "cacnea",
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 85,
+      "defense": 40,
+      "specialAttack": 85,
+      "specialDefense": 40,
+      "speed": 35
+    },
+    "height": 4,
+    "weight": 513,
+    "baseExperience": 67,
+    "generation": 3,
+    "evolutionChainId": 167
+  },
+  {
+    "id": 332,
+    "name": "cacturne",
+    "types": [
+      "grass",
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 115,
+      "defense": 60,
+      "specialAttack": 115,
+      "specialDefense": 60,
+      "speed": 55
+    },
+    "height": 13,
+    "weight": 774,
+    "baseExperience": 166,
+    "generation": 3,
+    "evolutionChainId": 167
+  },
+  {
+    "id": 333,
+    "name": "swablu",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 40,
+      "defense": 60,
+      "specialAttack": 40,
+      "specialDefense": 75,
+      "speed": 50
+    },
+    "height": 4,
+    "weight": 12,
+    "baseExperience": 62,
+    "generation": 3,
+    "evolutionChainId": 168
+  },
+  {
+    "id": 334,
+    "name": "altaria",
+    "types": [
+      "dragon",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 70,
+      "defense": 90,
+      "specialAttack": 70,
+      "specialDefense": 105,
+      "speed": 80
+    },
+    "height": 11,
+    "weight": 206,
+    "baseExperience": 172,
+    "generation": 3,
+    "evolutionChainId": 168
+  },
+  {
+    "id": 335,
+    "name": "zangoose",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 73,
+      "attack": 115,
+      "defense": 60,
+      "specialAttack": 60,
+      "specialDefense": 60,
+      "speed": 90
+    },
+    "height": 13,
+    "weight": 403,
+    "baseExperience": 160,
+    "generation": 3,
+    "evolutionChainId": 169
+  },
+  {
+    "id": 336,
+    "name": "seviper",
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 73,
+      "attack": 100,
+      "defense": 60,
+      "specialAttack": 100,
+      "specialDefense": 60,
+      "speed": 65
+    },
+    "height": 27,
+    "weight": 525,
+    "baseExperience": 160,
+    "generation": 3,
+    "evolutionChainId": 170
+  },
+  {
+    "id": 337,
+    "name": "lunatone",
+    "types": [
+      "rock",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 55,
+      "defense": 65,
+      "specialAttack": 95,
+      "specialDefense": 85,
+      "speed": 70
+    },
+    "height": 10,
+    "weight": 1680,
+    "baseExperience": 161,
+    "generation": 3,
+    "evolutionChainId": 171
+  },
+  {
+    "id": 338,
+    "name": "solrock",
+    "types": [
+      "rock",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 95,
+      "defense": 85,
+      "specialAttack": 55,
+      "specialDefense": 65,
+      "speed": 70
+    },
+    "height": 12,
+    "weight": 1540,
+    "baseExperience": 161,
+    "generation": 3,
+    "evolutionChainId": 172
+  },
+  {
+    "id": 339,
+    "name": "barboach",
+    "types": [
+      "water",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 48,
+      "defense": 43,
+      "specialAttack": 46,
+      "specialDefense": 41,
+      "speed": 60
+    },
+    "height": 4,
+    "weight": 19,
+    "baseExperience": 58,
+    "generation": 3,
+    "evolutionChainId": 173
+  },
+  {
+    "id": 340,
+    "name": "whiscash",
+    "types": [
+      "water",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 110,
+      "attack": 78,
+      "defense": 73,
+      "specialAttack": 76,
+      "specialDefense": 71,
+      "speed": 60
+    },
+    "height": 9,
+    "weight": 236,
+    "baseExperience": 164,
+    "generation": 3,
+    "evolutionChainId": 173
+  },
+  {
+    "id": 341,
+    "name": "corphish",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 43,
+      "attack": 80,
+      "defense": 65,
+      "specialAttack": 50,
+      "specialDefense": 35,
+      "speed": 35
+    },
+    "height": 6,
+    "weight": 115,
+    "baseExperience": 62,
+    "generation": 3,
+    "evolutionChainId": 174
+  },
+  {
+    "id": 342,
+    "name": "crawdaunt",
+    "types": [
+      "water",
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 63,
+      "attack": 120,
+      "defense": 85,
+      "specialAttack": 90,
+      "specialDefense": 55,
+      "speed": 55
+    },
+    "height": 11,
+    "weight": 328,
+    "baseExperience": 164,
+    "generation": 3,
+    "evolutionChainId": 174
+  },
+  {
+    "id": 343,
+    "name": "baltoy",
+    "types": [
+      "ground",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 40,
+      "defense": 55,
+      "specialAttack": 40,
+      "specialDefense": 70,
+      "speed": 55
+    },
+    "height": 5,
+    "weight": 215,
+    "baseExperience": 60,
+    "generation": 3,
+    "evolutionChainId": 175
+  },
+  {
+    "id": 344,
+    "name": "claydol",
+    "types": [
+      "ground",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 70,
+      "defense": 105,
+      "specialAttack": 70,
+      "specialDefense": 120,
+      "speed": 75
+    },
+    "height": 15,
+    "weight": 1080,
+    "baseExperience": 175,
+    "generation": 3,
+    "evolutionChainId": 175
+  },
+  {
+    "id": 345,
+    "name": "lileep",
+    "types": [
+      "rock",
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 66,
+      "attack": 41,
+      "defense": 77,
+      "specialAttack": 61,
+      "specialDefense": 87,
+      "speed": 23
+    },
+    "height": 10,
+    "weight": 238,
+    "baseExperience": 71,
+    "generation": 3,
+    "evolutionChainId": 176
+  },
+  {
+    "id": 346,
+    "name": "cradily",
+    "types": [
+      "rock",
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 86,
+      "attack": 81,
+      "defense": 97,
+      "specialAttack": 81,
+      "specialDefense": 107,
+      "speed": 43
+    },
+    "height": 15,
+    "weight": 604,
+    "baseExperience": 173,
+    "generation": 3,
+    "evolutionChainId": 176
+  },
+  {
+    "id": 347,
+    "name": "anorith",
+    "types": [
+      "rock",
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 95,
+      "defense": 50,
+      "specialAttack": 40,
+      "specialDefense": 50,
+      "speed": 75
+    },
+    "height": 7,
+    "weight": 125,
+    "baseExperience": 71,
+    "generation": 3,
+    "evolutionChainId": 177
+  },
+  {
+    "id": 348,
+    "name": "armaldo",
+    "types": [
+      "rock",
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 125,
+      "defense": 100,
+      "specialAttack": 70,
+      "specialDefense": 80,
+      "speed": 45
+    },
+    "height": 15,
+    "weight": 682,
+    "baseExperience": 173,
+    "generation": 3,
+    "evolutionChainId": 177
+  },
+  {
+    "id": 349,
+    "name": "feebas",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 20,
+      "attack": 15,
+      "defense": 20,
+      "specialAttack": 10,
+      "specialDefense": 55,
+      "speed": 80
+    },
+    "height": 6,
+    "weight": 74,
+    "baseExperience": 40,
+    "generation": 3,
+    "evolutionChainId": 178
+  },
+  {
+    "id": 350,
+    "name": "milotic",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 60,
+      "defense": 79,
+      "specialAttack": 100,
+      "specialDefense": 125,
+      "speed": 81
+    },
+    "height": 62,
+    "weight": 1620,
+    "baseExperience": 189,
+    "generation": 3,
+    "evolutionChainId": 178
+  },
+  {
+    "id": 351,
+    "name": "castform",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 70,
+      "defense": 70,
+      "specialAttack": 70,
+      "specialDefense": 70,
+      "speed": 70
+    },
+    "height": 3,
+    "weight": 8,
+    "baseExperience": 147,
+    "generation": 3,
+    "evolutionChainId": 179
+  },
+  {
+    "id": 352,
+    "name": "kecleon",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 90,
+      "defense": 70,
+      "specialAttack": 60,
+      "specialDefense": 120,
+      "speed": 40
+    },
+    "height": 10,
+    "weight": 220,
+    "baseExperience": 154,
+    "generation": 3,
+    "evolutionChainId": 180
+  },
+  {
+    "id": 353,
+    "name": "shuppet",
+    "types": [
+      "ghost"
+    ],
+    "baseStats": {
+      "hp": 44,
+      "attack": 75,
+      "defense": 35,
+      "specialAttack": 63,
+      "specialDefense": 33,
+      "speed": 45
+    },
+    "height": 6,
+    "weight": 23,
+    "baseExperience": 59,
+    "generation": 3,
+    "evolutionChainId": 181
+  },
+  {
+    "id": 354,
+    "name": "banette",
+    "types": [
+      "ghost"
+    ],
+    "baseStats": {
+      "hp": 64,
+      "attack": 115,
+      "defense": 65,
+      "specialAttack": 83,
+      "specialDefense": 63,
+      "speed": 65
+    },
+    "height": 11,
+    "weight": 125,
+    "baseExperience": 159,
+    "generation": 3,
+    "evolutionChainId": 181
+  },
+  {
+    "id": 355,
+    "name": "duskull",
+    "types": [
+      "ghost"
+    ],
+    "baseStats": {
+      "hp": 20,
+      "attack": 40,
+      "defense": 90,
+      "specialAttack": 30,
+      "specialDefense": 90,
+      "speed": 25
+    },
+    "height": 8,
+    "weight": 150,
+    "baseExperience": 59,
+    "generation": 3,
+    "evolutionChainId": 182
+  },
+  {
+    "id": 356,
+    "name": "dusclops",
+    "types": [
+      "ghost"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 70,
+      "defense": 130,
+      "specialAttack": 60,
+      "specialDefense": 130,
+      "speed": 25
+    },
+    "height": 16,
+    "weight": 306,
+    "baseExperience": 159,
+    "generation": 3,
+    "evolutionChainId": 182
+  },
+  {
+    "id": 357,
+    "name": "tropius",
+    "types": [
+      "grass",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 99,
+      "attack": 68,
+      "defense": 83,
+      "specialAttack": 72,
+      "specialDefense": 87,
+      "speed": 51
+    },
+    "height": 20,
+    "weight": 1000,
+    "baseExperience": 161,
+    "generation": 3,
+    "evolutionChainId": 183
+  },
+  {
+    "id": 358,
+    "name": "chimecho",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 50,
+      "defense": 80,
+      "specialAttack": 95,
+      "specialDefense": 90,
+      "speed": 65
+    },
+    "height": 6,
+    "weight": 10,
+    "baseExperience": 159,
+    "generation": 3,
+    "evolutionChainId": 184
+  },
+  {
+    "id": 359,
+    "name": "absol",
+    "types": [
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 130,
+      "defense": 60,
+      "specialAttack": 75,
+      "specialDefense": 60,
+      "speed": 75
+    },
+    "height": 12,
+    "weight": 470,
+    "baseExperience": 163,
+    "generation": 3,
+    "evolutionChainId": 185
+  },
+  {
+    "id": 360,
+    "name": "wynaut",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 23,
+      "defense": 48,
+      "specialAttack": 23,
+      "specialDefense": 48,
+      "speed": 23
+    },
+    "height": 6,
+    "weight": 140,
+    "baseExperience": 52,
+    "generation": 3,
+    "evolutionChainId": 100
+  },
+  {
+    "id": 361,
+    "name": "snorunt",
+    "types": [
+      "ice"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 50,
+      "defense": 50,
+      "specialAttack": 50,
+      "specialDefense": 50,
+      "speed": 50
+    },
+    "height": 7,
+    "weight": 168,
+    "baseExperience": 60,
+    "generation": 3,
+    "evolutionChainId": 186
+  },
+  {
+    "id": 362,
+    "name": "glalie",
+    "types": [
+      "ice"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 80,
+      "defense": 80,
+      "specialAttack": 80,
+      "specialDefense": 80,
+      "speed": 80
+    },
+    "height": 15,
+    "weight": 2565,
+    "baseExperience": 168,
+    "generation": 3,
+    "evolutionChainId": 186
+  },
+  {
+    "id": 363,
+    "name": "spheal",
+    "types": [
+      "ice",
+      "water"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 40,
+      "defense": 50,
+      "specialAttack": 55,
+      "specialDefense": 50,
+      "speed": 25
+    },
+    "height": 8,
+    "weight": 395,
+    "baseExperience": 58,
+    "generation": 3,
+    "evolutionChainId": 187
+  },
+  {
+    "id": 364,
+    "name": "sealeo",
+    "types": [
+      "ice",
+      "water"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 60,
+      "defense": 70,
+      "specialAttack": 75,
+      "specialDefense": 70,
+      "speed": 45
+    },
+    "height": 11,
+    "weight": 876,
+    "baseExperience": 144,
+    "generation": 3,
+    "evolutionChainId": 187
+  },
+  {
+    "id": 365,
+    "name": "walrein",
+    "types": [
+      "ice",
+      "water"
+    ],
+    "baseStats": {
+      "hp": 110,
+      "attack": 80,
+      "defense": 90,
+      "specialAttack": 95,
+      "specialDefense": 90,
+      "speed": 65
+    },
+    "height": 14,
+    "weight": 1506,
+    "baseExperience": 239,
+    "generation": 3,
+    "evolutionChainId": 187
+  },
+  {
+    "id": 366,
+    "name": "clamperl",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 64,
+      "defense": 85,
+      "specialAttack": 74,
+      "specialDefense": 55,
+      "speed": 32
+    },
+    "height": 4,
+    "weight": 525,
+    "baseExperience": 69,
+    "generation": 3,
+    "evolutionChainId": 188
+  },
+  {
+    "id": 367,
+    "name": "huntail",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 104,
+      "defense": 105,
+      "specialAttack": 94,
+      "specialDefense": 75,
+      "speed": 52
+    },
+    "height": 17,
+    "weight": 270,
+    "baseExperience": 170,
+    "generation": 3,
+    "evolutionChainId": 188
+  },
+  {
+    "id": 368,
+    "name": "gorebyss",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 84,
+      "defense": 105,
+      "specialAttack": 114,
+      "specialDefense": 75,
+      "speed": 52
+    },
+    "height": 18,
+    "weight": 226,
+    "baseExperience": 170,
+    "generation": 3,
+    "evolutionChainId": 188
+  },
+  {
+    "id": 369,
+    "name": "relicanth",
+    "types": [
+      "water",
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 90,
+      "defense": 130,
+      "specialAttack": 45,
+      "specialDefense": 65,
+      "speed": 55
+    },
+    "height": 10,
+    "weight": 234,
+    "baseExperience": 170,
+    "generation": 3,
+    "evolutionChainId": 189
+  },
+  {
+    "id": 370,
+    "name": "luvdisc",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 43,
+      "attack": 30,
+      "defense": 55,
+      "specialAttack": 40,
+      "specialDefense": 65,
+      "speed": 97
+    },
+    "height": 6,
+    "weight": 87,
+    "baseExperience": 116,
+    "generation": 3,
+    "evolutionChainId": 190
+  },
+  {
+    "id": 371,
+    "name": "bagon",
+    "types": [
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 75,
+      "defense": 60,
+      "specialAttack": 40,
+      "specialDefense": 30,
+      "speed": 50
+    },
+    "height": 6,
+    "weight": 421,
+    "baseExperience": 60,
+    "generation": 3,
+    "evolutionChainId": 191
+  },
+  {
+    "id": 372,
+    "name": "shelgon",
+    "types": [
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 95,
+      "defense": 100,
+      "specialAttack": 60,
+      "specialDefense": 50,
+      "speed": 50
+    },
+    "height": 11,
+    "weight": 1105,
+    "baseExperience": 147,
+    "generation": 3,
+    "evolutionChainId": 191
+  },
+  {
+    "id": 373,
+    "name": "salamence",
+    "types": [
+      "dragon",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 135,
+      "defense": 80,
+      "specialAttack": 110,
+      "specialDefense": 80,
+      "speed": 100
+    },
+    "height": 15,
+    "weight": 1026,
+    "baseExperience": 270,
+    "generation": 3,
+    "evolutionChainId": 191
+  },
+  {
+    "id": 374,
+    "name": "beldum",
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 55,
+      "defense": 80,
+      "specialAttack": 35,
+      "specialDefense": 60,
+      "speed": 30
+    },
+    "height": 6,
+    "weight": 952,
+    "baseExperience": 60,
+    "generation": 3,
+    "evolutionChainId": 192
+  },
+  {
+    "id": 375,
+    "name": "metang",
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 75,
+      "defense": 100,
+      "specialAttack": 55,
+      "specialDefense": 80,
+      "speed": 50
+    },
+    "height": 12,
+    "weight": 2025,
+    "baseExperience": 147,
+    "generation": 3,
+    "evolutionChainId": 192
+  },
+  {
+    "id": 376,
+    "name": "metagross",
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 135,
+      "defense": 130,
+      "specialAttack": 95,
+      "specialDefense": 90,
+      "speed": 70
+    },
+    "height": 16,
+    "weight": 5500,
+    "baseExperience": 270,
+    "generation": 3,
+    "evolutionChainId": 192
+  },
+  {
+    "id": 377,
+    "name": "regirock",
+    "types": [
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 100,
+      "defense": 200,
+      "specialAttack": 50,
+      "specialDefense": 100,
+      "speed": 50
+    },
+    "height": 17,
+    "weight": 2300,
+    "baseExperience": 261,
+    "generation": 3,
+    "evolutionChainId": 193
+  },
+  {
+    "id": 378,
+    "name": "regice",
+    "types": [
+      "ice"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 50,
+      "defense": 100,
+      "specialAttack": 100,
+      "specialDefense": 200,
+      "speed": 50
+    },
+    "height": 18,
+    "weight": 1750,
+    "baseExperience": 261,
+    "generation": 3,
+    "evolutionChainId": 194
+  },
+  {
+    "id": 379,
+    "name": "registeel",
+    "types": [
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 75,
+      "defense": 150,
+      "specialAttack": 75,
+      "specialDefense": 150,
+      "speed": 50
+    },
+    "height": 19,
+    "weight": 2050,
+    "baseExperience": 261,
+    "generation": 3,
+    "evolutionChainId": 195
+  },
+  {
+    "id": 380,
+    "name": "latias",
+    "types": [
+      "dragon",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 80,
+      "defense": 90,
+      "specialAttack": 110,
+      "specialDefense": 130,
+      "speed": 110
+    },
+    "height": 14,
+    "weight": 400,
+    "baseExperience": 270,
+    "generation": 3,
+    "evolutionChainId": 196
+  },
+  {
+    "id": 381,
+    "name": "latios",
+    "types": [
+      "dragon",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 90,
+      "defense": 80,
+      "specialAttack": 130,
+      "specialDefense": 110,
+      "speed": 110
+    },
+    "height": 20,
+    "weight": 600,
+    "baseExperience": 270,
+    "generation": 3,
+    "evolutionChainId": 197
+  },
+  {
+    "id": 382,
+    "name": "kyogre",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 100,
+      "defense": 90,
+      "specialAttack": 150,
+      "specialDefense": 140,
+      "speed": 90
+    },
+    "height": 45,
+    "weight": 3520,
+    "baseExperience": 302,
+    "generation": 3,
+    "evolutionChainId": 198
+  },
+  {
+    "id": 383,
+    "name": "groudon",
+    "types": [
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 150,
+      "defense": 140,
+      "specialAttack": 100,
+      "specialDefense": 90,
+      "speed": 90
+    },
+    "height": 35,
+    "weight": 9500,
+    "baseExperience": 302,
+    "generation": 3,
+    "evolutionChainId": 199
+  },
+  {
+    "id": 384,
+    "name": "rayquaza",
+    "types": [
+      "dragon",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 105,
+      "attack": 150,
+      "defense": 90,
+      "specialAttack": 150,
+      "specialDefense": 90,
+      "speed": 95
+    },
+    "height": 70,
+    "weight": 2065,
+    "baseExperience": 306,
+    "generation": 3,
+    "evolutionChainId": 200
+  },
+  {
+    "id": 385,
+    "name": "jirachi",
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 100,
+      "defense": 100,
+      "specialAttack": 100,
+      "specialDefense": 100,
+      "speed": 100
+    },
+    "height": 3,
+    "weight": 11,
+    "baseExperience": 270,
+    "generation": 3,
+    "evolutionChainId": 201
+  },
+  {
+    "id": 386,
+    "name": "deoxys-normal",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 150,
+      "defense": 50,
+      "specialAttack": 150,
+      "specialDefense": 50,
+      "speed": 150
+    },
+    "height": 17,
+    "weight": 608,
+    "baseExperience": 270,
+    "generation": 3,
+    "evolutionChainId": 202
+  },
+  {
+    "id": 387,
+    "name": "turtwig",
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 68,
+      "defense": 64,
+      "specialAttack": 45,
+      "specialDefense": 55,
+      "speed": 31
+    },
+    "height": 4,
+    "weight": 102,
+    "baseExperience": 64,
+    "generation": 4,
+    "evolutionChainId": 203
+  },
+  {
+    "id": 388,
+    "name": "grotle",
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 89,
+      "defense": 85,
+      "specialAttack": 55,
+      "specialDefense": 65,
+      "speed": 36
+    },
+    "height": 11,
+    "weight": 970,
+    "baseExperience": 142,
+    "generation": 4,
+    "evolutionChainId": 203
+  },
+  {
+    "id": 389,
+    "name": "torterra",
+    "types": [
+      "grass",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 109,
+      "defense": 105,
+      "specialAttack": 75,
+      "specialDefense": 85,
+      "speed": 56
+    },
+    "height": 22,
+    "weight": 3100,
+    "baseExperience": 236,
+    "generation": 4,
+    "evolutionChainId": 203
+  },
+  {
+    "id": 390,
+    "name": "chimchar",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 44,
+      "attack": 58,
+      "defense": 44,
+      "specialAttack": 58,
+      "specialDefense": 44,
+      "speed": 61
+    },
+    "height": 5,
+    "weight": 62,
+    "baseExperience": 62,
+    "generation": 4,
+    "evolutionChainId": 204
+  },
+  {
+    "id": 391,
+    "name": "monferno",
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 64,
+      "attack": 78,
+      "defense": 52,
+      "specialAttack": 78,
+      "specialDefense": 52,
+      "speed": 81
+    },
+    "height": 9,
+    "weight": 220,
+    "baseExperience": 142,
+    "generation": 4,
+    "evolutionChainId": 204
+  },
+  {
+    "id": 392,
+    "name": "infernape",
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 76,
+      "attack": 104,
+      "defense": 71,
+      "specialAttack": 104,
+      "specialDefense": 71,
+      "speed": 108
+    },
+    "height": 12,
+    "weight": 550,
+    "baseExperience": 240,
+    "generation": 4,
+    "evolutionChainId": 204
+  },
+  {
+    "id": 393,
+    "name": "piplup",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 53,
+      "attack": 51,
+      "defense": 53,
+      "specialAttack": 61,
+      "specialDefense": 56,
+      "speed": 40
+    },
+    "height": 4,
+    "weight": 52,
+    "baseExperience": 63,
+    "generation": 4,
+    "evolutionChainId": 205
+  },
+  {
+    "id": 394,
+    "name": "prinplup",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 64,
+      "attack": 66,
+      "defense": 68,
+      "specialAttack": 81,
+      "specialDefense": 76,
+      "speed": 50
+    },
+    "height": 8,
+    "weight": 230,
+    "baseExperience": 142,
+    "generation": 4,
+    "evolutionChainId": 205
+  },
+  {
+    "id": 395,
+    "name": "empoleon",
+    "types": [
+      "water",
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 84,
+      "attack": 86,
+      "defense": 88,
+      "specialAttack": 111,
+      "specialDefense": 101,
+      "speed": 60
+    },
+    "height": 17,
+    "weight": 845,
+    "baseExperience": 239,
+    "generation": 4,
+    "evolutionChainId": 205
+  },
+  {
+    "id": 396,
+    "name": "starly",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 55,
+      "defense": 30,
+      "specialAttack": 30,
+      "specialDefense": 30,
+      "speed": 60
+    },
+    "height": 3,
+    "weight": 20,
+    "baseExperience": 49,
+    "generation": 4,
+    "evolutionChainId": 206
+  },
+  {
+    "id": 397,
+    "name": "staravia",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 75,
+      "defense": 50,
+      "specialAttack": 40,
+      "specialDefense": 40,
+      "speed": 80
+    },
+    "height": 6,
+    "weight": 155,
+    "baseExperience": 119,
+    "generation": 4,
+    "evolutionChainId": 206
+  },
+  {
+    "id": 398,
+    "name": "staraptor",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "attack": 120,
+      "defense": 70,
+      "specialAttack": 50,
+      "specialDefense": 60,
+      "speed": 100
+    },
+    "height": 12,
+    "weight": 249,
+    "baseExperience": 218,
+    "generation": 4,
+    "evolutionChainId": 206
+  },
+  {
+    "id": 399,
+    "name": "bidoof",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 59,
+      "attack": 45,
+      "defense": 40,
+      "specialAttack": 35,
+      "specialDefense": 40,
+      "speed": 31
+    },
+    "height": 5,
+    "weight": 200,
+    "baseExperience": 50,
+    "generation": 4,
+    "evolutionChainId": 207
+  },
+  {
+    "id": 400,
+    "name": "bibarel",
+    "types": [
+      "normal",
+      "water"
+    ],
+    "baseStats": {
+      "hp": 79,
+      "attack": 85,
+      "defense": 60,
+      "specialAttack": 55,
+      "specialDefense": 60,
+      "speed": 71
+    },
+    "height": 10,
+    "weight": 315,
+    "baseExperience": 144,
+    "generation": 4,
+    "evolutionChainId": 207
+  },
+  {
+    "id": 401,
+    "name": "kricketot",
+    "types": [
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 37,
+      "attack": 25,
+      "defense": 41,
+      "specialAttack": 25,
+      "specialDefense": 41,
+      "speed": 25
+    },
+    "height": 3,
+    "weight": 22,
+    "baseExperience": 39,
+    "generation": 4,
+    "evolutionChainId": 208
+  },
+  {
+    "id": 402,
+    "name": "kricketune",
+    "types": [
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 77,
+      "attack": 85,
+      "defense": 51,
+      "specialAttack": 55,
+      "specialDefense": 51,
+      "speed": 65
+    },
+    "height": 10,
+    "weight": 255,
+    "baseExperience": 134,
+    "generation": 4,
+    "evolutionChainId": 208
+  },
+  {
+    "id": 403,
+    "name": "shinx",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 65,
+      "defense": 34,
+      "specialAttack": 40,
+      "specialDefense": 34,
+      "speed": 45
+    },
+    "height": 5,
+    "weight": 95,
+    "baseExperience": 53,
+    "generation": 4,
+    "evolutionChainId": 209
+  },
+  {
+    "id": 404,
+    "name": "luxio",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 85,
+      "defense": 49,
+      "specialAttack": 60,
+      "specialDefense": 49,
+      "speed": 60
+    },
+    "height": 9,
+    "weight": 305,
+    "baseExperience": 127,
+    "generation": 4,
+    "evolutionChainId": 209
+  },
+  {
+    "id": 405,
+    "name": "luxray",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 120,
+      "defense": 79,
+      "specialAttack": 95,
+      "specialDefense": 79,
+      "speed": 70
+    },
+    "height": 14,
+    "weight": 420,
+    "baseExperience": 235,
+    "generation": 4,
+    "evolutionChainId": 209
+  },
+  {
+    "id": 406,
+    "name": "budew",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 30,
+      "defense": 35,
+      "specialAttack": 50,
+      "specialDefense": 70,
+      "speed": 55
+    },
+    "height": 2,
+    "weight": 12,
+    "baseExperience": 56,
+    "generation": 4,
+    "evolutionChainId": 158
+  },
+  {
+    "id": 407,
+    "name": "roserade",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 70,
+      "defense": 65,
+      "specialAttack": 125,
+      "specialDefense": 105,
+      "speed": 90
+    },
+    "height": 9,
+    "weight": 145,
+    "baseExperience": 232,
+    "generation": 4,
+    "evolutionChainId": 158
+  },
+  {
+    "id": 408,
+    "name": "cranidos",
+    "types": [
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 67,
+      "attack": 125,
+      "defense": 40,
+      "specialAttack": 30,
+      "specialDefense": 30,
+      "speed": 58
+    },
+    "height": 9,
+    "weight": 315,
+    "baseExperience": 70,
+    "generation": 4,
+    "evolutionChainId": 211
+  },
+  {
+    "id": 409,
+    "name": "rampardos",
+    "types": [
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 97,
+      "attack": 165,
+      "defense": 60,
+      "specialAttack": 65,
+      "specialDefense": 50,
+      "speed": 58
+    },
+    "height": 16,
+    "weight": 1025,
+    "baseExperience": 173,
+    "generation": 4,
+    "evolutionChainId": 211
+  },
+  {
+    "id": 410,
+    "name": "shieldon",
+    "types": [
+      "rock",
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "attack": 42,
+      "defense": 118,
+      "specialAttack": 42,
+      "specialDefense": 88,
+      "speed": 30
+    },
+    "height": 5,
+    "weight": 570,
+    "baseExperience": 70,
+    "generation": 4,
+    "evolutionChainId": 212
+  },
+  {
+    "id": 411,
+    "name": "bastiodon",
+    "types": [
+      "rock",
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 52,
+      "defense": 168,
+      "specialAttack": 47,
+      "specialDefense": 138,
+      "speed": 30
+    },
+    "height": 13,
+    "weight": 1495,
+    "baseExperience": 173,
+    "generation": 4,
+    "evolutionChainId": 212
+  },
+  {
+    "id": 412,
+    "name": "burmy",
+    "types": [
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 29,
+      "defense": 45,
+      "specialAttack": 29,
+      "specialDefense": 45,
+      "speed": 36
+    },
+    "height": 2,
+    "weight": 34,
+    "baseExperience": 45,
+    "generation": 4,
+    "evolutionChainId": 213
+  },
+  {
+    "id": 413,
+    "name": "wormadam-plant",
+    "types": [
+      "bug",
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 59,
+      "defense": 85,
+      "specialAttack": 79,
+      "specialDefense": 105,
+      "speed": 36
+    },
+    "height": 5,
+    "weight": 65,
+    "baseExperience": 148,
+    "generation": 4,
+    "evolutionChainId": 213
+  },
+  {
+    "id": 414,
+    "name": "mothim",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 94,
+      "defense": 50,
+      "specialAttack": 94,
+      "specialDefense": 50,
+      "speed": 66
+    },
+    "height": 9,
+    "weight": 233,
+    "baseExperience": 148,
+    "generation": 4,
+    "evolutionChainId": 213
+  },
+  {
+    "id": 415,
+    "name": "combee",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "attack": 30,
+      "defense": 42,
+      "specialAttack": 30,
+      "specialDefense": 42,
+      "speed": 70
+    },
+    "height": 3,
+    "weight": 55,
+    "baseExperience": 49,
+    "generation": 4,
+    "evolutionChainId": 214
+  },
+  {
+    "id": 416,
+    "name": "vespiquen",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 80,
+      "defense": 102,
+      "specialAttack": 80,
+      "specialDefense": 102,
+      "speed": 40
+    },
+    "height": 12,
+    "weight": 385,
+    "baseExperience": 166,
+    "generation": 4,
+    "evolutionChainId": 214
+  },
+  {
+    "id": 417,
+    "name": "pachirisu",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 45,
+      "defense": 70,
+      "specialAttack": 45,
+      "specialDefense": 90,
+      "speed": 95
+    },
+    "height": 4,
+    "weight": 39,
+    "baseExperience": 142,
+    "generation": 4,
+    "evolutionChainId": 215
+  },
+  {
+    "id": 418,
+    "name": "buizel",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 65,
+      "defense": 35,
+      "specialAttack": 60,
+      "specialDefense": 30,
+      "speed": 85
+    },
+    "height": 7,
+    "weight": 295,
+    "baseExperience": 66,
+    "generation": 4,
+    "evolutionChainId": 216
+  },
+  {
+    "id": 419,
+    "name": "floatzel",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "attack": 105,
+      "defense": 55,
+      "specialAttack": 85,
+      "specialDefense": 50,
+      "speed": 115
+    },
+    "height": 11,
+    "weight": 335,
+    "baseExperience": 173,
+    "generation": 4,
+    "evolutionChainId": 216
+  },
+  {
+    "id": 420,
+    "name": "cherubi",
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 35,
+      "defense": 45,
+      "specialAttack": 62,
+      "specialDefense": 53,
+      "speed": 35
+    },
+    "height": 4,
+    "weight": 33,
+    "baseExperience": 55,
+    "generation": 4,
+    "evolutionChainId": 217
+  },
+  {
+    "id": 421,
+    "name": "cherrim",
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 60,
+      "defense": 70,
+      "specialAttack": 87,
+      "specialDefense": 78,
+      "speed": 85
+    },
+    "height": 5,
+    "weight": 93,
+    "baseExperience": 158,
+    "generation": 4,
+    "evolutionChainId": 217
+  },
+  {
+    "id": 422,
+    "name": "shellos",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 76,
+      "attack": 48,
+      "defense": 48,
+      "specialAttack": 57,
+      "specialDefense": 62,
+      "speed": 34
+    },
+    "height": 3,
+    "weight": 63,
+    "baseExperience": 65,
+    "generation": 4,
+    "evolutionChainId": 218
+  },
+  {
+    "id": 423,
+    "name": "gastrodon",
+    "types": [
+      "water",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 111,
+      "attack": 83,
+      "defense": 68,
+      "specialAttack": 92,
+      "specialDefense": 82,
+      "speed": 39
+    },
+    "height": 9,
+    "weight": 299,
+    "baseExperience": 166,
+    "generation": 4,
+    "evolutionChainId": 218
+  },
+  {
+    "id": 424,
+    "name": "ambipom",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 100,
+      "defense": 66,
+      "specialAttack": 60,
+      "specialDefense": 66,
+      "speed": 115
+    },
+    "height": 12,
+    "weight": 203,
+    "baseExperience": 169,
+    "generation": 4,
+    "evolutionChainId": 93
+  },
+  {
+    "id": 425,
+    "name": "drifloon",
+    "types": [
+      "ghost",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 50,
+      "defense": 34,
+      "specialAttack": 60,
+      "specialDefense": 44,
+      "speed": 70
+    },
+    "height": 4,
+    "weight": 12,
+    "baseExperience": 70,
+    "generation": 4,
+    "evolutionChainId": 219
+  },
+  {
+    "id": 426,
+    "name": "drifblim",
+    "types": [
+      "ghost",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 150,
+      "attack": 80,
+      "defense": 44,
+      "specialAttack": 90,
+      "specialDefense": 54,
+      "speed": 80
+    },
+    "height": 12,
+    "weight": 150,
+    "baseExperience": 174,
+    "generation": 4,
+    "evolutionChainId": 219
+  },
+  {
+    "id": 427,
+    "name": "buneary",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 66,
+      "defense": 44,
+      "specialAttack": 44,
+      "specialDefense": 56,
+      "speed": 85
+    },
+    "height": 4,
+    "weight": 55,
+    "baseExperience": 70,
+    "generation": 4,
+    "evolutionChainId": 220
+  },
+  {
+    "id": 428,
+    "name": "lopunny",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 76,
+      "defense": 84,
+      "specialAttack": 54,
+      "specialDefense": 96,
+      "speed": 105
+    },
+    "height": 12,
+    "weight": 333,
+    "baseExperience": 168,
+    "generation": 4,
+    "evolutionChainId": 220
+  },
+  {
+    "id": 429,
+    "name": "mismagius",
+    "types": [
+      "ghost"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 60,
+      "defense": 60,
+      "specialAttack": 105,
+      "specialDefense": 105,
+      "speed": 105
+    },
+    "height": 9,
+    "weight": 44,
+    "baseExperience": 173,
+    "generation": 4,
+    "evolutionChainId": 98
+  },
+  {
+    "id": 430,
+    "name": "honchkrow",
+    "types": [
+      "dark",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 125,
+      "defense": 52,
+      "specialAttack": 105,
+      "specialDefense": 52,
+      "speed": 71
+    },
+    "height": 9,
+    "weight": 273,
+    "baseExperience": 177,
+    "generation": 4,
+    "evolutionChainId": 97
+  },
+  {
+    "id": 431,
+    "name": "glameow",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 49,
+      "attack": 55,
+      "defense": 42,
+      "specialAttack": 42,
+      "specialDefense": 37,
+      "speed": 85
+    },
+    "height": 5,
+    "weight": 39,
+    "baseExperience": 62,
+    "generation": 4,
+    "evolutionChainId": 221
+  },
+  {
+    "id": 432,
+    "name": "purugly",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 71,
+      "attack": 82,
+      "defense": 64,
+      "specialAttack": 64,
+      "specialDefense": 59,
+      "speed": 112
+    },
+    "height": 10,
+    "weight": 438,
+    "baseExperience": 158,
+    "generation": 4,
+    "evolutionChainId": 221
+  },
+  {
+    "id": 433,
+    "name": "chingling",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 30,
+      "defense": 50,
+      "specialAttack": 65,
+      "specialDefense": 50,
+      "speed": 45
+    },
+    "height": 2,
+    "weight": 6,
+    "baseExperience": 57,
+    "generation": 4,
+    "evolutionChainId": 184
+  },
+  {
+    "id": 434,
+    "name": "stunky",
+    "types": [
+      "poison",
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 63,
+      "attack": 63,
+      "defense": 47,
+      "specialAttack": 41,
+      "specialDefense": 41,
+      "speed": 74
+    },
+    "height": 4,
+    "weight": 192,
+    "baseExperience": 66,
+    "generation": 4,
+    "evolutionChainId": 223
+  },
+  {
+    "id": 435,
+    "name": "skuntank",
+    "types": [
+      "poison",
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 103,
+      "attack": 93,
+      "defense": 67,
+      "specialAttack": 71,
+      "specialDefense": 61,
+      "speed": 84
+    },
+    "height": 10,
+    "weight": 380,
+    "baseExperience": 168,
+    "generation": 4,
+    "evolutionChainId": 223
+  },
+  {
+    "id": 436,
+    "name": "bronzor",
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 57,
+      "attack": 24,
+      "defense": 86,
+      "specialAttack": 24,
+      "specialDefense": 86,
+      "speed": 23
+    },
+    "height": 5,
+    "weight": 605,
+    "baseExperience": 60,
+    "generation": 4,
+    "evolutionChainId": 224
+  },
+  {
+    "id": 437,
+    "name": "bronzong",
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 67,
+      "attack": 89,
+      "defense": 116,
+      "specialAttack": 79,
+      "specialDefense": 116,
+      "speed": 33
+    },
+    "height": 13,
+    "weight": 1870,
+    "baseExperience": 175,
+    "generation": 4,
+    "evolutionChainId": 224
+  },
+  {
+    "id": 438,
+    "name": "bonsly",
+    "types": [
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 80,
+      "defense": 95,
+      "specialAttack": 10,
+      "specialDefense": 45,
+      "speed": 10
+    },
+    "height": 5,
+    "weight": 150,
+    "baseExperience": 58,
+    "generation": 4,
+    "evolutionChainId": 91
+  },
+  {
+    "id": 439,
+    "name": "mime-jr",
+    "types": [
+      "psychic",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 20,
+      "attack": 25,
+      "defense": 45,
+      "specialAttack": 70,
+      "specialDefense": 90,
+      "speed": 60
+    },
+    "height": 6,
+    "weight": 130,
+    "baseExperience": 62,
+    "generation": 4,
+    "evolutionChainId": 57
+  },
+  {
+    "id": 440,
+    "name": "happiny",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 5,
+      "defense": 5,
+      "specialAttack": 15,
+      "specialDefense": 65,
+      "speed": 30
+    },
+    "height": 6,
+    "weight": 244,
+    "baseExperience": 110,
+    "generation": 4,
+    "evolutionChainId": 51
+  },
+  {
+    "id": 441,
+    "name": "chatot",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 76,
+      "attack": 65,
+      "defense": 45,
+      "specialAttack": 92,
+      "specialDefense": 42,
+      "speed": 91
+    },
+    "height": 5,
+    "weight": 19,
+    "baseExperience": 144,
+    "generation": 4,
+    "evolutionChainId": 228
+  },
+  {
+    "id": 442,
+    "name": "spiritomb",
+    "types": [
+      "ghost",
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 92,
+      "defense": 108,
+      "specialAttack": 92,
+      "specialDefense": 108,
+      "speed": 35
+    },
+    "height": 10,
+    "weight": 1080,
+    "baseExperience": 170,
+    "generation": 4,
+    "evolutionChainId": 229
+  },
+  {
+    "id": 443,
+    "name": "gible",
+    "types": [
+      "dragon",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 58,
+      "attack": 70,
+      "defense": 45,
+      "specialAttack": 40,
+      "specialDefense": 45,
+      "speed": 42
+    },
+    "height": 7,
+    "weight": 205,
+    "baseExperience": 60,
+    "generation": 4,
+    "evolutionChainId": 230
+  },
+  {
+    "id": 444,
+    "name": "gabite",
+    "types": [
+      "dragon",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 68,
+      "attack": 90,
+      "defense": 65,
+      "specialAttack": 50,
+      "specialDefense": 55,
+      "speed": 82
+    },
+    "height": 14,
+    "weight": 560,
+    "baseExperience": 144,
+    "generation": 4,
+    "evolutionChainId": 230
+  },
+  {
+    "id": 445,
+    "name": "garchomp",
+    "types": [
+      "dragon",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 108,
+      "attack": 130,
+      "defense": 95,
+      "specialAttack": 80,
+      "specialDefense": 85,
+      "speed": 102
+    },
+    "height": 19,
+    "weight": 950,
+    "baseExperience": 270,
+    "generation": 4,
+    "evolutionChainId": 230
+  },
+  {
+    "id": 446,
+    "name": "munchlax",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 135,
+      "attack": 85,
+      "defense": 40,
+      "specialAttack": 40,
+      "specialDefense": 85,
+      "speed": 5
+    },
+    "height": 6,
+    "weight": 1050,
+    "baseExperience": 78,
+    "generation": 4,
+    "evolutionChainId": 72
+  },
+  {
+    "id": 447,
+    "name": "riolu",
+    "types": [
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 70,
+      "defense": 40,
+      "specialAttack": 35,
+      "specialDefense": 40,
+      "speed": 60
+    },
+    "height": 7,
+    "weight": 202,
+    "baseExperience": 57,
+    "generation": 4,
+    "evolutionChainId": 232
+  },
+  {
+    "id": 448,
+    "name": "lucario",
+    "types": [
+      "fighting",
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 110,
+      "defense": 70,
+      "specialAttack": 115,
+      "specialDefense": 70,
+      "speed": 90
+    },
+    "height": 12,
+    "weight": 540,
+    "baseExperience": 184,
+    "generation": 4,
+    "evolutionChainId": 232
+  },
+  {
+    "id": 449,
+    "name": "hippopotas",
+    "types": [
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 68,
+      "attack": 72,
+      "defense": 78,
+      "specialAttack": 38,
+      "specialDefense": 42,
+      "speed": 32
+    },
+    "height": 8,
+    "weight": 495,
+    "baseExperience": 66,
+    "generation": 4,
+    "evolutionChainId": 233
+  },
+  {
+    "id": 450,
+    "name": "hippowdon",
+    "types": [
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 108,
+      "attack": 112,
+      "defense": 118,
+      "specialAttack": 68,
+      "specialDefense": 72,
+      "speed": 47
+    },
+    "height": 20,
+    "weight": 3000,
+    "baseExperience": 184,
+    "generation": 4,
+    "evolutionChainId": 233
+  },
+  {
+    "id": 451,
+    "name": "skorupi",
+    "types": [
+      "poison",
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 50,
+      "defense": 90,
+      "specialAttack": 30,
+      "specialDefense": 55,
+      "speed": 65
+    },
+    "height": 8,
+    "weight": 120,
+    "baseExperience": 66,
+    "generation": 4,
+    "evolutionChainId": 234
+  },
+  {
+    "id": 452,
+    "name": "drapion",
+    "types": [
+      "poison",
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 90,
+      "defense": 110,
+      "specialAttack": 60,
+      "specialDefense": 75,
+      "speed": 95
+    },
+    "height": 13,
+    "weight": 615,
+    "baseExperience": 175,
+    "generation": 4,
+    "evolutionChainId": 234
+  },
+  {
+    "id": 453,
+    "name": "croagunk",
+    "types": [
+      "poison",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 48,
+      "attack": 61,
+      "defense": 40,
+      "specialAttack": 61,
+      "specialDefense": 40,
+      "speed": 50
+    },
+    "height": 7,
+    "weight": 230,
+    "baseExperience": 60,
+    "generation": 4,
+    "evolutionChainId": 235
+  },
+  {
+    "id": 454,
+    "name": "toxicroak",
+    "types": [
+      "poison",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 83,
+      "attack": 106,
+      "defense": 65,
+      "specialAttack": 86,
+      "specialDefense": 65,
+      "speed": 85
+    },
+    "height": 13,
+    "weight": 444,
+    "baseExperience": 172,
+    "generation": 4,
+    "evolutionChainId": 235
+  },
+  {
+    "id": 455,
+    "name": "carnivine",
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 74,
+      "attack": 100,
+      "defense": 72,
+      "specialAttack": 90,
+      "specialDefense": 72,
+      "speed": 46
+    },
+    "height": 14,
+    "weight": 270,
+    "baseExperience": 159,
+    "generation": 4,
+    "evolutionChainId": 236
+  },
+  {
+    "id": 456,
+    "name": "finneon",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 49,
+      "attack": 49,
+      "defense": 56,
+      "specialAttack": 49,
+      "specialDefense": 61,
+      "speed": 66
+    },
+    "height": 4,
+    "weight": 70,
+    "baseExperience": 66,
+    "generation": 4,
+    "evolutionChainId": 237
+  },
+  {
+    "id": 457,
+    "name": "lumineon",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 69,
+      "attack": 69,
+      "defense": 76,
+      "specialAttack": 69,
+      "specialDefense": 86,
+      "speed": 91
+    },
+    "height": 12,
+    "weight": 240,
+    "baseExperience": 161,
+    "generation": 4,
+    "evolutionChainId": 237
+  },
+  {
+    "id": 458,
+    "name": "mantyke",
+    "types": [
+      "water",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 20,
+      "defense": 50,
+      "specialAttack": 60,
+      "specialDefense": 120,
+      "speed": 50
+    },
+    "height": 10,
+    "weight": 650,
+    "baseExperience": 69,
+    "generation": 4,
+    "evolutionChainId": 116
+  },
+  {
+    "id": 459,
+    "name": "snover",
+    "types": [
+      "grass",
+      "ice"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 62,
+      "defense": 50,
+      "specialAttack": 62,
+      "specialDefense": 60,
+      "speed": 40
+    },
+    "height": 10,
+    "weight": 505,
+    "baseExperience": 67,
+    "generation": 4,
+    "evolutionChainId": 239
+  },
+  {
+    "id": 460,
+    "name": "abomasnow",
+    "types": [
+      "grass",
+      "ice"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 92,
+      "defense": 75,
+      "specialAttack": 92,
+      "specialDefense": 85,
+      "speed": 60
+    },
+    "height": 22,
+    "weight": 1355,
+    "baseExperience": 173,
+    "generation": 4,
+    "evolutionChainId": 239
+  },
+  {
+    "id": 461,
+    "name": "weavile",
+    "types": [
+      "dark",
+      "ice"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 120,
+      "defense": 65,
+      "specialAttack": 45,
+      "specialDefense": 85,
+      "speed": 125
+    },
+    "height": 11,
+    "weight": 340,
+    "baseExperience": 179,
+    "generation": 4,
+    "evolutionChainId": 109
+  },
+  {
+    "id": 462,
+    "name": "magnezone",
+    "types": [
+      "electric",
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 70,
+      "defense": 115,
+      "specialAttack": 130,
+      "specialDefense": 90,
+      "speed": 60
+    },
+    "height": 12,
+    "weight": 1800,
+    "baseExperience": 241,
+    "generation": 4,
+    "evolutionChainId": 34
+  },
+  {
+    "id": 463,
+    "name": "lickilicky",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 110,
+      "attack": 85,
+      "defense": 95,
+      "specialAttack": 80,
+      "specialDefense": 95,
+      "speed": 50
+    },
+    "height": 17,
+    "weight": 1400,
+    "baseExperience": 180,
+    "generation": 4,
+    "evolutionChainId": 48
+  },
+  {
+    "id": 464,
+    "name": "rhyperior",
+    "types": [
+      "ground",
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 115,
+      "attack": 140,
+      "defense": 130,
+      "specialAttack": 55,
+      "specialDefense": 55,
+      "speed": 40
+    },
+    "height": 24,
+    "weight": 2828,
+    "baseExperience": 241,
+    "generation": 4,
+    "evolutionChainId": 50
+  },
+  {
+    "id": 465,
+    "name": "tangrowth",
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 100,
+      "defense": 125,
+      "specialAttack": 110,
+      "specialDefense": 50,
+      "speed": 50
+    },
+    "height": 20,
+    "weight": 1286,
+    "baseExperience": 187,
+    "generation": 4,
+    "evolutionChainId": 52
+  },
+  {
+    "id": 466,
+    "name": "electivire",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 123,
+      "defense": 67,
+      "specialAttack": 95,
+      "specialDefense": 85,
+      "speed": 95
+    },
+    "height": 18,
+    "weight": 1386,
+    "baseExperience": 243,
+    "generation": 4,
+    "evolutionChainId": 60
+  },
+  {
+    "id": 467,
+    "name": "magmortar",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 95,
+      "defense": 67,
+      "specialAttack": 125,
+      "specialDefense": 95,
+      "speed": 83
+    },
+    "height": 16,
+    "weight": 680,
+    "baseExperience": 243,
+    "generation": 4,
+    "evolutionChainId": 61
+  },
+  {
+    "id": 468,
+    "name": "togekiss",
+    "types": [
+      "fairy",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "attack": 50,
+      "defense": 95,
+      "specialAttack": 120,
+      "specialDefense": 115,
+      "speed": 80
+    },
+    "height": 15,
+    "weight": 380,
+    "baseExperience": 245,
+    "generation": 4,
+    "evolutionChainId": 87
+  },
+  {
+    "id": 469,
+    "name": "yanmega",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 86,
+      "attack": 76,
+      "defense": 86,
+      "specialAttack": 116,
+      "specialDefense": 56,
+      "speed": 95
+    },
+    "height": 19,
+    "weight": 515,
+    "baseExperience": 180,
+    "generation": 4,
+    "evolutionChainId": 95
+  },
+  {
+    "id": 470,
+    "name": "leafeon",
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 110,
+      "defense": 130,
+      "specialAttack": 60,
+      "specialDefense": 65,
+      "speed": 95
+    },
+    "height": 10,
+    "weight": 255,
+    "baseExperience": 184,
+    "generation": 4,
+    "evolutionChainId": 67
+  },
+  {
+    "id": 471,
+    "name": "glaceon",
+    "types": [
+      "ice"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 60,
+      "defense": 110,
+      "specialAttack": 130,
+      "specialDefense": 95,
+      "speed": 65
+    },
+    "height": 8,
+    "weight": 259,
+    "baseExperience": 184,
+    "generation": 4,
+    "evolutionChainId": 67
+  },
+  {
+    "id": 472,
+    "name": "gliscor",
+    "types": [
+      "ground",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 95,
+      "defense": 125,
+      "specialAttack": 45,
+      "specialDefense": 75,
+      "speed": 95
+    },
+    "height": 20,
+    "weight": 425,
+    "baseExperience": 179,
+    "generation": 4,
+    "evolutionChainId": 104
+  },
+  {
+    "id": 473,
+    "name": "mamoswine",
+    "types": [
+      "ice",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 110,
+      "attack": 130,
+      "defense": 80,
+      "specialAttack": 70,
+      "specialDefense": 60,
+      "speed": 80
+    },
+    "height": 25,
+    "weight": 2910,
+    "baseExperience": 239,
+    "generation": 4,
+    "evolutionChainId": 112
+  },
+  {
+    "id": 474,
+    "name": "porygon-z",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "attack": 80,
+      "defense": 70,
+      "specialAttack": 135,
+      "specialDefense": 75,
+      "speed": 90
+    },
+    "height": 9,
+    "weight": 340,
+    "baseExperience": 241,
+    "generation": 4,
+    "evolutionChainId": 68
+  },
+  {
+    "id": 475,
+    "name": "gallade",
+    "types": [
+      "psychic",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 68,
+      "attack": 125,
+      "defense": 65,
+      "specialAttack": 65,
+      "specialDefense": 115,
+      "speed": 80
+    },
+    "height": 16,
+    "weight": 520,
+    "baseExperience": 233,
+    "generation": 4,
+    "evolutionChainId": 140
+  },
+  {
+    "id": 476,
+    "name": "probopass",
+    "types": [
+      "rock",
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 55,
+      "defense": 145,
+      "specialAttack": 75,
+      "specialDefense": 150,
+      "speed": 40
+    },
+    "height": 14,
+    "weight": 3400,
+    "baseExperience": 184,
+    "generation": 4,
+    "evolutionChainId": 147
+  },
+  {
+    "id": 477,
+    "name": "dusknoir",
+    "types": [
+      "ghost"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 100,
+      "defense": 135,
+      "specialAttack": 65,
+      "specialDefense": 135,
+      "speed": 45
+    },
+    "height": 22,
+    "weight": 1066,
+    "baseExperience": 236,
+    "generation": 4,
+    "evolutionChainId": 182
+  },
+  {
+    "id": 478,
+    "name": "froslass",
+    "types": [
+      "ice",
+      "ghost"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 80,
+      "defense": 70,
+      "specialAttack": 80,
+      "specialDefense": 70,
+      "speed": 110
+    },
+    "height": 13,
+    "weight": 266,
+    "baseExperience": 168,
+    "generation": 4,
+    "evolutionChainId": 186
+  },
+  {
+    "id": 479,
+    "name": "rotom",
+    "types": [
+      "electric",
+      "ghost"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 50,
+      "defense": 77,
+      "specialAttack": 95,
+      "specialDefense": 77,
+      "speed": 91
+    },
+    "height": 3,
+    "weight": 3,
+    "baseExperience": 154,
+    "generation": 4,
+    "evolutionChainId": 240
+  },
+  {
+    "id": 480,
+    "name": "uxie",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 75,
+      "defense": 130,
+      "specialAttack": 75,
+      "specialDefense": 130,
+      "speed": 95
+    },
+    "height": 3,
+    "weight": 3,
+    "baseExperience": 261,
+    "generation": 4,
+    "evolutionChainId": 241
+  },
+  {
+    "id": 481,
+    "name": "mesprit",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 105,
+      "defense": 105,
+      "specialAttack": 105,
+      "specialDefense": 105,
+      "speed": 80
+    },
+    "height": 3,
+    "weight": 3,
+    "baseExperience": 261,
+    "generation": 4,
+    "evolutionChainId": 242
+  },
+  {
+    "id": 482,
+    "name": "azelf",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 125,
+      "defense": 70,
+      "specialAttack": 125,
+      "specialDefense": 70,
+      "speed": 115
+    },
+    "height": 3,
+    "weight": 3,
+    "baseExperience": 261,
+    "generation": 4,
+    "evolutionChainId": 243
+  },
+  {
+    "id": 483,
+    "name": "dialga",
+    "types": [
+      "steel",
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 120,
+      "defense": 120,
+      "specialAttack": 150,
+      "specialDefense": 100,
+      "speed": 90
+    },
+    "height": 54,
+    "weight": 6830,
+    "baseExperience": 306,
+    "generation": 4,
+    "evolutionChainId": 244
+  },
+  {
+    "id": 484,
+    "name": "palkia",
+    "types": [
+      "water",
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 120,
+      "defense": 100,
+      "specialAttack": 150,
+      "specialDefense": 120,
+      "speed": 100
+    },
+    "height": 42,
+    "weight": 3360,
+    "baseExperience": 306,
+    "generation": 4,
+    "evolutionChainId": 245
+  },
+  {
+    "id": 485,
+    "name": "heatran",
+    "types": [
+      "fire",
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 91,
+      "attack": 90,
+      "defense": 106,
+      "specialAttack": 130,
+      "specialDefense": 106,
+      "speed": 77
+    },
+    "height": 17,
+    "weight": 4300,
+    "baseExperience": 270,
+    "generation": 4,
+    "evolutionChainId": 246
+  },
+  {
+    "id": 486,
+    "name": "regigigas",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 110,
+      "attack": 160,
+      "defense": 110,
+      "specialAttack": 80,
+      "specialDefense": 110,
+      "speed": 100
+    },
+    "height": 37,
+    "weight": 4200,
+    "baseExperience": 302,
+    "generation": 4,
+    "evolutionChainId": 247
+  },
+  {
+    "id": 487,
+    "name": "giratina-altered",
+    "types": [
+      "ghost",
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 150,
+      "attack": 100,
+      "defense": 120,
+      "specialAttack": 100,
+      "specialDefense": 120,
+      "speed": 90
+    },
+    "height": 45,
+    "weight": 7500,
+    "baseExperience": 306,
+    "generation": 4,
+    "evolutionChainId": 248
+  },
+  {
+    "id": 488,
+    "name": "cresselia",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 120,
+      "attack": 70,
+      "defense": 110,
+      "specialAttack": 75,
+      "specialDefense": 120,
+      "speed": 85
+    },
+    "height": 15,
+    "weight": 856,
+    "baseExperience": 270,
+    "generation": 4,
+    "evolutionChainId": 249
+  },
+  {
+    "id": 489,
+    "name": "phione",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 80,
+      "defense": 80,
+      "specialAttack": 80,
+      "specialDefense": 80,
+      "speed": 80
+    },
+    "height": 4,
+    "weight": 31,
+    "baseExperience": 216,
+    "generation": 4,
+    "evolutionChainId": 250
+  },
+  {
+    "id": 490,
+    "name": "manaphy",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 100,
+      "defense": 100,
+      "specialAttack": 100,
+      "specialDefense": 100,
+      "speed": 100
+    },
+    "height": 3,
+    "weight": 14,
+    "baseExperience": 270,
+    "generation": 4,
+    "evolutionChainId": 250
+  },
+  {
+    "id": 491,
+    "name": "darkrai",
+    "types": [
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 90,
+      "defense": 90,
+      "specialAttack": 135,
+      "specialDefense": 90,
+      "speed": 125
+    },
+    "height": 15,
+    "weight": 505,
+    "baseExperience": 270,
+    "generation": 4,
+    "evolutionChainId": 252
+  },
+  {
+    "id": 492,
+    "name": "shaymin-land",
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 100,
+      "defense": 100,
+      "specialAttack": 100,
+      "specialDefense": 100,
+      "speed": 100
+    },
+    "height": 2,
+    "weight": 21,
+    "baseExperience": 270,
+    "generation": 4,
+    "evolutionChainId": 253
+  },
+  {
+    "id": 493,
+    "name": "arceus",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 120,
+      "attack": 120,
+      "defense": 120,
+      "specialAttack": 120,
+      "specialDefense": 120,
+      "speed": 120
+    },
+    "height": 32,
+    "weight": 3200,
+    "baseExperience": 324,
+    "generation": 4,
+    "evolutionChainId": 254
+  }
+]

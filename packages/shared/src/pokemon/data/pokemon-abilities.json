@@ -1,0 +1,8517 @@
+[
+  {
+    "speciesId": 1,
+    "abilities": [
+      {
+        "abilityId": 65,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 34,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 2,
+    "abilities": [
+      {
+        "abilityId": 65,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 34,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 3,
+    "abilities": [
+      {
+        "abilityId": 65,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 34,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 4,
+    "abilities": [
+      {
+        "abilityId": 66,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 94,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 5,
+    "abilities": [
+      {
+        "abilityId": 66,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 94,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 6,
+    "abilities": [
+      {
+        "abilityId": 66,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 94,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 7,
+    "abilities": [
+      {
+        "abilityId": 67,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 44,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 8,
+    "abilities": [
+      {
+        "abilityId": 67,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 44,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 9,
+    "abilities": [
+      {
+        "abilityId": 67,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 44,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 10,
+    "abilities": [
+      {
+        "abilityId": 19,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 50,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 11,
+    "abilities": [
+      {
+        "abilityId": 61,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 12,
+    "abilities": [
+      {
+        "abilityId": 14,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 110,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 13,
+    "abilities": [
+      {
+        "abilityId": 19,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 50,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 14,
+    "abilities": [
+      {
+        "abilityId": 61,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 15,
+    "abilities": [
+      {
+        "abilityId": 68,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 97,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 16,
+    "abilities": [
+      {
+        "abilityId": 51,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 77,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 145,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 17,
+    "abilities": [
+      {
+        "abilityId": 51,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 77,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 145,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 18,
+    "abilities": [
+      {
+        "abilityId": 51,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 77,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 145,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 19,
+    "abilities": [
+      {
+        "abilityId": 50,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 62,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 55,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 20,
+    "abilities": [
+      {
+        "abilityId": 50,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 62,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 55,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 21,
+    "abilities": [
+      {
+        "abilityId": 51,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 97,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 22,
+    "abilities": [
+      {
+        "abilityId": 51,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 97,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 23,
+    "abilities": [
+      {
+        "abilityId": 22,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 61,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 127,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 24,
+    "abilities": [
+      {
+        "abilityId": 22,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 61,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 127,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 25,
+    "abilities": [
+      {
+        "abilityId": 9,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 31,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 26,
+    "abilities": [
+      {
+        "abilityId": 9,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 31,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 27,
+    "abilities": [
+      {
+        "abilityId": 8,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 146,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 28,
+    "abilities": [
+      {
+        "abilityId": 8,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 146,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 29,
+    "abilities": [
+      {
+        "abilityId": 38,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 79,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 55,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 30,
+    "abilities": [
+      {
+        "abilityId": 38,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 79,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 55,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 31,
+    "abilities": [
+      {
+        "abilityId": 38,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 79,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 125,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 32,
+    "abilities": [
+      {
+        "abilityId": 38,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 79,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 55,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 33,
+    "abilities": [
+      {
+        "abilityId": 38,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 79,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 55,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 34,
+    "abilities": [
+      {
+        "abilityId": 38,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 79,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 125,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 35,
+    "abilities": [
+      {
+        "abilityId": 56,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 98,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 132,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 36,
+    "abilities": [
+      {
+        "abilityId": 56,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 98,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 109,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 37,
+    "abilities": [
+      {
+        "abilityId": 18,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 70,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 38,
+    "abilities": [
+      {
+        "abilityId": 18,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 70,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 39,
+    "abilities": [
+      {
+        "abilityId": 56,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 172,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 132,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 40,
+    "abilities": [
+      {
+        "abilityId": 56,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 172,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 119,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 41,
+    "abilities": [
+      {
+        "abilityId": 39,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 151,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 42,
+    "abilities": [
+      {
+        "abilityId": 39,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 151,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 43,
+    "abilities": [
+      {
+        "abilityId": 34,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 50,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 44,
+    "abilities": [
+      {
+        "abilityId": 34,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 1,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 45,
+    "abilities": [
+      {
+        "abilityId": 34,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 27,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 46,
+    "abilities": [
+      {
+        "abilityId": 27,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 87,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 6,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 47,
+    "abilities": [
+      {
+        "abilityId": 27,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 87,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 6,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 48,
+    "abilities": [
+      {
+        "abilityId": 14,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 110,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 50,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 49,
+    "abilities": [
+      {
+        "abilityId": 19,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 110,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 147,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 50,
+    "abilities": [
+      {
+        "abilityId": 8,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 71,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 159,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 51,
+    "abilities": [
+      {
+        "abilityId": 8,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 71,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 159,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 52,
+    "abilities": [
+      {
+        "abilityId": 53,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 101,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 127,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 53,
+    "abilities": [
+      {
+        "abilityId": 7,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 101,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 127,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 54,
+    "abilities": [
+      {
+        "abilityId": 6,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 13,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 33,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 55,
+    "abilities": [
+      {
+        "abilityId": 6,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 13,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 33,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 56,
+    "abilities": [
+      {
+        "abilityId": 72,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 83,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 128,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 57,
+    "abilities": [
+      {
+        "abilityId": 72,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 83,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 128,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 58,
+    "abilities": [
+      {
+        "abilityId": 22,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 18,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 154,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 59,
+    "abilities": [
+      {
+        "abilityId": 22,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 18,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 154,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 60,
+    "abilities": [
+      {
+        "abilityId": 11,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 6,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 33,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 61,
+    "abilities": [
+      {
+        "abilityId": 11,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 6,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 33,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 62,
+    "abilities": [
+      {
+        "abilityId": 11,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 6,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 33,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 63,
+    "abilities": [
+      {
+        "abilityId": 28,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 39,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 98,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 64,
+    "abilities": [
+      {
+        "abilityId": 28,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 39,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 98,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 65,
+    "abilities": [
+      {
+        "abilityId": 28,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 39,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 98,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 66,
+    "abilities": [
+      {
+        "abilityId": 62,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 99,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 80,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 67,
+    "abilities": [
+      {
+        "abilityId": 62,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 99,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 80,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 68,
+    "abilities": [
+      {
+        "abilityId": 62,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 99,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 80,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 69,
+    "abilities": [
+      {
+        "abilityId": 34,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 82,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 70,
+    "abilities": [
+      {
+        "abilityId": 34,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 82,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 71,
+    "abilities": [
+      {
+        "abilityId": 34,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 82,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 72,
+    "abilities": [
+      {
+        "abilityId": 29,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 64,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 44,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 73,
+    "abilities": [
+      {
+        "abilityId": 29,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 64,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 44,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 74,
+    "abilities": [
+      {
+        "abilityId": 69,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 5,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 8,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 75,
+    "abilities": [
+      {
+        "abilityId": 69,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 5,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 8,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 76,
+    "abilities": [
+      {
+        "abilityId": 69,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 5,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 8,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 77,
+    "abilities": [
+      {
+        "abilityId": 50,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 18,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 49,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 78,
+    "abilities": [
+      {
+        "abilityId": 50,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 18,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 49,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 79,
+    "abilities": [
+      {
+        "abilityId": 12,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 20,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 144,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 80,
+    "abilities": [
+      {
+        "abilityId": 12,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 20,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 144,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 81,
+    "abilities": [
+      {
+        "abilityId": 42,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 5,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 148,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 82,
+    "abilities": [
+      {
+        "abilityId": 42,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 5,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 148,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 83,
+    "abilities": [
+      {
+        "abilityId": 51,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 39,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 128,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 84,
+    "abilities": [
+      {
+        "abilityId": 50,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 48,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 77,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 85,
+    "abilities": [
+      {
+        "abilityId": 50,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 48,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 77,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 86,
+    "abilities": [
+      {
+        "abilityId": 47,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 93,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 115,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 87,
+    "abilities": [
+      {
+        "abilityId": 47,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 93,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 115,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 88,
+    "abilities": [
+      {
+        "abilityId": 1,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 60,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 143,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 89,
+    "abilities": [
+      {
+        "abilityId": 1,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 60,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 143,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 90,
+    "abilities": [
+      {
+        "abilityId": 75,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 92,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 142,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 91,
+    "abilities": [
+      {
+        "abilityId": 75,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 92,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 142,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 92,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 93,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 94,
+    "abilities": [
+      {
+        "abilityId": 130,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 95,
+    "abilities": [
+      {
+        "abilityId": 69,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 5,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 133,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 96,
+    "abilities": [
+      {
+        "abilityId": 15,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 108,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 39,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 97,
+    "abilities": [
+      {
+        "abilityId": 15,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 108,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 39,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 98,
+    "abilities": [
+      {
+        "abilityId": 52,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 75,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 125,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 99,
+    "abilities": [
+      {
+        "abilityId": 52,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 75,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 125,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 100,
+    "abilities": [
+      {
+        "abilityId": 43,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 9,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 106,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 101,
+    "abilities": [
+      {
+        "abilityId": 43,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 9,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 106,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 102,
+    "abilities": [
+      {
+        "abilityId": 34,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 139,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 103,
+    "abilities": [
+      {
+        "abilityId": 34,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 139,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 104,
+    "abilities": [
+      {
+        "abilityId": 69,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 31,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 4,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 105,
+    "abilities": [
+      {
+        "abilityId": 69,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 31,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 4,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 106,
+    "abilities": [
+      {
+        "abilityId": 7,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 120,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 84,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 107,
+    "abilities": [
+      {
+        "abilityId": 51,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 89,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 39,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 108,
+    "abilities": [
+      {
+        "abilityId": 20,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 12,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 13,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 109,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 256,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 1,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 110,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 256,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 1,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 111,
+    "abilities": [
+      {
+        "abilityId": 31,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 69,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 120,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 112,
+    "abilities": [
+      {
+        "abilityId": 31,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 69,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 120,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 113,
+    "abilities": [
+      {
+        "abilityId": 30,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 32,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 131,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 114,
+    "abilities": [
+      {
+        "abilityId": 34,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 102,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 144,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 115,
+    "abilities": [
+      {
+        "abilityId": 48,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 113,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 39,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 116,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 97,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 6,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 117,
+    "abilities": [
+      {
+        "abilityId": 38,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 97,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 6,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 118,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 41,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 31,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 119,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 41,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 31,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 120,
+    "abilities": [
+      {
+        "abilityId": 35,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 30,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 148,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 121,
+    "abilities": [
+      {
+        "abilityId": 35,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 30,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 148,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 122,
+    "abilities": [
+      {
+        "abilityId": 43,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 111,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 101,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 123,
+    "abilities": [
+      {
+        "abilityId": 68,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 101,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 80,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 124,
+    "abilities": [
+      {
+        "abilityId": 12,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 108,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 87,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 125,
+    "abilities": [
+      {
+        "abilityId": 9,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 72,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 126,
+    "abilities": [
+      {
+        "abilityId": 49,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 72,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 127,
+    "abilities": [
+      {
+        "abilityId": 52,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 104,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 153,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 128,
+    "abilities": [
+      {
+        "abilityId": 22,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 83,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 125,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 129,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 155,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 130,
+    "abilities": [
+      {
+        "abilityId": 22,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 153,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 131,
+    "abilities": [
+      {
+        "abilityId": 11,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 75,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 93,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 132,
+    "abilities": [
+      {
+        "abilityId": 7,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 150,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 133,
+    "abilities": [
+      {
+        "abilityId": 50,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 91,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 107,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 134,
+    "abilities": [
+      {
+        "abilityId": 11,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 93,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 135,
+    "abilities": [
+      {
+        "abilityId": 10,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 95,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 136,
+    "abilities": [
+      {
+        "abilityId": 18,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 62,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 137,
+    "abilities": [
+      {
+        "abilityId": 36,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 88,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 148,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 138,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 75,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 133,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 139,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 75,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 133,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 140,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 4,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 133,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 141,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 4,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 133,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 142,
+    "abilities": [
+      {
+        "abilityId": 69,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 46,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 127,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 143,
+    "abilities": [
+      {
+        "abilityId": 17,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 47,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 82,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 144,
+    "abilities": [
+      {
+        "abilityId": 46,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 81,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 145,
+    "abilities": [
+      {
+        "abilityId": 46,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 9,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 146,
+    "abilities": [
+      {
+        "abilityId": 46,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 49,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 147,
+    "abilities": [
+      {
+        "abilityId": 61,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 63,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 148,
+    "abilities": [
+      {
+        "abilityId": 61,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 63,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 149,
+    "abilities": [
+      {
+        "abilityId": 39,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 136,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 150,
+    "abilities": [
+      {
+        "abilityId": 46,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 127,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 151,
+    "abilities": [
+      {
+        "abilityId": 28,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 152,
+    "abilities": [
+      {
+        "abilityId": 65,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 102,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 153,
+    "abilities": [
+      {
+        "abilityId": 65,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 102,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 154,
+    "abilities": [
+      {
+        "abilityId": 65,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 102,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 155,
+    "abilities": [
+      {
+        "abilityId": 66,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 18,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 156,
+    "abilities": [
+      {
+        "abilityId": 66,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 18,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 157,
+    "abilities": [
+      {
+        "abilityId": 66,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 18,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 158,
+    "abilities": [
+      {
+        "abilityId": 67,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 125,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 159,
+    "abilities": [
+      {
+        "abilityId": 67,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 125,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 160,
+    "abilities": [
+      {
+        "abilityId": 67,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 125,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 161,
+    "abilities": [
+      {
+        "abilityId": 50,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 51,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 119,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 162,
+    "abilities": [
+      {
+        "abilityId": 50,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 51,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 119,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 163,
+    "abilities": [
+      {
+        "abilityId": 15,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 51,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 110,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 164,
+    "abilities": [
+      {
+        "abilityId": 15,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 51,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 110,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 165,
+    "abilities": [
+      {
+        "abilityId": 68,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 48,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 155,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 166,
+    "abilities": [
+      {
+        "abilityId": 68,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 48,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 89,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 167,
+    "abilities": [
+      {
+        "abilityId": 68,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 15,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 97,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 168,
+    "abilities": [
+      {
+        "abilityId": 68,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 15,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 97,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 169,
+    "abilities": [
+      {
+        "abilityId": 39,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 151,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 170,
+    "abilities": [
+      {
+        "abilityId": 10,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 35,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 11,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 171,
+    "abilities": [
+      {
+        "abilityId": 10,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 35,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 11,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 172,
+    "abilities": [
+      {
+        "abilityId": 9,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 31,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 173,
+    "abilities": [
+      {
+        "abilityId": 56,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 98,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 132,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 174,
+    "abilities": [
+      {
+        "abilityId": 56,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 172,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 132,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 175,
+    "abilities": [
+      {
+        "abilityId": 55,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 32,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 105,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 176,
+    "abilities": [
+      {
+        "abilityId": 55,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 32,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 105,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 177,
+    "abilities": [
+      {
+        "abilityId": 28,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 48,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 156,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 178,
+    "abilities": [
+      {
+        "abilityId": 28,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 48,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 156,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 179,
+    "abilities": [
+      {
+        "abilityId": 9,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 57,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 180,
+    "abilities": [
+      {
+        "abilityId": 9,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 57,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 181,
+    "abilities": [
+      {
+        "abilityId": 9,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 57,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 182,
+    "abilities": [
+      {
+        "abilityId": 34,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 131,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 183,
+    "abilities": [
+      {
+        "abilityId": 47,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 37,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 157,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 184,
+    "abilities": [
+      {
+        "abilityId": 47,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 37,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 157,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 185,
+    "abilities": [
+      {
+        "abilityId": 5,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 69,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 155,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 186,
+    "abilities": [
+      {
+        "abilityId": 11,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 6,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 2,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 187,
+    "abilities": [
+      {
+        "abilityId": 34,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 102,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 151,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 188,
+    "abilities": [
+      {
+        "abilityId": 34,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 102,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 151,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 189,
+    "abilities": [
+      {
+        "abilityId": 34,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 102,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 151,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 190,
+    "abilities": [
+      {
+        "abilityId": 50,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 53,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 92,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 191,
+    "abilities": [
+      {
+        "abilityId": 34,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 94,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 48,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 192,
+    "abilities": [
+      {
+        "abilityId": 34,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 94,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 48,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 193,
+    "abilities": [
+      {
+        "abilityId": 3,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 14,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 119,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 194,
+    "abilities": [
+      {
+        "abilityId": 6,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 11,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 109,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 195,
+    "abilities": [
+      {
+        "abilityId": 6,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 11,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 109,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 196,
+    "abilities": [
+      {
+        "abilityId": 28,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 156,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 197,
+    "abilities": [
+      {
+        "abilityId": 28,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 39,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 198,
+    "abilities": [
+      {
+        "abilityId": 15,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 105,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 158,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 199,
+    "abilities": [
+      {
+        "abilityId": 12,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 20,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 144,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 200,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 201,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 202,
+    "abilities": [
+      {
+        "abilityId": 23,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 140,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 203,
+    "abilities": [
+      {
+        "abilityId": 39,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 48,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 157,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 204,
+    "abilities": [
+      {
+        "abilityId": 5,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 142,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 205,
+    "abilities": [
+      {
+        "abilityId": 5,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 142,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 206,
+    "abilities": [
+      {
+        "abilityId": 32,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 50,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 155,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 207,
+    "abilities": [
+      {
+        "abilityId": 52,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 8,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 17,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 208,
+    "abilities": [
+      {
+        "abilityId": 69,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 5,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 125,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 209,
+    "abilities": [
+      {
+        "abilityId": 22,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 50,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 155,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 210,
+    "abilities": [
+      {
+        "abilityId": 22,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 95,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 155,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 211,
+    "abilities": [
+      {
+        "abilityId": 38,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 33,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 22,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 212,
+    "abilities": [
+      {
+        "abilityId": 68,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 101,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 135,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 213,
+    "abilities": [
+      {
+        "abilityId": 5,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 82,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 126,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 214,
+    "abilities": [
+      {
+        "abilityId": 68,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 62,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 153,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 215,
+    "abilities": [
+      {
+        "abilityId": 39,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 51,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 124,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 216,
+    "abilities": [
+      {
+        "abilityId": 53,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 95,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 118,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 217,
+    "abilities": [
+      {
+        "abilityId": 62,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 95,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 127,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 218,
+    "abilities": [
+      {
+        "abilityId": 40,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 49,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 133,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 219,
+    "abilities": [
+      {
+        "abilityId": 40,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 49,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 133,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 220,
+    "abilities": [
+      {
+        "abilityId": 12,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 81,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 47,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 221,
+    "abilities": [
+      {
+        "abilityId": 12,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 81,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 47,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 222,
+    "abilities": [
+      {
+        "abilityId": 55,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 30,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 144,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 223,
+    "abilities": [
+      {
+        "abilityId": 55,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 97,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 141,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 224,
+    "abilities": [
+      {
+        "abilityId": 21,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 97,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 141,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 225,
+    "abilities": [
+      {
+        "abilityId": 72,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 55,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 15,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 226,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 11,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 41,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 227,
+    "abilities": [
+      {
+        "abilityId": 51,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 5,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 133,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 228,
+    "abilities": [
+      {
+        "abilityId": 48,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 18,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 127,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 229,
+    "abilities": [
+      {
+        "abilityId": 48,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 18,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 127,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 230,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 97,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 6,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 231,
+    "abilities": [
+      {
+        "abilityId": 53,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 8,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 232,
+    "abilities": [
+      {
+        "abilityId": 5,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 8,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 233,
+    "abilities": [
+      {
+        "abilityId": 36,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 88,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 148,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 234,
+    "abilities": [
+      {
+        "abilityId": 22,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 119,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 157,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 235,
+    "abilities": [
+      {
+        "abilityId": 20,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 101,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 141,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 236,
+    "abilities": [
+      {
+        "abilityId": 62,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 80,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 72,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 237,
+    "abilities": [
+      {
+        "abilityId": 22,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 101,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 80,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 238,
+    "abilities": [
+      {
+        "abilityId": 12,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 108,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 93,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 239,
+    "abilities": [
+      {
+        "abilityId": 9,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 72,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 240,
+    "abilities": [
+      {
+        "abilityId": 49,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 72,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 241,
+    "abilities": [
+      {
+        "abilityId": 47,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 113,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 157,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 242,
+    "abilities": [
+      {
+        "abilityId": 30,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 32,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 131,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 243,
+    "abilities": [
+      {
+        "abilityId": 46,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 39,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 244,
+    "abilities": [
+      {
+        "abilityId": 46,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 39,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 245,
+    "abilities": [
+      {
+        "abilityId": 46,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 39,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 246,
+    "abilities": [
+      {
+        "abilityId": 62,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 8,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 247,
+    "abilities": [
+      {
+        "abilityId": 61,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 248,
+    "abilities": [
+      {
+        "abilityId": 45,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 127,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 249,
+    "abilities": [
+      {
+        "abilityId": 46,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 136,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 250,
+    "abilities": [
+      {
+        "abilityId": 46,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 144,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 251,
+    "abilities": [
+      {
+        "abilityId": 30,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 252,
+    "abilities": [
+      {
+        "abilityId": 65,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 84,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 253,
+    "abilities": [
+      {
+        "abilityId": 65,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 84,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 254,
+    "abilities": [
+      {
+        "abilityId": 65,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 84,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 255,
+    "abilities": [
+      {
+        "abilityId": 66,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 3,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 256,
+    "abilities": [
+      {
+        "abilityId": 66,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 3,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 257,
+    "abilities": [
+      {
+        "abilityId": 66,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 3,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 258,
+    "abilities": [
+      {
+        "abilityId": 67,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 6,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 259,
+    "abilities": [
+      {
+        "abilityId": 67,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 6,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 260,
+    "abilities": [
+      {
+        "abilityId": 67,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 6,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 261,
+    "abilities": [
+      {
+        "abilityId": 50,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 95,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 155,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 262,
+    "abilities": [
+      {
+        "abilityId": 22,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 95,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 153,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 263,
+    "abilities": [
+      {
+        "abilityId": 53,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 82,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 95,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 264,
+    "abilities": [
+      {
+        "abilityId": 53,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 82,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 95,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 265,
+    "abilities": [
+      {
+        "abilityId": 19,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 50,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 266,
+    "abilities": [
+      {
+        "abilityId": 61,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 267,
+    "abilities": [
+      {
+        "abilityId": 68,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 79,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 268,
+    "abilities": [
+      {
+        "abilityId": 61,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 269,
+    "abilities": [
+      {
+        "abilityId": 19,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 14,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 270,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 44,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 20,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 271,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 44,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 20,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 272,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 44,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 20,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 273,
+    "abilities": [
+      {
+        "abilityId": 34,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 48,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 124,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 274,
+    "abilities": [
+      {
+        "abilityId": 34,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 48,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 124,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 275,
+    "abilities": [
+      {
+        "abilityId": 34,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 274,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 124,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 276,
+    "abilities": [
+      {
+        "abilityId": 62,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 113,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 277,
+    "abilities": [
+      {
+        "abilityId": 62,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 113,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 278,
+    "abilities": [
+      {
+        "abilityId": 51,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 93,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 44,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 279,
+    "abilities": [
+      {
+        "abilityId": 51,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 2,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 44,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 280,
+    "abilities": [
+      {
+        "abilityId": 28,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 36,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 140,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 281,
+    "abilities": [
+      {
+        "abilityId": 28,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 36,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 140,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 282,
+    "abilities": [
+      {
+        "abilityId": 28,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 36,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 140,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 283,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 44,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 284,
+    "abilities": [
+      {
+        "abilityId": 22,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 127,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 285,
+    "abilities": [
+      {
+        "abilityId": 27,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 90,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 95,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 286,
+    "abilities": [
+      {
+        "abilityId": 27,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 90,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 101,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 287,
+    "abilities": [
+      {
+        "abilityId": 54,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 288,
+    "abilities": [
+      {
+        "abilityId": 72,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 289,
+    "abilities": [
+      {
+        "abilityId": 54,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 290,
+    "abilities": [
+      {
+        "abilityId": 14,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 50,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 291,
+    "abilities": [
+      {
+        "abilityId": 3,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 151,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 292,
+    "abilities": [
+      {
+        "abilityId": 25,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 293,
+    "abilities": [
+      {
+        "abilityId": 43,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 155,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 294,
+    "abilities": [
+      {
+        "abilityId": 43,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 113,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 295,
+    "abilities": [
+      {
+        "abilityId": 43,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 113,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 296,
+    "abilities": [
+      {
+        "abilityId": 47,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 62,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 125,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 297,
+    "abilities": [
+      {
+        "abilityId": 47,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 62,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 125,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 298,
+    "abilities": [
+      {
+        "abilityId": 47,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 37,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 157,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 299,
+    "abilities": [
+      {
+        "abilityId": 5,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 42,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 159,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 300,
+    "abilities": [
+      {
+        "abilityId": 56,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 96,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 147,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 301,
+    "abilities": [
+      {
+        "abilityId": 56,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 96,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 147,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 302,
+    "abilities": [
+      {
+        "abilityId": 51,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 100,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 158,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 303,
+    "abilities": [
+      {
+        "abilityId": 52,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 22,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 125,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 304,
+    "abilities": [
+      {
+        "abilityId": 5,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 69,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 134,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 305,
+    "abilities": [
+      {
+        "abilityId": 5,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 69,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 134,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 306,
+    "abilities": [
+      {
+        "abilityId": 5,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 69,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 134,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 307,
+    "abilities": [
+      {
+        "abilityId": 74,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 140,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 308,
+    "abilities": [
+      {
+        "abilityId": 74,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 140,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 309,
+    "abilities": [
+      {
+        "abilityId": 9,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 31,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 58,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 310,
+    "abilities": [
+      {
+        "abilityId": 9,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 31,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 58,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 311,
+    "abilities": [
+      {
+        "abilityId": 57,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 31,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 312,
+    "abilities": [
+      {
+        "abilityId": 58,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 10,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 313,
+    "abilities": [
+      {
+        "abilityId": 35,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 68,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 158,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 314,
+    "abilities": [
+      {
+        "abilityId": 12,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 110,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 158,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 315,
+    "abilities": [
+      {
+        "abilityId": 30,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 38,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 102,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 316,
+    "abilities": [
+      {
+        "abilityId": 64,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 60,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 82,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 317,
+    "abilities": [
+      {
+        "abilityId": 64,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 60,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 82,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 318,
+    "abilities": [
+      {
+        "abilityId": 24,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 3,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 319,
+    "abilities": [
+      {
+        "abilityId": 24,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 3,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 320,
+    "abilities": [
+      {
+        "abilityId": 41,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 12,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 46,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 321,
+    "abilities": [
+      {
+        "abilityId": 41,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 12,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 46,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 322,
+    "abilities": [
+      {
+        "abilityId": 12,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 86,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 20,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 323,
+    "abilities": [
+      {
+        "abilityId": 40,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 116,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 83,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 324,
+    "abilities": [
+      {
+        "abilityId": 73,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 70,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 75,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 325,
+    "abilities": [
+      {
+        "abilityId": 47,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 20,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 82,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 326,
+    "abilities": [
+      {
+        "abilityId": 47,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 20,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 82,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 327,
+    "abilities": [
+      {
+        "abilityId": 20,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 77,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 126,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 328,
+    "abilities": [
+      {
+        "abilityId": 52,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 71,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 125,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 329,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 330,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 331,
+    "abilities": [
+      {
+        "abilityId": 8,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 11,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 332,
+    "abilities": [
+      {
+        "abilityId": 8,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 11,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 333,
+    "abilities": [
+      {
+        "abilityId": 30,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 13,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 334,
+    "abilities": [
+      {
+        "abilityId": 30,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 13,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 335,
+    "abilities": [
+      {
+        "abilityId": 17,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 137,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 336,
+    "abilities": [
+      {
+        "abilityId": 61,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 151,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 337,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 338,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 339,
+    "abilities": [
+      {
+        "abilityId": 12,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 107,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 93,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 340,
+    "abilities": [
+      {
+        "abilityId": 12,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 107,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 93,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 341,
+    "abilities": [
+      {
+        "abilityId": 52,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 75,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 91,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 342,
+    "abilities": [
+      {
+        "abilityId": 52,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 75,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 91,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 343,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 344,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 345,
+    "abilities": [
+      {
+        "abilityId": 21,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 114,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 346,
+    "abilities": [
+      {
+        "abilityId": 21,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 114,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 347,
+    "abilities": [
+      {
+        "abilityId": 4,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 33,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 348,
+    "abilities": [
+      {
+        "abilityId": 4,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 33,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 349,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 12,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 91,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 350,
+    "abilities": [
+      {
+        "abilityId": 63,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 172,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 56,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 351,
+    "abilities": [
+      {
+        "abilityId": 59,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 352,
+    "abilities": [
+      {
+        "abilityId": 16,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 168,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 353,
+    "abilities": [
+      {
+        "abilityId": 15,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 119,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 130,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 354,
+    "abilities": [
+      {
+        "abilityId": 15,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 119,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 130,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 355,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 119,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 356,
+    "abilities": [
+      {
+        "abilityId": 46,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 119,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 357,
+    "abilities": [
+      {
+        "abilityId": 34,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 94,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 139,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 358,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 359,
+    "abilities": [
+      {
+        "abilityId": 46,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 105,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 154,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 360,
+    "abilities": [
+      {
+        "abilityId": 23,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 140,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 361,
+    "abilities": [
+      {
+        "abilityId": 39,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 115,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 141,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 362,
+    "abilities": [
+      {
+        "abilityId": 39,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 115,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 141,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 363,
+    "abilities": [
+      {
+        "abilityId": 47,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 115,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 12,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 364,
+    "abilities": [
+      {
+        "abilityId": 47,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 115,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 12,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 365,
+    "abilities": [
+      {
+        "abilityId": 47,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 115,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 12,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 366,
+    "abilities": [
+      {
+        "abilityId": 75,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 155,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 367,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 41,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 368,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 93,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 369,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 69,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 5,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 370,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 93,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 371,
+    "abilities": [
+      {
+        "abilityId": 69,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 125,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 372,
+    "abilities": [
+      {
+        "abilityId": 69,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 142,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 373,
+    "abilities": [
+      {
+        "abilityId": 22,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 153,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 374,
+    "abilities": [
+      {
+        "abilityId": 29,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 135,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 375,
+    "abilities": [
+      {
+        "abilityId": 29,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 135,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 376,
+    "abilities": [
+      {
+        "abilityId": 29,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 135,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 377,
+    "abilities": [
+      {
+        "abilityId": 29,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 5,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 378,
+    "abilities": [
+      {
+        "abilityId": 29,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 115,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 379,
+    "abilities": [
+      {
+        "abilityId": 29,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 135,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 380,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 381,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 382,
+    "abilities": [
+      {
+        "abilityId": 2,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 383,
+    "abilities": [
+      {
+        "abilityId": 70,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 384,
+    "abilities": [
+      {
+        "abilityId": 76,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 385,
+    "abilities": [
+      {
+        "abilityId": 32,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 386,
+    "abilities": [
+      {
+        "abilityId": 46,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 387,
+    "abilities": [
+      {
+        "abilityId": 65,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 75,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 388,
+    "abilities": [
+      {
+        "abilityId": 65,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 75,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 389,
+    "abilities": [
+      {
+        "abilityId": 65,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 75,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 390,
+    "abilities": [
+      {
+        "abilityId": 66,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 89,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 391,
+    "abilities": [
+      {
+        "abilityId": 66,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 89,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 392,
+    "abilities": [
+      {
+        "abilityId": 66,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 89,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 393,
+    "abilities": [
+      {
+        "abilityId": 67,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 172,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 394,
+    "abilities": [
+      {
+        "abilityId": 67,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 172,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 395,
+    "abilities": [
+      {
+        "abilityId": 67,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 172,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 396,
+    "abilities": [
+      {
+        "abilityId": 51,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 120,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 397,
+    "abilities": [
+      {
+        "abilityId": 22,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 120,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 398,
+    "abilities": [
+      {
+        "abilityId": 22,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 120,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 399,
+    "abilities": [
+      {
+        "abilityId": 86,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 109,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 141,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 400,
+    "abilities": [
+      {
+        "abilityId": 86,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 109,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 141,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 401,
+    "abilities": [
+      {
+        "abilityId": 61,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 50,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 402,
+    "abilities": [
+      {
+        "abilityId": 68,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 101,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 403,
+    "abilities": [
+      {
+        "abilityId": 79,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 22,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 62,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 404,
+    "abilities": [
+      {
+        "abilityId": 79,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 22,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 62,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 405,
+    "abilities": [
+      {
+        "abilityId": 79,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 22,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 62,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 406,
+    "abilities": [
+      {
+        "abilityId": 30,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 38,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 102,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 407,
+    "abilities": [
+      {
+        "abilityId": 30,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 38,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 101,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 408,
+    "abilities": [
+      {
+        "abilityId": 104,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 125,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 409,
+    "abilities": [
+      {
+        "abilityId": 104,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 125,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 410,
+    "abilities": [
+      {
+        "abilityId": 5,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 43,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 411,
+    "abilities": [
+      {
+        "abilityId": 5,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 43,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 412,
+    "abilities": [
+      {
+        "abilityId": 61,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 142,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 413,
+    "abilities": [
+      {
+        "abilityId": 107,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 142,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 414,
+    "abilities": [
+      {
+        "abilityId": 68,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 110,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 415,
+    "abilities": [
+      {
+        "abilityId": 118,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 55,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 416,
+    "abilities": [
+      {
+        "abilityId": 46,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 127,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 417,
+    "abilities": [
+      {
+        "abilityId": 50,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 53,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 10,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 418,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 41,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 419,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 41,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 420,
+    "abilities": [
+      {
+        "abilityId": 34,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 421,
+    "abilities": [
+      {
+        "abilityId": 122,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 422,
+    "abilities": [
+      {
+        "abilityId": 60,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 114,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 159,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 423,
+    "abilities": [
+      {
+        "abilityId": 60,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 114,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 159,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 424,
+    "abilities": [
+      {
+        "abilityId": 101,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 53,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 92,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 425,
+    "abilities": [
+      {
+        "abilityId": 106,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 84,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 138,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 426,
+    "abilities": [
+      {
+        "abilityId": 106,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 84,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 138,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 427,
+    "abilities": [
+      {
+        "abilityId": 50,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 103,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 7,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 428,
+    "abilities": [
+      {
+        "abilityId": 56,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 103,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 7,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 429,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 430,
+    "abilities": [
+      {
+        "abilityId": 15,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 105,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 153,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 431,
+    "abilities": [
+      {
+        "abilityId": 7,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 20,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 51,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 432,
+    "abilities": [
+      {
+        "abilityId": 47,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 20,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 128,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 433,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 434,
+    "abilities": [
+      {
+        "abilityId": 1,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 106,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 51,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 435,
+    "abilities": [
+      {
+        "abilityId": 1,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 106,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 51,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 436,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 85,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 134,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 437,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 85,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 134,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 438,
+    "abilities": [
+      {
+        "abilityId": 5,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 69,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 155,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 439,
+    "abilities": [
+      {
+        "abilityId": 43,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 111,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 101,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 440,
+    "abilities": [
+      {
+        "abilityId": 30,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 32,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 132,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 441,
+    "abilities": [
+      {
+        "abilityId": 51,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 77,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 145,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 442,
+    "abilities": [
+      {
+        "abilityId": 46,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 151,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 443,
+    "abilities": [
+      {
+        "abilityId": 8,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 24,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 444,
+    "abilities": [
+      {
+        "abilityId": 8,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 24,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 445,
+    "abilities": [
+      {
+        "abilityId": 8,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 24,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 446,
+    "abilities": [
+      {
+        "abilityId": 53,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 47,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 82,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 447,
+    "abilities": [
+      {
+        "abilityId": 80,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 39,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 158,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 448,
+    "abilities": [
+      {
+        "abilityId": 80,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 39,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 154,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 449,
+    "abilities": [
+      {
+        "abilityId": 45,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 159,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 450,
+    "abilities": [
+      {
+        "abilityId": 45,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 159,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 451,
+    "abilities": [
+      {
+        "abilityId": 4,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 97,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 51,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 452,
+    "abilities": [
+      {
+        "abilityId": 4,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 97,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 51,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 453,
+    "abilities": [
+      {
+        "abilityId": 107,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 87,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 143,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 454,
+    "abilities": [
+      {
+        "abilityId": 107,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 87,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 143,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 455,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 456,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 114,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 41,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 457,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 114,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 41,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 458,
+    "abilities": [
+      {
+        "abilityId": 33,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 11,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 41,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 459,
+    "abilities": [
+      {
+        "abilityId": 117,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 43,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 460,
+    "abilities": [
+      {
+        "abilityId": 117,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 43,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 461,
+    "abilities": [
+      {
+        "abilityId": 46,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 124,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 462,
+    "abilities": [
+      {
+        "abilityId": 42,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 5,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 148,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 463,
+    "abilities": [
+      {
+        "abilityId": 20,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 12,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 13,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 464,
+    "abilities": [
+      {
+        "abilityId": 31,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 116,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 120,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 465,
+    "abilities": [
+      {
+        "abilityId": 34,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 102,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 144,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 466,
+    "abilities": [
+      {
+        "abilityId": 78,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 72,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 467,
+    "abilities": [
+      {
+        "abilityId": 49,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 72,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 468,
+    "abilities": [
+      {
+        "abilityId": 55,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 32,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 105,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 469,
+    "abilities": [
+      {
+        "abilityId": 3,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 110,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 119,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 470,
+    "abilities": [
+      {
+        "abilityId": 102,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 34,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 471,
+    "abilities": [
+      {
+        "abilityId": 81,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 115,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 472,
+    "abilities": [
+      {
+        "abilityId": 52,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 8,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 90,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 473,
+    "abilities": [
+      {
+        "abilityId": 12,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 81,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 47,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 474,
+    "abilities": [
+      {
+        "abilityId": 91,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 88,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 148,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 475,
+    "abilities": [
+      {
+        "abilityId": 80,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 292,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 154,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 476,
+    "abilities": [
+      {
+        "abilityId": 5,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 42,
+        "slot": 2,
+        "isHidden": false
+      },
+      {
+        "abilityId": 159,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 477,
+    "abilities": [
+      {
+        "abilityId": 46,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 119,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 478,
+    "abilities": [
+      {
+        "abilityId": 81,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 130,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 479,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 480,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 481,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 482,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 483,
+    "abilities": [
+      {
+        "abilityId": 46,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 140,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 484,
+    "abilities": [
+      {
+        "abilityId": 46,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 140,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 485,
+    "abilities": [
+      {
+        "abilityId": 18,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 49,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 486,
+    "abilities": [
+      {
+        "abilityId": 112,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 487,
+    "abilities": [
+      {
+        "abilityId": 46,
+        "slot": 1,
+        "isHidden": false
+      },
+      {
+        "abilityId": 140,
+        "slot": 3,
+        "isHidden": true
+      }
+    ]
+  },
+  {
+    "speciesId": 488,
+    "abilities": [
+      {
+        "abilityId": 26,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 489,
+    "abilities": [
+      {
+        "abilityId": 93,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 490,
+    "abilities": [
+      {
+        "abilityId": 93,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 491,
+    "abilities": [
+      {
+        "abilityId": 123,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 492,
+    "abilities": [
+      {
+        "abilityId": 30,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  },
+  {
+    "speciesId": 493,
+    "abilities": [
+      {
+        "abilityId": 121,
+        "slot": 1,
+        "isHidden": false
+      }
+    ]
+  }
+]
