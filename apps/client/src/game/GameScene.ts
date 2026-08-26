@@ -2,22 +2,27 @@ import Phaser from "phaser";
 
 import { isChatMessageInput, DEFAULT_MAP_ID } from "@cesar-mmo/shared";
 
+// assets
 import {
   NPC_ASSETS,
   NPC_FRAME_HEIGHT,
   NPC_FRAME_WIDTH,
   getNpcTextureKey,
 } from "./config/npcAssets";
-
 import {
   PLAYER_AVATARS,
   PLAYER_DIRECTIONS,
   getPlayerTextureKey,
   getPlayerAnimationKey,
 } from "./config/playerAssets";
+import { POKEMON_STARTER_ASSETS } from "./pokemon/pokemon-starter-assets";
 
+// ui components
 import { ChatBox } from "./ui/ChatBox";
 import { DialogueBox } from "./ui/DialogueBox";
+import { StarterSelectionPanel } from "./ui/StarterSelectionPanel";
+
+// helpers
 import { getDialogue } from "./dialogue/dialogues";
 import { MAP_REGISTRY } from "./maps/mapRegistry";
 
@@ -29,7 +34,11 @@ import { RemotePlayerManager } from "./player/RemotePlayerManager";
 import { LocalPlayerController } from "./player/LocalPlayerController";
 import { MapTransitionController } from "./maps/MapTransitionController";
 import { MovementInputController } from "./player/MovementInputController";
-import type { NpcDirection, NpcInstance, NpcInteractionType } from "./npc/types";
+import type {
+  NpcDirection,
+  NpcInstance,
+  NpcInteractionType,
+} from "./npc/types";
 
 // types
 import type {
@@ -66,6 +75,8 @@ export class GameScene extends Phaser.Scene {
   private dialogueBox!: DialogueBox;
 
   private chatBox!: ChatBox;
+
+  private starterSelectionPanel!: StarterSelectionPanel;
 
   // managers
   private npcManager!: NpcManager;
@@ -105,13 +116,18 @@ export class GameScene extends Phaser.Scene {
           {
             frameWidth: 24,
             frameHeight: 24,
-          }
+          },
         );
       });
     });
 
     // NPCs
     this.preloadNpcSprites();
+
+    // Pokemon Starter Assets
+    Object.values(POKEMON_STARTER_ASSETS).forEach((asset) => {
+      this.load.image(asset.textureKey, asset.path);
+    });
   }
 
   create() {
@@ -120,21 +136,24 @@ export class GameScene extends Phaser.Scene {
 
     this.createPlayerAnimations();
     this.createPlayer();
-    this.localPlayerController = new LocalPlayerController(this.player, this.avatarId);
+    this.localPlayerController = new LocalPlayerController(
+      this.player,
+      this.avatarId,
+    );
 
     this.mapTransitionController = new MapTransitionController(
       this,
       (transitionId) => this.requestMapTransition(transitionId),
       (transition) => this.handleMapTransitionResolved(transition),
-      () => this.localPlayerController.setIdle()
+      () => this.localPlayerController.setIdle(),
     );
     this.mapTransitionController.loadZones(this.mapManager.map);
 
     this.remotePlayerManager = new RemotePlayerManager(this, (displayName) =>
-      this.createPlayerNameLabel(displayName)
+      this.createPlayerNameLabel(displayName),
     );
     this.npcManager = new NpcManager(this, (displayName) =>
-      this.createPlayerNameLabel(displayName)
+      this.createPlayerNameLabel(displayName),
     );
 
     this.npcManager.create(this.mapManager.map);
@@ -142,6 +161,7 @@ export class GameScene extends Phaser.Scene {
     this.setupCamera();
     this.createDialogueUi();
     this.createChatUi();
+    this.createStarterSelectionUi();
     this.createControls();
     this.connectToServer();
 
@@ -159,7 +179,7 @@ export class GameScene extends Phaser.Scene {
     this.handleNpcInteraction();
 
     const input = this.movementInputController.getCurrentInput(
-      this.isMovementInputBlocked()
+      this.isMovementInputBlocked(),
     );
     this.localPlayerController.updateAnimation(input);
     this.sendInputIfChanged(input);
@@ -167,7 +187,7 @@ export class GameScene extends Phaser.Scene {
       input,
       delta,
       this.currentMapId,
-      this.isMapTransitioning
+      this.isMapTransitioning,
     );
 
     this.localPlayerController.reconcile(delta);
@@ -185,6 +205,14 @@ export class GameScene extends Phaser.Scene {
     this.chatBox = new ChatBox(this, (text) => this.sendChatMessage(text));
   }
 
+  private createStarterSelectionUi(): void {
+    this.starterSelectionPanel = new StarterSelectionPanel(this, {
+      onSelect: (starterId) => {
+        this.network.chooseStarter(starterId);
+      },
+    });
+  }
+
   private createPlayer() {
     const spawn = this.mapManager.getPlayerSpawn();
 
@@ -192,7 +220,7 @@ export class GameScene extends Phaser.Scene {
       spawn.x,
       spawn.y,
       getPlayerTextureKey(this.avatarId, "down"),
-      0
+      0,
     );
 
     this.player.setDepth(5);
@@ -204,7 +232,7 @@ export class GameScene extends Phaser.Scene {
     this.nearbyNpc = this.npcManager.findNearby(
       this.player.x,
       this.player.y,
-      this.npcInteractionDistance
+      this.npcInteractionDistance,
     );
 
     if (previousNpc?.definition.id !== this.nearbyNpc?.definition.id) {
@@ -253,7 +281,7 @@ export class GameScene extends Phaser.Scene {
     fromY: number,
     targetX: number,
     targetY: number,
-    fallback: NpcDirection
+    fallback: NpcDirection,
   ): NpcDirection {
     const deltaX = targetX - fromX;
     const deltaY = targetY - fromY;
@@ -274,21 +302,24 @@ export class GameScene extends Phaser.Scene {
       this.player.y,
       npc.sprite.x,
       npc.sprite.y,
-      this.localPlayerController.direction
+      this.localPlayerController.direction,
     );
     const npcDirection = this.getFacingDirection(
       npc.sprite.x,
       npc.sprite.y,
       this.player.x,
       this.player.y,
-      npc.definition.direction
+      npc.definition.direction,
     );
 
     this.localPlayerController.setDirection(playerDirection);
     this.localPlayerController.setIdle();
 
     npc.sprite.anims.stop();
-    npc.sprite.setTexture(getNpcTextureKey(npc.definition.sprite, npcDirection), 0);
+    npc.sprite.setTexture(
+      getNpcTextureKey(npc.definition.sprite, npcDirection),
+      0,
+    );
   }
 
   private restoreActiveDialogueNpcDirection(): void {
@@ -299,7 +330,7 @@ export class GameScene extends Phaser.Scene {
     npc.sprite.anims.stop();
     npc.sprite.setTexture(
       getNpcTextureKey(npc.definition.sprite, npc.definition.direction),
-      0
+      0,
     );
 
     this.activeDialogueNpc = undefined;
@@ -323,10 +354,14 @@ export class GameScene extends Phaser.Scene {
       for (const direction of definition.directions) {
         const textureKey = getNpcTextureKey(spriteId, direction);
 
-        this.load.spritesheet(textureKey, `${definition.folder}/walk-${direction}.png`, {
-          frameWidth: NPC_FRAME_WIDTH,
-          frameHeight: NPC_FRAME_HEIGHT,
-        });
+        this.load.spritesheet(
+          textureKey,
+          `${definition.folder}/walk-${direction}.png`,
+          {
+            frameWidth: NPC_FRAME_WIDTH,
+            frameHeight: NPC_FRAME_HEIGHT,
+          },
+        );
       }
     }
   }
@@ -361,16 +396,24 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.network.onPokemonTrainerState((payload) => {
-      const pokemon = payload.trainerState.party.pokemon[0];
+      const party = payload.trainerState.party.pokemon;
+      const pokemon = party[0];
 
-      console.log("[Pokemon 6.5]", {
-        partySize: payload.trainerState.party.pokemon.length,
+      console.log("[Pokemon Starter]", {
+        partySize: party.length,
         instanceId: pokemon?.instanceId,
         speciesId: pokemon?.speciesId,
         level: pokemon?.level,
-        abilityId: pokemon?.abilityId,
-        moves: pokemon?.moves,
       });
+
+      if (party.length === 0) {
+        this.starterSelectionPanel.setSelectionPending(false);
+        this.starterSelectionPanel.show();
+        return;
+      }
+
+      this.starterSelectionPanel.setSelectionPending(false);
+      this.starterSelectionPanel.hide();
     });
 
     this.network.onCurrentPlayers((players) => {
@@ -421,7 +464,10 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.network.onTransitionResolved((transition) => {
-      this.mapTransitionController.handleResolved(transition, this.currentMapId);
+      this.mapTransitionController.handleResolved(
+        transition,
+        this.currentMapId,
+      );
     });
 
     this.network.onPlayerDisconnected((playerId) => {
@@ -454,7 +500,7 @@ export class GameScene extends Phaser.Scene {
 
     this.playerNameLabel.setPosition(
       Math.round(this.player.x),
-      Math.round(this.player.y - 14)
+      Math.round(this.player.y - 14),
     );
   }
 
@@ -475,7 +521,7 @@ export class GameScene extends Phaser.Scene {
             {
               start: 0,
               end: 11,
-            }
+            },
           ),
 
           frameRate: 12,
@@ -501,7 +547,7 @@ export class GameScene extends Phaser.Scene {
       -horizontalPadding,
       -verticalPadding,
       mapWidth + horizontalPadding * 2,
-      mapHeight + verticalPadding * 2
+      mapHeight + verticalPadding * 2,
     );
   }
 
@@ -547,7 +593,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     const interactionPrompt = this.getNpcInteractionPromptText(
-      this.nearbyNpc.definition.interactionType
+      this.nearbyNpc.definition.interactionType,
     );
     if (!interactionPrompt) {
       return;
@@ -589,7 +635,9 @@ export class GameScene extends Phaser.Scene {
     }
     const npc = this.nearbyNpc;
 
-    const promptText = this.getNpcInteractionPromptText(npc.definition.interactionType);
+    const promptText = this.getNpcInteractionPromptText(
+      npc.definition.interactionType,
+    );
     if (!promptText) {
       prompt.setVisible(false);
       return;
@@ -602,7 +650,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private getNpcInteractionPromptText(
-    interactionType: NpcInteractionType
+    interactionType: NpcInteractionType,
   ): string | undefined {
     switch (interactionType) {
       case "dialogue":
@@ -687,7 +735,9 @@ export class GameScene extends Phaser.Scene {
 
   private isMovementInputBlocked(): boolean {
     return (
-      this.isMapTransitioning || this.dialogueBox.isOpen() || this.chatBox.isTyping()
+      this.isMapTransitioning ||
+      this.dialogueBox.isOpen() ||
+      this.chatBox.isTyping()
     );
   }
 }

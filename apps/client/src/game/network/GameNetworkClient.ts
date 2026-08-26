@@ -11,6 +11,8 @@ import type {
   PlayerAvatarId,
   PlayerInput,
   PokemonTrainerStatePayload,
+  PokemonStarterId,
+  PokemonStarterChoiceInput,
 } from "@cesar-mmo/shared";
 
 type ConnectionRejectedError = {
@@ -42,7 +44,9 @@ export class GameNetworkClient {
     this.socket.disconnect();
   }
 
-  public onConnectionRejected(callback: (error: ConnectionRejectedError) => void): void {
+  public onConnectionRejected(
+    callback: (error: ConnectionRejectedError) => void,
+  ): void {
     this.socket.on("connectionRejected", callback);
   }
 
@@ -57,12 +61,14 @@ export class GameNetworkClient {
   }
 
   public onPokemonTrainerState(
-    callback: (payload: PokemonTrainerStatePayload) => void
+    callback: (payload: PokemonTrainerStatePayload) => void,
   ): void {
     this.socket.on(POKEMON_EVENTS.TRAINER_STATE, callback);
   }
 
-  public onCurrentPlayers(callback: (players: Record<string, Player>) => void): void {
+  public onCurrentPlayers(
+    callback: (players: Record<string, Player>) => void,
+  ): void {
     this.socket.on("currentPlayers", callback);
   }
 
@@ -70,12 +76,14 @@ export class GameNetworkClient {
     this.socket.on("playerJoined", callback);
   }
 
-  public onPlayersState(callback: (players: Record<string, Player>) => void): void {
+  public onPlayersState(
+    callback: (players: Record<string, Player>) => void,
+  ): void {
     this.socket.on("playersState", callback);
   }
 
   public onTransitionResolved(
-    callback: (transition: MapTransitionResolved) => void
+    callback: (transition: MapTransitionResolved) => void,
   ): void {
     this.socket.on(MAP_EVENTS.TRANSITION_RESOLVED, callback);
   }
@@ -86,6 +94,14 @@ export class GameNetworkClient {
 
   public onPlayerLeftMap(callback: (playerId: string) => void): void {
     this.socket.on(MAP_EVENTS.PLAYER_LEFT, callback);
+  }
+
+  public chooseStarter(starterId: PokemonStarterId): void {
+    const payload: PokemonStarterChoiceInput = {
+      starterId,
+    };
+
+    this.socket.emit(POKEMON_EVENTS.CHOOSE_STARTER, payload);
   }
 
   public sendPlayerInput(input: PlayerInput): void {

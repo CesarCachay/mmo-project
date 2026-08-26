@@ -59,3 +59,24 @@ export const POKEMON_STARTERS = {
     level: 5,
   },
 } as const;
+
+export type PokemonStarterId = keyof typeof POKEMON_STARTERS;
+
+export interface PokemonStarterChoiceInput {
+  starterId: PokemonStarterId;
+}
+
+export function isPokemonStarterId(value: unknown): value is PokemonStarterId {
+  return typeof value === "string" && value in POKEMON_STARTERS;
+}
+export function isPokemonStarterChoiceInput(
+  value: unknown,
+): value is PokemonStarterChoiceInput {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const record = value as Record<string, unknown>;
+
+  return isPokemonStarterId(record.starterId);
+}

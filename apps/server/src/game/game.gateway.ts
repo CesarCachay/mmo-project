@@ -29,6 +29,7 @@ import {
   MAP_EVENTS,
   MAP_DATA_REGISTRY,
   POKEMON_EVENTS,
+  isPokemonStarterChoiceInput,
 } from '@cesar-mmo/shared';
 import {
   getServerMapSpawn,
@@ -148,12 +149,7 @@ export class GameGateway
       right: false,
     };
 
-    this.pokemonTrainerStateStore.create(newPlayer.id);
-    const trainerState = this.pokemonTrainerService.addPokemon(
-      newPlayer.id,
-      25,
-      5,
-    );
+    const trainerState = this.pokemonTrainerStateStore.create(newPlayer.id);
     const trainerStatePayload: PokemonTrainerStatePayload = {
       trainerState,
     };
@@ -223,6 +219,33 @@ export class GameGateway
     const message = this.chatService.createMessage(player, payload);
 
     this.server.emit(CHAT_EVENTS.MESSAGE_RECEIVED, message);
+  }
+
+  @SubscribeMessage(POKEMON_EVENTS.CHOOSE_STARTER)
+  handleChooseStarter(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: unknown,
+  ): void {
+    if (!isPokemonStarterChoiceInput(payload)) {
+      return;
+    }
+
+    const player = this.players[client.id];
+
+    if (!player) {
+      return;
+    }
+
+    const trainerState = this.pokemonTrainerService.chooseStarter(
+      player.id,
+      payload.starterId,
+    );
+
+    const trainerStatePayload: PokemonTrainerStatePayload = {
+      trainerState,
+    };
+
+    client.emit(POKEMON_EVENTS.TRAINER_STATE, trainerStatePayload);
   }
 
   @SubscribeMessage(MAP_EVENTS.REQUEST_TRANSITION)

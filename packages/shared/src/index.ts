@@ -23,10 +23,22 @@ export type { CollisionMap, Position } from "./maps/collision.js";
 export { PLAYER_AVATAR_IDS, isPlayerAvatarId } from "./player/avatar.js";
 export type { PlayerAvatarId } from "./player/avatar.js";
 
-export type { ChatMessage, ChatMessageInput, ChatMessageSender } from "./chat.js";
-export { CHAT_EVENTS, CHAT_MESSAGE_MAX_LENGTH, isChatMessageInput } from "./chat.js";
+export type {
+  ChatMessage,
+  ChatMessageInput,
+  ChatMessageSender,
+} from "./chat.js";
+export {
+  CHAT_EVENTS,
+  CHAT_MESSAGE_MAX_LENGTH,
+  isChatMessageInput,
+} from "./chat.js";
 
-export type { MapId, MapTransitionInput, MapTransitionResolved } from "./map.js";
+export type {
+  MapId,
+  MapTransitionInput,
+  MapTransitionResolved,
+} from "./map.js";
 export {
   MAP_IDS,
   DEFAULT_MAP_ID,
@@ -107,3 +119,14 @@ export {
 } from "./pokemon/pokemon-party.js";
 export { POKEMON_EVENTS } from "./pokemon/pokemon-network.js";
 export type { PokemonTrainerStatePayload } from "./pokemon/pokemon-network.js";
+
+// Pokemon Starters
+export {
+  POKEMON_STARTERS,
+  isPokemonStarterId,
+  isPokemonStarterChoiceInput,
+} from "./pokemon/pokemon-starter.js";
+export type {
+  PokemonStarterId,
+  PokemonStarterChoiceInput,
+} from "./pokemon/pokemon-starter.js";
