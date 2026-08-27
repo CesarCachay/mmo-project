@@ -6,6 +6,7 @@ import type {
   NpcDirection,
   NpcInstance,
   NpcInteractionType,
+  NpcPostDialogueAction,
 } from "./types";
 
 type TiledCustomProperty = {
@@ -59,7 +60,7 @@ export class NpcManager {
   public findNearby(
     playerX: number,
     playerY: number,
-    interactionDistance: number
+    interactionDistance: number,
   ): NpcInstance | undefined {
     let nearestNpc: NpcInstance | undefined;
     let nearestDistance = interactionDistance;
@@ -69,7 +70,7 @@ export class NpcManager {
         playerX,
         playerY,
         npc.sprite.x,
-        npc.sprite.y
+        npc.sprite.y,
       );
 
       if (distance <= nearestDistance) {
@@ -100,6 +101,7 @@ export class NpcManager {
         const sprite = getProperty("sprite");
         const dialogueId = getProperty("dialogueId");
         const interactionType = getProperty("interactionType");
+        const rawPostDialogueAction = getProperty("postDialogueAction");
 
         if (
           typeof object.x !== "number" ||
@@ -118,7 +120,23 @@ export class NpcManager {
         }
 
         if (!this.isNpcInteractionType(interactionType)) {
-          throw new Error(`Invalid NPC interaction type: ${String(interactionType)}`);
+          throw new Error(
+            `Invalid NPC interaction type: ${String(interactionType)}`,
+          );
+        }
+
+        let postDialogueAction: NpcPostDialogueAction | undefined;
+
+        if (rawPostDialogueAction !== undefined) {
+          if (rawPostDialogueAction !== "chooseStarter") {
+            throw new Error(
+              `Invalid NPC post dialogue action: ${String(
+                rawPostDialogueAction,
+              )}`,
+            );
+          }
+
+          postDialogueAction = rawPostDialogueAction;
         }
 
         return {
@@ -130,12 +148,18 @@ export class NpcManager {
           sprite,
           interactionType,
           dialogueId,
+          postDialogueAction,
         };
       });
   }
 
   private isNpcDirection(value: string): value is NpcDirection {
-    return value === "up" || value === "down" || value === "left" || value === "right";
+    return (
+      value === "up" ||
+      value === "down" ||
+      value === "left" ||
+      value === "right"
+    );
   }
 
   private isNpcInteractionType(value: unknown): value is NpcInteractionType {

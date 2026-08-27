@@ -3,8 +3,8 @@
  <editorsettings>
   <export target="town-01.json" format="json"/>
  </editorsettings>
- <tileset firstgid="1" source="../../../../../../../../../Downloads/mmo-cesar-edition/mmo-project/apps/client/public/assets/tilesets/town-terrain.tsx"/>
- <tileset firstgid="111" source="../../../../../../../../../Downloads/mmo-cesar-edition/mmo-project/apps/client/public/assets/tilesets/town-buildings.tsx"/>
+ <tileset firstgid="1" source="../tilesets/town/town-terrain.tsx"/>
+ <tileset firstgid="111" source="../tilesets/town/town-buildings.tsx"/>
  <layer id="1" name="Ground" width="40" height="30" locked="1">
   <data encoding="csv">
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -185,6 +185,7 @@
     <property name="direction" value="down"/>
     <property name="displayName" value="Prof. Juan"/>
     <property name="interactionType" value="dialogue"/>
+    <property name="postDialogueAction" value="chooseStarter"/>
     <property name="sprite" value="professor-oak"/>
    </properties>
    <point/>

@@ -21,11 +21,11 @@ export const MAP_REGISTRY: Record<MapId, GameMapConfig> = {
     tilesets: [
       {
         key: "town-terrain",
-        path: "/assets/maps/town-01/poke-sheet.png",
+        path: "/assets/maps/tilesets/town/town-terrain.png",
       },
       {
         key: "town-buildings",
-        path: "/assets/maps/town-01/poke-assets.png",
+        path: "/assets/maps/tilesets/town/town-building.png",
       },
     ],
   },

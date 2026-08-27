@@ -257,6 +257,11 @@
                          "value":"dialogue"
                         }, 
                         {
+                         "name":"postDialogueAction",
+                         "type":"string",
+                         "value":"chooseStarter"
+                        }, 
+                        {
                          "name":"sprite",
                          "type":"string",
                          "value":"professor-oak"
@@ -371,7 +376,7 @@
         {
          "columns":11,
          "firstgid":1,
-         "image":"..\/..\/..\/..\/..\/..\/..\/..\/..\/Downloads\/mmo-cesar-edition\/mmo-project\/apps\/client\/public\/assets\/tilesets\/town-terrain.png",
+         "image":"..\/tilesets\/town\/town-terrain.png",
          "imageheight":160,
          "imagewidth":176,
          "margin":0,
@@ -384,7 +389,7 @@
         {
          "columns":17,
          "firstgid":111,
-         "image":"..\/..\/..\/..\/..\/..\/..\/..\/..\/Downloads\/mmo-cesar-edition\/mmo-project\/apps\/client\/public\/assets\/tilesets\/town-building.png",
+         "image":"..\/tilesets\/town\/town-building.png",
          "imageheight":112,
          "imagewidth":272,
          "margin":0,

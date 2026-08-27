@@ -13,6 +13,7 @@ export type NpcDefinition = {
   sprite: string;
   interactionType: NpcInteractionType;
   dialogueId?: string;
+  postDialogueAction?: NpcPostDialogueAction;
 };
 
 export type NpcInstance = {
@@ -20,3 +21,5 @@ export type NpcInstance = {
   sprite: Phaser.GameObjects.Sprite;
   nameLabel: Phaser.GameObjects.Text;
 };
+
+export type NpcPostDialogueAction = "chooseStarter";

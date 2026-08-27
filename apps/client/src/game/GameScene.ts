@@ -78,6 +78,8 @@ export class GameScene extends Phaser.Scene {
 
   private starterSelectionPanel!: StarterSelectionPanel;
 
+  private canChooseStarter = false;
+
   // managers
   private npcManager!: NpcManager;
   private remotePlayerManager!: RemotePlayerManager;
@@ -399,6 +401,8 @@ export class GameScene extends Phaser.Scene {
       const party = payload.trainerState.party.pokemon;
       const pokemon = party[0];
 
+      this.canChooseStarter = party.length === 0;
+
       console.log("[Pokemon Starter]", {
         partySize: party.length,
         instanceId: pokemon?.instanceId,
@@ -406,14 +410,12 @@ export class GameScene extends Phaser.Scene {
         level: pokemon?.level,
       });
 
-      if (party.length === 0) {
-        this.starterSelectionPanel.setSelectionPending(false);
-        this.starterSelectionPanel.show();
-        return;
-      }
-
       this.starterSelectionPanel.setSelectionPending(false);
-      this.starterSelectionPanel.hide();
+
+      if (party.length > 0) {
+        this.starterSelectionPanel.hide();
+        this.chatBox.setVisible(true);
+      }
     });
 
     this.network.onCurrentPlayers((players) => {
@@ -573,6 +575,9 @@ export class GameScene extends Phaser.Scene {
     if (this.isMapTransitioning) {
       return;
     }
+    if (this.starterSelectionPanel.isVisible()) {
+      return;
+    }
     if (this.chatBox.isTyping()) {
       return;
     }
@@ -581,10 +586,17 @@ export class GameScene extends Phaser.Scene {
     }
     if (this.dialogueBox.isOpen()) {
       this.dialogueBox.advance();
+
       if (!this.dialogueBox.isOpen()) {
+        const completedDialogueNpc = this.activeDialogueNpc;
         this.restoreActiveDialogueNpcDirection();
         this.chatBox.setVisible(true);
+
+        if (completedDialogueNpc) {
+          this.handleNpcPostDialogueAction(completedDialogueNpc);
+        }
       }
+
       return;
     }
 
@@ -626,6 +638,7 @@ export class GameScene extends Phaser.Scene {
     }
     if (
       this.isMapTransitioning ||
+      this.starterSelectionPanel.isVisible() ||
       !this.nearbyNpc ||
       this.dialogueBox.isOpen() ||
       this.chatBox.isTyping()
@@ -685,6 +698,9 @@ export class GameScene extends Phaser.Scene {
     if (this.isMapTransitioning) {
       return;
     }
+    if (this.starterSelectionPanel.isVisible()) {
+      return;
+    }
     if (this.chatBox.isTyping()) {
       return;
     }
@@ -737,7 +753,27 @@ export class GameScene extends Phaser.Scene {
     return (
       this.isMapTransitioning ||
       this.dialogueBox.isOpen() ||
-      this.chatBox.isTyping()
+      this.chatBox.isTyping() ||
+      this.starterSelectionPanel.isVisible()
     );
+  }
+
+  private handleNpcPostDialogueAction(npc: NpcInstance): void {
+    const action = npc.definition.postDialogueAction;
+
+    if (!action) {
+      return;
+    }
+
+    switch (action) {
+      case "chooseStarter":
+        if (!this.canChooseStarter) {
+          return;
+        }
+
+        this.chatBox.setVisible(false);
+        this.starterSelectionPanel.show();
+        return;
+    }
   }
 }
