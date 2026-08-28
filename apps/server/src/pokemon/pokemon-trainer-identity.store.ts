@@ -112,4 +112,41 @@ export class PokemonTrainerIdentityStore {
 
     this.activePlayerIdByTrainerId.set(identity.trainerId, playerId);
   }
+
+  bindRecovered(
+    playerId: string,
+    identity: PokemonTrainerIdentity,
+  ): PokemonTrainerIdentity {
+    const normalizedPlayerId = playerId.trim();
+
+    if (!normalizedPlayerId) {
+      throw new Error(
+        'Player id is required to bind a recovered trainer identity',
+      );
+    }
+
+    if (this.identitiesByPlayerId.has(normalizedPlayerId)) {
+      throw new Error(
+        `Player ${normalizedPlayerId} already has an active trainer identity`,
+      );
+    }
+
+    const identityForSessionToken = this.identitiesBySessionToken.get(
+      identity.sessionToken,
+    );
+
+    if (
+      identityForSessionToken &&
+      identityForSessionToken.trainerId !== identity.trainerId
+    ) {
+      throw new Error(
+        'Trainer session token is already bound to another trainer',
+      );
+    }
+
+    this.bind(normalizedPlayerId, identity);
+    this.identitiesBySessionToken.set(identity.sessionToken, identity);
+
+    return identity;
+  }
 }

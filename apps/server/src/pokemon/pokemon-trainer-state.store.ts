@@ -11,13 +11,18 @@ export class PokemonTrainerStateStore {
 
   private readonly starterSelectionUnlocked = new Set<PokemonTrainerId>();
 
-  create(trainerId: PokemonTrainerId): PokemonTrainerState {
+  create(
+    trainerId: PokemonTrainerId,
+    party: PokemonParty = createPokemonParty(),
+  ): PokemonTrainerState {
     if (this.trainerStates.has(trainerId)) {
       throw new Error(`Trainer state already exists for trainer ${trainerId}`);
     }
+
     const trainerState: PokemonTrainerState = {
-      party: createPokemonParty(),
+      party,
     };
+
     this.trainerStates.set(trainerId, trainerState);
     return trainerState;
   }

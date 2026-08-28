@@ -1,0 +1,25 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: cesar-mmo-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: cesar_mmo
+      POSTGRES_PASSWORD: cesar_mmo_dev
+      POSTGRES_DB: cesar_mmo
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - cesar_mmo_postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cesar_mmo -d cesar_mmo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  cesar_mmo_postgres_data:

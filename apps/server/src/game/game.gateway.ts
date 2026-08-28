@@ -52,8 +52,14 @@ import type {
   PokemonStarterSelectionStatus,
   SharedMapNpc,
   PokemonTrainerSessionPayload,
+  PokemonTrainerState,
 } from '@cesar-mmo/shared';
 
+// db and repositories
+import { PokemonTrainerRepository } from 'src/pokemon/pokemon-trainer.repository';
+import { PokemonPartyRepository } from 'src/pokemon/pokemon-party.repository';
+
+// services
 import { PokemonTrainerService } from 'src/pokemon/pokemon-trainer.service';
 import { PokemonTrainerStateStore } from 'src/pokemon/pokemon-trainer-state.store';
 import { DialogueSessionService } from 'src/dialogue/dialogue-session.service';
@@ -63,6 +69,7 @@ import { isPokemonTrainerSessionToken } from 'src/pokemon/pokemon-trainer-identi
 import type {
   PokemonTrainerId,
   PokemonTrainerSessionToken,
+  PokemonTrainerIdentity,
 } from 'src/pokemon/pokemon-trainer-identity';
 
 @WebSocketGateway({
@@ -81,15 +88,12 @@ export class GameGateway
   server!: Server;
 
   private players: Record<string, Player> = {};
-
   private playerInputs: Record<string, PlayerInput> = {};
 
   private readonly pokemonTrainerIdentityStore =
     new PokemonTrainerIdentityStore();
   private readonly pokemonTrainerStateStore = new PokemonTrainerStateStore();
-  private readonly pokemonTrainerService = new PokemonTrainerService(
-    this.pokemonTrainerStateStore,
-  );
+  private readonly pokemonTrainerService: PokemonTrainerService;
 
   private readonly dialogueSessionStore = new DialogueSessionStore();
   private readonly dialogueSessionService = new DialogueSessionService(
@@ -97,10 +101,18 @@ export class GameGateway
   );
 
   private nextColorIndex = 0;
-
   private gameLoop?: ReturnType<typeof setInterval>;
 
-  constructor(private readonly chatService: ChatService) {}
+  constructor(
+    private readonly chatService: ChatService,
+    private readonly pokemonTrainerRepository: PokemonTrainerRepository,
+    private readonly pokemonPartyRepository: PokemonPartyRepository,
+  ) {
+    this.pokemonTrainerService = new PokemonTrainerService(
+      this.pokemonTrainerStateStore,
+      this.pokemonPartyRepository,
+    );
+  }
 
   afterInit() {
     this.startGameLoop();
@@ -162,6 +174,54 @@ export class GameGateway
       lastProcessedInputSequence: 0,
     };
 
+    const requestedTrainerSessionToken =
+      this.getRequestedTrainerSessionToken(client);
+
+    let trainerIdentity: PokemonTrainerIdentity;
+    let restored: boolean;
+    let trainerState: PokemonTrainerState;
+
+    try {
+      const resolution = await this.resolvePokemonTrainerIdentity(
+        newPlayer.id,
+        requestedTrainerSessionToken,
+      );
+
+      trainerIdentity = resolution.identity;
+
+      restored = resolution.restored;
+
+      const existingTrainerState = this.pokemonTrainerStateStore.get(
+        trainerIdentity.trainerId,
+      );
+
+      if (existingTrainerState) {
+        trainerState = existingTrainerState;
+      } else {
+        const persistedParty = await this.pokemonPartyRepository.loadParty(
+          trainerIdentity.trainerId,
+        );
+
+        trainerState = this.pokemonTrainerStateStore.create(
+          trainerIdentity.trainerId,
+          persistedParty,
+        );
+      }
+    } catch (error: unknown) {
+      console.error('[PokemonTrainerIdentity] resolution failed', error);
+
+      this.pokemonTrainerIdentityStore.unbind(newPlayer.id);
+
+      client.emit('connectionRejected', {
+        code: 'TRAINER_SESSION_ERROR',
+        message: 'Could not restore the trainer session.',
+      });
+
+      client.disconnect(true);
+
+      return;
+    }
+
     this.players[client.id] = newPlayer;
 
     this.playerInputs[client.id] = {
@@ -172,28 +232,13 @@ export class GameGateway
       right: false,
     };
 
-    const requestedTrainerSessionToken =
-      this.getRequestedTrainerSessionToken(client);
-
-    const trainerIdentityResolution = this.pokemonTrainerIdentityStore.resolve(
-      newPlayer.id,
-      requestedTrainerSessionToken,
-    );
-
-    const { identity: trainerIdentity, restored } = trainerIdentityResolution;
-
     console.log('[PokemonTrainerIdentity]', {
       restored,
+      source: restored ? 'postgresql' : 'created',
       playerId: newPlayer.id,
       trainerId: trainerIdentity.trainerId,
-      hasTrainerState: this.pokemonTrainerStateStore.has(
-        trainerIdentity.trainerId,
-      ),
+      partySize: trainerState.party.pokemon.length,
     });
-
-    const trainerState =
-      this.pokemonTrainerStateStore.get(trainerIdentity.trainerId) ??
-      this.pokemonTrainerStateStore.create(trainerIdentity.trainerId);
 
     const trainerStatePayload: PokemonTrainerStatePayload = {
       trainerState,
@@ -380,10 +425,10 @@ export class GameGateway
   }
 
   @SubscribeMessage(POKEMON_EVENTS.CHOOSE_STARTER)
-  handleChooseStarter(
+  async handleChooseStarter(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: unknown,
-  ): void {
+  ): Promise<void> {
     if (!isPokemonStarterChoiceInput(payload)) {
       return;
     }
@@ -399,17 +444,17 @@ export class GameGateway
     }
 
     const starterNpc = getServerMapNpc(player.mapId, 'professorOak');
-
     if (!starterNpc || !isPlayerNearMapNpc(player.x, player.y, starterNpc)) {
       this.pokemonTrainerStateStore.lockStarterSelection(trainerId);
       return;
     }
 
     try {
-      const trainerState = this.pokemonTrainerService.chooseStarter(
+      const trainerState = await this.pokemonTrainerService.chooseStarter(
         trainerId,
         payload.starterId,
       );
+
       client.emit(POKEMON_EVENTS.TRAINER_STATE, {
         trainerState,
       });
@@ -684,5 +729,41 @@ export class GameGateway
     }
 
     return value;
+  }
+
+  private async resolvePokemonTrainerIdentity(
+    playerId: string,
+    sessionToken?: PokemonTrainerSessionToken,
+  ): Promise<{
+    identity: PokemonTrainerIdentity;
+    restored: boolean;
+  }> {
+    if (sessionToken) {
+      const persistedTrainer =
+        await this.pokemonTrainerRepository.findBySessionToken(sessionToken);
+
+      if (persistedTrainer) {
+        const identity: PokemonTrainerIdentity = {
+          trainerId: persistedTrainer.trainerId,
+          sessionToken,
+        };
+
+        this.pokemonTrainerIdentityStore.bindRecovered(playerId, identity);
+
+        return {
+          identity,
+          restored: true,
+        };
+      }
+    }
+
+    const { identity } = this.pokemonTrainerIdentityStore.resolve(playerId);
+
+    await this.pokemonTrainerRepository.create(identity);
+
+    return {
+      identity,
+      restored: false,
+    };
   }
 }

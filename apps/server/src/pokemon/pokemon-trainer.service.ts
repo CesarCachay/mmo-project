@@ -9,18 +9,21 @@ import type { PokemonTrainerId } from './pokemon-trainer-identity';
 
 import { PokemonTrainerStateStore } from './pokemon-trainer-state.store.js';
 
-export class PokemonTrainerService {
-  private readonly trainerStateStore: PokemonTrainerStateStore;
+import { PokemonPartyRepository } from './pokemon-party.repository';
 
-  constructor(trainerStateStore: PokemonTrainerStateStore) {
+export class PokemonTrainerService {
+  constructor(
+    private readonly trainerStateStore: PokemonTrainerStateStore,
+    private readonly pokemonPartyRepository: PokemonPartyRepository,
+  ) {
     this.trainerStateStore = trainerStateStore;
   }
 
-  public addPokemon(
+  public async addPokemon(
     trainerId: PokemonTrainerId,
     speciesId: number,
     level: number,
-  ): PokemonTrainerState {
+  ): Promise<PokemonTrainerState> {
     const trainerState = this.trainerStateStore.get(trainerId);
 
     if (!trainerState) {
@@ -31,13 +34,16 @@ export class PokemonTrainerService {
 
     const pokemon = createPokemonInstance(speciesId, level);
     const updatedParty = addPokemonToParty(trainerState.party, pokemon);
+
+    /* Persistimos primero. Si PostgreSQL falla, NO modificamos el estado runtime. */
+    await this.pokemonPartyRepository.saveParty(trainerId, updatedParty);
     return this.trainerStateStore.setParty(trainerId, updatedParty);
   }
 
-  public chooseStarter(
+  public async chooseStarter(
     trainerId: PokemonTrainerId,
     starterId: PokemonStarterId,
-  ): PokemonTrainerState {
+  ): Promise<PokemonTrainerState> {
     const trainerState = this.trainerStateStore.get(trainerId);
 
     if (!trainerState) {
@@ -48,7 +54,7 @@ export class PokemonTrainerService {
 
     if (trainerState.party.pokemon.length > 0) {
       throw new Error(
-        `Player ${trainerId} already has a Pokémon and cannot choose a starter`,
+        `Trainer ${trainerId} already has a Pokémon and cannot choose a starter`,
       );
     }
 
@@ -59,13 +65,16 @@ export class PokemonTrainerService {
     }
 
     const starter = POKEMON_STARTERS[starterId];
-    const updatedTrainerState = this.addPokemon(
-      trainerId,
-      starter.speciesId,
-      starter.level,
-    );
 
+    /* Bloqueamos ANTES del await para evitar dos elecciones concurrentes. */
     this.trainerStateStore.lockStarterSelection(trainerId);
-    return updatedTrainerState;
+
+    try {
+      return await this.addPokemon(trainerId, starter.speciesId, starter.level);
+    } catch (error: unknown) {
+      /* Si falla PostgreSQL permitimos que el jugador reintente. */
+      this.trainerStateStore.unlockStarterSelection(trainerId);
+      throw error;
+    }
   }
 }

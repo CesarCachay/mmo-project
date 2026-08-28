@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model PokemonTrainer {
+  id               String @id @db.Uuid
+  sessionTokenHash String @unique @map("session_token_hash")
+
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+  pokemonInstances PokemonInstance[]
+
+  @@map("pokemon_trainers")
+}
+
+model PokemonInstance {
+  id String @id @map("instance_id") @db.Uuid
+
+  trainerId String @map("trainer_id") @db.Uuid
+
+  speciesId Int     @map("species_id")
+  formId    Int     @map("form_id")
+  nickname  String?
+
+  level      Int
+  experience Int
+  currentHp  Int @map("current_hp")
+  abilityId  Int @map("ability_id")
+
+  partyPosition Int? @map("party_position")
+
+  trainer PokemonTrainer @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+
+  moves PokemonInstanceMove[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([trainerId, partyPosition])
+  @@index([trainerId])
+  @@map("pokemon_instances")
+}
+
+model PokemonInstanceMove {
+  pokemonInstanceId String @map("pokemon_instance_id") @db.Uuid
+
+  slot      Int
+  moveId    Int @map("move_id")
+  currentPp Int @map("current_pp")
+
+  pokemon PokemonInstance @relation(fields: [pokemonInstanceId], references: [id], onDelete: Cascade)
+
+  @@id([pokemonInstanceId, slot])
+  @@map("pokemon_instance_moves")
+}
