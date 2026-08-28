@@ -1,76 +1,71 @@
 import { createPokemonParty } from '@cesar-mmo/shared';
 
+import type { PokemonTrainerId } from './pokemon-trainer-identity';
 import type { PokemonParty, PokemonTrainerState } from '@cesar-mmo/shared';
 
 export class PokemonTrainerStateStore {
-  private readonly trainerStates = new Map<string, PokemonTrainerState>();
+  private readonly trainerStates = new Map<
+    PokemonTrainerId,
+    PokemonTrainerState
+  >();
 
-  private readonly starterSelectionUnlockedPlayerIds = new Set<string>();
+  private readonly starterSelectionUnlocked = new Set<PokemonTrainerId>();
 
-  create(playerId: string): PokemonTrainerState {
-    if (this.trainerStates.has(playerId)) {
-      throw new Error(
-        `Pokémon trainer state already exists for player ${playerId}`,
-      );
+  create(trainerId: PokemonTrainerId): PokemonTrainerState {
+    if (this.trainerStates.has(trainerId)) {
+      throw new Error(`Trainer state already exists for trainer ${trainerId}`);
     }
-
     const trainerState: PokemonTrainerState = {
       party: createPokemonParty(),
     };
-
-    this.trainerStates.set(playerId, trainerState);
-
+    this.trainerStates.set(trainerId, trainerState);
     return trainerState;
   }
 
-  get(playerId: string): PokemonTrainerState | undefined {
-    return this.trainerStates.get(playerId);
+  get(trainerId: PokemonTrainerId): PokemonTrainerState | undefined {
+    return this.trainerStates.get(trainerId);
   }
 
-  setParty(playerId: string, party: PokemonParty): PokemonTrainerState {
-    const trainerState = this.trainerStates.get(playerId);
+  setParty(
+    trainerId: PokemonTrainerId,
+    party: PokemonParty,
+  ): PokemonTrainerState {
+    const trainerState = this.trainerStates.get(trainerId);
 
     if (!trainerState) {
-      throw new Error(`Pokémon trainer state not found for player ${playerId}`);
+      throw new Error(`Trainer state not found for trainer ${trainerId}`);
     }
-
     const updatedTrainerState: PokemonTrainerState = {
       ...trainerState,
       party,
     };
-
-    this.trainerStates.set(playerId, updatedTrainerState);
-
+    this.trainerStates.set(trainerId, updatedTrainerState);
     return updatedTrainerState;
   }
 
-  has(playerId: string): boolean {
-    return this.trainerStates.has(playerId);
+  has(trainerId: PokemonTrainerId): boolean {
+    return this.trainerStates.has(trainerId);
   }
 
-  public remove(playerId: string): void {
-    this.trainerStates.delete(playerId);
-    this.starterSelectionUnlockedPlayerIds.delete(playerId);
+  remove(trainerId: PokemonTrainerId): void {
+    this.trainerStates.delete(trainerId);
+    this.starterSelectionUnlocked.delete(trainerId);
   }
 
   public clear(): void {
     this.trainerStates.clear();
-    this.starterSelectionUnlockedPlayerIds.clear();
+    this.starterSelectionUnlocked.clear();
   }
 
-  public unlockStarterSelection(playerId: string): void {
-    if (!this.trainerStates.has(playerId)) {
-      throw new Error(`Pokémon trainer state not found for player ${playerId}`);
-    }
-
-    this.starterSelectionUnlockedPlayerIds.add(playerId);
+  unlockStarterSelection(trainerId: PokemonTrainerId): void {
+    this.starterSelectionUnlocked.add(trainerId);
   }
 
-  public isStarterSelectionUnlocked(playerId: string): boolean {
-    return this.starterSelectionUnlockedPlayerIds.has(playerId);
+  isStarterSelectionUnlocked(trainerId: PokemonTrainerId): boolean {
+    return this.starterSelectionUnlocked.has(trainerId);
   }
 
-  public lockStarterSelection(playerId: string): void {
-    this.starterSelectionUnlockedPlayerIds.delete(playerId);
+  lockStarterSelection(trainerId: PokemonTrainerId): void {
+    this.starterSelectionUnlocked.delete(trainerId);
   }
 }

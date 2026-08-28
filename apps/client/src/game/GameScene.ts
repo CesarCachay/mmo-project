@@ -25,6 +25,12 @@ import { StarterSelectionPanel } from "./ui/StarterSelectionPanel";
 // helpers
 import { MAP_REGISTRY } from "./maps/mapRegistry";
 
+// storage
+import {
+  getPokemonTrainerSessionToken,
+  setPokemonTrainerSessionToken,
+} from "./pokemon/pokemon-trainer-session.storage";
+
 // class managers
 import { NpcManager } from "./npc/NpcManager";
 import { MapManager } from "./maps/MapManager";
@@ -408,7 +414,18 @@ export class GameScene extends Phaser.Scene {
   }
 
   private connectToServer(): void {
-    this.network = new GameNetworkClient(this.displayName, this.avatarId);
+    const trainerSessionToken = getPokemonTrainerSessionToken();
+
+    this.network = new GameNetworkClient(
+      this.displayName,
+      this.avatarId,
+      trainerSessionToken
+    );
+
+    this.network.onPokemonTrainerSession(({ sessionToken }) => {
+      setPokemonTrainerSessionToken(sessionToken);
+      console.log("[PokemonTrainerSession] stored");
+    });
 
     this.network.onConnectionRejected((error) => {
       this.network.disconnect();

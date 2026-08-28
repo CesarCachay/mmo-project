@@ -22,6 +22,7 @@ import type {
   DialogueStartInput,
   DialogueSessionState,
   DialogueAdvanceInput,
+  PokemonTrainerSessionPayload,
 } from "@cesar-mmo/shared";
 
 type ConnectionRejectedError = {
@@ -32,11 +33,16 @@ type ConnectionRejectedError = {
 export class GameNetworkClient {
   private readonly socket: Socket;
 
-  constructor(displayName: string, avatarId: PlayerAvatarId) {
+  constructor(
+    displayName: string,
+    avatarId: PlayerAvatarId,
+    trainerSessionToken?: string
+  ) {
     this.socket = io("http://localhost:3000", {
       auth: {
         displayName,
         avatarId,
+        trainerSessionToken,
       },
     });
   }
@@ -140,7 +146,12 @@ export class GameNetworkClient {
     const payload: DialogueAdvanceInput = {
       sessionId,
     };
-
     this.socket.emit(DIALOGUE_EVENTS.ADVANCE, payload);
+  }
+
+  public onPokemonTrainerSession(
+    callback: (payload: PokemonTrainerSessionPayload) => void
+  ): void {
+    this.socket.on(POKEMON_EVENTS.TRAINER_SESSION, callback);
   }
 }

@@ -110,6 +110,7 @@ export { POKEMON_EVENTS } from "./pokemon/pokemon-network.js";
 export type {
   PokemonTrainerStatePayload,
   PokemonStarterSelectionStatus,
+  PokemonTrainerSessionPayload,
 } from "./pokemon/pokemon-network.js";
 
 // Pokemon Starters

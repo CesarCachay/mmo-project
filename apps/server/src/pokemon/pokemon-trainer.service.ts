@@ -5,6 +5,8 @@ import {
   POKEMON_STARTERS,
 } from '@cesar-mmo/shared';
 
+import type { PokemonTrainerId } from './pokemon-trainer-identity';
+
 import { PokemonTrainerStateStore } from './pokemon-trainer-state.store.js';
 
 export class PokemonTrainerService {
@@ -15,51 +17,55 @@ export class PokemonTrainerService {
   }
 
   public addPokemon(
-    playerId: string,
+    trainerId: PokemonTrainerId,
     speciesId: number,
     level: number,
   ): PokemonTrainerState {
-    const trainerState = this.trainerStateStore.get(playerId);
+    const trainerState = this.trainerStateStore.get(trainerId);
 
     if (!trainerState) {
-      throw new Error(`Pokémon trainer state not found for player ${playerId}`);
+      throw new Error(
+        `Pokémon trainer state not found for trainer ${trainerId}`,
+      );
     }
 
     const pokemon = createPokemonInstance(speciesId, level);
     const updatedParty = addPokemonToParty(trainerState.party, pokemon);
-    return this.trainerStateStore.setParty(playerId, updatedParty);
+    return this.trainerStateStore.setParty(trainerId, updatedParty);
   }
 
   public chooseStarter(
-    playerId: string,
+    trainerId: PokemonTrainerId,
     starterId: PokemonStarterId,
   ): PokemonTrainerState {
-    const trainerState = this.trainerStateStore.get(playerId);
+    const trainerState = this.trainerStateStore.get(trainerId);
 
     if (!trainerState) {
-      throw new Error(`Pokémon trainer state not found for player ${playerId}`);
+      throw new Error(
+        `Pokémon trainer state not found for trainer ${trainerId}`,
+      );
     }
 
     if (trainerState.party.pokemon.length > 0) {
       throw new Error(
-        `Player ${playerId} already has a Pokémon and cannot choose a starter`,
+        `Player ${trainerId} already has a Pokémon and cannot choose a starter`,
       );
     }
 
-    if (!this.trainerStateStore.isStarterSelectionUnlocked(playerId)) {
+    if (!this.trainerStateStore.isStarterSelectionUnlocked(trainerId)) {
       throw new Error(
-        `Starter selection is not unlocked for player ${playerId}`,
+        `Starter selection is not unlocked for trainer ${trainerId}`,
       );
     }
 
     const starter = POKEMON_STARTERS[starterId];
     const updatedTrainerState = this.addPokemon(
-      playerId,
+      trainerId,
       starter.speciesId,
       starter.level,
     );
 
-    this.trainerStateStore.lockStarterSelection(playerId);
+    this.trainerStateStore.lockStarterSelection(trainerId);
     return updatedTrainerState;
   }
 }

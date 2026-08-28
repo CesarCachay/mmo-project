@@ -5,6 +5,8 @@ export const POKEMON_EVENTS = {
   CHOOSE_STARTER: "pokemon:choose-starter",
 
   STARTER_SELECTION_STATUS: "pokemon:starter-selection-status",
+
+  TRAINER_SESSION: "pokemon:trainer-session",
 } as const;
 
 export interface PokemonTrainerStatePayload {
@@ -13,4 +15,8 @@ export interface PokemonTrainerStatePayload {
 
 export interface PokemonStarterSelectionStatus {
   unlocked: boolean;
+}
+
+export interface PokemonTrainerSessionPayload {
+  sessionToken: string;
 }

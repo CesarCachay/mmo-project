@@ -51,12 +51,19 @@ import type {
   PokemonTrainerStatePayload,
   PokemonStarterSelectionStatus,
   SharedMapNpc,
+  PokemonTrainerSessionPayload,
 } from '@cesar-mmo/shared';
 
 import { PokemonTrainerService } from 'src/pokemon/pokemon-trainer.service';
 import { PokemonTrainerStateStore } from 'src/pokemon/pokemon-trainer-state.store';
 import { DialogueSessionService } from 'src/dialogue/dialogue-session.service';
 import { DialogueSessionStore } from 'src/dialogue/dialogue-session.store';
+import { PokemonTrainerIdentityStore } from 'src/pokemon/pokemon-trainer-identity.store';
+import { isPokemonTrainerSessionToken } from 'src/pokemon/pokemon-trainer-identity';
+import type {
+  PokemonTrainerId,
+  PokemonTrainerSessionToken,
+} from 'src/pokemon/pokemon-trainer-identity';
 
 @WebSocketGateway({
   cors: {
@@ -77,6 +84,8 @@ export class GameGateway
 
   private playerInputs: Record<string, PlayerInput> = {};
 
+  private readonly pokemonTrainerIdentityStore =
+    new PokemonTrainerIdentityStore();
   private readonly pokemonTrainerStateStore = new PokemonTrainerStateStore();
   private readonly pokemonTrainerService = new PokemonTrainerService(
     this.pokemonTrainerStateStore,
@@ -163,10 +172,37 @@ export class GameGateway
       right: false,
     };
 
-    const trainerState = this.pokemonTrainerStateStore.create(newPlayer.id);
+    const requestedTrainerSessionToken =
+      this.getRequestedTrainerSessionToken(client);
+
+    const trainerIdentityResolution = this.pokemonTrainerIdentityStore.resolve(
+      newPlayer.id,
+      requestedTrainerSessionToken,
+    );
+
+    const { identity: trainerIdentity, restored } = trainerIdentityResolution;
+
+    console.log('[PokemonTrainerIdentity]', {
+      restored,
+      playerId: newPlayer.id,
+      trainerId: trainerIdentity.trainerId,
+      hasTrainerState: this.pokemonTrainerStateStore.has(
+        trainerIdentity.trainerId,
+      ),
+    });
+
+    const trainerState =
+      this.pokemonTrainerStateStore.get(trainerIdentity.trainerId) ??
+      this.pokemonTrainerStateStore.create(trainerIdentity.trainerId);
+
     const trainerStatePayload: PokemonTrainerStatePayload = {
       trainerState,
     };
+
+    client.emit(POKEMON_EVENTS.TRAINER_SESSION, {
+      sessionToken: trainerIdentity.sessionToken,
+    } satisfies PokemonTrainerSessionPayload);
+
     client.emit(POKEMON_EVENTS.TRAINER_STATE, trainerStatePayload);
 
     const mapRoom = this.getMapRoom(newPlayer.mapId);
@@ -179,8 +215,14 @@ export class GameGateway
 
   handleDisconnect(client: Socket) {
     const player = this.players[client.id];
+    const trainerId = this.getTrainerId(client.id);
 
-    this.pokemonTrainerStateStore.remove(client.id);
+    if (trainerId) {
+      this.pokemonTrainerStateStore.lockStarterSelection(trainerId);
+    }
+
+    this.pokemonTrainerIdentityStore.unbind(client.id);
+
     this.dialogueSessionStore.remove(client.id);
 
     if (!player) {
@@ -351,16 +393,21 @@ export class GameGateway
       return;
     }
 
+    const trainerId = this.getTrainerId(client.id);
+    if (!trainerId) {
+      return;
+    }
+
     const starterNpc = getServerMapNpc(player.mapId, 'professorOak');
 
     if (!starterNpc || !isPlayerNearMapNpc(player.x, player.y, starterNpc)) {
-      this.pokemonTrainerStateStore.lockStarterSelection(client.id);
+      this.pokemonTrainerStateStore.lockStarterSelection(trainerId);
       return;
     }
 
     try {
       const trainerState = this.pokemonTrainerService.chooseStarter(
-        client.id,
+        trainerId,
         payload.starterId,
       );
       client.emit(POKEMON_EVENTS.TRAINER_STATE, {
@@ -371,7 +418,7 @@ export class GameGateway
         `[Pokemon] Starter selection rejected for player ${client.id}`,
         error,
       );
-      const trainerState = this.pokemonTrainerStateStore.get(client.id);
+      const trainerState = this.pokemonTrainerStateStore.get(trainerId);
       if (!trainerState) {
         return;
       }
@@ -481,8 +528,12 @@ export class GameGateway
 
     switch (action) {
       case 'chooseStarter': {
-        const trainerState = this.pokemonTrainerStateStore.get(client.id);
+        const trainerId = this.getTrainerId(client.id);
+        if (!trainerId) {
+          return;
+        }
 
+        const trainerState = this.pokemonTrainerStateStore.get(trainerId);
         if (!trainerState) {
           return;
         }
@@ -490,7 +541,7 @@ export class GameGateway
           return;
         }
 
-        this.pokemonTrainerStateStore.unlockStarterSelection(client.id);
+        this.pokemonTrainerStateStore.unlockStarterSelection(trainerId);
 
         client.emit(POKEMON_EVENTS.STARTER_SELECTION_STATUS, {
           unlocked: true,
@@ -617,5 +668,21 @@ export class GameGateway
       const players = this.getPlayersInMap(mapId);
       this.server.to(room).emit('playersState', players);
     }
+  }
+
+  private getTrainerId(playerId: string): PokemonTrainerId | undefined {
+    return this.pokemonTrainerIdentityStore.get(playerId)?.trainerId;
+  }
+
+  private getRequestedTrainerSessionToken(
+    client: Socket,
+  ): PokemonTrainerSessionToken | undefined {
+    const value: unknown = client.handshake.auth.trainerSessionToken;
+
+    if (!isPokemonTrainerSessionToken(value)) {
+      return undefined;
+    }
+
+    return value;
   }
 }
