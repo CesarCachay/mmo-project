@@ -26,6 +26,20 @@ export const TOWN_01_MAP = {
     },
   },
 
+  npcs: {
+    "professorOak": {
+      x: 309.6,
+      y: 89.3033,
+      dialogueId: "professor-oak-greet",
+      postDialogueAction: "chooseStarter",
+    },
+    "draGianela": {
+      x: 151.867,
+      y: 192.934,
+      dialogueId: "dra-gianela-intro",
+    },
+  },
+
   transitions: {
     "enterHouse01": {
       targetMapId: "house-01",

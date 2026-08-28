@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 
-import { isChatMessageInput, DEFAULT_MAP_ID } from "@cesar-mmo/shared";
+import { isChatMessageInput, DEFAULT_MAP_ID, getDialogue } from "@cesar-mmo/shared";
 
 // assets
 import {
@@ -23,7 +23,6 @@ import { DialogueBox } from "./ui/DialogueBox";
 import { StarterSelectionPanel } from "./ui/StarterSelectionPanel";
 
 // helpers
-import { getDialogue } from "./dialogue/dialogues";
 import { MAP_REGISTRY } from "./maps/mapRegistry";
 
 // class managers
@@ -34,11 +33,7 @@ import { RemotePlayerManager } from "./player/RemotePlayerManager";
 import { LocalPlayerController } from "./player/LocalPlayerController";
 import { MapTransitionController } from "./maps/MapTransitionController";
 import { MovementInputController } from "./player/MovementInputController";
-import type {
-  NpcDirection,
-  NpcInstance,
-  NpcInteractionType,
-} from "./npc/types";
+import type { NpcDirection, NpcInstance, NpcInteractionType } from "./npc/types";
 
 // types
 import type {
@@ -49,6 +44,7 @@ import type {
   MapId,
   MapTransitionInput,
   MapTransitionResolved,
+  DialogueSessionState,
 } from "@cesar-mmo/shared";
 
 export class GameScene extends Phaser.Scene {
@@ -73,6 +69,9 @@ export class GameScene extends Phaser.Scene {
   private npcInteractionPrompt?: Phaser.GameObjects.Text;
 
   private dialogueBox!: DialogueBox;
+  private pendingDialogueNpc?: NpcInstance;
+  private activeDialogueSessionId?: string;
+  private isDialogueAdvancePending = false;
 
   private chatBox!: ChatBox;
 
@@ -118,7 +117,7 @@ export class GameScene extends Phaser.Scene {
           {
             frameWidth: 24,
             frameHeight: 24,
-          },
+          }
         );
       });
     });
@@ -138,24 +137,21 @@ export class GameScene extends Phaser.Scene {
 
     this.createPlayerAnimations();
     this.createPlayer();
-    this.localPlayerController = new LocalPlayerController(
-      this.player,
-      this.avatarId,
-    );
+    this.localPlayerController = new LocalPlayerController(this.player, this.avatarId);
 
     this.mapTransitionController = new MapTransitionController(
       this,
       (transitionId) => this.requestMapTransition(transitionId),
       (transition) => this.handleMapTransitionResolved(transition),
-      () => this.localPlayerController.setIdle(),
+      () => this.localPlayerController.setIdle()
     );
     this.mapTransitionController.loadZones(this.mapManager.map);
 
     this.remotePlayerManager = new RemotePlayerManager(this, (displayName) =>
-      this.createPlayerNameLabel(displayName),
+      this.createPlayerNameLabel(displayName)
     );
     this.npcManager = new NpcManager(this, (displayName) =>
-      this.createPlayerNameLabel(displayName),
+      this.createPlayerNameLabel(displayName)
     );
 
     this.npcManager.create(this.mapManager.map);
@@ -181,7 +177,7 @@ export class GameScene extends Phaser.Scene {
     this.handleNpcInteraction();
 
     const input = this.movementInputController.getCurrentInput(
-      this.isMovementInputBlocked(),
+      this.isMovementInputBlocked()
     );
     this.localPlayerController.updateAnimation(input);
     this.sendInputIfChanged(input);
@@ -189,7 +185,7 @@ export class GameScene extends Phaser.Scene {
       input,
       delta,
       this.currentMapId,
-      this.isMapTransitioning,
+      this.isMapTransitioning
     );
 
     this.localPlayerController.reconcile(delta);
@@ -222,7 +218,7 @@ export class GameScene extends Phaser.Scene {
       spawn.x,
       spawn.y,
       getPlayerTextureKey(this.avatarId, "down"),
-      0,
+      0
     );
 
     this.player.setDepth(5);
@@ -234,7 +230,7 @@ export class GameScene extends Phaser.Scene {
     this.nearbyNpc = this.npcManager.findNearby(
       this.player.x,
       this.player.y,
-      this.npcInteractionDistance,
+      this.npcInteractionDistance
     );
 
     if (previousNpc?.definition.id !== this.nearbyNpc?.definition.id) {
@@ -258,24 +254,66 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  private startNpcDialogue(npc: NpcInstance) {
-    const { dialogueId } = npc.definition;
-
-    if (!dialogueId) {
-      console.warn(`NPC ${npc.definition.id} has no dialogueId`);
+  private startNpcDialogue(npc: NpcInstance): void {
+    if (this.pendingDialogueNpc || this.activeDialogueNpc) {
       return;
     }
 
-    const dialogue = getDialogue(dialogueId);
+    this.pendingDialogueNpc = npc;
+    this.network.startDialogue(npc.definition.id);
+  }
+
+  private handleDialogueState(state: DialogueSessionState): void {
+    const npc = this.activeDialogueNpc ?? this.pendingDialogueNpc;
+
+    if (!npc) {
+      return;
+    }
+
+    if (npc.definition.id !== state.npcId) {
+      return;
+    }
+
+    if (
+      this.activeDialogueSessionId &&
+      this.activeDialogueSessionId !== state.sessionId
+    ) {
+      return;
+    }
+
+    this.isDialogueAdvancePending = false;
+
+    if (state.completed) {
+      this.dialogueBox.hide();
+      this.activeDialogueSessionId = undefined;
+      this.pendingDialogueNpc = undefined;
+      this.restoreActiveDialogueNpcDirection();
+      this.chatBox.setVisible(true);
+      return;
+    }
+
+    const dialogue = getDialogue(state.dialogueId);
     if (!dialogue) {
-      console.warn(`Dialogue not found: ${npc.definition.dialogueId}`);
+      console.warn(`Dialogue not found: ${state.dialogueId}`);
       return;
     }
 
-    this.activeDialogueNpc = npc;
-    this.facePlayerAndNpc(npc);
-    this.chatBox.setVisible(false);
-    this.dialogueBox.start(npc.definition.displayName, dialogue.lines);
+    const line = dialogue.lines[state.lineIndex];
+    if (line === undefined) {
+      console.warn(`Dialogue line ${state.lineIndex} not found for ${state.dialogueId}`);
+      return;
+    }
+
+    if (!this.activeDialogueNpc) {
+      this.activeDialogueNpc = npc;
+      this.pendingDialogueNpc = undefined;
+      this.facePlayerAndNpc(npc);
+      this.chatBox.setVisible(false);
+    }
+
+    this.activeDialogueSessionId = state.sessionId;
+    const isLastLine = state.lineIndex >= state.lineCount - 1;
+    this.dialogueBox.showLine(npc.definition.displayName, line, isLastLine);
   }
 
   private getFacingDirection(
@@ -283,7 +321,7 @@ export class GameScene extends Phaser.Scene {
     fromY: number,
     targetX: number,
     targetY: number,
-    fallback: NpcDirection,
+    fallback: NpcDirection
   ): NpcDirection {
     const deltaX = targetX - fromX;
     const deltaY = targetY - fromY;
@@ -304,24 +342,21 @@ export class GameScene extends Phaser.Scene {
       this.player.y,
       npc.sprite.x,
       npc.sprite.y,
-      this.localPlayerController.direction,
+      this.localPlayerController.direction
     );
     const npcDirection = this.getFacingDirection(
       npc.sprite.x,
       npc.sprite.y,
       this.player.x,
       this.player.y,
-      npc.definition.direction,
+      npc.definition.direction
     );
 
     this.localPlayerController.setDirection(playerDirection);
     this.localPlayerController.setIdle();
 
     npc.sprite.anims.stop();
-    npc.sprite.setTexture(
-      getNpcTextureKey(npc.definition.sprite, npcDirection),
-      0,
-    );
+    npc.sprite.setTexture(getNpcTextureKey(npc.definition.sprite, npcDirection), 0);
   }
 
   private restoreActiveDialogueNpcDirection(): void {
@@ -332,7 +367,7 @@ export class GameScene extends Phaser.Scene {
     npc.sprite.anims.stop();
     npc.sprite.setTexture(
       getNpcTextureKey(npc.definition.sprite, npc.definition.direction),
-      0,
+      0
     );
 
     this.activeDialogueNpc = undefined;
@@ -356,14 +391,10 @@ export class GameScene extends Phaser.Scene {
       for (const direction of definition.directions) {
         const textureKey = getNpcTextureKey(spriteId, direction);
 
-        this.load.spritesheet(
-          textureKey,
-          `${definition.folder}/walk-${direction}.png`,
-          {
-            frameWidth: NPC_FRAME_WIDTH,
-            frameHeight: NPC_FRAME_HEIGHT,
-          },
-        );
+        this.load.spritesheet(textureKey, `${definition.folder}/walk-${direction}.png`, {
+          frameWidth: NPC_FRAME_WIDTH,
+          frameHeight: NPC_FRAME_HEIGHT,
+        });
       }
     }
   }
@@ -397,6 +428,10 @@ export class GameScene extends Phaser.Scene {
       this.handleChatMessageReceived(message);
     });
 
+    this.network.onDialogueState((state) => {
+      this.handleDialogueState(state);
+    });
+
     this.network.onPokemonTrainerState((payload) => {
       const party = payload.trainerState.party.pokemon;
       const pokemon = party[0];
@@ -416,6 +451,18 @@ export class GameScene extends Phaser.Scene {
         this.starterSelectionPanel.hide();
         this.chatBox.setVisible(true);
       }
+    });
+
+    this.network.onStarterSelectionStatus((status) => {
+      if (!status.unlocked) {
+        return;
+      }
+      if (!this.canChooseStarter) {
+        return;
+      }
+
+      this.chatBox.setVisible(false);
+      this.starterSelectionPanel.show();
     });
 
     this.network.onCurrentPlayers((players) => {
@@ -466,10 +513,7 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.network.onTransitionResolved((transition) => {
-      this.mapTransitionController.handleResolved(
-        transition,
-        this.currentMapId,
-      );
+      this.mapTransitionController.handleResolved(transition, this.currentMapId);
     });
 
     this.network.onPlayerDisconnected((playerId) => {
@@ -502,7 +546,7 @@ export class GameScene extends Phaser.Scene {
 
     this.playerNameLabel.setPosition(
       Math.round(this.player.x),
-      Math.round(this.player.y - 14),
+      Math.round(this.player.y - 14)
     );
   }
 
@@ -523,7 +567,7 @@ export class GameScene extends Phaser.Scene {
             {
               start: 0,
               end: 11,
-            },
+            }
           ),
 
           frameRate: 12,
@@ -549,7 +593,7 @@ export class GameScene extends Phaser.Scene {
       -horizontalPadding,
       -verticalPadding,
       mapWidth + horizontalPadding * 2,
-      mapHeight + verticalPadding * 2,
+      mapHeight + verticalPadding * 2
     );
   }
 
@@ -581,22 +625,24 @@ export class GameScene extends Phaser.Scene {
     if (this.chatBox.isTyping()) {
       return;
     }
+    if (this.pendingDialogueNpc) {
+      return;
+    }
     if (!Phaser.Input.Keyboard.JustDown(this.interactKey)) {
       return;
     }
     if (this.dialogueBox.isOpen()) {
-      this.dialogueBox.advance();
+      const sessionId = this.activeDialogueSessionId;
 
-      if (!this.dialogueBox.isOpen()) {
-        const completedDialogueNpc = this.activeDialogueNpc;
-        this.restoreActiveDialogueNpcDirection();
-        this.chatBox.setVisible(true);
-
-        if (completedDialogueNpc) {
-          this.handleNpcPostDialogueAction(completedDialogueNpc);
-        }
+      if (!sessionId) {
+        return;
+      }
+      if (this.isDialogueAdvancePending) {
+        return;
       }
 
+      this.isDialogueAdvancePending = true;
+      this.network.advanceDialogue(sessionId);
       return;
     }
 
@@ -605,7 +651,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     const interactionPrompt = this.getNpcInteractionPromptText(
-      this.nearbyNpc.definition.interactionType,
+      this.nearbyNpc.definition.interactionType
     );
     if (!interactionPrompt) {
       return;
@@ -648,9 +694,7 @@ export class GameScene extends Phaser.Scene {
     }
     const npc = this.nearbyNpc;
 
-    const promptText = this.getNpcInteractionPromptText(
-      npc.definition.interactionType,
-    );
+    const promptText = this.getNpcInteractionPromptText(npc.definition.interactionType);
     if (!promptText) {
       prompt.setVisible(false);
       return;
@@ -663,7 +707,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private getNpcInteractionPromptText(
-    interactionType: NpcInteractionType,
+    interactionType: NpcInteractionType
   ): string | undefined {
     switch (interactionType) {
       case "dialogue":
@@ -756,24 +800,5 @@ export class GameScene extends Phaser.Scene {
       this.chatBox.isTyping() ||
       this.starterSelectionPanel.isVisible()
     );
-  }
-
-  private handleNpcPostDialogueAction(npc: NpcInstance): void {
-    const action = npc.definition.postDialogueAction;
-
-    if (!action) {
-      return;
-    }
-
-    switch (action) {
-      case "chooseStarter":
-        if (!this.canChooseStarter) {
-          return;
-        }
-
-        this.chatBox.setVisible(false);
-        this.starterSelectionPanel.show();
-        return;
-    }
   }
 }

@@ -30,6 +30,24 @@ function getRequiredStringProperty(object, propertyName) {
   return property.value.trim();
 }
 
+function getOptionalStringProperty(object, propertyName) {
+  const property = object.properties?.find(
+    (candidate) => candidate.name === propertyName
+  );
+
+  if (!property) {
+    return undefined;
+  }
+
+  if (typeof property.value !== "string" || property.value.trim().length === 0) {
+    throw new Error(
+      `Object "${object.name}" property "${propertyName}" must be a non-empty string`
+    );
+  }
+
+  return property.value.trim();
+}
+
 function parseMapSpawn(object, mapName) {
   if (typeof object.name !== "string" || object.name.trim().length === 0) {
     throw new Error(`Map "${mapName}" contains a mapSpawn without a name`);
@@ -48,6 +66,27 @@ function parseMapSpawn(object, mapName) {
   };
 }
 
+function parseNpc(object, mapName) {
+  if (typeof object.name !== "string" || object.name.trim().length === 0) {
+    throw new Error(`Map "${mapName}" contains an NPC without a name`);
+  }
+
+  if (!Number.isFinite(object.x) || !Number.isFinite(object.y)) {
+    throw new Error(`Invalid coordinates for NPC "${object.name}" in map "${mapName}"`);
+  }
+
+  const dialogueId = getOptionalStringProperty(object, "dialogueId");
+
+  const postDialogueAction = getOptionalStringProperty(object, "postDialogueAction");
+
+  return {
+    id: object.name.trim(),
+    x: object.x,
+    y: object.y,
+    dialogueId,
+    postDialogueAction,
+  };
+}
 function parseMapTransition(object, mapName) {
   if (typeof object.name !== "string" || object.name.trim().length === 0) {
     throw new Error(`Map "${mapName}" contains a mapExit without a name`);
@@ -111,7 +150,8 @@ function formatSpawns(spawns) {
   }
 
   const entries = spawns.map(
-    (spawn) => `    ${JSON.stringify(spawn.id)}: {
+    (spawn) =>
+      `    ${JSON.stringify(spawn.id)}: {
       x: ${spawn.x},
       y: ${spawn.y},
     },`
@@ -122,13 +162,42 @@ ${entries.join("\n")}
   },`;
 }
 
+function formatNpcs(npcs) {
+  if (npcs.length === 0) {
+    return `  npcs: {},`;
+  }
+
+  const entries = npcs.map((npc) => {
+    const properties = [`      x: ${npc.x},`, `      y: ${npc.y},`];
+
+    if (npc.dialogueId) {
+      properties.push(`      dialogueId: ${JSON.stringify(npc.dialogueId)},`);
+    }
+
+    if (npc.postDialogueAction) {
+      properties.push(
+        `      postDialogueAction: ${JSON.stringify(npc.postDialogueAction)},`
+      );
+    }
+
+    return `    ${JSON.stringify(npc.id)}: {
+${properties.join("\n")}
+    },`;
+  });
+
+  return `  npcs: {
+${entries.join("\n")}
+  },`;
+}
+
 function formatTransitions(transitions) {
   if (transitions.length === 0) {
     return `  transitions: {},`;
   }
 
   const entries = transitions.map(
-    (transition) => `    ${JSON.stringify(transition.id)}: {
+    (transition) =>
+      `    ${JSON.stringify(transition.id)}: {
       targetMapId: ${JSON.stringify(transition.targetMapId)},
       targetSpawn: ${JSON.stringify(transition.targetSpawn)},
       trigger: {
@@ -216,11 +285,17 @@ for (const mapDefinition of MAPS) {
     .filter((object) => object.type === "mapSpawn")
     .map((object) => parseMapSpawn(object, name));
 
+  const npcs = objectsLayer.objects
+    .filter((object) => object.type === "npc")
+    .map((object) => parseNpc(object, name));
+
   const transitions = objectsLayer.objects
     .filter((object) => object.type === "mapExit")
     .map((object) => parseMapTransition(object, name));
 
   ensureUniqueIds(spawns, "mapSpawn", name);
+
+  ensureUniqueIds(npcs, "NPC", name);
 
   ensureUniqueIds(transitions, "mapExit", name);
 
@@ -233,6 +308,7 @@ for (const mapDefinition of MAPS) {
     collision,
     collisionRows,
     spawns,
+    npcs,
     transitions,
   });
 }
@@ -271,6 +347,7 @@ for (const parsedMap of parsedMaps) {
     collision,
     collisionRows,
     spawns,
+    npcs,
     transitions,
   } = parsedMap;
 
@@ -297,6 +374,8 @@ export const ${exportName} = {
 
 ${formatSpawns(spawns)}
 
+${formatNpcs(npcs)}
+
 ${formatTransitions(transitions)}
 
   collision: [
@@ -318,6 +397,8 @@ ${collisionRows.join("\n")}
   console.log(`Spawn: (${playerSpawn.x}, ${playerSpawn.y})`);
 
   console.log(`Map spawns: ${spawns.length}`);
+
+  console.log(`NPCs: ${npcs.length}`);
 
   console.log(`Map transitions: ${transitions.length}`);
 

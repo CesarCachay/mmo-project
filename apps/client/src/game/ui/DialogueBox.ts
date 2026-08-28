@@ -1,35 +1,28 @@
 import Phaser from "phaser";
 
-const DIALOGUE_MAX_WIDTH = 760;
-const DIALOGUE_SIDE_MARGIN = 16;
-const DIALOGUE_BOTTOM_MARGIN = 16;
-const DIALOGUE_HEIGHT = 90;
-
 export class DialogueBox {
   private readonly container: Phaser.GameObjects.Container;
+
   private readonly speakerText: Phaser.GameObjects.Text;
+
   private readonly dialogueText: Phaser.GameObjects.Text;
+
   private readonly hintText: Phaser.GameObjects.Text;
 
   private open = false;
 
-  private currentSpeaker = "";
-  private currentLines: readonly string[] = [];
-  private currentLineIndex = 0;
-
   constructor(scene: Phaser.Scene) {
-    const viewportWidth = scene.scale.width;
-    const viewportHeight = scene.scale.height;
+    const width = scene.scale.width;
 
-    const availableWidth = viewportWidth - DIALOGUE_SIDE_MARGIN * 2;
+    const height = scene.scale.height;
 
-    const boxWidth = Math.min(availableWidth, DIALOGUE_MAX_WIDTH);
+    const boxWidth = width - 32;
 
-    const boxHeight = DIALOGUE_HEIGHT;
+    const boxHeight = 90;
 
-    const x = Math.round((viewportWidth - boxWidth) / 2);
+    const x = 16;
 
-    const y = viewportHeight - boxHeight - DIALOGUE_BOTTOM_MARGIN;
+    const y = height - boxHeight - 16;
 
     const background = scene.add
       .rectangle(0, 0, boxWidth, boxHeight, 0x111111, 0.92)
@@ -54,7 +47,7 @@ export class DialogueBox {
     });
 
     this.hintText = scene.add
-      .text(boxWidth - 10, boxHeight - 8, "E to close", {
+      .text(boxWidth - 10, boxHeight - 8, "", {
         fontFamily: "Arial",
         fontSize: "9px",
         color: "#cccccc",
@@ -71,58 +64,29 @@ export class DialogueBox {
     this.container.setScrollFactor(0).setDepth(1000).setVisible(false);
   }
 
-  start(speaker: string, lines: readonly string[]): void {
-    if (lines.length === 0) {
-      return;
-    }
-
-    this.currentSpeaker = speaker;
-    this.currentLines = lines;
-    this.currentLineIndex = 0;
-
+  public showLine(speaker: string, line: string, isLastLine: boolean): void {
     this.open = true;
+
     this.container.setVisible(true);
 
-    this.renderCurrentLine();
+    this.renderLine(speaker, line, isLastLine);
   }
 
-  advance(): void {
-    if (!this.open) {
-      return;
-    }
-
-    const isLastLine = this.currentLineIndex >= this.currentLines.length - 1;
-
-    if (isLastLine) {
-      this.hide();
-
-      return;
-    }
-
-    this.currentLineIndex++;
-
-    this.renderCurrentLine();
-  }
-
-  hide(): void {
+  public hide(): void {
     this.container.setVisible(false);
 
     this.open = false;
-
-    this.currentSpeaker = "";
-    this.currentLines = [];
-    this.currentLineIndex = 0;
   }
 
-  isOpen(): boolean {
+  public isOpen(): boolean {
     return this.open;
   }
 
-  private renderCurrentLine(): void {
-    const currentLine = this.currentLines[this.currentLineIndex];
-    this.speakerText.setText(this.currentSpeaker);
-    this.dialogueText.setText(currentLine);
-    const isLastLine = this.currentLineIndex === this.currentLines.length - 1;
+  private renderLine(speaker: string, line: string, isLastLine: boolean): void {
+    this.speakerText.setText(speaker);
+
+    this.dialogueText.setText(line);
+
     this.hintText.setText(isLastLine ? "E to close" : "E to continue");
   }
 }

@@ -46,8 +46,20 @@ export class PokemonTrainerService {
       );
     }
 
-    const starter = POKEMON_STARTERS[starterId];
+    if (!this.trainerStateStore.isStarterSelectionUnlocked(playerId)) {
+      throw new Error(
+        `Starter selection is not unlocked for player ${playerId}`,
+      );
+    }
 
-    return this.addPokemon(playerId, starter.speciesId, starter.level);
+    const starter = POKEMON_STARTERS[starterId];
+    const updatedTrainerState = this.addPokemon(
+      playerId,
+      starter.speciesId,
+      starter.level,
+    );
+
+    this.trainerStateStore.lockStarterSelection(playerId);
+    return updatedTrainerState;
   }
 }

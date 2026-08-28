@@ -23,22 +23,10 @@ export type { CollisionMap, Position } from "./maps/collision.js";
 export { PLAYER_AVATAR_IDS, isPlayerAvatarId } from "./player/avatar.js";
 export type { PlayerAvatarId } from "./player/avatar.js";
 
-export type {
-  ChatMessage,
-  ChatMessageInput,
-  ChatMessageSender,
-} from "./chat.js";
-export {
-  CHAT_EVENTS,
-  CHAT_MESSAGE_MAX_LENGTH,
-  isChatMessageInput,
-} from "./chat.js";
+export type { ChatMessage, ChatMessageInput, ChatMessageSender } from "./chat.js";
+export { CHAT_EVENTS, CHAT_MESSAGE_MAX_LENGTH, isChatMessageInput } from "./chat.js";
 
-export type {
-  MapId,
-  MapTransitionInput,
-  MapTransitionResolved,
-} from "./map.js";
+export type { MapId, MapTransitionInput, MapTransitionResolved } from "./map.js";
 export {
   MAP_IDS,
   DEFAULT_MAP_ID,
@@ -52,6 +40,7 @@ export type {
   SharedMapSpawn,
   SharedMapTransition,
   SharedMapTransitionTrigger,
+  SharedMapNpc,
 } from "./mapDataRegistry.js";
 export { MAP_DATA_REGISTRY } from "./mapDataRegistry.js";
 
@@ -118,7 +107,10 @@ export {
   removePokemonFromParty,
 } from "./pokemon/pokemon-party.js";
 export { POKEMON_EVENTS } from "./pokemon/pokemon-network.js";
-export type { PokemonTrainerStatePayload } from "./pokemon/pokemon-network.js";
+export type {
+  PokemonTrainerStatePayload,
+  PokemonStarterSelectionStatus,
+} from "./pokemon/pokemon-network.js";
 
 // Pokemon Starters
 export {
@@ -130,3 +122,17 @@ export type {
   PokemonStarterId,
   PokemonStarterChoiceInput,
 } from "./pokemon/pokemon-starter.js";
+
+// Dialogue with NPCs
+export {
+  DIALOGUE_EVENTS,
+  isDialogueAdvanceInput,
+  isDialogueStartInput,
+} from "./dialogue-network.js";
+export type {
+  DialogueStartInput,
+  DialogueAdvanceInput,
+  DialogueSessionState,
+} from "./dialogue-network.js";
+export type { DialogueId, DialogueDefinition } from "./dialogue.js";
+export { DIALOGUES, getDialogue } from "./dialogue.js";

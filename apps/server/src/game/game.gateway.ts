@@ -30,11 +30,16 @@ import {
   MAP_DATA_REGISTRY,
   POKEMON_EVENTS,
   isPokemonStarterChoiceInput,
+  DIALOGUE_EVENTS,
+  isDialogueStartInput,
+  isDialogueAdvanceInput,
 } from '@cesar-mmo/shared';
 import {
   getServerMapSpawn,
   getServerMapTransition,
   isPlayerInsideMapTransition,
+  getServerMapNpc,
+  isPlayerNearMapNpc,
 } from './maps/serverMapRegistry';
 import { ChatService } from 'src/chat/chat.service';
 
@@ -44,10 +49,14 @@ import type {
   MapTransitionResolved,
   MapId,
   PokemonTrainerStatePayload,
+  PokemonStarterSelectionStatus,
+  SharedMapNpc,
 } from '@cesar-mmo/shared';
 
 import { PokemonTrainerService } from 'src/pokemon/pokemon-trainer.service';
 import { PokemonTrainerStateStore } from 'src/pokemon/pokemon-trainer-state.store';
+import { DialogueSessionService } from 'src/dialogue/dialogue-session.service';
+import { DialogueSessionStore } from 'src/dialogue/dialogue-session.store';
 
 @WebSocketGateway({
   cors: {
@@ -71,6 +80,11 @@ export class GameGateway
   private readonly pokemonTrainerStateStore = new PokemonTrainerStateStore();
   private readonly pokemonTrainerService = new PokemonTrainerService(
     this.pokemonTrainerStateStore,
+  );
+
+  private readonly dialogueSessionStore = new DialogueSessionStore();
+  private readonly dialogueSessionService = new DialogueSessionService(
+    this.dialogueSessionStore,
   );
 
   private nextColorIndex = 0;
@@ -167,6 +181,7 @@ export class GameGateway
     const player = this.players[client.id];
 
     this.pokemonTrainerStateStore.remove(client.id);
+    this.dialogueSessionStore.remove(client.id);
 
     if (!player) {
       return;
@@ -221,6 +236,107 @@ export class GameGateway
     this.server.emit(CHAT_EVENTS.MESSAGE_RECEIVED, message);
   }
 
+  @SubscribeMessage(DIALOGUE_EVENTS.START)
+  handleDialogueStart(
+    @ConnectedSocket()
+    client: Socket,
+
+    @MessageBody()
+    payload: unknown,
+  ): void {
+    if (!isDialogueStartInput(payload)) {
+      return;
+    }
+
+    const player = this.players[client.id];
+
+    if (!player) {
+      return;
+    }
+
+    const npc = getServerMapNpc(player.mapId, payload.npcId);
+
+    if (!npc) {
+      return;
+    }
+
+    if (!npc.dialogueId) {
+      return;
+    }
+
+    if (!isPlayerNearMapNpc(player.x, player.y, npc)) {
+      return;
+    }
+
+    try {
+      const state = this.dialogueSessionService.start(
+        client.id,
+        payload.npcId,
+        npc.dialogueId,
+      );
+
+      client.emit(DIALOGUE_EVENTS.STATE, state);
+    } catch (error: unknown) {
+      console.warn(`[Dialogue] Start rejected for player ${client.id}`, error);
+    }
+  }
+
+  @SubscribeMessage(DIALOGUE_EVENTS.ADVANCE)
+  handleDialogueAdvance(
+    @ConnectedSocket()
+    client: Socket,
+
+    @MessageBody()
+    payload: unknown,
+  ): void {
+    if (!isDialogueAdvanceInput(payload)) {
+      return;
+    }
+
+    const player = this.players[client.id];
+    if (!player) {
+      return;
+    }
+
+    const session = this.dialogueSessionStore.get(client.id);
+    if (!session) {
+      return;
+    }
+
+    const sessionId = payload.sessionId.trim();
+    if (session.sessionId !== sessionId) {
+      return;
+    }
+
+    const npc = getServerMapNpc(player.mapId, session.npcId);
+
+    if (!npc) {
+      this.dialogueSessionStore.remove(client.id);
+      return;
+    }
+    if (npc.dialogueId !== session.dialogueId) {
+      this.dialogueSessionStore.remove(client.id);
+      return;
+    }
+    if (!isPlayerNearMapNpc(player.x, player.y, npc)) {
+      this.dialogueSessionStore.remove(client.id);
+      return;
+    }
+
+    try {
+      const state = this.dialogueSessionService.advance(client.id, sessionId);
+      client.emit(DIALOGUE_EVENTS.STATE, state);
+      if (state.completed) {
+        this.handleDialoguePostAction(client, npc);
+      }
+    } catch (error: unknown) {
+      console.warn(
+        `[Dialogue] Advance rejected for player ${client.id}`,
+        error,
+      );
+    }
+  }
+
   @SubscribeMessage(POKEMON_EVENTS.CHOOSE_STARTER)
   handleChooseStarter(
     @ConnectedSocket() client: Socket,
@@ -231,21 +347,38 @@ export class GameGateway
     }
 
     const player = this.players[client.id];
-
     if (!player) {
       return;
     }
 
-    const trainerState = this.pokemonTrainerService.chooseStarter(
-      player.id,
-      payload.starterId,
-    );
+    const starterNpc = getServerMapNpc(player.mapId, 'professorOak');
 
-    const trainerStatePayload: PokemonTrainerStatePayload = {
-      trainerState,
-    };
+    if (!starterNpc || !isPlayerNearMapNpc(player.x, player.y, starterNpc)) {
+      this.pokemonTrainerStateStore.lockStarterSelection(client.id);
+      return;
+    }
 
-    client.emit(POKEMON_EVENTS.TRAINER_STATE, trainerStatePayload);
+    try {
+      const trainerState = this.pokemonTrainerService.chooseStarter(
+        client.id,
+        payload.starterId,
+      );
+      client.emit(POKEMON_EVENTS.TRAINER_STATE, {
+        trainerState,
+      });
+    } catch (error: unknown) {
+      console.warn(
+        `[Pokemon] Starter selection rejected for player ${client.id}`,
+        error,
+      );
+      const trainerState = this.pokemonTrainerStateStore.get(client.id);
+      if (!trainerState) {
+        return;
+      }
+      client.emit(POKEMON_EVENTS.TRAINER_STATE, {
+        trainerState,
+      });
+    }
   }
 
   @SubscribeMessage(MAP_EVENTS.REQUEST_TRANSITION)
@@ -258,8 +391,11 @@ export class GameGateway
     }
 
     const player = this.players[client.id];
-
     if (!player) {
+      return;
+    }
+
+    if (this.dialogueSessionStore.has(client.id)) {
       return;
     }
 
@@ -267,7 +403,6 @@ export class GameGateway
       player.mapId,
       payload.transitionId,
     );
-
     if (!transition) {
       return;
     }
@@ -337,6 +472,34 @@ export class GameGateway
     client.emit(MAP_EVENTS.TRANSITION_RESOLVED, resolvedTransition);
   }
 
+  private handleDialoguePostAction(client: Socket, npc: SharedMapNpc): void {
+    const action = npc.postDialogueAction;
+
+    if (!action) {
+      return;
+    }
+
+    switch (action) {
+      case 'chooseStarter': {
+        const trainerState = this.pokemonTrainerStateStore.get(client.id);
+
+        if (!trainerState) {
+          return;
+        }
+        if (trainerState.party.pokemon.length > 0) {
+          return;
+        }
+
+        this.pokemonTrainerStateStore.unlockStarterSelection(client.id);
+
+        client.emit(POKEMON_EVENTS.STARTER_SELECTION_STATUS, {
+          unlocked: true,
+        } satisfies PokemonStarterSelectionStatus);
+        return;
+      }
+    }
+  }
+
   private startGameLoop() {
     const tickInterval = 1000 / SERVER_TICK_RATE;
 
@@ -366,6 +529,11 @@ export class GameGateway
     input: PlayerInput,
     deltaSeconds: number,
   ) {
+    if (this.dialogueSessionStore.has(player.id)) {
+      player.isMoving = false;
+      return;
+    }
+
     player.direction = getDirectionFromInput(input, player.direction);
     player.isMoving = isPlayerMoving(input);
 

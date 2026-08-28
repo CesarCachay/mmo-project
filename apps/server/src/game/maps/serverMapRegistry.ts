@@ -4,9 +4,17 @@ import type {
   MapId,
   SharedMapSpawn,
   SharedMapTransition,
+  SharedMapNpc,
 } from '@cesar-mmo/shared';
 
 const MAP_TRANSITION_TRIGGER_TOLERANCE = 8;
+
+const NPC_INTERACTION_DISTANCE = 36;
+
+const NPC_INTERACTION_SERVER_TOLERANCE = 4;
+
+const MAX_NPC_INTERACTION_DISTANCE =
+  NPC_INTERACTION_DISTANCE + NPC_INTERACTION_SERVER_TOLERANCE;
 
 export function getServerMapTransition(
   mapId: MapId,
@@ -37,4 +45,32 @@ export function isPlayerInsideMapTransition(
   return (
     playerX >= minX && playerX <= maxX && playerY >= minY && playerY <= maxY
   );
+}
+
+export function getServerMapNpc(
+  mapId: MapId,
+  npcId: string,
+): SharedMapNpc | undefined {
+  const npcs = MAP_DATA_REGISTRY[mapId].npcs;
+
+  if (!npcs) {
+    return undefined;
+  }
+
+  return npcs[npcId.trim()];
+}
+
+export function isPlayerNearMapNpc(
+  playerX: number,
+  playerY: number,
+  npc: SharedMapNpc,
+): boolean {
+  const deltaX = playerX - npc.x;
+  const deltaY = playerY - npc.y;
+  const distanceSquared = deltaX * deltaX + deltaY * deltaY;
+
+  const maxDistanceSquared =
+    MAX_NPC_INTERACTION_DISTANCE * MAX_NPC_INTERACTION_DISTANCE;
+
+  return distanceSquared <= maxDistanceSquared;
 }

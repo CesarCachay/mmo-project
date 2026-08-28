@@ -5,6 +5,8 @@ import type { PokemonParty, PokemonTrainerState } from '@cesar-mmo/shared';
 export class PokemonTrainerStateStore {
   private readonly trainerStates = new Map<string, PokemonTrainerState>();
 
+  private readonly starterSelectionUnlockedPlayerIds = new Set<string>();
+
   create(playerId: string): PokemonTrainerState {
     if (this.trainerStates.has(playerId)) {
       throw new Error(
@@ -46,11 +48,29 @@ export class PokemonTrainerStateStore {
     return this.trainerStates.has(playerId);
   }
 
-  remove(playerId: string): void {
+  public remove(playerId: string): void {
     this.trainerStates.delete(playerId);
+    this.starterSelectionUnlockedPlayerIds.delete(playerId);
   }
 
-  clear(): void {
+  public clear(): void {
     this.trainerStates.clear();
+    this.starterSelectionUnlockedPlayerIds.clear();
+  }
+
+  public unlockStarterSelection(playerId: string): void {
+    if (!this.trainerStates.has(playerId)) {
+      throw new Error(`Pokémon trainer state not found for player ${playerId}`);
+    }
+
+    this.starterSelectionUnlockedPlayerIds.add(playerId);
+  }
+
+  public isStarterSelectionUnlocked(playerId: string): boolean {
+    return this.starterSelectionUnlockedPlayerIds.has(playerId);
+  }
+
+  public lockStarterSelection(playerId: string): void {
+    this.starterSelectionUnlockedPlayerIds.delete(playerId);
   }
 }

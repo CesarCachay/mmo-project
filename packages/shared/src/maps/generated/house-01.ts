@@ -26,6 +26,8 @@ export const HOUSE_01_MAP = {
     },
   },
 
+  npcs: {},
+
   transitions: {
     "exitToTown": {
       targetMapId: "town-01",
