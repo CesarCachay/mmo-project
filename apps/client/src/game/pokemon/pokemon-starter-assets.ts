@@ -5,19 +5,16 @@ export interface PokemonStarterAsset {
   path: string;
 }
 
-function getPokemonAssetPath(speciesId: number): string {
-  const pokedexNumber = String(speciesId).padStart(3, "0");
-
-  return `/assets/pokemon/starters/${pokedexNumber}.png`;
+function getStarterAssetPath(speciesId: number): string {
+  return `/assets/pokemon/starters/${String(speciesId).padStart(3, "0")}.png`;
 }
 
 export const POKEMON_STARTER_ASSETS = Object.fromEntries(
   Object.entries(POKEMON_STARTERS).map(([starterId, starter]) => [
     starterId,
     {
-      textureKey: `pokemon-${starter.speciesId}`,
-
-      path: getPokemonAssetPath(starter.speciesId),
+      textureKey: `pokemon-starter-${starter.speciesId}`,
+      path: getStarterAssetPath(starter.speciesId),
     },
-  ]),
+  ])
 ) as Record<PokemonStarterId, PokemonStarterAsset>;
