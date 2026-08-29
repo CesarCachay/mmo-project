@@ -7,7 +7,7 @@ import {
   type PokemonOverworldDirection,
 } from "./pokemon-overworld-sprite.registry";
 
-const FOLLOW_DISTANCE = 22;
+const FOLLOW_DISTANCE = 8;
 
 const FOLLOW_INTERPOLATION_RATE = 8;
 

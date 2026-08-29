@@ -1,0 +1,96 @@
+{
+  "starters": 12,
+  "icons_current": 621,
+  "icons_future": 320,
+  "right_current": 49,
+  "right_future": 31,
+  "female_current": 0,
+  "female_future": 5,
+  "legacy": 737,
+  "legacy_female": 3,
+  "overworld": {
+    "normal": {
+      "down": {
+        "frame-1": 564,
+        "frame-2": 564
+      },
+      "left": {
+        "frame-1": 564,
+        "frame-2": 564
+      },
+      "right": {
+        "frame-1": 564,
+        "frame-2": 564
+      },
+      "up": {
+        "frame-1": 564,
+        "frame-2": 564
+      }
+    },
+    "shiny": {
+      "down": {
+        "frame-1": 564,
+        "frame-2": 564
+      },
+      "left": {
+        "frame-1": 564,
+        "frame-2": 564
+      },
+      "right": {
+        "frame-1": 564,
+        "frame-2": 564
+      },
+      "up": {
+        "frame-1": 564,
+        "frame-2": 564
+      }
+    },
+    "female_normal": {
+      "down": {
+        "frame-1": 12,
+        "frame-2": 12
+      },
+      "left": {
+        "frame-1": 12,
+        "frame-2": 12
+      },
+      "right": {
+        "frame-1": 12,
+        "frame-2": 12
+      },
+      "up": {
+        "frame-1": 12,
+        "frame-2": 12
+      }
+    },
+    "female_shiny": {
+      "down": {
+        "frame-1": 12,
+        "frame-2": 12
+      },
+      "left": {
+        "frame-1": 12,
+        "frame-2": 12
+      },
+      "right": {
+        "frame-1": 12,
+        "frame-2": 12
+      },
+      "up": {
+        "frame-1": 12,
+        "frame-2": 12
+      }
+    }
+  },
+  "total_pngs": 10994,
+  "invalid_pngs": 0,
+  "missing_required_paths": [],
+  "missing_base_party_icons_1_493": [],
+  "missing_normal_overworld_base_frames_1_493": 0,
+  "dimensions": {
+    "32x32 RGBA": 9229,
+    "32x32 P": 199,
+    "40x30 P": 1038,
+    "64x64 RGBA": 528
+  }
+}
