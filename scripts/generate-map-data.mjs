@@ -10,6 +10,10 @@ const MAPS = [
     name: "house-01",
     exportName: "HOUSE_01_MAP",
   },
+  {
+    name: "route-01",
+    exportName: "ROUTE_01_MAP",
+  },
 ];
 
 const availableMapIds = new Set(MAPS.map((mapDefinition) => mapDefinition.name));
@@ -132,6 +136,64 @@ function parseMapTransition(object, mapName) {
   };
 }
 
+function getTiledObjectType(object) {
+  if (typeof object.class === "string" && object.class.trim().length > 0) {
+    return object.class.trim();
+  }
+
+  if (typeof object.type === "string" && object.type.trim().length > 0) {
+    return object.type.trim();
+  }
+
+  return "";
+}
+
+function parseEncounterZone(object, mapName) {
+  if (typeof object.name !== "string" || object.name.trim().length === 0) {
+    throw new Error(`Map "${mapName}" contains an encounter zone without a name`);
+  }
+
+  const objectType = getTiledObjectType(object);
+
+  if (objectType !== "encounter-zone") {
+    throw new Error(
+      `Object "${object.name}" in EncounterZones of map "${mapName}" must have class/type "encounter-zone"`
+    );
+  }
+
+  if (
+    typeof object.x !== "number" ||
+    typeof object.y !== "number" ||
+    typeof object.width !== "number" ||
+    typeof object.height !== "number"
+  ) {
+    throw new Error(
+      `Invalid rectangle for encounter zone "${object.name}" in map "${mapName}"`
+    );
+  }
+
+  if (object.width <= 0 || object.height <= 0) {
+    throw new Error(
+      `Encounter zone "${object.name}" in map "${mapName}" must have width and height greater than zero`
+    );
+  }
+
+  const encounterTableId = getRequiredStringProperty(object, "encounterTableId");
+
+  return {
+    id: object.name.trim(),
+
+    encounterTableId,
+
+    bounds: {
+      x: object.x,
+      y: object.y,
+      width: object.width,
+      height: object.height,
+    },
+  };
+}
+
 function ensureUniqueIds(items, kind, mapName) {
   const ids = new Set();
 
@@ -214,6 +276,28 @@ ${entries.join("\n")}
   },`;
 }
 
+function formatEncounterZones(encounterZones) {
+  if (encounterZones.length === 0) {
+    return `  encounterZones: {},`;
+  }
+
+  const entries = encounterZones.map(
+    (zone) => `    ${JSON.stringify(zone.id)}: {
+      encounterTableId: ${JSON.stringify(zone.encounterTableId)},
+      bounds: {
+        x: ${zone.bounds.x},
+        y: ${zone.bounds.y},
+        width: ${zone.bounds.width},
+        height: ${zone.bounds.height},
+      },
+    },`
+  );
+
+  return `  encounterZones: {
+${entries.join("\n")}
+  },`;
+}
+
 const parsedMaps = [];
 
 for (const mapDefinition of MAPS) {
@@ -243,6 +327,10 @@ for (const mapDefinition of MAPS) {
 
   const objectsLayer = map.layers.find(
     (layer) => layer.name === "Objects" && layer.type === "objectgroup"
+  );
+
+  const encounterZonesLayer = map.layers.find(
+    (layer) => layer.name === "EncounterZones" && layer.type === "objectgroup"
   );
 
   if (!objectsLayer) {
@@ -293,11 +381,17 @@ for (const mapDefinition of MAPS) {
     .filter((object) => object.type === "mapExit")
     .map((object) => parseMapTransition(object, name));
 
+  const encounterZones = encounterZonesLayer
+    ? encounterZonesLayer.objects.map((object) => parseEncounterZone(object, name))
+    : [];
+
   ensureUniqueIds(spawns, "mapSpawn", name);
 
   ensureUniqueIds(npcs, "NPC", name);
 
   ensureUniqueIds(transitions, "mapExit", name);
+
+  ensureUniqueIds(encounterZones, "encounter zone", name);
 
   parsedMaps.push({
     name,
@@ -310,6 +404,7 @@ for (const mapDefinition of MAPS) {
     spawns,
     npcs,
     transitions,
+    encounterZones,
   });
 }
 
@@ -349,6 +444,7 @@ for (const parsedMap of parsedMaps) {
     spawns,
     npcs,
     transitions,
+    encounterZones,
   } = parsedMap;
 
   const generatedFile = `// AUTO-GENERATED FILE.
@@ -378,6 +474,8 @@ ${formatNpcs(npcs)}
 
 ${formatTransitions(transitions)}
 
+${formatEncounterZones(encounterZones)}
+
   collision: [
 ${collisionRows.join("\n")}
   ],
@@ -401,6 +499,8 @@ ${collisionRows.join("\n")}
   console.log(`NPCs: ${npcs.length}`);
 
   console.log(`Map transitions: ${transitions.length}`);
+
+  console.log(`Encounter zones: ${encounterZones.length}`);
 
   console.log(`Blocked cells: ${collision.filter(Boolean).length}`);
 

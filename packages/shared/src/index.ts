@@ -41,6 +41,8 @@ export type {
   SharedMapTransition,
   SharedMapTransitionTrigger,
   SharedMapNpc,
+  SharedMapEncounterZone,
+  SharedMapEncounterZoneBounds,
 } from "./mapDataRegistry.js";
 export { MAP_DATA_REGISTRY } from "./mapDataRegistry.js";
 
@@ -63,6 +65,7 @@ export type {
   PokemonInstanceMove,
   PokemonParty,
   PokemonTrainerState,
+  PokemonFollowerPublicState,
 } from "./pokemon/pokemon.types.js";
 export { MAX_POKEMON_PARTY_SIZE } from "./pokemon/pokemon.types.js";
 
@@ -106,11 +109,15 @@ export {
   addPokemonToParty,
   removePokemonFromParty,
 } from "./pokemon/pokemon-party.js";
-export { POKEMON_EVENTS } from "./pokemon/pokemon-network.js";
+export {
+  POKEMON_EVENTS,
+  isPokemonWildEncounterStartedPayload,
+} from "./pokemon/pokemon-network.js";
 export type {
   PokemonTrainerStatePayload,
   PokemonStarterSelectionStatus,
   PokemonTrainerSessionPayload,
+  PokemonWildEncounterStartedPayload,
 } from "./pokemon/pokemon-network.js";
 
 // Pokemon Starters
@@ -137,3 +144,21 @@ export type {
 } from "./dialogue-network.js";
 export type { DialogueId, DialogueDefinition } from "./dialogue.js";
 export { DIALOGUES, getDialogue } from "./dialogue.js";
+
+// Pokemon Encounter
+export {
+  PokemonEncounterEntry,
+  PokemonEncounterTable,
+  PokemonEncounterZone,
+  WildPokemonEncounter,
+} from "./pokemon/encounters/pokemon-encounter.types.js";
+export {
+  POKEMON_ENCOUNTER_TABLES,
+  type PokemonEncounterTableId,
+} from "./pokemon/encounters/pokemon-encounter-table.registry.js";
+export {
+  selectWeightedEncounterEntry,
+  type PokemonEncounterRng,
+} from "./pokemon/encounters/pokemon-encounter-selection.js";
+export { rollPokemonEncounterLevel } from "./pokemon/encounters/pokemon-encounter-level.js";
+export { createWildPokemonEncounter } from "./pokemon/encounters/pokemon-wild-encounter.factory.js";

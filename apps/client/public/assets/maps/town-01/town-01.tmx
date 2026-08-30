@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="40" height="30" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="12">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="40" height="30" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="14">
  <editorsettings>
   <export target="town-01.json" format="json"/>
  </editorsettings>
@@ -172,7 +172,7 @@
 20,0,0,0,0,0,20,0,0,0,20,0,0,0,20,0,0,0,0,0,0,0,0,0,0,20,0,0,0,20,0,0,0,20,0,0,0,0,0,20,
 20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
 20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
-20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20
+20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,0,0,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20
 </data>
  </layer>
  <objectgroup id="5" name="Objects">
@@ -208,6 +208,15 @@
    <properties>
     <property name="targetMapId" value="house-01"/>
     <property name="targetSpawn" value="house01Entrance"/>
+   </properties>
+  </object>
+  <object id="12" name="route01Entrance" type="mapSpawn" x="320" y="448">
+   <point/>
+  </object>
+  <object id="13" name="enterRoute01" type="mapExit" x="304" y="464" width="32" height="16">
+   <properties>
+    <property name="targetMapId" value="route-01"/>
+    <property name="targetSpawn" value="town01Entrance"/>
    </properties>
   </object>
  </objectgroup>

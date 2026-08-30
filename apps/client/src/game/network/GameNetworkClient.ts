@@ -5,6 +5,7 @@ import {
   MAP_EVENTS,
   POKEMON_EVENTS,
   DIALOGUE_EVENTS,
+  isPokemonWildEncounterStartedPayload,
 } from "@cesar-mmo/shared";
 
 import type {
@@ -23,6 +24,7 @@ import type {
   DialogueSessionState,
   DialogueAdvanceInput,
   PokemonTrainerSessionPayload,
+  PokemonWildEncounterStartedPayload,
 } from "@cesar-mmo/shared";
 
 type ConnectionRejectedError = {
@@ -83,6 +85,19 @@ export class GameNetworkClient {
     callback: (status: PokemonStarterSelectionStatus) => void
   ): void {
     this.socket.on(POKEMON_EVENTS.STARTER_SELECTION_STATUS, callback);
+  }
+
+  // wild encounters
+  public onWildEncounterStarted(
+    callback: (payload: PokemonWildEncounterStartedPayload) => void
+  ): void {
+    this.socket.on(POKEMON_EVENTS.WILD_ENCOUNTER_STARTED, (payload: unknown) => {
+      if (!isPokemonWildEncounterStartedPayload(payload)) {
+        console.warn("[WildEncounter] invalid payload received");
+        return;
+      }
+      callback(payload);
+    });
   }
 
   public onCurrentPlayers(callback: (players: Record<string, Player>) => void): void {

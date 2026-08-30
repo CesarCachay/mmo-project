@@ -53,4 +53,20 @@ export const MAP_REGISTRY: Record<MapId, GameMapConfig> = {
       },
     ],
   },
+  [MAP_IDS.ROUTE_01]: {
+    id: MAP_IDS.ROUTE_01,
+    key: "route-01",
+    path: "/assets/maps/route-01/route-01.json",
+
+    tilesets: [
+      {
+        key: "route-01-terrain",
+        path: "/assets/maps/tilesets/route/route-01-terrain.png",
+      },
+      {
+        key: "route-01-collision",
+        path: "/assets/maps/tilesets/route/route-01-collision-marker.png",
+      },
+    ],
+  },
 };

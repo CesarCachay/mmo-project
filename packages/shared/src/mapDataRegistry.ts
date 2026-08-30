@@ -3,6 +3,9 @@ import type { MapId } from "./map.js";
 
 import { TOWN_01_MAP } from "./maps/generated/town-01.js";
 import { HOUSE_01_MAP } from "./maps/generated/house-01.js";
+import { ROUTE_01_MAP } from "./maps/generated/route-01.js";
+
+import { PokemonEncounterTableId } from "./pokemon/encounters/pokemon-encounter-table.registry.js";
 
 export type SharedMapSpawn = {
   readonly x: number;
@@ -51,9 +54,24 @@ export type SharedMapData = {
   readonly transitions: Readonly<Record<string, SharedMapTransition>>;
 
   readonly npcs?: Readonly<Record<string, SharedMapNpc>>;
+
+  readonly encounterZones: Readonly<Record<string, SharedMapEncounterZone>>;
 };
 
 export const MAP_DATA_REGISTRY: Record<MapId, SharedMapData> = {
   [MAP_IDS.TOWN_01]: TOWN_01_MAP,
   [MAP_IDS.HOUSE_01]: HOUSE_01_MAP,
+  [MAP_IDS.ROUTE_01]: ROUTE_01_MAP,
+};
+
+export type SharedMapEncounterZoneBounds = {
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+};
+
+export type SharedMapEncounterZone = {
+  readonly encounterTableId: PokemonEncounterTableId;
+  readonly bounds: SharedMapEncounterZoneBounds;
 };

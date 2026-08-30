@@ -138,3 +138,9 @@ export interface PokemonParty {
 export interface PokemonTrainerState {
   party: PokemonParty;
 }
+
+// Follower for multiplayers
+export interface PokemonFollowerPublicState {
+  speciesId: number;
+  formId: number;
+}

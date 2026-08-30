@@ -33,6 +33,7 @@ import {
   DIALOGUE_EVENTS,
   isDialogueStartInput,
   isDialogueAdvanceInput,
+  createWildPokemonEncounter,
 } from '@cesar-mmo/shared';
 import {
   getServerMapSpawn,
@@ -40,6 +41,7 @@ import {
   isPlayerInsideMapTransition,
   getServerMapNpc,
   isPlayerNearMapNpc,
+  getServerEncounterZoneAtPosition,
 } from './maps/serverMapRegistry';
 import { ChatService } from 'src/chat/chat.service';
 
@@ -54,7 +56,14 @@ import type {
   PokemonTrainerSessionPayload,
   PokemonTrainerState,
   PokemonFollowerPublicState,
+  PokemonWildEncounterStartedPayload,
 } from '@cesar-mmo/shared';
+import type {
+  PokemonTrainerId,
+  PokemonTrainerSessionToken,
+  PokemonTrainerIdentity,
+} from 'src/pokemon/pokemon-trainer-identity';
+import type { PokemonWildEncounterSession } from 'src/pokemon/encounters/pokemon-wild-encounter-session';
 
 // db and repositories
 import { PokemonTrainerRepository } from 'src/pokemon/pokemon-trainer.repository';
@@ -67,12 +76,8 @@ import { DialogueSessionService } from 'src/dialogue/dialogue-session.service';
 import { DialogueSessionStore } from 'src/dialogue/dialogue-session.store';
 import { PokemonTrainerIdentityStore } from 'src/pokemon/pokemon-trainer-identity.store';
 import { isPokemonTrainerSessionToken } from 'src/pokemon/pokemon-trainer-identity';
-import type {
-  PokemonTrainerId,
-  PokemonTrainerSessionToken,
-  PokemonTrainerIdentity,
-} from 'src/pokemon/pokemon-trainer-identity';
-
+import { PokemonWildEncounterTriggerService } from 'src/pokemon/encounters/pokemon-wild-encounter-trigger.service';
+import { PokemonWildEncounterSessionStore } from 'src/pokemon/encounters/pokemon-wild-encounter-session.store';
 @WebSocketGateway({
   cors: {
     origin: 'http://localhost:5173',
@@ -91,6 +96,8 @@ export class GameGateway
   private players: Record<string, Player> = {};
   private playerInputs: Record<string, PlayerInput> = {};
 
+  private readonly playerEncounterZoneIds = new Map<string, string>();
+
   private readonly pokemonTrainerIdentityStore =
     new PokemonTrainerIdentityStore();
   private readonly pokemonTrainerStateStore = new PokemonTrainerStateStore();
@@ -100,6 +107,11 @@ export class GameGateway
   private readonly dialogueSessionService = new DialogueSessionService(
     this.dialogueSessionStore,
   );
+
+  private readonly pokemonWildEncounterTriggerService =
+    new PokemonWildEncounterTriggerService();
+  private readonly pokemonWildEncounterSessionStore =
+    new PokemonWildEncounterSessionStore();
 
   private nextColorIndex = 0;
   private gameLoop?: ReturnType<typeof setInterval>;
@@ -282,7 +294,9 @@ export class GameGateway
     const mapRoom = this.getMapRoom(player.mapId);
     delete this.players[client.id];
     delete this.playerInputs[client.id];
-
+    this.playerEncounterZoneIds.delete(client.id);
+    this.pokemonWildEncounterTriggerService.reset(client.id);
+    this.pokemonWildEncounterSessionStore.remove(client.id);
     this.server.to(mapRoom).emit('playerDisconnected', client.id);
   }
 
@@ -640,6 +654,9 @@ export class GameGateway
 
     const mapData = MAP_DATA_REGISTRY[player.mapId];
 
+    const previousX = player.x;
+    const previousY = player.y;
+
     const updatedPlayer = applyPlayerMovement(player, input, deltaSeconds);
     const resolvedPosition = resolveMapCollision(
       {
@@ -656,6 +673,64 @@ export class GameGateway
 
     player.x = resolvedPosition.x;
     player.y = resolvedPosition.y;
+
+    const movedDistance = Math.hypot(
+      player.x - previousX,
+      player.y - previousY,
+    );
+    this.updatePlayerEncounterZone(player);
+
+    const encounterZone = getServerEncounterZoneAtPosition(
+      player.mapId,
+      player.x,
+      player.y,
+    );
+
+    if (this.pokemonWildEncounterSessionStore.has(player.id)) {
+      return;
+    }
+
+    const encounterTrigger = this.pokemonWildEncounterTriggerService.update(
+      player.id,
+      encounterZone,
+      movedDistance,
+    );
+
+    if (!encounterTrigger) {
+      return;
+    }
+
+    const trainerId = this.getTrainerId(player.id);
+
+    if (!trainerId) {
+      console.warn('[WildEncounter] trainer identity missing', {
+        playerId: player.id,
+      });
+      return;
+    }
+
+    const wildEncounter = createWildPokemonEncounter(
+      encounterTrigger.zoneId,
+      encounterTrigger.encounterTableId,
+    );
+
+    const encounterSession = this.pokemonWildEncounterSessionStore.create({
+      playerId: player.id,
+      trainerId,
+      mapId: player.mapId,
+      zoneId: wildEncounter.zoneId,
+      encounterTableId: encounterTrigger.encounterTableId,
+      pokemon: wildEncounter.pokemon,
+    });
+
+    this.emitWildEncounterStarted(encounterSession);
+
+    console.log('[WildEncounter] started', {
+      encounterId: encounterSession.encounterId,
+      playerId: encounterSession.playerId,
+      speciesId: encounterSession.pokemon.speciesId,
+      level: encounterSession.pokemon.level,
+    });
   }
 
   private getRequestedDisplayName(client: Socket): string | null {
@@ -798,5 +873,74 @@ export class GameGateway
     }
 
     player.pokemonFollower = this.getPokemonFollowerPublicState(trainerState);
+  }
+
+  private updatePlayerEncounterZone(player: Player): void {
+    const zone = getServerEncounterZoneAtPosition(
+      player.mapId,
+      player.x,
+      player.y,
+    );
+
+    const previousZoneId = this.playerEncounterZoneIds.get(player.id);
+    const currentZoneId = zone?.id;
+    if (previousZoneId === currentZoneId) {
+      return;
+    }
+
+    if (currentZoneId === undefined) {
+      this.playerEncounterZoneIds.delete(player.id);
+    } else {
+      this.playerEncounterZoneIds.set(player.id, currentZoneId);
+    }
+
+    if (previousZoneId === undefined && currentZoneId !== undefined) {
+      console.log('[EncounterZone] entered', {
+        playerId: player.id,
+        mapId: player.mapId,
+        zoneId: currentZoneId,
+        encounterTableId: zone?.encounterTableId,
+        x: player.x,
+        y: player.y,
+      });
+      return;
+    }
+
+    if (previousZoneId !== undefined && currentZoneId === undefined) {
+      console.log('[EncounterZone] left', {
+        playerId: player.id,
+        mapId: player.mapId,
+        zoneId: previousZoneId,
+        x: player.x,
+        y: player.y,
+      });
+      return;
+    }
+  }
+
+  private emitWildEncounterStarted(
+    encounterSession: PokemonWildEncounterSession,
+  ): void {
+    const ownerSocket = this.server.sockets.sockets.get(
+      encounterSession.playerId,
+    );
+
+    if (!ownerSocket) {
+      console.warn('[WildEncounter] owner socket not found', {
+        playerId: encounterSession.playerId,
+        encounterId: encounterSession.encounterId,
+      });
+
+      return;
+    }
+
+    const payload: PokemonWildEncounterStartedPayload = {
+      encounterId: encounterSession.encounterId,
+      zoneId: encounterSession.zoneId,
+      encounterTableId: encounterSession.encounterTableId,
+      pokemon: encounterSession.pokemon,
+    };
+
+    ownerSocket.emit(POKEMON_EVENTS.WILD_ENCOUNTER_STARTED, payload);
   }
 }

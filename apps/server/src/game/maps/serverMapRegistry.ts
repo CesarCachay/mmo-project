@@ -5,6 +5,7 @@ import type {
   SharedMapSpawn,
   SharedMapTransition,
   SharedMapNpc,
+  SharedMapEncounterZone,
 } from '@cesar-mmo/shared';
 
 const MAP_TRANSITION_TRIGGER_TOLERANCE = 8;
@@ -15,6 +16,10 @@ const NPC_INTERACTION_SERVER_TOLERANCE = 4;
 
 const MAX_NPC_INTERACTION_DISTANCE =
   NPC_INTERACTION_DISTANCE + NPC_INTERACTION_SERVER_TOLERANCE;
+
+export type ServerMapEncounterZone = SharedMapEncounterZone & {
+  readonly id: string;
+};
 
 export function getServerMapTransition(
   mapId: MapId,
@@ -73,4 +78,38 @@ export function isPlayerNearMapNpc(
     MAX_NPC_INTERACTION_DISTANCE * MAX_NPC_INTERACTION_DISTANCE;
 
   return distanceSquared <= maxDistanceSquared;
+}
+
+export function isPositionInsideEncounterZone(
+  x: number,
+  y: number,
+  zone: SharedMapEncounterZone,
+): boolean {
+  const { bounds } = zone;
+
+  return (
+    x >= bounds.x &&
+    x < bounds.x + bounds.width &&
+    y >= bounds.y &&
+    y < bounds.y + bounds.height
+  );
+}
+
+export function getServerEncounterZoneAtPosition(
+  mapId: MapId,
+  x: number,
+  y: number,
+): ServerMapEncounterZone | undefined {
+  const encounterZones = MAP_DATA_REGISTRY[mapId].encounterZones;
+
+  for (const [id, zone] of Object.entries(encounterZones)) {
+    if (isPositionInsideEncounterZone(x, y, zone)) {
+      return {
+        id,
+        ...zone,
+      };
+    }
+  }
+
+  return undefined;
 }

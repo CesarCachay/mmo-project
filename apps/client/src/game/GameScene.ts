@@ -58,6 +58,7 @@ import type {
   DialogueSessionState,
   PokemonTrainerState,
   PokemonInstance,
+  PokemonWildEncounterStartedPayload,
 } from "@cesar-mmo/shared";
 
 export class GameScene extends Phaser.Scene {
@@ -501,6 +502,10 @@ export class GameScene extends Phaser.Scene {
       this.starterSelectionPanel.show();
     });
 
+    this.network.onWildEncounterStarted((payload) => {
+      this.handleWildEncounterStarted(payload);
+    });
+
     this.network.onCurrentPlayers((players) => {
       console.log("Numero de players:", players);
 
@@ -931,5 +936,14 @@ export class GameScene extends Phaser.Scene {
       console.error("[Pokemon Follower] Failed to prepare follower", error);
       this.pokemonFollowerController.destroy();
     }
+  }
+
+  private handleWildEncounterStarted(payload: PokemonWildEncounterStartedPayload): void {
+    console.log("[WildEncounter] received", {
+      encounterId: payload.encounterId,
+      zoneId: payload.zoneId,
+      speciesId: payload.pokemon.speciesId,
+      level: payload.pokemon.level,
+    });
   }
 }
