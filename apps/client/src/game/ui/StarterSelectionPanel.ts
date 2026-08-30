@@ -5,6 +5,8 @@ import { type PokemonStarterId } from "@cesar-mmo/shared";
 
 import { POKEMON_STARTER_ASSETS } from "../pokemon/pokemon-starter-assets";
 
+import { UI_DEPTHS } from "./uiDepths";
+
 type StarterSelectionPanelOptions = {
   onSelect: (starterId: PokemonStarterId) => void;
 };
@@ -62,28 +64,18 @@ export class StarterSelectionPanel {
       .setScrollFactor(0);
 
     this.subtitle = scene.add
-      .text(
-        width / 2,
-        height / 2 - 108,
-        "Select one Pokémon to begin your journey",
-        {
-          fontFamily: "Arial",
-          fontSize: "12px",
-          color: "#d1d5db",
-        },
-      )
+      .text(width / 2, height / 2 - 108, "Select one Pokémon to begin your journey", {
+        fontFamily: "Arial",
+        fontSize: "12px",
+        color: "#d1d5db",
+      })
       .setOrigin(0.5)
       .setScrollFactor(0);
 
-    this.root = scene.add.container(0, 0, [
-      this.background,
-      this.panel,
-      this.title,
-      this.subtitle,
-    ]);
-
-    this.root.setDepth(200);
-    this.root.setVisible(false);
+    this.root = scene.add
+      .container(0, 0, [this.background, this.panel, this.title, this.subtitle])
+      .setDepth(UI_DEPTHS.MODAL)
+      .setVisible(false);
 
     this.content = scene.add.container(0, 0);
     this.root.add(this.content);
@@ -124,8 +116,7 @@ export class StarterSelectionPanel {
     const cardHeight = 150;
     const gap = 20;
 
-    const totalWidth =
-      cardWidth * starters.length + gap * (starters.length - 1);
+    const totalWidth = cardWidth * starters.length + gap * (starters.length - 1);
 
     const startX = width / 2 - totalWidth / 2 + cardWidth / 2;
 

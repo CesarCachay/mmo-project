@@ -53,6 +53,7 @@ import type {
   SharedMapNpc,
   PokemonTrainerSessionPayload,
   PokemonTrainerState,
+  PokemonFollowerPublicState,
 } from '@cesar-mmo/shared';
 
 // db and repositories
@@ -223,6 +224,8 @@ export class GameGateway
     }
 
     this.players[client.id] = newPlayer;
+
+    this.syncPlayerPokemonFollower(client.id, trainerState);
 
     this.playerInputs[client.id] = {
       sequence: 0,
@@ -454,6 +457,8 @@ export class GameGateway
         trainerId,
         payload.starterId,
       );
+
+      this.syncPlayerPokemonFollower(client.id, trainerState);
 
       client.emit(POKEMON_EVENTS.TRAINER_STATE, {
         trainerState,
@@ -765,5 +770,33 @@ export class GameGateway
       identity,
       restored: false,
     };
+  }
+
+  private getPokemonFollowerPublicState(
+    trainerState: PokemonTrainerState,
+  ): PokemonFollowerPublicState | undefined {
+    const pokemon = trainerState.party.pokemon[0];
+
+    if (!pokemon) {
+      return undefined;
+    }
+
+    return {
+      speciesId: pokemon.speciesId,
+      formId: pokemon.formId,
+    };
+  }
+
+  private syncPlayerPokemonFollower(
+    playerId: string,
+    trainerState: PokemonTrainerState,
+  ): void {
+    const player = this.players[playerId];
+
+    if (!player) {
+      return;
+    }
+
+    player.pokemonFollower = this.getPokemonFollowerPublicState(trainerState);
   }
 }

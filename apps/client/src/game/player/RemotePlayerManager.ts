@@ -4,7 +4,14 @@ import { getPlayerAnimationKey, getPlayerTextureKey } from "../config/playerAsse
 
 import type { Player } from "@cesar-mmo/shared";
 
+export interface RemotePlayerRenderPosition {
+  x: number;
+  y: number;
+}
+
 type CreateNameLabel = (displayName: string) => Phaser.GameObjects.Text;
+
+const PLAYER_NAME_GAP = 5;
 
 export class RemotePlayerManager {
   private readonly scene: Phaser.Scene;
@@ -88,7 +95,11 @@ export class RemotePlayerManager {
       sprite.y = Phaser.Math.Linear(sprite.y, target.y, alpha);
       const nameLabel = this.nameLabels.get(playerId);
       if (nameLabel) {
-        nameLabel.setPosition(Math.round(sprite.x), Math.round(sprite.y - 14));
+        nameLabel.setPosition(
+          Math.round(sprite.x),
+          Math.round(sprite.y - sprite.displayHeight / 2 - PLAYER_NAME_GAP)
+        );
+        // nameLabel.setPosition(Math.round(sprite.x), Math.round(sprite.y - 14));
       }
     }
   }
@@ -101,5 +112,18 @@ export class RemotePlayerManager {
 
     sprite.anims.stop();
     sprite.setTexture(getPlayerTextureKey(player.avatarId, player.direction), 0);
+  }
+
+  public getRenderPosition(playerId: string): RemotePlayerRenderPosition | undefined {
+    const sprite = this.players.get(playerId);
+
+    if (!sprite) {
+      return undefined;
+    }
+
+    return {
+      x: sprite.x,
+      y: sprite.y,
+    };
   }
 }

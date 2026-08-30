@@ -8,6 +8,8 @@ import {
 
 import { getPokemonSpriteAsset } from "../pokemon/pokemon-sprite.registry";
 
+import { UI_DEPTHS } from "./uiDepths";
+
 const PARTY_PANEL_WIDTH = 220;
 const PARTY_PANEL_MARGIN = 12;
 
@@ -26,7 +28,7 @@ export class PartyPanel {
 
     this.container = this.scene.add
       .container(0, 0)
-      .setDepth(2000)
+      .setDepth(UI_DEPTHS.PANEL)
       .setScrollFactor(0)
       .setVisible(false);
   }

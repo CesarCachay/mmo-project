@@ -44,6 +44,7 @@ import { LocalPlayerController } from "./player/LocalPlayerController";
 import { MapTransitionController } from "./maps/MapTransitionController";
 import { MovementInputController } from "./player/MovementInputController";
 import type { NpcDirection, NpcInstance, NpcInteractionType } from "./npc/types";
+import { RemotePokemonFollowerManager } from "./pokemon/RemotePokemonFollowerManager";
 
 // types
 import type {
@@ -73,8 +74,6 @@ export class GameScene extends Phaser.Scene {
 
   private network!: GameNetworkClient;
 
-  private playerNameLabel?: Phaser.GameObjects.Text;
-
   private nearbyNpc?: NpcInstance;
   private activeDialogueNpc?: NpcInstance;
   private readonly npcInteractionDistance = 36;
@@ -102,6 +101,7 @@ export class GameScene extends Phaser.Scene {
   private npcManager!: NpcManager;
   private remotePlayerManager!: RemotePlayerManager;
   private mapTransitionController!: MapTransitionController;
+  private remotePokemonFollowerManager!: RemotePokemonFollowerManager;
 
   private displayName = "";
   private avatarId: PlayerAvatarId = "male-01";
@@ -220,7 +220,7 @@ export class GameScene extends Phaser.Scene {
     );
 
     this.remotePlayerManager.interpolate(delta);
-    this.updateLocalPlayerNamePosition();
+    this.remotePokemonFollowerManager.update(delta);
     this.mapTransitionController.update(this.player.x, this.player.y);
   }
 
@@ -434,6 +434,11 @@ export class GameScene extends Phaser.Scene {
     this.pokemonOverworldSpriteLoader = new PokemonOverworldSpriteLoader(this);
     this.partyPanel = new PartyPanel(this);
     this.pokemonFollowerController = new PokemonFollowerController(this);
+    this.remotePokemonFollowerManager = new RemotePokemonFollowerManager(
+      this,
+      this.pokemonOverworldSpriteLoader,
+      (playerId) => this.remotePlayerManager.getRenderPosition(playerId)
+    );
   }
 
   private sendInputIfChanged(input: PlayerInput) {
@@ -502,7 +507,6 @@ export class GameScene extends Phaser.Scene {
       Object.values(players).forEach((player) => {
         if (player.id === this.network.id) {
           this.localPlayerController.snapToPosition(player.x, player.y);
-          this.playerNameLabel = this.createPlayerNameLabel(player.displayName);
           return;
         }
 
@@ -519,6 +523,7 @@ export class GameScene extends Phaser.Scene {
         return;
       }
       this.remotePlayerManager.add(player);
+      this.remotePokemonFollowerManager.sync(player);
     });
 
     this.network.onPlayersState((players) => {
@@ -540,6 +545,7 @@ export class GameScene extends Phaser.Scene {
 
         // REMOTE PLAYER DEL MISMO MAPA
         this.remotePlayerManager.update(player);
+        this.remotePokemonFollowerManager.sync(player);
       });
     });
 
@@ -549,10 +555,12 @@ export class GameScene extends Phaser.Scene {
 
     this.network.onPlayerDisconnected((playerId) => {
       this.remotePlayerManager.remove(playerId);
+      this.remotePokemonFollowerManager.remove(playerId);
     });
 
     this.network.onPlayerLeftMap((playerId) => {
       this.remotePlayerManager.remove(playerId);
+      this.remotePokemonFollowerManager.remove(playerId);
     });
   }
 
@@ -564,21 +572,14 @@ export class GameScene extends Phaser.Scene {
     this.mapTransitionController.resetExitTracking();
     this.changeCurrentMap(transition.targetMapId);
     this.localPlayerController.snapToPosition(transition.x, transition.y);
+    this.pokemonFollowerController.resetToPlayerPosition(
+      transition.x,
+      transition.y,
+      this.localPlayerController.direction
+    );
     this.updateCameraBounds();
     this.movementInputController.resetLastInputToNeutral();
     this.localPlayerController.setIdle();
-    this.updateLocalPlayerNamePosition();
-  }
-
-  private updateLocalPlayerNamePosition() {
-    if (!this.playerNameLabel) {
-      return;
-    }
-
-    this.playerNameLabel.setPosition(
-      Math.round(this.player.x),
-      Math.round(this.player.y - 14)
-    );
   }
 
   private createPlayerAnimations() {
@@ -640,7 +641,7 @@ export class GameScene extends Phaser.Scene {
         fontSize: "10px",
         color: "#ffffff",
         stroke: "#000000",
-        strokeThickness: 1,
+        strokeThickness: 2,
       })
       .setOrigin(0.5, 1)
       .setDepth(20);
@@ -818,6 +819,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.destroyCurrentMap();
+    this.remotePokemonFollowerManager.clear();
     this.remotePlayerManager.clear();
 
     this.currentMapId = mapId;

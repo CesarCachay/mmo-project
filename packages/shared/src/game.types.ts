@@ -1,5 +1,6 @@
 import { PlayerAvatarId } from "./player/avatar.js";
 import { MapId } from "./map.js";
+import { PokemonFollowerPublicState } from "./pokemon/pokemon.types.js";
 
 export type Player = {
   id: string;
@@ -12,6 +13,7 @@ export type Player = {
   displayName: string;
   avatarId: PlayerAvatarId;
   lastProcessedInputSequence: number;
+  pokemonFollower?: PokemonFollowerPublicState;
 };
 
 export type PlayerInput = {

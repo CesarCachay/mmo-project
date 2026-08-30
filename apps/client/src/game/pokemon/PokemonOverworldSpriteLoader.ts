@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import type { PokemonInstance } from "@cesar-mmo/shared";
+import type { PokemonFollowerPublicState } from "@cesar-mmo/shared";
 import {
   POKEMON_OVERWORLD_DIRECTIONS,
   getPokemonOverworldSpriteAsset,
@@ -13,7 +13,7 @@ export class PokemonOverworldSpriteLoader {
   }
 
   public ensurePokemonLoaded(
-    pokemon: Pick<PokemonInstance, "speciesId" | "formId">
+    pokemon: Pick<PokemonFollowerPublicState, "speciesId" | "formId">
   ): Promise<void> {
     const task = this.loadChain.then(() => this.loadPokemon(pokemon));
     this.loadChain = task.catch(() => undefined);
@@ -21,7 +21,7 @@ export class PokemonOverworldSpriteLoader {
   }
 
   private loadPokemon(
-    pokemon: Pick<PokemonInstance, "speciesId" | "formId">
+    pokemon: Pick<PokemonFollowerPublicState, "speciesId" | "formId">
   ): Promise<void> {
     const assets = POKEMON_OVERWORLD_DIRECTIONS.flatMap((direction) => [
       getPokemonOverworldSpriteAsset(pokemon.speciesId, pokemon.formId, direction, 1),
