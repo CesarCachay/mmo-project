@@ -230,8 +230,14 @@ export type {
 } from "./pokemon/battles/pokemon-battle-move-accuracy.js";
 export { consumeBattleMovePp } from "./pokemon/battles/pokemon-battle-move-pp.js";
 export type { BattleMovePpConsumptionResult } from "./pokemon/battles/pokemon-battle-move-pp.js";
-export { calculateBattleMoveDamage } from "./pokemon/battles/pokemon-battle-move-damage.js";
-export type { BattleMoveDamageResult } from "./pokemon/battles/pokemon-battle-move-damage.js";
+export {
+  calculateBattleMoveDamage,
+  resolveBattleDamageRandomModifier,
+} from "./pokemon/battles/pokemon-battle-move-damage.js";
+export type {
+  BattleMoveDamageResult,
+  BattleMoveDamageRandomSource,
+} from "./pokemon/battles/pokemon-battle-move-damage.js";
 export { applyBattleMoveDamage } from "./pokemon/battles/pokemon-battle-move-damage-application.js";
 export type { BattleMoveDamageApplicationResult } from "./pokemon/battles/pokemon-battle-move-damage-application.js";
 export {
@@ -253,3 +259,5 @@ export { resolveWildBattleContinuationOutcome } from "./pokemon/battles/pokemon-
 export type { WildBattleContinuationOutcome } from "./pokemon/battles/pokemon-battle-continuation.js";
 export { replaceFaintedTrainerBattlePokemon } from "./pokemon/battles/pokemon-battle-participant-replacement.js";
 export type { BattleTrainerPokemonReplacementResult } from "./pokemon/battles/pokemon-battle-participant-replacement.js";
+export { calculateBattleNonHpStat } from "./pokemon/battles/pokemon-battle-stat.js";
+export { syncPokemonPartyFromBattleParticipant } from "./pokemon/battles/pokemon-battle-trainer-party-sync.js";

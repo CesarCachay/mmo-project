@@ -1,8 +1,13 @@
-import type { PokemonTrainerState, PokemonStarterId } from '@cesar-mmo/shared';
+import type {
+  PokemonTrainerState,
+  BattleParticipant,
+  PokemonStarterId,
+} from '@cesar-mmo/shared';
 import {
   addPokemonToParty,
   createPokemonInstance,
   POKEMON_STARTERS,
+  syncPokemonPartyFromBattleParticipant,
 } from '@cesar-mmo/shared';
 
 import type { PokemonTrainerId } from './pokemon-trainer-identity';
@@ -76,5 +81,30 @@ export class PokemonTrainerService {
       this.trainerStateStore.unlockStarterSelection(trainerId);
       throw error;
     }
+  }
+
+  public async syncBattleParticipantResult(
+    trainerId: PokemonTrainerId,
+    trainerParticipant: BattleParticipant,
+  ): Promise<PokemonTrainerState> {
+    const trainerState = this.trainerStateStore.get(trainerId);
+
+    if (!trainerState) {
+      throw new Error(
+        `Pokémon Trainer state not found for Trainer "${trainerId}" while synchronizing Battle result`,
+      );
+    }
+
+    const updatedParty = syncPokemonPartyFromBattleParticipant(
+      trainerState.party,
+      trainerParticipant,
+    );
+
+    // Persist FIRST.
+    // If PostgreSQL fails, RAM remains unchanged.
+    await this.pokemonPartyRepository.saveParty(trainerId, updatedParty);
+
+    // Only after durable persistence succeeds do we update runtime Trainer state.
+    return this.trainerStateStore.setParty(trainerId, updatedParty);
   }
 }
