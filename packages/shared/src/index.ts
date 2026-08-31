@@ -112,12 +112,19 @@ export {
 export {
   POKEMON_EVENTS,
   isPokemonWildEncounterStartedPayload,
+  isPokemonBattleReplacementInput,
+  isPokemonBattleReplacementResolvedPayload,
+  isPokemonBattleCompletedPayload,
 } from "./pokemon/pokemon-network.js";
 export type {
   PokemonTrainerStatePayload,
   PokemonStarterSelectionStatus,
   PokemonTrainerSessionPayload,
   PokemonWildEncounterStartedPayload,
+  PokemonBattleReplacementInput,
+  PokemonBattleReplacementResolvedPayload,
+  PokemonBattleCompletedOutcome,
+  PokemonBattleCompletedPayload,
 } from "./pokemon/pokemon-network.js";
 
 // Pokemon Starters
@@ -162,3 +169,87 @@ export {
 } from "./pokemon/encounters/pokemon-encounter-selection.js";
 export { rollPokemonEncounterLevel } from "./pokemon/encounters/pokemon-encounter-level.js";
 export { createWildPokemonEncounter } from "./pokemon/encounters/pokemon-wild-encounter.factory.js";
+
+// Battles
+export {
+  BattleId,
+  BattleType,
+  BattleStatus,
+  BattleSide,
+  BattleParticipantId,
+  BattleParticipantType,
+  BattlePokemonState,
+  BattleParticipant,
+  BattleInstance,
+} from "./pokemon/battles/pokemon-battle.types.js";
+export {
+  createBattleParticipant,
+  getActiveBattlePokemon,
+} from "./pokemon/battles/pokemon-battle-participant.js";
+export type { CreateBattleParticipantInput } from "./pokemon/battles/pokemon-battle-participant.js";
+export { createBattlePokemonState } from "./pokemon/battles/pokemon-battle-pokemon-state.js";
+export {
+  isBattleActive,
+  completeBattle,
+} from "./pokemon/battles/pokemon-battle-lifecycle.js";
+export {
+  isPokemonBattleStartedPayload,
+  isPokemonBattleCommandInput,
+} from "./pokemon/battles/pokemon-battle-network.js";
+export type {
+  PokemonBattleStartedPayload,
+  PokemonBattleCommandInput,
+} from "./pokemon/battles/pokemon-battle-network.js";
+export { createBattleCommand } from "./pokemon/battles/pokemon-battle-command.js";
+export type {
+  BattleUseMoveAction,
+  BattleCommandAction,
+  BattleCommand,
+  CreateBattleCommandInput,
+} from "./pokemon/battles/pokemon-battle-command.js";
+export { BattleTurn, BattleTurnNumber } from "./pokemon/battles/pokemon-battle-turn.js";
+export {
+  createBattleTurn,
+  addBattleTurnCommand,
+  hasBattleTurnCommand,
+  isBattleTurnReady,
+  createNextBattleTurn,
+} from "./pokemon/battles/pokemon-battle-turn.js";
+export { createBattleTurnResolutionOrder } from "./pokemon/battles/pokemon-battle-turn-order.js";
+export type {
+  BattleTurnOrderRandomSource,
+  BattleTurnResolutionEntry,
+  BattleTurnResolutionOrder,
+} from "./pokemon/battles/pokemon-battle-turn-order.js";
+export { createBattleMoveExecutionContext } from "./pokemon/battles/pokemon-battle-move-execution.js";
+export type { BattleMoveExecutionContext } from "./pokemon/battles/pokemon-battle-move-execution.js";
+export { resolveBattleMoveAccuracy } from "./pokemon/battles/pokemon-battle-move-accuracy.js";
+export type {
+  BattleAccuracyRandomSource,
+  BattleMoveAccuracyResult,
+} from "./pokemon/battles/pokemon-battle-move-accuracy.js";
+export { consumeBattleMovePp } from "./pokemon/battles/pokemon-battle-move-pp.js";
+export type { BattleMovePpConsumptionResult } from "./pokemon/battles/pokemon-battle-move-pp.js";
+export { calculateBattleMoveDamage } from "./pokemon/battles/pokemon-battle-move-damage.js";
+export type { BattleMoveDamageResult } from "./pokemon/battles/pokemon-battle-move-damage.js";
+export { applyBattleMoveDamage } from "./pokemon/battles/pokemon-battle-move-damage-application.js";
+export type { BattleMoveDamageApplicationResult } from "./pokemon/battles/pokemon-battle-move-damage-application.js";
+export {
+  isBattlePokemonAbleToAct,
+  isBattlePokemonFainted,
+} from "./pokemon/battles/pokemon-battle-faint.js";
+export { evaluateBattleMoveExecutionEligibility } from "./pokemon/battles/pokemon-battle-move-execution-eligibility.js";
+export type {
+  BattleMoveExecutionEligibility,
+  BattleMoveExecutionSkipReason,
+} from "./pokemon/battles/pokemon-battle-move-execution-eligibility.js";
+export {
+  getBattleParticipantReplacementPokemonIndexes,
+  getBattleParticipantUsablePokemonIndexes,
+  isBattleParticipantDefeated,
+  hasBattleParticipantUsablePokemon,
+} from "./pokemon/battles/pokemon-battle-participant-defeat.js";
+export { resolveWildBattleContinuationOutcome } from "./pokemon/battles/pokemon-battle-continuation.js";
+export type { WildBattleContinuationOutcome } from "./pokemon/battles/pokemon-battle-continuation.js";
+export { replaceFaintedTrainerBattlePokemon } from "./pokemon/battles/pokemon-battle-participant-replacement.js";
+export type { BattleTrainerPokemonReplacementResult } from "./pokemon/battles/pokemon-battle-participant-replacement.js";

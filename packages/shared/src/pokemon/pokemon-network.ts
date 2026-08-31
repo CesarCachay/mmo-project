@@ -3,6 +3,10 @@ import type { PokemonEncounterTableId } from "./encounters/pokemon-encounter-tab
 
 import { PokemonInstance } from "./pokemon.types.js";
 
+import { BattleInstance } from "./battles/pokemon-battle.types.js";
+
+import { isPokemonBattleStartedPayload } from "./battles/pokemon-battle-network.js";
+
 import { POKEMON_ENCOUNTER_TABLES } from "./encounters/pokemon-encounter-table.registry.js";
 
 export const POKEMON_EVENTS = {
@@ -14,6 +18,13 @@ export const POKEMON_EVENTS = {
   TRAINER_SESSION: "pokemon:trainer-session",
 
   WILD_ENCOUNTER_STARTED: "pokemon:wild-encounter-started",
+
+  BATTLE_STARTED: "pokemon:battle-started",
+  BATTLE_COMMAND: "pokemon:battle-command",
+
+  BATTLE_REPLACEMENT: "pokemon:battle-replacement",
+  BATTLE_REPLACEMENT_RESOLVED: "pokemon:battle-replacement-resolved",
+  BATTLE_COMPLETED: "pokemon:battle-completed",
 } as const;
 
 export interface PokemonTrainerStatePayload {
@@ -127,4 +138,87 @@ export function isPokemonWildEncounterStartedPayload(
   }
 
   return isPokemonInstance(value.pokemon);
+}
+
+export interface PokemonBattleReplacementInput {
+  readonly battleId: string;
+  readonly replacementPokemonIndex: number;
+}
+
+export interface PokemonBattleReplacementResolvedPayload {
+  readonly battle: BattleInstance;
+  readonly nextTurnNumber: number;
+}
+
+export function isPokemonBattleReplacementInput(
+  value: unknown
+): value is PokemonBattleReplacementInput {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const candidate = value as Record<string, unknown>;
+
+  if (typeof candidate.battleId !== "string" || candidate.battleId.trim().length === 0) {
+    return false;
+  }
+
+  if (
+    typeof candidate.replacementPokemonIndex !== "number" ||
+    !Number.isInteger(candidate.replacementPokemonIndex) ||
+    candidate.replacementPokemonIndex < 0
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+export function isPokemonBattleReplacementResolvedPayload(
+  value: unknown
+): value is PokemonBattleReplacementResolvedPayload {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const candidate = value as Record<string, unknown>;
+
+  if (
+    typeof candidate.nextTurnNumber !== "number" ||
+    !Number.isInteger(candidate.nextTurnNumber) ||
+    candidate.nextTurnNumber <= 0
+  ) {
+    return false;
+  }
+
+  return isPokemonBattleStartedPayload({
+    battle: candidate.battle,
+  });
+}
+
+export type PokemonBattleCompletedOutcome = "trainer-defeated" | "wild-defeated";
+
+export interface PokemonBattleCompletedPayload {
+  readonly battleId: string;
+  readonly outcome: PokemonBattleCompletedOutcome;
+}
+
+export function isPokemonBattleCompletedPayload(
+  value: unknown
+): value is PokemonBattleCompletedPayload {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const candidate = value as Record<string, unknown>;
+
+  if (typeof candidate.battleId !== "string" || candidate.battleId.trim().length === 0) {
+    return false;
+  }
+
+  if (candidate.outcome !== "trainer-defeated" && candidate.outcome !== "wild-defeated") {
+    return false;
+  }
+
+  return true;
 }

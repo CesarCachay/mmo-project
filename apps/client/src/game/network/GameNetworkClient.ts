@@ -6,6 +6,9 @@ import {
   POKEMON_EVENTS,
   DIALOGUE_EVENTS,
   isPokemonWildEncounterStartedPayload,
+  isPokemonBattleStartedPayload,
+  isPokemonBattleReplacementResolvedPayload,
+  isPokemonBattleCompletedPayload,
 } from "@cesar-mmo/shared";
 
 import type {
@@ -25,6 +28,11 @@ import type {
   DialogueAdvanceInput,
   PokemonTrainerSessionPayload,
   PokemonWildEncounterStartedPayload,
+  PokemonBattleStartedPayload,
+  PokemonBattleCommandInput,
+  PokemonBattleReplacementInput,
+  PokemonBattleReplacementResolvedPayload,
+  PokemonBattleCompletedPayload,
 } from "@cesar-mmo/shared";
 
 type ConnectionRejectedError = {
@@ -138,6 +146,40 @@ export class GameNetworkClient {
     this.socket.emit(POKEMON_EVENTS.CHOOSE_STARTER, payload);
   }
 
+  // battles
+  public sendBattleCommand(input: PokemonBattleCommandInput): void {
+    this.socket.emit(POKEMON_EVENTS.BATTLE_COMMAND, input);
+  }
+
+  public sendBattleReplacement(input: PokemonBattleReplacementInput): void {
+    this.socket.emit(POKEMON_EVENTS.BATTLE_REPLACEMENT, input);
+  }
+
+  public onBattleReplacementResolved(
+    callback: (payload: PokemonBattleReplacementResolvedPayload) => void
+  ): void {
+    this.socket.on(POKEMON_EVENTS.BATTLE_REPLACEMENT_RESOLVED, (payload: unknown) => {
+      if (!isPokemonBattleReplacementResolvedPayload(payload)) {
+        console.warn("[BattleReplacement] invalid resolved payload", payload);
+        return;
+      }
+      callback(payload);
+    });
+  }
+
+  public onBattleCompleted(
+    callback: (payload: PokemonBattleCompletedPayload) => void
+  ): void {
+    this.socket.on(POKEMON_EVENTS.BATTLE_COMPLETED, (payload: unknown) => {
+      if (!isPokemonBattleCompletedPayload(payload)) {
+        console.warn("[BattleCompleted] invalid payload", payload);
+        return;
+      }
+      callback(payload);
+    });
+  }
+
+  // players
   public sendPlayerInput(input: PlayerInput): void {
     this.socket.emit("playerInput", input);
   }
@@ -168,5 +210,21 @@ export class GameNetworkClient {
     callback: (payload: PokemonTrainerSessionPayload) => void
   ): void {
     this.socket.on(POKEMON_EVENTS.TRAINER_SESSION, callback);
+  }
+
+  onBattleStarted(callback: (payload: PokemonBattleStartedPayload) => void): () => void {
+    const handler = (payload: unknown) => {
+      if (!isPokemonBattleStartedPayload(payload)) {
+        console.warn("Ignoring invalid battle started payload", payload);
+        return;
+      }
+      callback(payload);
+    };
+
+    this.socket.on(POKEMON_EVENTS.BATTLE_STARTED, handler);
+
+    return () => {
+      this.socket.off(POKEMON_EVENTS.BATTLE_STARTED, handler);
+    };
   }
 }

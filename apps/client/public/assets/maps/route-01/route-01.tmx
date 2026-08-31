@@ -3,7 +3,7 @@
  <editorsettings>
   <export target="route-01.json" format="json"/>
  </editorsettings>
- <tileset firstgid="1" source="../tilesets/route/route-01/route-01-terrain.tsx"/>
+ <tileset firstgid="1" source="../tilesets/route/route-01-terrain.tsx"/>
  <tileset firstgid="2001" source="../tilesets/route/route-01/route-01-collision.tsx"/>
  <layer id="1" name="Ground" width="50" height="40" locked="1">
   <data encoding="csv">

@@ -10,7 +10,6 @@ import {
 } from '@nestjs/websockets';
 
 import { OnModuleDestroy } from '@nestjs/common';
-
 import { Server, Socket } from 'socket.io';
 
 import {
@@ -34,6 +33,18 @@ import {
   isDialogueStartInput,
   isDialogueAdvanceInput,
   createWildPokemonEncounter,
+  createBattleCommand,
+  isPokemonBattleCommandInput,
+  isBattleTurnReady,
+  createBattleTurnResolutionOrder,
+  createBattleMoveExecutionContext,
+  resolveBattleMoveAccuracy,
+  consumeBattleMovePp,
+  applyBattleMoveDamage,
+  calculateBattleMoveDamage,
+  evaluateBattleMoveExecutionEligibility,
+  resolveWildBattleContinuationOutcome,
+  isPokemonBattleReplacementInput,
 } from '@cesar-mmo/shared';
 import {
   getServerMapSpawn,
@@ -57,6 +68,7 @@ import type {
   PokemonTrainerState,
   PokemonFollowerPublicState,
   PokemonWildEncounterStartedPayload,
+  PokemonBattleStartedPayload,
 } from '@cesar-mmo/shared';
 import type {
   PokemonTrainerId,
@@ -78,6 +90,13 @@ import { PokemonTrainerIdentityStore } from 'src/pokemon/pokemon-trainer-identit
 import { isPokemonTrainerSessionToken } from 'src/pokemon/pokemon-trainer-identity';
 import { PokemonWildEncounterTriggerService } from 'src/pokemon/encounters/pokemon-wild-encounter-trigger.service';
 import { PokemonWildEncounterSessionStore } from 'src/pokemon/encounters/pokemon-wild-encounter-session.store';
+import { PokemonBattleSessionStore } from '../pokemon/battles/pokemon-battle-session.store';
+import { createWildBattleInstance } from '../pokemon/battles/pokemon-wild-battle.factory';
+import { PokemonBattleTurnStore } from 'src/pokemon/battles/pokemon-battle-turn.store';
+import { createWildBattleCommand } from '../pokemon/battles/pokemon-wild-battle-command.factory';
+import { applyPokemonWildBattleOutcome } from '../pokemon/battles/pokemon-wild-battle-outcome.runtime';
+import { applyPokemonTrainerBattleReplacement } from '../pokemon/battles/pokemon-trainer-battle-replacement.runtime';
+
 @WebSocketGateway({
   cors: {
     origin: 'http://localhost:5173',
@@ -112,6 +131,8 @@ export class GameGateway
     new PokemonWildEncounterTriggerService();
   private readonly pokemonWildEncounterSessionStore =
     new PokemonWildEncounterSessionStore();
+  private readonly pokemonBattleSessionStore = new PokemonBattleSessionStore();
+  private readonly pokemonBattleTurnStore = new PokemonBattleTurnStore();
 
   private nextColorIndex = 0;
   private gameLoop?: ReturnType<typeof setInterval>;
@@ -492,6 +513,314 @@ export class GameGateway
     }
   }
 
+  @SubscribeMessage(POKEMON_EVENTS.BATTLE_COMMAND)
+  handleBattleCommand(
+    @ConnectedSocket()
+    client: Socket,
+    @MessageBody()
+    payload: unknown,
+  ): void {
+    if (!isPokemonBattleCommandInput(payload)) {
+      console.warn('[BattleCommand] Invalid payload', {
+        playerId: client.id,
+        payload,
+      });
+      return;
+    }
+
+    const session = this.pokemonBattleSessionStore.getByPlayerId(client.id);
+    if (!session) {
+      console.warn('[BattleCommand] Player has no active battle', {
+        playerId: client.id,
+        requestedBattleId: payload.battleId,
+      });
+      return;
+    }
+    if (session.battle.battleId !== payload.battleId) {
+      console.warn('[BattleCommand] Battle id mismatch', {
+        playerId: client.id,
+        activeBattleId: session.battle.battleId,
+        requestedBattleId: payload.battleId,
+      });
+      return;
+    }
+
+    const trainerBinding = session.trainerBindings.find(
+      (binding) => binding.playerId === client.id,
+    );
+
+    if (!trainerBinding) {
+      console.warn('[BattleCommand] Trainer binding not found', {
+        playerId: client.id,
+        battleId: session.battle.battleId,
+      });
+      return;
+    }
+    try {
+      const trainerCommand = createBattleCommand(session.battle, {
+        participantId: trainerBinding.participantId,
+        action: payload.action,
+      });
+
+      let turn = this.pokemonBattleTurnStore.submitCommand(
+        session.battle,
+        trainerCommand,
+      );
+
+      const wildCommand = createWildBattleCommand(session.battle);
+
+      turn = this.pokemonBattleTurnStore.submitCommand(
+        session.battle,
+        wildCommand,
+      );
+
+      const turnReady = isBattleTurnReady(session.battle, turn);
+      if (!turnReady) {
+        throw new Error(
+          `Battle turn ${turn.number} for battle "${session.battle.battleId}" should be ready after Wild command submission`,
+        );
+      }
+
+      const resolutionOrder = createBattleTurnResolutionOrder(
+        session.battle,
+        turn,
+        Math.random,
+      );
+
+      const orderedActions = resolutionOrder.entries.map((entry, index) => {
+        const participant = session.battle.participants.find(
+          (candidate) => candidate.id === entry.command.participantId,
+        );
+
+        if (!participant) {
+          throw new Error(
+            `Participant "${entry.command.participantId}" not found while logging battle turn resolution`,
+          );
+        }
+
+        const moveId =
+          entry.command.action.type === 'use-move'
+            ? entry.command.action.moveId
+            : undefined;
+
+        return {
+          position: index + 1,
+          participantId: participant.id,
+          participantType: participant.type,
+          moveId,
+          movePriority: entry.movePriority,
+          speed: entry.speed,
+          tieBreaker: entry.tieBreaker,
+        };
+      });
+
+      console.log('[BattleTurn] resolution order', {
+        battleId: resolutionOrder.battleId,
+        turnNumber: resolutionOrder.turnNumber,
+        orderedActions,
+      });
+
+      const moveResults = resolutionOrder.entries.map((entry, index) => {
+        const eligibility = evaluateBattleMoveExecutionEligibility(
+          session.battle,
+          entry,
+        );
+
+        if (!eligibility.canExecute) {
+          return {
+            position: index + 1,
+            participantId: eligibility.actorParticipant.id,
+            participantType: eligibility.actorParticipant.type,
+            pokemonInstanceId: eligibility.actorPokemon.pokemon.instanceId,
+            moveId:
+              entry.command.action.type === 'use-move'
+                ? entry.command.action.moveId
+                : undefined,
+            skipped: true,
+            skipReason: eligibility.skipReason,
+            previousPp: null,
+            currentPp: null,
+            accuracy: null,
+            roll: null,
+            hit: null,
+            requestedDamage: 0,
+            appliedDamage: 0,
+            targetPreviousHp: null,
+            targetCurrentHp: null,
+          };
+        }
+        const executionContext = createBattleMoveExecutionContext(
+          session.battle,
+          entry,
+        );
+
+        const ppResult = consumeBattleMovePp(executionContext);
+
+        const accuracyResult = resolveBattleMoveAccuracy(
+          executionContext,
+          Math.random,
+        );
+
+        let requestedDamage = 0;
+        let appliedDamage = 0;
+
+        const targetPreviousHp = executionContext.targetPokemon.currentHp;
+
+        let targetCurrentHp = targetPreviousHp;
+
+        if (accuracyResult.hit) {
+          const damageResult = calculateBattleMoveDamage(executionContext);
+          requestedDamage = damageResult.damage;
+          const damageApplication = applyBattleMoveDamage(
+            executionContext,
+            damageResult,
+          );
+          appliedDamage = damageApplication.appliedDamage;
+          targetCurrentHp = damageApplication.currentHp;
+        }
+
+        const participant = session.battle.participants.find(
+          (candidate) => candidate.id === executionContext.actorParticipantId,
+        );
+
+        if (!participant) {
+          throw new Error(
+            `Battle participant "${executionContext.actorParticipantId}" not found while resolving move execution`,
+          );
+        }
+
+        return {
+          position: index + 1,
+          participantId: participant.id,
+          participantType: participant.type,
+          pokemonInstanceId: executionContext.actorPokemon.pokemon.instanceId,
+          targetPokemonInstanceId:
+            executionContext.targetPokemon.pokemon.instanceId,
+          moveId: executionContext.move.id,
+          moveName: executionContext.move.name,
+          previousPp: ppResult.previousPp,
+          currentPp: ppResult.currentPp,
+          accuracy: accuracyResult.accuracy,
+          roll: accuracyResult.roll,
+          hit: accuracyResult.hit,
+          requestedDamage,
+          appliedDamage,
+          targetPreviousHp,
+          targetCurrentHp,
+        };
+      });
+
+      console.log('[BattleTurn] move execution', {
+        battleId: session.battle.battleId,
+        turnNumber: turn.number,
+        results: moveResults,
+      });
+
+      const continuationOutcome = resolveWildBattleContinuationOutcome(
+        session.battle,
+      );
+
+      const outcomeRuntime = applyPokemonWildBattleOutcome({
+        battleId: session.battle.battleId,
+        outcome: continuationOutcome,
+        battleSessionStore: this.pokemonBattleSessionStore,
+        battleTurnStore: this.pokemonBattleTurnStore,
+      });
+
+      let nextTurnNumber: number | null = null;
+
+      if (outcomeRuntime.type === 'continue') {
+        const nextTurn = this.pokemonBattleTurnStore.advance(session.battle);
+        nextTurnNumber = nextTurn.number;
+      }
+
+      if (
+        outcomeRuntime.type === 'trainer-defeated' ||
+        outcomeRuntime.type === 'wild-defeated'
+      ) {
+        client.emit(POKEMON_EVENTS.BATTLE_COMPLETED, {
+          battleId: session.battle.battleId,
+          outcome: outcomeRuntime.type,
+        });
+      }
+
+      console.log('[BattleTurn] continuation outcome', {
+        battleId: session.battle.battleId,
+        resolvedTurnNumber: turn.number,
+        outcome: continuationOutcome.type,
+        battleCompleted: outcomeRuntime.battleCompleted,
+        nextTurnNumber,
+        replacementPokemonIndexes:
+          outcomeRuntime.type === 'trainer-replacement-required'
+            ? outcomeRuntime.replacementPokemonIndexes
+            : null,
+      });
+    } catch {
+      console.warn('[BattleCommand] rejected', {
+        playerId: client.id,
+        battleId: payload.battleId,
+        error: 'error',
+      });
+    }
+  }
+
+  @SubscribeMessage(POKEMON_EVENTS.BATTLE_REPLACEMENT)
+  handlePokemonBattleReplacement(
+    @ConnectedSocket()
+    client: Socket,
+    @MessageBody()
+    payload: unknown,
+  ): void {
+    if (!isPokemonBattleReplacementInput(payload)) {
+      return;
+    }
+
+    const session = this.pokemonBattleSessionStore.getByPlayerId(client.id);
+
+    if (!session) {
+      return;
+    }
+
+    if (session.battle.battleId !== payload.battleId) {
+      console.warn('[BattleReplacement] rejected battle mismatch', {
+        playerId: client.id,
+        requestedBattleId: payload.battleId,
+        activeBattleId: session.battle.battleId,
+      });
+
+      return;
+    }
+
+    try {
+      const result = applyPokemonTrainerBattleReplacement({
+        session,
+        playerId: client.id,
+        replacementPokemonIndex: payload.replacementPokemonIndex,
+        battleTurnStore: this.pokemonBattleTurnStore,
+      });
+
+      console.log('[BattleReplacement] resolved', {
+        battleId: result.battleId,
+        participantId: result.participantId,
+        previousActivePokemonIndex: result.previousActivePokemonIndex,
+        currentActivePokemonIndex: result.currentActivePokemonIndex,
+        activePokemonInstanceId: result.activePokemonInstanceId,
+        nextTurnNumber: result.nextTurnNumber,
+      });
+
+      // Owner-only acknowledgement.
+      client.emit(POKEMON_EVENTS.BATTLE_REPLACEMENT_RESOLVED, {
+        battle: session.battle,
+        nextTurnNumber: result.nextTurnNumber,
+      });
+    } catch (error: unknown) {
+      console.warn(
+        `[BattleReplacement] rejected for player ${client.id}`,
+        error,
+      );
+    }
+  }
+
   @SubscribeMessage(MAP_EVENTS.REQUEST_TRANSITION)
   async handleMapTransitionRequest(
     @ConnectedSocket() client: Socket,
@@ -724,6 +1053,7 @@ export class GameGateway
     });
 
     this.emitWildEncounterStarted(encounterSession);
+    this.startWildBattle(encounterSession);
 
     console.log('[WildEncounter] started', {
       encounterId: encounterSession.encounterId,
@@ -942,5 +1272,80 @@ export class GameGateway
     };
 
     ownerSocket.emit(POKEMON_EVENTS.WILD_ENCOUNTER_STARTED, payload);
+  }
+
+  private startWildBattle(encounterSession: PokemonWildEncounterSession): void {
+    if (
+      this.pokemonBattleSessionStore.hasTrainerBattle(
+        encounterSession.trainerId,
+      )
+    ) {
+      return;
+    }
+
+    const trainerState = this.pokemonTrainerStateStore.get(
+      encounterSession.trainerId,
+    );
+
+    if (!trainerState) {
+      throw new Error(
+        `Trainer state not found for trainer "${encounterSession.trainerId}"`,
+      );
+    }
+
+    if (trainerState.party.pokemon.length === 0) {
+      throw new Error(
+        `Trainer "${encounterSession.trainerId}" cannot start battle without Pokémon`,
+      );
+    }
+
+    const battle = createWildBattleInstance({
+      encounterSession,
+      trainerPokemon: trainerState.party.pokemon,
+    });
+
+    const trainerParticipant = battle.participants.find(
+      (participant) => participant.type === 'trainer',
+    );
+
+    if (!trainerParticipant) {
+      throw new Error(
+        `Trainer participant not found in battle "${battle.battleId}"`,
+      );
+    }
+
+    const battleSession = this.pokemonBattleSessionStore.create({
+      battle,
+      trainerBindings: [
+        {
+          participantId: trainerParticipant.id,
+          trainerId: encounterSession.trainerId,
+          playerId: encounterSession.playerId,
+        },
+      ],
+    });
+
+    try {
+      this.pokemonBattleTurnStore.create(battleSession.battle);
+    } catch (error) {
+      this.pokemonBattleSessionStore.remove(battleSession.battle.battleId);
+      throw error;
+    }
+
+    this.pokemonWildEncounterSessionStore.remove(encounterSession.playerId);
+
+    const ownerSocket = this.server.sockets.sockets.get(
+      encounterSession.playerId,
+    );
+
+    if (!ownerSocket) {
+      return;
+    }
+
+    const payload: PokemonBattleStartedPayload = {
+      battle: battleSession.battle,
+    };
+
+    ownerSocket.emit(POKEMON_EVENTS.BATTLE_STARTED, payload);
   }
 }
