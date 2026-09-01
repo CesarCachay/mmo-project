@@ -70,6 +70,7 @@ import type {
   PokemonWildEncounterStartedPayload,
   PokemonBattleStartedPayload,
   BattleTurnResolutionEntry,
+  PokemonBattleStateUpdatedPayload,
 } from '@cesar-mmo/shared';
 import type {
   PokemonTrainerId,
@@ -602,11 +603,28 @@ export class GameGateway
       });
 
       if (outcomeRuntime.type === 'continue') {
-        this.pokemonBattleTurnStore.advance(session.battle);
+        const nextTurn = this.pokemonBattleTurnStore.advance(session.battle);
+
+        client.emit(POKEMON_EVENTS.BATTLE_STATE_UPDATED, {
+          battle: session.battle,
+          resolvedTurnNumber: turn.number,
+          interactionState: 'selecting-action',
+          nextTurnNumber: nextTurn.number,
+          replacementPokemonIndexes: [],
+        } satisfies PokemonBattleStateUpdatedPayload);
+
         return;
       }
 
       if (outcomeRuntime.type === 'trainer-replacement-required') {
+        client.emit(POKEMON_EVENTS.BATTLE_STATE_UPDATED, {
+          battle: session.battle,
+          resolvedTurnNumber: turn.number,
+          interactionState: 'replacement-required',
+          nextTurnNumber: null,
+          replacementPokemonIndexes: outcomeRuntime.replacementPokemonIndexes,
+        } satisfies PokemonBattleStateUpdatedPayload);
+
         return;
       }
 

@@ -1,0 +1,1146 @@
+.battle-ui-modern {
+  --battle-backdrop: #07111f;
+
+  --battle-surface: rgba(15, 23, 42, 0.88);
+
+  --battle-surface-strong: rgba(15, 23, 42, 0.96);
+
+  --battle-surface-hover: rgba(30, 41, 59, 0.96);
+
+  --battle-border: rgba(148, 163, 184, 0.18);
+
+  --battle-border-strong: rgba(148, 163, 184, 0.3);
+
+  --battle-text-primary: #f8fafc;
+  --battle-text-secondary: #cbd5e1;
+  --battle-text-muted: #94a3b8;
+
+  --battle-accent: #60a5fa;
+  --battle-accent-strong: #3b82f6;
+
+  --battle-hp-healthy: #22c55e;
+  --battle-hp-warning: #f59e0b;
+  --battle-hp-danger: #ef4444;
+
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  box-sizing: border-box;
+  overflow: hidden;
+  color: var(--battle-text-primary);
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  /*
+     * Importante:
+     *
+     * esta UI NO forma parte del canvas
+     * pixelArt de Phaser.
+     */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  pointer-events: none;
+}
+
+.battle-ui-modern[hidden] {
+  display: none;
+}
+
+/*
+   * Background que usaremos cuando migremos
+   * BattleOverlay al DOM.
+   */
+.battle-ui-modern__backdrop {
+  position: absolute;
+  inset: 0;
+
+  background:
+    radial-gradient(circle at 72% 18%, rgba(59, 130, 246, 0.13), transparent 32%),
+    radial-gradient(circle at 18% 66%, rgba(34, 197, 94, 0.08), transparent 30%),
+    linear-gradient(145deg, rgba(7, 17, 31, 0.96), rgba(10, 18, 32, 0.98));
+}
+
+.battle-ui-modern__surface {
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.86), rgba(15, 23, 42, 0.94));
+  border: 1px solid var(--battle-border);
+  border-radius: 18px;
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.045);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.battle-ui-modern__interactive {
+  pointer-events: auto;
+}
+
+.battle-ui-modern__muted {
+  color: var(--battle-text-muted);
+}
+
+/* =========================================================
+   MODERN BATTLE POKÉMON HUD
+   ========================================================= */
+
+.battle-modern-hud {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.battle-modern-hud[hidden] {
+  display: none;
+}
+
+/* Wild:
+     card izquierda / Pokémon derecha */
+.battle-modern-hud--wild {
+  flex-direction: row-reverse;
+}
+
+/* Trainer:
+     Pokémon izquierda / card derecha */
+.battle-modern-hud--trainer {
+  flex-direction: row;
+}
+
+.battle-modern-hud__sprite {
+  width: clamp(68px, 34%, 122px);
+  height: clamp(68px, 34%, 122px);
+  flex: 0 0 auto;
+  object-fit: contain;
+  /*
+     * El Pokémon puede seguir siendo pixel art.
+     * La UI alrededor ya no lo es.
+     */
+  image-rendering: pixelated;
+  filter: drop-shadow(0 12px 14px rgba(0, 0, 0, 0.4));
+  transform: translateZ(0);
+}
+
+.battle-modern-hud__card {
+  width: min(240px, 68%);
+  min-width: 150px;
+  padding: 13px 15px 14px;
+  box-sizing: border-box;
+}
+
+.battle-modern-hud__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.battle-modern-hud__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--battle-text-primary);
+  font-size: clamp(14px, 1.4vw, 19px);
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.battle-modern-hud__level {
+  flex: 0 0 auto;
+  padding: 3px 7px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.08);
+  color: var(--battle-text-secondary);
+  font-size: clamp(10px, 0.85vw, 12px);
+  font-weight: 650;
+}
+
+.battle-modern-hud__hp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.battle-modern-hud__hp-label {
+  color: var(--battle-text-muted);
+  font-size: clamp(9px, 0.8vw, 11px);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.battle-modern-hud__hp-text {
+  color: var(--battle-text-secondary);
+  font-size: clamp(10px, 0.9vw, 12px);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.battle-modern-hud__hp-track {
+  position: relative;
+  width: 100%;
+  height: 9px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.72);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+.battle-modern-hud__hp-fill {
+  height: 100%;
+  border-radius: inherit;
+  transition:
+    width 280ms ease,
+    background 180ms ease;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.08);
+}
+
+.battle-modern-hud__hp-fill--healthy {
+  background: linear-gradient(90deg, #16a34a, var(--battle-hp-healthy));
+}
+
+.battle-modern-hud__hp-fill--warning {
+  background: linear-gradient(90deg, #d97706, var(--battle-hp-warning));
+}
+
+.battle-modern-hud__hp-fill--danger {
+  background: linear-gradient(90deg, #dc2626, var(--battle-hp-danger));
+}
+
+/*
+   * El HUD wild queda visualmente alineado
+   * hacia la derecha.
+   */
+.battle-modern-hud--wild .battle-modern-hud__card {
+  text-align: left;
+}
+
+/*
+   * Responsive para ventanas estrechas.
+   */
+@media (max-width: 720px) {
+  .battle-modern-hud {
+    gap: 8px;
+  }
+
+  .battle-modern-hud__card {
+    padding: 10px 11px 11px;
+
+    min-width: 130px;
+  }
+
+  .battle-modern-hud__hp-track {
+    height: 7px;
+  }
+}
+
+/* =========================================================
+   MODERN MOVE PANEL
+   ========================================================= */
+
+.battle-modern-moves {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 18px 16px;
+  pointer-events: auto;
+}
+
+.battle-modern-moves[hidden] {
+  display: none;
+}
+
+.battle-modern-moves__header {
+  min-height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.battle-modern-moves__title {
+  color: var(--battle-text-primary);
+  font-size: clamp(13px, 1.1vw, 16px);
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+.battle-modern-moves__waiting {
+  padding: 4px 9px;
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.1);
+  color: #93c5fd;
+  font-size: clamp(9px, 0.8vw, 11px);
+  font-weight: 650;
+}
+
+.battle-modern-moves__waiting[hidden] {
+  display: none;
+}
+
+.battle-modern-moves__grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+/* ============================
+     MOVE CARD
+     ============================ */
+
+.battle-modern-move-card {
+  position: relative;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px 12px;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.88), rgba(15, 23, 42, 0.94));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  color: var(--battle-text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 150ms ease,
+    border-color 150ms ease,
+    background 150ms ease,
+    box-shadow 150ms ease,
+    opacity 150ms ease;
+}
+
+.battle-modern-move-card:not(:disabled):hover {
+  transform: translateY(-2px);
+  border-color: rgba(96, 165, 250, 0.42);
+  background: linear-gradient(145deg, rgba(37, 52, 75, 0.97), rgba(20, 31, 49, 0.98));
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.055);
+}
+
+.battle-modern-move-card:not(:disabled):active {
+  transform: translateY(0);
+}
+
+.battle-modern-move-card:focus-visible {
+  outline: none;
+  border-color: var(--battle-accent);
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.22);
+}
+
+.battle-modern-move-card:disabled {
+  cursor: default;
+  opacity: 0.54;
+}
+
+.battle-modern-move-card--empty {
+  opacity: 0.36;
+}
+
+.battle-modern-move-card__top,
+.battle-modern-move-card__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.battle-modern-move-card__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: clamp(12px, 1.05vw, 15px);
+  font-weight: 750;
+  letter-spacing: -0.015em;
+}
+
+.battle-modern-move-card__bottom {
+  margin-top: 6px;
+}
+
+.battle-modern-move-card__pp-label {
+  color: var(--battle-text-muted);
+  font-size: clamp(8px, 0.7vw, 10px);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.battle-modern-move-card__pp {
+  color: var(--battle-text-secondary);
+  font-size: clamp(9px, 0.8vw, 11px);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================
+     MOVE TYPE BADGES
+     ============================ */
+
+.battle-modern-move-card__type {
+  flex: 0 0 auto;
+  padding: 3px 7px;
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: clamp(7px, 0.65vw, 9px);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  background: #64748b;
+}
+
+.battle-modern-move-card__type--normal {
+  background: #737373;
+}
+
+.battle-modern-move-card__type--fire {
+  background: #ea580c;
+}
+
+.battle-modern-move-card__type--water {
+  background: #2563eb;
+}
+
+.battle-modern-move-card__type--electric {
+  background: #ca8a04;
+}
+
+.battle-modern-move-card__type--grass {
+  background: #16a34a;
+}
+
+.battle-modern-move-card__type--ice {
+  background: #0891b2;
+}
+
+.battle-modern-move-card__type--fighting {
+  background: #b91c1c;
+}
+
+.battle-modern-move-card__type--poison {
+  background: #9333ea;
+}
+
+.battle-modern-move-card__type--ground {
+  background: #a16207;
+}
+
+.battle-modern-move-card__type--flying {
+  background: #6366f1;
+}
+
+.battle-modern-move-card__type--psychic {
+  background: #db2777;
+}
+
+.battle-modern-move-card__type--bug {
+  background: #65a30d;
+}
+
+.battle-modern-move-card__type--rock {
+  background: #78716c;
+}
+
+.battle-modern-move-card__type--ghost {
+  background: #6d28d9;
+}
+
+.battle-modern-move-card__type--dragon {
+  background: #4f46e5;
+}
+
+.battle-modern-move-card__type--dark {
+  background: #44403c;
+}
+
+.battle-modern-move-card__type--steel {
+  background: #64748b;
+}
+
+.battle-modern-move-card__type--fairy {
+  background: #e879f9;
+}
+
+/* Waiting:
+     mantenemos las cartas visibles,
+     pero bloqueadas. */
+.battle-modern-moves--waiting .battle-modern-move-card {
+  opacity: 0.58;
+}
+
+@media (max-width: 720px) {
+  .battle-modern-moves {
+    padding: 8px 12px 11px;
+  }
+
+  .battle-modern-moves__grid {
+    gap: 6px;
+  }
+
+  .battle-modern-move-card {
+    padding: 8px 9px;
+  }
+}
+
+/* =========================================================
+   MODERN REPLACEMENT PANEL
+   ========================================================= */
+
+.battle-modern-replacement {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 18px 14px;
+  pointer-events: auto;
+}
+
+.battle-modern-replacement[hidden] {
+  display: none;
+}
+
+.battle-modern-replacement__header {
+  min-height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.battle-modern-replacement__title {
+  color: var(--battle-text-primary);
+  font-size: clamp(13px, 1.1vw, 16px);
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+.battle-modern-replacement__waiting {
+  padding: 4px 9px;
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.1);
+  color: #93c5fd;
+  font-size: clamp(9px, 0.8vw, 11px);
+  font-weight: 650;
+}
+
+.battle-modern-replacement__waiting[hidden] {
+  display: none;
+}
+
+/* 3 x 2 Party layout */
+.battle-modern-replacement__grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+/* =========================================================
+     REPLACEMENT CARD
+     ========================================================= */
+
+.battle-modern-replacement-card {
+  position: relative;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 9px;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 13px;
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.88), rgba(15, 23, 42, 0.94));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  color: var(--battle-text-primary);
+  font: inherit;
+  text-align: left;
+  transition:
+    transform 150ms ease,
+    border-color 150ms ease,
+    background 150ms ease,
+    box-shadow 150ms ease,
+    opacity 150ms ease;
+}
+
+.battle-modern-replacement-card--selectable {
+  cursor: pointer;
+  border-color: rgba(34, 197, 94, 0.27);
+}
+
+.battle-modern-replacement-card--selectable:hover {
+  transform: translateY(-2px);
+  border-color: rgba(34, 197, 94, 0.62);
+  background: linear-gradient(145deg, rgba(25, 55, 52, 0.98), rgba(15, 32, 37, 0.98));
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.22),
+    0 0 0 1px rgba(34, 197, 94, 0.07);
+}
+
+.battle-modern-replacement-card--selectable:active {
+  transform: translateY(0);
+}
+
+.battle-modern-replacement-card:focus-visible {
+  outline: none;
+  border-color: var(--battle-accent);
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.22);
+}
+
+.battle-modern-replacement-card:disabled {
+  cursor: default;
+  opacity: 0.48;
+}
+
+/* =========================================================
+     SPRITE
+     ========================================================= */
+
+.battle-modern-replacement-card__sprite-wrap {
+  width: clamp(36px, 4.2vw, 52px);
+  height: clamp(36px, 4.2vw, 52px);
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  background: rgba(15, 23, 42, 0.48);
+}
+
+.battle-modern-replacement-card__sprite {
+  width: 90%;
+  height: 90%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.32));
+}
+
+/* =========================================================
+     CONTENT
+     ========================================================= */
+
+.battle-modern-replacement-card__content {
+  min-width: 0;
+  flex: 1;
+}
+
+.battle-modern-replacement-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.battle-modern-replacement-card__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: clamp(10px, 0.9vw, 13px);
+  font-weight: 750;
+}
+
+.battle-modern-replacement-card__level {
+  flex: 0 0 auto;
+  color: var(--battle-text-secondary);
+  font-size: clamp(8px, 0.7vw, 10px);
+  font-weight: 650;
+}
+
+.battle-modern-replacement-card__hp-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--battle-text-muted);
+  font-size: clamp(7px, 0.65vw, 9px);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.battle-modern-replacement-card__hp-track {
+  height: 5px;
+  margin-top: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.76);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.battle-modern-replacement-card__hp-fill {
+  height: 100%;
+  border-radius: inherit;
+  transition: width 250ms ease;
+}
+
+.battle-modern-replacement-card__hp-fill--healthy {
+  background: var(--battle-hp-healthy);
+}
+
+.battle-modern-replacement-card__hp-fill--warning {
+  background: var(--battle-hp-warning);
+}
+
+.battle-modern-replacement-card__hp-fill--danger {
+  background: var(--battle-hp-danger);
+}
+
+/* =========================================================
+     STATUS
+     ========================================================= */
+
+.battle-modern-replacement-card__status {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 5px;
+  border-radius: 999px;
+  font-size: clamp(6px, 0.58vw, 8px);
+  font-weight: 850;
+  letter-spacing: 0.055em;
+}
+
+.battle-modern-replacement-card__status--ready {
+  background: rgba(34, 197, 94, 0.13);
+  color: #86efac;
+}
+
+.battle-modern-replacement-card__status--active {
+  background: rgba(59, 130, 246, 0.13);
+  color: #93c5fd;
+}
+
+.battle-modern-replacement-card__status--fainted {
+  background: rgba(239, 68, 68, 0.13);
+  color: #fca5a5;
+}
+
+.battle-modern-replacement-card__status--unavailable {
+  background: rgba(148, 163, 184, 0.09);
+  color: var(--battle-text-muted);
+}
+
+.battle-modern-replacement--waiting .battle-modern-replacement-card {
+  opacity: 0.55;
+}
+
+@media (max-width: 720px) {
+  .battle-modern-replacement {
+    padding: 8px 10px 10px;
+  }
+
+  .battle-modern-replacement__grid {
+    gap: 5px;
+  }
+
+  .battle-modern-replacement-card {
+    gap: 5px;
+    padding: 5px 6px;
+  }
+}
+
+/* =========================================================
+   MODERN BATTLE STAGE
+   ========================================================= */
+
+.battle-modern-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* =========================================================
+     BACKGROUND
+     ========================================================= */
+
+.battle-modern-stage__backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 78% 23%, rgba(59, 130, 246, 0.18), transparent 27%),
+    radial-gradient(circle at 18% 63%, rgba(34, 197, 94, 0.1), transparent 30%),
+    radial-gradient(circle at 50% 48%, rgba(99, 102, 241, 0.07), transparent 44%),
+    linear-gradient(160deg, #09111f 0%, #101b2c 42%, #0b1423 100%);
+}
+
+/*
+   * Suave iluminación central para dar
+   * profundidad al battlefield.
+   */
+.battle-modern-stage__ambient {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  width: 90%;
+  height: 72%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(148, 163, 184, 0.075), transparent 67%);
+  filter: blur(12px);
+}
+
+/* =========================================================
+     BATTLEFIELD
+     ========================================================= */
+
+.battle-modern-stage__field {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+/*
+   * Línea ambiental muy sutil que separa
+   * visualmente suelo y fondo.
+   */
+.battle-modern-stage__horizon {
+  position: absolute;
+  left: 7%;
+  right: 7%;
+  top: 55%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(148, 163, 184, 0.08),
+    rgba(148, 163, 184, 0.13),
+    rgba(148, 163, 184, 0.08),
+    transparent
+  );
+}
+
+/*
+   * Oscurecimiento periférico para dirigir
+   * atención al combate.
+   */
+.battle-modern-stage__field::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 45%,
+    rgba(2, 6, 23, 0.34) 100%
+  );
+}
+
+/* =========================================================
+     POKÉMON PLATFORMS
+     ========================================================= */
+
+.battle-modern-stage__platform {
+  position: absolute;
+  border-radius: 50%;
+  transform: perspective(280px) rotateX(58deg);
+  filter: blur(0.15px);
+  transition:
+    left 180ms ease,
+    top 180ms ease,
+    width 180ms ease,
+    height 180ms ease;
+}
+
+.battle-modern-stage__platform--trainer {
+  background: radial-gradient(
+    ellipse,
+    rgba(34, 197, 94, 0.17) 0%,
+    rgba(34, 197, 94, 0.07) 45%,
+    transparent 72%
+  );
+  box-shadow: 0 0 34px rgba(34, 197, 94, 0.08);
+}
+
+.battle-modern-stage__platform--wild {
+  background: radial-gradient(
+    ellipse,
+    rgba(96, 165, 250, 0.2) 0%,
+    rgba(59, 130, 246, 0.08) 45%,
+    transparent 72%
+  );
+  box-shadow: 0 0 38px rgba(59, 130, 246, 0.1);
+}
+
+/*
+   * Núcleo sutil de la plataforma.
+   */
+.battle-modern-stage__platform::after {
+  content: "";
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 42%;
+  height: 16%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+  filter: blur(3px);
+}
+
+/* =========================================================
+     COMMAND AREA
+     ========================================================= */
+
+.battle-modern-stage__command {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+  border-top: 1px solid rgba(148, 163, 184, 0.09);
+  background: linear-gradient(180deg, rgba(7, 15, 28, 0.9), rgba(5, 11, 22, 0.98));
+  box-shadow: 0 -18px 45px rgba(0, 0, 0, 0.17);
+}
+
+.battle-modern-stage__command-glow {
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  top: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.2), transparent);
+}
+
+/* =========================================================
+     BATTLE LABEL
+     ========================================================= */
+
+.battle-modern-stage__label {
+  position: absolute;
+  top: 16px;
+  left: 18px;
+  padding: 5px 9px;
+  border: 1px solid rgba(148, 163, 184, 0.13);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.42);
+  color: var(--battle-text-muted);
+  font-size: clamp(8px, 0.7vw, 10px);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  backdrop-filter: blur(8px);
+}
+
+/* =========================================================
+     UI LAYERING
+     ========================================================= */
+
+.battle-modern-hud {
+  z-index: 10;
+}
+
+.battle-modern-moves,
+.battle-modern-replacement {
+  z-index: 20;
+}
+
+/* =========================================================
+   BATTLE COMPLETION
+   ========================================================= */
+
+.battle-modern-completion {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+  pointer-events: auto;
+}
+
+.battle-modern-completion[hidden] {
+  display: none;
+}
+
+.battle-modern-completion__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.58);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: battle-completion-fade-in 220ms ease-out;
+}
+
+.battle-modern-completion__card {
+  position: relative;
+  width: min(360px, 88%);
+  padding: 26px 28px 24px;
+  box-sizing: border-box;
+  text-align: center;
+  animation: battle-completion-card-in 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.battle-modern-completion__card::before {
+  content: "";
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--completion-accent), transparent);
+}
+
+.battle-modern-completion__icon {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--completion-accent);
+  background: var(--completion-accent-soft);
+  border: 1px solid var(--completion-accent-border);
+  font-size: 17px;
+  box-shadow: 0 0 28px var(--completion-glow);
+}
+
+.battle-modern-completion__eyebrow {
+  margin-bottom: 6px;
+  color: var(--battle-text-muted);
+  font-size: clamp(8px, 0.72vw, 10px);
+  font-weight: 850;
+  letter-spacing: 0.16em;
+}
+
+.battle-modern-completion__title {
+  color: var(--battle-text-primary);
+  font-size: clamp(27px, 3vw, 38px);
+  font-weight: 850;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
+.battle-modern-completion__message {
+  max-width: 290px;
+  margin: 12px auto 22px;
+  color: var(--battle-text-secondary);
+  font-size: clamp(11px, 1vw, 14px);
+  line-height: 1.5;
+}
+
+.battle-modern-completion__continue {
+  min-width: 140px;
+  padding: 10px 22px;
+  border: 1px solid var(--completion-accent-border);
+  border-radius: 12px;
+  background: linear-gradient(
+    135deg,
+    var(--completion-button-start),
+    var(--completion-button-end)
+  );
+  color: #ffffff;
+  font: inherit;
+  font-size: clamp(11px, 0.95vw, 13px);
+  font-weight: 750;
+  cursor: pointer;
+  box-shadow: 0 8px 24px var(--completion-button-shadow);
+  transition:
+    transform 150ms ease,
+    filter 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.battle-modern-completion__continue:not(:disabled):hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+  box-shadow: 0 12px 30px var(--completion-button-shadow);
+}
+
+.battle-modern-completion__continue:not(:disabled):active {
+  transform: translateY(0);
+}
+
+.battle-modern-completion__continue:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px var(--completion-focus),
+    0 8px 24px var(--completion-button-shadow);
+}
+
+.battle-modern-completion__continue:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+/* =========================================================
+     VICTORY
+     ========================================================= */
+
+.battle-modern-completion--victory {
+  --completion-accent: #4ade80;
+  --completion-accent-soft: rgba(34, 197, 94, 0.12);
+  --completion-accent-border: rgba(74, 222, 128, 0.28);
+  --completion-glow: rgba(34, 197, 94, 0.2);
+  --completion-button-start: #16a34a;
+  --completion-button-end: #15803d;
+  --completion-button-shadow: rgba(22, 163, 74, 0.22);
+  --completion-focus: rgba(74, 222, 128, 0.2);
+}
+
+/* =========================================================
+     DEFEAT
+     ========================================================= */
+
+.battle-modern-completion--defeat {
+  --completion-accent: #f87171;
+  --completion-accent-soft: rgba(239, 68, 68, 0.11);
+  --completion-accent-border: rgba(248, 113, 113, 0.26);
+  --completion-glow: rgba(239, 68, 68, 0.18);
+  --completion-button-start: #475569;
+  --completion-button-end: #334155;
+  --completion-button-shadow: rgba(15, 23, 42, 0.34);
+  --completion-focus: rgba(148, 163, 184, 0.2);
+}
+
+/* =========================================================
+     ANIMATIONS
+     ========================================================= */
+
+@keyframes battle-completion-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes battle-completion-card-in {
+  from {
+    opacity: 0;
+
+    transform: translateY(10px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}

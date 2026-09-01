@@ -1,10 +1,11 @@
 import Phaser from "phaser";
 
+import type { PokemonInstance } from "@cesar-mmo/shared";
+
 import {
-  getPokemonFormsBySpecies,
-  getPokemonSpecies,
-  type PokemonInstance,
-} from "@cesar-mmo/shared";
+  getPokemonDisplayName,
+  getPokemonMaxHp,
+} from "../pokemon/pokemon-presentation.utils";
 
 import { getPokemonSpriteAsset } from "../pokemon/pokemon-sprite.registry";
 
@@ -96,21 +97,13 @@ export class PartyPanel {
   private createPokemonSlot(pokemon: PokemonInstance, index: number): void {
     const slotY = PARTY_HEADER_HEIGHT + index * PARTY_SLOT_HEIGHT;
 
-    const species = getPokemonSpecies(pokemon.speciesId);
-
-    if (!species) {
-      throw new Error(
-        `Pokémon species ${pokemon.speciesId} not found while rendering Party`
-      );
-    }
-
     const asset = getPokemonSpriteAsset(pokemon.speciesId, pokemon.formId);
 
-    const maxHp = this.getPokemonMaxHp(pokemon);
+    const maxHp = getPokemonMaxHp(pokemon);
 
     const hpRatio = Phaser.Math.Clamp(pokemon.currentHp / maxHp, 0, 1);
 
-    const displayName = pokemon.nickname?.trim() || this.formatPokemonName(species.name);
+    const displayName = getPokemonDisplayName(pokemon);
 
     const icon = this.scene.add.image(30, slotY + 20, asset.textureKey);
 
@@ -146,26 +139,5 @@ export class PartyPanel {
       .setOrigin(0, 0.5);
 
     this.container.add([icon, name, level, hpLabel, hpBackground, hpFill]);
-  }
-
-  private getPokemonMaxHp(pokemon: PokemonInstance): number {
-    const forms = getPokemonFormsBySpecies(pokemon.speciesId);
-
-    const form = forms.find((candidate) => candidate.formId === pokemon.formId);
-
-    if (!form) {
-      throw new Error(
-        `Pokémon form ${pokemon.formId} not found for species ${pokemon.speciesId}`
-      );
-    }
-
-    return Math.floor((2 * form.baseStats.hp * pokemon.level) / 100) + pokemon.level + 10;
-  }
-
-  private formatPokemonName(name: string): string {
-    return name
-      .split("-")
-      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-      .join(" ");
   }
 }

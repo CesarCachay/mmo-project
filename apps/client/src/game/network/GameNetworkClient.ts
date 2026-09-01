@@ -9,6 +9,7 @@ import {
   isPokemonBattleStartedPayload,
   isPokemonBattleReplacementResolvedPayload,
   isPokemonBattleCompletedPayload,
+  isPokemonBattleStateUpdatedPayload,
 } from "@cesar-mmo/shared";
 
 import type {
@@ -33,6 +34,7 @@ import type {
   PokemonBattleReplacementInput,
   PokemonBattleReplacementResolvedPayload,
   PokemonBattleCompletedPayload,
+  PokemonBattleStateUpdatedPayload,
 } from "@cesar-mmo/shared";
 
 type ConnectionRejectedError = {
@@ -173,6 +175,18 @@ export class GameNetworkClient {
     this.socket.on(POKEMON_EVENTS.BATTLE_COMPLETED, (payload: unknown) => {
       if (!isPokemonBattleCompletedPayload(payload)) {
         console.warn("[BattleCompleted] invalid payload", payload);
+        return;
+      }
+      callback(payload);
+    });
+  }
+
+  public onBattleStateUpdated(
+    callback: (payload: PokemonBattleStateUpdatedPayload) => void
+  ): void {
+    this.socket.on(POKEMON_EVENTS.BATTLE_STATE_UPDATED, (payload: unknown) => {
+      if (!isPokemonBattleStateUpdatedPayload(payload)) {
+        console.warn("[BattleState] invalid payload", payload);
         return;
       }
       callback(payload);

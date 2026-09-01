@@ -25,6 +25,8 @@ export const POKEMON_EVENTS = {
   BATTLE_REPLACEMENT: "pokemon:battle-replacement",
   BATTLE_REPLACEMENT_RESOLVED: "pokemon:battle-replacement-resolved",
   BATTLE_COMPLETED: "pokemon:battle-completed",
+
+  BATTLE_STATE_UPDATED: "pokemon:battle-state-updated",
 } as const;
 
 export interface PokemonTrainerStatePayload {
@@ -217,6 +219,62 @@ export function isPokemonBattleCompletedPayload(
   }
 
   if (candidate.outcome !== "trainer-defeated" && candidate.outcome !== "wild-defeated") {
+    return false;
+  }
+
+  return true;
+}
+
+export type PokemonBattleInteractionState = "selecting-action" | "replacement-required";
+
+export interface PokemonBattleStateUpdatedPayload {
+  readonly battle: BattleInstance;
+  readonly resolvedTurnNumber: number;
+  readonly interactionState: PokemonBattleInteractionState;
+  readonly nextTurnNumber: number | null;
+  readonly replacementPokemonIndexes: readonly number[];
+}
+
+export function isPokemonBattleStateUpdatedPayload(
+  value: unknown
+): value is PokemonBattleStateUpdatedPayload {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const candidate = value as Partial<PokemonBattleStateUpdatedPayload>;
+
+  if (
+    !candidate.battle ||
+    typeof candidate.resolvedTurnNumber !== "number" ||
+    !Number.isInteger(candidate.resolvedTurnNumber) ||
+    candidate.resolvedTurnNumber < 1
+  ) {
+    return false;
+  }
+
+  if (
+    candidate.interactionState !== "selecting-action" &&
+    candidate.interactionState !== "replacement-required"
+  ) {
+    return false;
+  }
+
+  if (
+    candidate.nextTurnNumber !== null &&
+    (typeof candidate.nextTurnNumber !== "number" ||
+      !Number.isInteger(candidate.nextTurnNumber) ||
+      candidate.nextTurnNumber < 1)
+  ) {
+    return false;
+  }
+
+  if (
+    !Array.isArray(candidate.replacementPokemonIndexes) ||
+    !candidate.replacementPokemonIndexes.every(
+      (index) => Number.isInteger(index) && index >= 0
+    )
+  ) {
     return false;
   }
 

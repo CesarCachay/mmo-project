@@ -115,6 +115,7 @@ export {
   isPokemonBattleReplacementInput,
   isPokemonBattleReplacementResolvedPayload,
   isPokemonBattleCompletedPayload,
+  isPokemonBattleStateUpdatedPayload,
 } from "./pokemon/pokemon-network.js";
 export type {
   PokemonTrainerStatePayload,
@@ -125,6 +126,8 @@ export type {
   PokemonBattleReplacementResolvedPayload,
   PokemonBattleCompletedOutcome,
   PokemonBattleCompletedPayload,
+  PokemonBattleInteractionState,
+  PokemonBattleStateUpdatedPayload,
 } from "./pokemon/pokemon-network.js";
 
 // Pokemon Starters

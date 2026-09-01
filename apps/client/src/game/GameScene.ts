@@ -25,7 +25,7 @@ import { ChatBox } from "./ui/ChatBox";
 import { DialogueBox } from "./ui/DialogueBox";
 import { StarterSelectionPanel } from "./ui/StarterSelectionPanel";
 import { PartyPanel } from "./ui/PartyPanel";
-import { BattleDebugPanel } from "./ui/BattleDebugPanel";
+import { BattleController } from "./battle/BattleController";
 
 // helpers
 import { MAP_REGISTRY } from "./maps/mapRegistry";
@@ -60,9 +60,6 @@ import type {
   PokemonTrainerState,
   PokemonInstance,
   PokemonWildEncounterStartedPayload,
-  PokemonBattleStartedPayload,
-  PokemonBattleReplacementResolvedPayload,
-  PokemonBattleCompletedPayload,
 } from "@cesar-mmo/shared";
 
 export class GameScene extends Phaser.Scene {
@@ -76,8 +73,6 @@ export class GameScene extends Phaser.Scene {
   private interactKey!: Phaser.Input.Keyboard.Key;
   private chatKey!: Phaser.Input.Keyboard.Key;
   private partyKey!: Phaser.Input.Keyboard.Key;
-  private battleCommandKey!: Phaser.Input.Keyboard.Key;
-  private battleReplacementKey!: Phaser.Input.Keyboard.Key;
 
   private network!: GameNetworkClient;
 
@@ -102,8 +97,7 @@ export class GameScene extends Phaser.Scene {
   private pokemonFollowerController!: PokemonFollowerController;
   private pokemonOverworldSpriteLoader!: PokemonOverworldSpriteLoader;
 
-  private battleDebugPanel: BattleDebugPanel | undefined;
-  private activeBattlePayload: PokemonBattleStartedPayload | undefined;
+  private battleController!: BattleController;
 
   private canChooseStarter = false;
 
@@ -189,16 +183,16 @@ export class GameScene extends Phaser.Scene {
     this.createDialogueUi();
     this.createChatUi();
     this.createStarterSelectionUi();
+
     this.createPokemonPresentation();
-    this.createBattleDebugUi();
+    this.createBattleUi();
+
     this.createControls();
     this.connectToServer();
   }
 
   update(_: number, delta: number) {
     this.handlePartyToggle();
-    this.handleBattleCommandDebug();
-    this.handleBattleReplacementDebug();
     this.handleChatFocus();
 
     this.updateNearbyNpc();
@@ -247,12 +241,20 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  private createBattleDebugUi(): void {
-    this.battleDebugPanel = new BattleDebugPanel(this);
+  private createBattleUi(): void {
+    this.battleController = new BattleController(
+      this,
+      this.pokemonSpriteLoader,
+      (input) => {
+        this.network.sendBattleCommand(input);
+      },
+      (input) => {
+        this.network.sendBattleReplacement(input);
+      }
+    );
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-      this.battleDebugPanel?.destroy();
-      this.battleDebugPanel = undefined;
+      this.battleController.destroy();
     });
   }
 
@@ -429,10 +431,6 @@ export class GameScene extends Phaser.Scene {
     this.interactKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
     this.chatKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
     this.partyKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P, false);
-    this.battleCommandKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.M, false);
-    this.battleReplacementKey = this.input.keyboard!.addKey(
-      Phaser.Input.Keyboard.KeyCodes.R
-    );
   }
 
   private preloadNpcSprites() {
@@ -525,15 +523,19 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.network.onBattleStarted((payload) => {
-      this.handleBattleStarted(payload);
+      void this.battleController.start(payload);
+    });
+
+    this.network.onBattleStateUpdated((payload) => {
+      void this.battleController.applyStateUpdate(payload);
     });
 
     this.network.onBattleReplacementResolved((payload) => {
-      this.handleBattleReplacementResolved(payload);
+      void this.battleController.applyReplacement(payload);
     });
 
     this.network.onBattleCompleted((payload) => {
-      this.handleBattleCompleted(payload);
+      this.battleController.complete(payload);
     });
 
     this.network.onCurrentPlayers((players) => {
@@ -678,6 +680,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private handleNpcInteraction() {
+    if (this.battleController.isActive) {
+      return;
+    }
     if (this.isMapTransitioning) {
       return;
     }
@@ -827,7 +832,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private requestMapTransition(transitionId: string): void {
-    if (this.isMapTransitioning) {
+    if (this.isMapTransitioning || this.battleController.isActive) {
       return;
     }
     const payload: MapTransitionInput = {
@@ -866,6 +871,7 @@ export class GameScene extends Phaser.Scene {
     return (
       this.isMapTransitioning ||
       this.dialogueBox.isOpen() ||
+      this.battleController.isActive ||
       this.chatBox.isTyping() ||
       this.starterSelectionPanel.isVisible() ||
       this.partyPanel.isVisible()
@@ -918,6 +924,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private handlePartyToggle(): void {
+    if (this.battleController.isActive) {
+      return;
+    }
     if (this.isMapTransitioning) {
       return;
     }
@@ -941,56 +950,6 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.partyPanel.toggle();
-  }
-
-  private handleBattleCommandDebug(): void {
-    if (!Phaser.Input.Keyboard.JustDown(this.battleCommandKey)) {
-      return;
-    }
-
-    const payload = this.activeBattlePayload;
-
-    if (!payload) {
-      console.warn("[BattleCommand debug] No active battle");
-      return;
-    }
-
-    const trainerParticipant = payload.battle.participants.find(
-      (participant) => participant.type === "trainer"
-    );
-
-    if (!trainerParticipant) {
-      console.warn("[BattleCommand debug] Trainer participant not found");
-      return;
-    }
-
-    const activePokemon =
-      trainerParticipant.pokemon[trainerParticipant.activePokemonIndex];
-
-    if (!activePokemon) {
-      console.warn("[BattleCommand debug] Active Pokémon not found");
-      return;
-    }
-
-    const move = activePokemon.pokemon.moves[0];
-
-    if (!move) {
-      console.warn("[BattleCommand debug] Active Pokémon has no moves");
-      return;
-    }
-
-    this.network.sendBattleCommand({
-      battleId: payload.battle.battleId,
-      action: {
-        type: "use-move",
-        moveId: move.moveId,
-      },
-    });
-
-    console.log("[BattleCommand debug] sent", {
-      battleId: payload.battle.battleId,
-      moveId: move.moveId,
-    });
   }
 
   private async preparePokemonFollower(pokemon: PokemonInstance): Promise<void> {
@@ -1020,104 +979,5 @@ export class GameScene extends Phaser.Scene {
       speciesId: payload.pokemon.speciesId,
       level: payload.pokemon.level,
     });
-  }
-
-  private handleBattleStarted(payload: PokemonBattleStartedPayload): void {
-    this.activeBattlePayload = payload;
-
-    const trainerParticipant = payload.battle.participants.find(
-      (participant) => participant.type === "trainer"
-    );
-    const wildParticipant = payload.battle.participants.find(
-      (participant) => participant.type === "wild"
-    );
-
-    const trainerPokemon =
-      trainerParticipant?.pokemon[trainerParticipant.activePokemonIndex];
-    const wildPokemon = wildParticipant?.pokemon[wildParticipant.activePokemonIndex];
-    console.log("[Battle started]", {
-      battleId: payload.battle.battleId,
-      trainerSpeciesId: trainerPokemon?.pokemon.speciesId,
-      wildSpeciesId: wildPokemon?.pokemon.speciesId,
-    });
-
-    this.battleDebugPanel?.show(payload);
-  }
-
-  private handleBattleReplacementResolved(
-    payload: PokemonBattleReplacementResolvedPayload
-  ): void {
-    this.activeBattlePayload = {
-      battle: payload.battle,
-    };
-
-    const trainerParticipant = payload.battle.participants.find(
-      (participant) => participant.type === "trainer"
-    );
-
-    const activePokemon =
-      trainerParticipant?.pokemon[trainerParticipant.activePokemonIndex];
-
-    console.log("[BattleReplacement] received", {
-      battleId: payload.battle.battleId,
-      activePokemonIndex: trainerParticipant?.activePokemonIndex,
-      activePokemonSpeciesId: activePokemon?.pokemon.speciesId,
-      nextTurnNumber: payload.nextTurnNumber,
-    });
-
-    this.battleDebugPanel?.show(this.activeBattlePayload);
-  }
-
-  private handleBattleReplacementDebug(): void {
-    if (!Phaser.Input.Keyboard.JustDown(this.battleReplacementKey)) {
-      return;
-    }
-
-    if (!this.activeBattlePayload) {
-      return;
-    }
-
-    const trainer = this.activeBattlePayload.battle.participants.find(
-      (participant) => participant.type === "trainer"
-    );
-
-    if (!trainer) {
-      return;
-    }
-
-    const replacementPokemonIndex = trainer.pokemon.findIndex(
-      (pokemon, index) => index !== trainer.activePokemonIndex && pokemon.currentHp > 0
-    );
-
-    if (replacementPokemonIndex < 0) {
-      console.warn("[BattleReplacement] no reserve Pokémon available in client snapshot");
-      return;
-    }
-
-    console.log("[BattleReplacement] debug request", {
-      battleId: this.activeBattlePayload.battle.battleId,
-      replacementPokemonIndex,
-    });
-
-    this.network.sendBattleReplacement({
-      battleId: this.activeBattlePayload.battle.battleId,
-      replacementPokemonIndex,
-    });
-  }
-
-  private handleBattleCompleted(payload: PokemonBattleCompletedPayload): void {
-    if (!this.activeBattlePayload) {
-      return;
-    }
-
-    if (this.activeBattlePayload.battle.battleId !== payload.battleId) {
-      console.warn("[BattleCompleted] battle mismatch", {
-        activeBattleId: this.activeBattlePayload.battle.battleId,
-        completedBattleId: payload.battleId,
-      });
-      return;
-    }
-
-    this.activeBattlePayload = undefined;
   }
 }
