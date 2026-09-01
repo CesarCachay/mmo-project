@@ -99,6 +99,8 @@ import { createWildBattleCommand } from '../pokemon/battles/pokemon-wild-battle-
 import { applyPokemonWildBattleOutcome } from '../pokemon/battles/pokemon-wild-battle-outcome.runtime';
 import { applyPokemonTrainerBattleReplacement } from '../pokemon/battles/pokemon-trainer-battle-replacement.runtime';
 import type { PokemonBattleSession } from 'src/pokemon/battles/pokemon-battle-session';
+import { assertPokemonTrainerBattleSwitchAllowed } from '../pokemon/battles/pokemon-trainer-battle-switch.validator';
+import { applyPokemonTrainerBattleSwitch } from 'src/pokemon/battles/pokemon-trainer-battle-switch.runtime';
 
 @WebSocketGateway({
   cors: {
@@ -552,6 +554,14 @@ export class GameGateway
     }
 
     try {
+      if (payload.action.type === 'switch-pokemon') {
+        assertPokemonTrainerBattleSwitchAllowed({
+          session,
+          playerId: client.id,
+          pokemonIndex: payload.action.pokemonIndex,
+        });
+      }
+
       const trainerCommand = createBattleCommand(session.battle, {
         participantId: trainerBinding.participantId,
         action: payload.action,
@@ -1243,6 +1253,29 @@ export class GameGateway
     session: PokemonBattleSession,
     entry: BattleTurnResolutionEntry,
   ): void {
+    switch (entry.command.action.type) {
+      case 'switch-pokemon': {
+        const result = applyPokemonTrainerBattleSwitch({
+          session,
+          entry,
+        });
+
+        console.log('[BattleSwitch] resolved', {
+          battleId: result.battleId,
+          participantId: result.participantId,
+          previousActivePokemonIndex: result.previousActivePokemonIndex,
+          currentActivePokemonIndex: result.currentActivePokemonIndex,
+          previousPokemonInstanceId: result.previousPokemonInstanceId,
+          activePokemonInstanceId: result.activePokemonInstanceId,
+        });
+        return;
+      }
+
+      case 'use-move': {
+        break;
+      }
+    }
+
     const eligibility = evaluateBattleMoveExecutionEligibility(
       session.battle,
       entry,

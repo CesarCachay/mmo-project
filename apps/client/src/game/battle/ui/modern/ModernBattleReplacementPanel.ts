@@ -21,8 +21,11 @@ export interface ModernBattleReplacementPanelViewport {
   height: number;
 }
 
+export type ModernBattleReplacementPanelMode = "forced" | "voluntary";
+
 interface ModernBattleReplacementPanelOptions {
-  onReplacementSelected: (pokemonIndex: number) => void;
+  onPartyPokemonSelected: (pokemonIndex: number) => void;
+  onBack: () => void;
 }
 
 interface ReplacementSlotEntry {
@@ -37,48 +40,57 @@ export class ModernBattleReplacementPanel {
   private readonly waitingLabel: HTMLDivElement;
   private readonly grid: HTMLDivElement;
 
-  private readonly onReplacementSelected: (pokemonIndex: number) => void;
+  private readonly onPartyPokemonSelected: (pokemonIndex: number) => void;
 
   private interactionState: BattleClientInteractionState = "completed";
 
+  private mode: ModernBattleReplacementPanelMode = "forced";
+
   private slots: ReplacementSlotEntry[] = [];
 
+  private readonly backButton: HTMLButtonElement;
+
   constructor(parent: HTMLElement, options: ModernBattleReplacementPanelOptions) {
-    this.onReplacementSelected = options.onReplacementSelected;
+    this.onPartyPokemonSelected = options.onPartyPokemonSelected;
 
     this.root = document.createElement("div");
-
     this.root.className = [
       "battle-modern-replacement",
       "battle-ui-modern__interactive",
     ].join(" ");
 
     const header = document.createElement("div");
-
     header.className = "battle-modern-replacement__header";
 
+    const headerLeft = document.createElement("div");
+    headerLeft.className = "battle-modern-replacement__header-left";
+
     this.title = document.createElement("div");
-
     this.title.className = "battle-modern-replacement__title";
-
     this.title.textContent = "Choose your next Pokémon";
 
     this.waitingLabel = document.createElement("div");
-
     this.waitingLabel.className = "battle-modern-replacement__waiting";
-
     this.waitingLabel.textContent = "Switching Pokémon…";
 
-    header.append(this.title, this.waitingLabel);
-
     this.grid = document.createElement("div");
-
     this.grid.className = "battle-modern-replacement__grid";
 
-    this.root.append(header, this.grid);
+    this.backButton = document.createElement("button");
+    this.backButton.type = "button";
+    this.backButton.className = "battle-replacement-panel__back";
+    this.backButton.textContent = "BACK";
+    this.backButton.addEventListener("click", () => {
+      options.onBack();
+    });
 
+    headerLeft.append(this.backButton, this.title);
+    header.append(headerLeft, this.waitingLabel);
+
+    this.root.append(header, this.grid);
     parent.appendChild(this.root);
 
+    this.updateBackButton();
     this.setVisible(false);
   }
 
@@ -152,6 +164,13 @@ export class ModernBattleReplacementPanel {
     this.root.remove();
   }
 
+  public setMode(mode: ModernBattleReplacementPanelMode): void {
+    this.mode = mode;
+
+    this.updateBackButton();
+    this.refreshInteractionState();
+  }
+
   private createSlot(
     pokemonState: BattlePokemonState,
     pokemonIndex: number,
@@ -162,10 +181,6 @@ export class ModernBattleReplacementPanel {
     const isActive = pokemonIndex === activePokemonIndex;
     const isFainted = pokemonState.currentHp <= 0;
 
-    /*
-     * ESTE es el authority gate real
-     * que viene del servidor.
-     */
     const serverAllowsReplacement = replacementPokemonIndexes.includes(pokemonIndex);
 
     const selectable = serverAllowsReplacement && !isActive && !isFainted;
@@ -258,21 +273,17 @@ export class ModernBattleReplacementPanel {
 
     status.className = "battle-modern-replacement-card__status";
 
-    if (isActive) {
-      status.textContent = "ACTIVE";
-
-      status.classList.add("battle-modern-replacement-card__status--active");
-    } else if (isFainted) {
+    if (isFainted) {
       status.textContent = "FAINTED";
-
       status.classList.add("battle-modern-replacement-card__status--fainted");
+    } else if (isActive) {
+      status.textContent = "ACTIVE";
+      status.classList.add("battle-modern-replacement-card__status--active");
     } else if (serverAllowsReplacement) {
       status.textContent = "READY";
-
       status.classList.add("battle-modern-replacement-card__status--ready");
     } else {
       status.textContent = "UNAVAILABLE";
-
       status.classList.add("battle-modern-replacement-card__status--unavailable");
     }
 
@@ -280,11 +291,15 @@ export class ModernBattleReplacementPanel {
     button.append(spriteWrap, content);
 
     button.addEventListener("click", () => {
-      if (this.interactionState !== "replacement-required" || !selectable) {
+      const canChoose =
+        this.interactionState === "replacement-required" ||
+        this.interactionState === "pokemon-selection";
+
+      if (!canChoose || !selectable) {
         return;
       }
 
-      this.onReplacementSelected(pokemonIndex);
+      this.onPartyPokemonSelected(pokemonIndex);
     });
 
     this.grid.appendChild(button);
@@ -297,10 +312,12 @@ export class ModernBattleReplacementPanel {
   }
 
   private refreshInteractionState(): void {
-    const canChoose = this.interactionState === "replacement-required";
+    const canChoose =
+      this.interactionState === "replacement-required" ||
+      this.interactionState === "pokemon-selection";
+
     const waiting = this.interactionState === "waiting-for-server";
     this.waitingLabel.hidden = !waiting;
-
     this.root.classList.toggle("battle-modern-replacement--waiting", waiting);
 
     for (const slot of this.slots) {
@@ -308,5 +325,14 @@ export class ModernBattleReplacementPanel {
       slot.button.disabled = !enabled;
       slot.button.classList.toggle("battle-modern-replacement-card--selectable", enabled);
     }
+
+    this.backButton.disabled = !(
+      this.mode === "voluntary" && this.interactionState === "pokemon-selection"
+    );
+  }
+
+  private updateBackButton(): void {
+    const isVoluntary = this.mode === "voluntary";
+    this.backButton.style.display = isVoluntary ? "block" : "none";
   }
 }

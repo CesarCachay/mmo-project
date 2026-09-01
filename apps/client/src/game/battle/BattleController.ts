@@ -40,11 +40,23 @@ export class BattleController {
     this.sendBattleReplacement = sendBattleReplacement;
     this.overlay = new BattleOverlay(
       scene,
+      () => {
+        this.handleFightSelected();
+      },
+      () => {
+        this.handlePokemonSelected();
+      },
       (moveId) => {
         this.handleMoveSelected(moveId);
       },
+      () => {
+        this.handleMoveBack();
+      },
       (pokemonIndex) => {
-        this.handleReplacementSelected(pokemonIndex);
+        this.handlePartyPokemonSelected(pokemonIndex);
+      },
+      () => {
+        this.handlePokemonBack();
       },
       () => {
         this.handleCompletionAcknowledged();
@@ -85,7 +97,7 @@ export class BattleController {
       }
 
       this.overlay.renderBattle(payload.battle);
-      this.setInteractionState("selecting-action");
+      this.setInteractionState("action-menu");
     } catch (error) {
       console.error("[BattleController] failed to prepare battle presentation", error);
     }
@@ -127,7 +139,7 @@ export class BattleController {
       }
 
       this.overlay.renderBattle(payload.battle);
-      this.setInteractionState("selecting-action");
+      this.setInteractionState("action-menu");
 
       console.log("[BattleController] replacement presentation applied", {
         battleId: payload.battle.battleId,
@@ -242,7 +254,7 @@ export class BattleController {
         );
       }
 
-      this.setInteractionState(payload.interactionState);
+      this.setInteractionState(this.mapServerInteractionState(payload.interactionState));
 
       console.log("[BattleController] state updated", {
         battleId: payload.battle.battleId,
@@ -261,7 +273,7 @@ export class BattleController {
   }
 
   private handleMoveSelected(moveId: number): void {
-    if (this.interactionState !== "selecting-action") {
+    if (this.interactionState !== "move-selection") {
       return;
     }
 
@@ -318,12 +330,12 @@ export class BattleController {
         moveId,
       });
     } catch (error) {
-      this.setInteractionState("selecting-action");
+      this.setInteractionState("move-selection");
       console.error("[BattleController] failed to submit move", error);
     }
   }
 
-  private handleReplacementSelected(pokemonIndex: number): void {
+  private handleForcedReplacementSelected(pokemonIndex: number): void {
     if (this.interactionState !== "replacement-required") {
       return;
     }
@@ -369,11 +381,6 @@ export class BattleController {
         battleId: payload.battle.battleId,
         replacementPokemonIndex: pokemonIndex,
       });
-
-      console.log("[BattleController] replacement submitted", {
-        battleId: payload.battle.battleId,
-        replacementPokemonIndex: pokemonIndex,
-      });
     } catch (error) {
       this.setInteractionState("replacement-required");
       console.error("[BattleController] failed to submit replacement", error);
@@ -392,5 +399,132 @@ export class BattleController {
     this.replacementPokemonIndexes = [];
     this.activeBattlePayload = undefined;
     this.overlay.hide();
+  }
+
+  private mapServerInteractionState(
+    state: PokemonBattleStateUpdatedPayload["interactionState"]
+  ): BattleClientInteractionState {
+    switch (state) {
+      case "selecting-action":
+        return "action-menu";
+
+      case "replacement-required":
+        return "replacement-required";
+    }
+  }
+
+  private handleFightSelected(): void {
+    if (this.interactionState !== "action-menu") {
+      return;
+    }
+    this.setInteractionState("move-selection");
+  }
+
+  private handlePokemonSelected(): void {
+    if (this.interactionState !== "action-menu") {
+      return;
+    }
+    const payload = this.activeBattlePayload;
+    if (!payload) {
+      return;
+    }
+    this.overlay.setVoluntaryPokemonOptions(payload.battle);
+    this.setInteractionState("pokemon-selection");
+  }
+
+  private handleMoveBack(): void {
+    if (this.interactionState !== "move-selection") {
+      return;
+    }
+    this.setInteractionState("action-menu");
+  }
+
+  private handlePokemonBack(): void {
+    if (this.interactionState !== "pokemon-selection") {
+      return;
+    }
+    this.setInteractionState("action-menu");
+  }
+
+  private handlePartyPokemonSelected(pokemonIndex: number): void {
+    switch (this.interactionState) {
+      case "pokemon-selection":
+        this.handleVoluntaryPokemonSelected(pokemonIndex);
+        return;
+
+      case "replacement-required":
+        this.handleForcedReplacementSelected(pokemonIndex);
+        return;
+
+      default:
+        return;
+    }
+  }
+
+  private handleVoluntaryPokemonSelected(pokemonIndex: number): void {
+    if (this.interactionState !== "pokemon-selection") {
+      return;
+    }
+
+    const payload = this.activeBattlePayload;
+
+    if (!payload) {
+      return;
+    }
+
+    const trainer = payload.battle.participants.find(
+      (participant) => participant.type === "trainer"
+    );
+
+    if (!trainer) {
+      return;
+    }
+
+    const activePokemon = trainer.pokemon[trainer.activePokemonIndex];
+
+    if (!activePokemon) {
+      return;
+    }
+
+    /*
+     * Si el active está fainted, esto NO es voluntary switch.
+     * El server deberá haber entrado en replacement-required.
+     */
+    if (activePokemon.currentHp <= 0) {
+      return;
+    }
+
+    const pokemonState = trainer.pokemon[pokemonIndex];
+
+    if (!pokemonState) {
+      return;
+    }
+
+    //  No podemos elegir al mismo Pokémon que ya está activo.
+    if (pokemonIndex === trainer.activePokemonIndex) {
+      return;
+    }
+
+    // No podemos elegir un Pokémon fainted.
+    if (pokemonState.currentHp <= 0) {
+      return;
+    }
+
+    // Lock ANTES del emit.
+    this.setInteractionState("waiting-for-server");
+
+    try {
+      this.sendBattleCommand({
+        battleId: payload.battle.battleId,
+        action: {
+          type: "switch-pokemon",
+          pokemonIndex,
+        },
+      });
+    } catch (error) {
+      this.overlay.setVoluntaryPokemonOptions(payload.battle);
+      this.setInteractionState("pokemon-selection");
+      console.error("[BattleController] failed to submit voluntary switch", error);
+    }
   }
 }

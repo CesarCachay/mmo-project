@@ -209,6 +209,7 @@ export type {
   BattleCommandAction,
   BattleCommand,
   CreateBattleCommandInput,
+  BattleSwitchPokemonAction,
 } from "./pokemon/battles/pokemon-battle-command.js";
 export { BattleTurn, BattleTurnNumber } from "./pokemon/battles/pokemon-battle-turn.js";
 export {

@@ -14,8 +14,9 @@ export interface ModernBattleMovePanelViewport {
   height: number;
 }
 
-interface ModernBattleMovePanelOptions {
-  onMoveSelected: (moveId: number) => void;
+export interface ModernBattleMovePanelOptions {
+  readonly onMoveSelected: (moveId: number) => void;
+  readonly onBack: () => void;
 }
 
 interface MoveButtonEntry {
@@ -29,8 +30,9 @@ export class ModernBattleMovePanel {
   private readonly title: HTMLDivElement;
   private readonly grid: HTMLDivElement;
   private readonly waitingLabel: HTMLDivElement;
+  private readonly backButton: HTMLButtonElement;
 
-  private readonly onMoveSelected: (moveId: number) => void;
+  readonly onMoveSelected: (moveId: number) => void;
 
   private interactionState: BattleClientInteractionState = "completed";
   private buttons: MoveButtonEntry[] = [];
@@ -43,32 +45,36 @@ export class ModernBattleMovePanel {
       " "
     );
 
-    const header = document.createElement("div");
+    this.backButton = document.createElement("button");
+    this.backButton.type = "button";
+    this.backButton.className = "battle-move-panel__back";
+    this.backButton.textContent = "BACK";
+    this.backButton.addEventListener("click", () => {
+      options.onBack();
+    });
 
+    const header = document.createElement("div");
     header.className = "battle-modern-moves__header";
 
+    const headerLeft = document.createElement("div");
+    headerLeft.className = "battle-modern-moves__header-left";
+
     this.title = document.createElement("div");
-
     this.title.className = "battle-modern-moves__title";
-
     this.title.textContent = "Choose a move";
 
     this.waitingLabel = document.createElement("div");
-
     this.waitingLabel.className = "battle-modern-moves__waiting";
-
     this.waitingLabel.textContent = "Waiting for opponent…";
 
-    header.append(this.title, this.waitingLabel);
+    headerLeft.append(this.backButton, this.title);
+    header.append(headerLeft, this.waitingLabel);
 
     this.grid = document.createElement("div");
-
     this.grid.className = "battle-modern-moves__grid";
 
     this.root.append(header, this.grid);
-
     parent.appendChild(this.root);
-
     this.setVisible(false);
   }
 
@@ -194,7 +200,7 @@ export class ModernBattleMovePanel {
       const moveId = instanceMove.moveId;
 
       button.addEventListener("click", () => {
-        if (this.interactionState !== "selecting-action" || instanceMove.currentPp <= 0) {
+        if (this.interactionState !== "move-selection" || instanceMove.currentPp <= 0) {
           return;
         }
 
@@ -214,7 +220,7 @@ export class ModernBattleMovePanel {
   }
 
   private refreshInteractionState(): void {
-    const canSelect = this.interactionState === "selecting-action";
+    const canSelect = this.interactionState === "move-selection";
     const waiting = this.interactionState === "waiting-for-server";
     this.waitingLabel.hidden = !waiting;
     this.root.classList.toggle("battle-modern-moves--waiting", waiting);
@@ -225,6 +231,8 @@ export class ModernBattleMovePanel {
       entry.button.disabled = !enabled;
       entry.button.classList.toggle("battle-modern-move-card--empty", !hasPp);
     }
+
+    this.backButton.disabled = this.interactionState !== "move-selection";
   }
 
   private formatMoveName(name: string): string {

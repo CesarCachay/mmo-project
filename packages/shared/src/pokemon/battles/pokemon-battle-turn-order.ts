@@ -14,6 +14,7 @@ export type BattleTurnOrderRandomSource = () => number;
 
 export interface BattleTurnResolutionEntry {
   readonly command: BattleCommand;
+  readonly actionPriority: number;
   readonly movePriority: number;
   readonly speed: number;
   readonly tieBreaker: number;
@@ -70,6 +71,8 @@ function createResolutionEntry(
 
   const activePokemon = getActiveBattlePokemon(participant);
 
+  const actionPriority = getCommandActionPriority(command);
+
   const movePriority = getCommandMovePriority(command);
 
   const speed = getBattlePokemonSpeed(
@@ -86,14 +89,28 @@ function createResolutionEntry(
 
   return {
     command,
+    actionPriority,
     movePriority,
     speed,
     tieBreaker,
   };
 }
 
+function getCommandActionPriority(command: BattleCommand): number {
+  switch (command.action.type) {
+    case "switch-pokemon":
+      return 1;
+
+    case "use-move":
+      return 0;
+  }
+}
+
 function getCommandMovePriority(command: BattleCommand): number {
   switch (command.action.type) {
+    case "switch-pokemon":
+      return 0;
+
     case "use-move": {
       const move = getPokemonMove(command.action.moveId);
 
@@ -130,26 +147,21 @@ function compareResolutionEntries(
   left: BattleTurnResolutionEntry,
   right: BattleTurnResolutionEntry
 ): number {
-  //
-  // 1. Higher move priority acts first.
-  //
+  // 1. Higher action category priority acts first.
+  if (left.actionPriority !== right.actionPriority) {
+    return right.actionPriority - left.actionPriority;
+  }
 
+  // 2. Within the same action category, higher move priority acts first.
   if (left.movePriority !== right.movePriority) {
     return right.movePriority - left.movePriority;
   }
 
-  //
-  // 2. Higher Speed acts first.
-  //
-
+  // 3. Higher Speed acts first.
   if (left.speed !== right.speed) {
     return right.speed - left.speed;
   }
 
-  //
-  // 3. Exact tie:
-  // server-provided RNG decides.
-  //
-
+  // 4. Exact tie: server-provided RNG decides.
   return right.tieBreaker - left.tieBreaker;
 }

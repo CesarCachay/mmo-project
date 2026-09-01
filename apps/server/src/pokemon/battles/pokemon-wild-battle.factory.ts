@@ -26,6 +26,16 @@ export function createWildBattleInstance(
     createBattlePokemonState(pokemon),
   );
 
+  const initialActivePokemonIndex = trainerBattlePokemon.findIndex(
+    (pokemonState) => pokemonState.currentHp > 0,
+  );
+
+  if (initialActivePokemonIndex === -1) {
+    throw new Error(
+      `Cannot create wild battle for trainer "${encounterSession.trainerId}" because all Trainer Pokémon are fainted`,
+    );
+  }
+
   const wildBattlePokemon = createBattlePokemonState(encounterSession.pokemon);
 
   const trainerParticipant = createBattleParticipant({
@@ -33,7 +43,7 @@ export function createWildBattleInstance(
     type: 'trainer',
     side: 'side-a',
     pokemon: trainerBattlePokemon,
-    activePokemonIndex: 0,
+    activePokemonIndex: initialActivePokemonIndex,
   });
 
   const wildParticipant = createBattleParticipant({

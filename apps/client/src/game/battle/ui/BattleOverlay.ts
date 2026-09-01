@@ -9,6 +9,7 @@ import { ModernBattlePokemonHud } from "./modern/ModernBattlePokemonHud";
 import { ModernBattleMovePanel } from "./modern/ModernBattleMovePanel";
 import { ModernBattleReplacementPanel } from "./modern/ModernBattleReplacementPanel";
 import { ModernBattleCompletionPanel } from "./modern/ModernBattleCompletionPanel";
+import { ModernBattleActionMenu } from "./modern/ModernBattleActionMenu";
 
 import type { BattleClientInteractionState } from "../battle-client.types";
 
@@ -23,11 +24,16 @@ export class BattleOverlay {
   private readonly movePanel: ModernBattleMovePanel;
   private readonly replacementPanel: ModernBattleReplacementPanel;
   private readonly completionPanel: ModernBattleCompletionPanel;
+  private readonly actionMenu: ModernBattleActionMenu;
 
   constructor(
     scene: Phaser.Scene,
+    onFightSelected: () => void,
+    onPokemonSelected: () => void,
     onMoveSelected: (moveId: number) => void,
-    onReplacementSelected: (pokemonIndex: number) => void,
+    onMoveBack: () => void,
+    onPartyPokemonSelected: (pokemonIndex: number) => void,
+    onPokemonBack: () => void,
     onCompletionContinue: () => void
   ) {
     this.scene = scene;
@@ -38,11 +44,17 @@ export class BattleOverlay {
 
     this.trainerHud = new ModernBattlePokemonHud(this.modernRoot.element, "trainer");
     this.wildHud = new ModernBattlePokemonHud(this.modernRoot.element, "wild");
+    this.actionMenu = new ModernBattleActionMenu(this.modernRoot.element, {
+      onFightSelected,
+      onPokemonSelected,
+    });
     this.movePanel = new ModernBattleMovePanel(this.modernRoot.element, {
       onMoveSelected,
+      onBack: onMoveBack,
     });
     this.replacementPanel = new ModernBattleReplacementPanel(this.modernRoot.element, {
-      onReplacementSelected,
+      onPartyPokemonSelected,
+      onBack: onPokemonBack,
     });
     this.completionPanel = new ModernBattleCompletionPanel(this.modernRoot.element, {
       onContinue: onCompletionContinue,
@@ -66,6 +78,7 @@ export class BattleOverlay {
     this.trainerHud.clear();
     this.wildHud.clear();
 
+    this.actionMenu.clear();
     this.movePanel.clear();
     this.replacementPanel.clear();
   }
@@ -101,6 +114,7 @@ export class BattleOverlay {
 
     this.trainerHud.setPokemon(trainerPokemon);
     this.wildHud.setPokemon(wildPokemon);
+    this.actionMenu.setPokemon(trainerPokemon);
     this.movePanel.setPokemon(trainerPokemon);
   }
 
@@ -110,6 +124,7 @@ export class BattleOverlay {
     this.trainerHud.destroy();
     this.wildHud.destroy();
 
+    this.actionMenu.destroy();
     this.movePanel.destroy();
     this.replacementPanel.destroy();
 
@@ -143,6 +158,7 @@ export class BattleOverlay {
       height: commandAreaHeight,
     };
 
+    this.actionMenu.setBounds(commandBounds, viewport);
     this.movePanel.setBounds(commandBounds, viewport);
     this.replacementPanel.setBounds(commandBounds, viewport);
 
@@ -192,30 +208,54 @@ export class BattleOverlay {
     this.replacementPanel.setInteractionState(state);
 
     switch (state) {
-      case "selecting-action":
+      case "action-menu":
+        this.actionMenu.setEnabled(true);
+        this.actionMenu.setVisible(true);
+
+        this.movePanel.setVisible(false);
+        this.replacementPanel.setVisible(false);
+        break;
+
+      case "move-selection":
+        this.actionMenu.setVisible(false);
+
         this.movePanel.setVisible(true);
         this.replacementPanel.setVisible(false);
         break;
 
+      case "pokemon-selection":
+        this.actionMenu.setVisible(false);
+
+        this.movePanel.setVisible(false);
+        this.replacementPanel.setVisible(true);
+        break;
+
       case "replacement-required":
+        this.actionMenu.setVisible(false);
+
         this.movePanel.setVisible(false);
         this.replacementPanel.setVisible(true);
         break;
 
       case "completed":
+        this.actionMenu.setVisible(false);
+
         this.movePanel.setVisible(false);
         this.replacementPanel.setVisible(false);
         break;
 
       case "waiting-for-server":
         /*
-         * IMPORTANTE:
-         * No cambiamos qué panel es visible.
-         * Si veníamos de Move Selection,
-         * sigue visible pero disabled.
-         * Si veníamos de Replacement,
-         * sigue visible pero disabled.
+         * Conservamos el panel que ya estaba visible.
+         *
+         * ActionMenu:
+         * disabled.
+         *
+         * MovePanel / ReplacementPanel:
+         * reciben waiting-for-server y se
+         * deshabilitan mediante sus reglas internas.
          */
+        this.actionMenu.setEnabled(false);
         break;
     }
   }
@@ -224,12 +264,39 @@ export class BattleOverlay {
     battle: BattleInstance,
     replacementPokemonIndexes: readonly number[]
   ): void {
+    this.replacementPanel.setMode("forced");
     this.replacementPanel.render(battle, replacementPokemonIndexes);
   }
 
   public showCompletion(outcome: PokemonBattleCompletedPayload["outcome"]): void {
+    this.actionMenu.setVisible(false);
     this.movePanel.setVisible(false);
     this.replacementPanel.setVisible(false);
     this.completionPanel.show(outcome);
+  }
+
+  public setVoluntaryPokemonOptions(battle: BattleInstance): void {
+    const trainerParticipant = battle.participants.find(
+      (participant) => participant.type === "trainer"
+    );
+
+    if (!trainerParticipant) {
+      return;
+    }
+
+    const selectablePokemonIndexes = trainerParticipant.pokemon
+      .map((pokemonState, pokemonIndex) => ({
+        pokemonState,
+        pokemonIndex,
+      }))
+      .filter(
+        ({ pokemonState, pokemonIndex }) =>
+          pokemonIndex !== trainerParticipant.activePokemonIndex &&
+          pokemonState.currentHp > 0
+      )
+      .map(({ pokemonIndex }) => pokemonIndex);
+
+    this.replacementPanel.setMode("voluntary");
+    this.replacementPanel.render(battle, selectablePokemonIndexes);
   }
 }

@@ -13,7 +13,12 @@ export interface BattleUseMoveAction {
   readonly moveId: number;
 }
 
-export type BattleCommandAction = BattleUseMoveAction;
+export interface BattleSwitchPokemonAction {
+  readonly type: "switch-pokemon";
+  readonly pokemonIndex: number;
+}
+
+export type BattleCommandAction = BattleUseMoveAction | BattleSwitchPokemonAction;
 
 export interface BattleCommand {
   readonly battleId: BattleId;
@@ -49,7 +54,10 @@ export function createBattleCommand(
   switch (input.action.type) {
     case "use-move": {
       assertValidUseMoveAction(battle, participant.id, input.action);
-
+      break;
+    }
+    case "switch-pokemon": {
+      assertValidSwitchPokemonAction(battle, input.action);
       break;
     }
   }
@@ -96,5 +104,16 @@ function assertValidUseMoveAction(
 
   if (move.currentPp <= 0) {
     throw new Error(`Move "${action.moveId}" has no PP remaining`);
+  }
+}
+
+function assertValidSwitchPokemonAction(
+  battle: BattleInstance,
+  action: BattleSwitchPokemonAction
+): void {
+  if (!Number.isInteger(action.pokemonIndex) || action.pokemonIndex < 0) {
+    throw new Error(
+      `Invalid Pokémon index "${action.pokemonIndex}" for battle "${battle.battleId}"`
+    );
   }
 }
