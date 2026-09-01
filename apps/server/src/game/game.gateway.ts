@@ -244,6 +244,12 @@ export class GameGateway
           persistedParty,
         );
       }
+
+      // TO REMOVE - TEST
+      trainerState =
+        await this.pokemonTrainerService.ensureDevelopmentBattleTestParty(
+          trainerIdentity.trainerId,
+        );
     } catch (error: unknown) {
       console.error('[PokemonTrainerIdentity] resolution failed', error);
 

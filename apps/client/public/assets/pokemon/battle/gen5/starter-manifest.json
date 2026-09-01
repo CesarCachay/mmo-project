@@ -1,0 +1,101 @@
+{
+  "starterCount": 12,
+  "starters": [
+    {
+      "speciesId": 1,
+      "name": "Bulbasaur",
+      "region": "Kanto",
+      "spriteKey": "1",
+      "front": "/assets/pokemon/battle/gen5/front/1.png",
+      "back": "/assets/pokemon/battle/gen5/back/1.png"
+    },
+    {
+      "speciesId": 4,
+      "name": "Charmander",
+      "region": "Kanto",
+      "spriteKey": "4",
+      "front": "/assets/pokemon/battle/gen5/front/4.png",
+      "back": "/assets/pokemon/battle/gen5/back/4.png"
+    },
+    {
+      "speciesId": 7,
+      "name": "Squirtle",
+      "region": "Kanto",
+      "spriteKey": "7",
+      "front": "/assets/pokemon/battle/gen5/front/7.png",
+      "back": "/assets/pokemon/battle/gen5/back/7.png"
+    },
+    {
+      "speciesId": 152,
+      "name": "Chikorita",
+      "region": "Johto",
+      "spriteKey": "152",
+      "front": "/assets/pokemon/battle/gen5/front/152.png",
+      "back": "/assets/pokemon/battle/gen5/back/152.png"
+    },
+    {
+      "speciesId": 155,
+      "name": "Cyndaquil",
+      "region": "Johto",
+      "spriteKey": "155",
+      "front": "/assets/pokemon/battle/gen5/front/155.png",
+      "back": "/assets/pokemon/battle/gen5/back/155.png"
+    },
+    {
+      "speciesId": 158,
+      "name": "Totodile",
+      "region": "Johto",
+      "spriteKey": "158",
+      "front": "/assets/pokemon/battle/gen5/front/158.png",
+      "back": "/assets/pokemon/battle/gen5/back/158.png"
+    },
+    {
+      "speciesId": 252,
+      "name": "Treecko",
+      "region": "Hoenn",
+      "spriteKey": "252",
+      "front": "/assets/pokemon/battle/gen5/front/252.png",
+      "back": "/assets/pokemon/battle/gen5/back/252.png"
+    },
+    {
+      "speciesId": 255,
+      "name": "Torchic",
+      "region": "Hoenn",
+      "spriteKey": "255",
+      "front": "/assets/pokemon/battle/gen5/front/255.png",
+      "back": "/assets/pokemon/battle/gen5/back/255.png"
+    },
+    {
+      "speciesId": 258,
+      "name": "Mudkip",
+      "region": "Hoenn",
+      "spriteKey": "258",
+      "front": "/assets/pokemon/battle/gen5/front/258.png",
+      "back": "/assets/pokemon/battle/gen5/back/258.png"
+    },
+    {
+      "speciesId": 387,
+      "name": "Turtwig",
+      "region": "Sinnoh",
+      "spriteKey": "387",
+      "front": "/assets/pokemon/battle/gen5/front/387.png",
+      "back": "/assets/pokemon/battle/gen5/back/387.png"
+    },
+    {
+      "speciesId": 390,
+      "name": "Chimchar",
+      "region": "Sinnoh",
+      "spriteKey": "390",
+      "front": "/assets/pokemon/battle/gen5/front/390.png",
+      "back": "/assets/pokemon/battle/gen5/back/390.png"
+    },
+    {
+      "speciesId": 393,
+      "name": "Piplup",
+      "region": "Sinnoh",
+      "spriteKey": "393",
+      "front": "/assets/pokemon/battle/gen5/front/393.png",
+      "back": "/assets/pokemon/battle/gen5/back/393.png"
+    }
+  ]
+}

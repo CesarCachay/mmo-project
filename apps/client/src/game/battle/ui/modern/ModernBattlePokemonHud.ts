@@ -6,6 +6,7 @@ import {
 } from "../../../pokemon/pokemon-presentation.utils";
 
 import { getPokemonSpriteAsset } from "../../../pokemon/pokemon-sprite.registry";
+import { getPokemonBattleSpriteAsset } from "../../../pokemon/pokemon-battle-sprite.registry";
 
 export type ModernBattlePokemonHudSide = "trainer" | "wild";
 
@@ -22,6 +23,8 @@ export interface ModernBattlePokemonHudViewport {
 }
 
 export class ModernBattlePokemonHud {
+  private readonly side: ModernBattlePokemonHudSide;
+
   private readonly root: HTMLDivElement;
 
   private readonly sprite: HTMLImageElement;
@@ -37,6 +40,8 @@ export class ModernBattlePokemonHud {
   private readonly hpFill: HTMLDivElement;
 
   constructor(parent: HTMLElement, side: ModernBattlePokemonHudSide) {
+    this.side = side;
+
     this.root = document.createElement("div");
 
     this.root.className = ["battle-modern-hud", `battle-modern-hud--${side}`].join(" ");
@@ -126,15 +131,52 @@ export class ModernBattlePokemonHud {
   public setPokemon(state: BattlePokemonState): void {
     const pokemon = state.pokemon;
 
+    const displayName = getPokemonDisplayName(pokemon);
+
     const maxHp = getPokemonMaxHp(pokemon);
 
     const currentHp = Math.max(0, state.currentHp);
 
     const hpRatio = maxHp > 0 ? Math.max(0, Math.min(1, currentHp / maxHp)) : 0;
 
-    const asset = getPokemonSpriteAsset(pokemon.speciesId, pokemon.formId);
+    const fallbackAsset = getPokemonSpriteAsset(pokemon.speciesId, pokemon.formId);
 
-    this.name.textContent = getPokemonDisplayName(pokemon);
+    const battleSpriteSide = this.side === "trainer" ? "back" : "front";
+
+    const battleAsset = getPokemonBattleSpriteAsset(
+      pokemon.speciesId,
+      pokemon.formId,
+      battleSpriteSide
+    );
+
+    /*
+     * Eliminamos cualquier callback
+     * perteneciente al Pokémon anterior.
+     */
+    this.sprite.onerror = null;
+
+    this.sprite.classList.remove("battle-modern-hud__sprite--icon");
+
+    this.sprite.classList.add("battle-modern-hud__sprite--battle");
+
+    /*
+     * Si la forma no existe dentro del
+     * source Gen 5, conservamos el icon
+     * registry actual como fallback.
+     */
+    this.sprite.onerror = () => {
+      this.sprite.onerror = null;
+
+      this.sprite.classList.remove("battle-modern-hud__sprite--battle");
+
+      this.sprite.classList.add("battle-modern-hud__sprite--icon");
+
+      this.sprite.src = fallbackAsset.path;
+    };
+
+    this.sprite.src = battleAsset.path;
+
+    this.name.textContent = displayName;
 
     this.level.textContent = `Lv. ${pokemon.level}`;
 
@@ -156,9 +198,7 @@ export class ModernBattlePokemonHud {
       this.hpFill.classList.add("battle-modern-hud__hp-fill--danger");
     }
 
-    this.sprite.src = asset.path;
-
-    this.sprite.alt = this.name.textContent;
+    this.sprite.alt = displayName;
 
     this.root.hidden = false;
   }
@@ -172,7 +212,14 @@ export class ModernBattlePokemonHud {
 
     this.hpFill.style.width = "0%";
 
+    this.sprite.onerror = null;
+
     this.sprite.removeAttribute("src");
+
+    this.sprite.classList.remove(
+      "battle-modern-hud__sprite--battle",
+      "battle-modern-hud__sprite--icon"
+    );
 
     this.sprite.alt = "";
   }

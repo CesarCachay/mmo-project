@@ -150,8 +150,8 @@ export class BattleOverlay {
      * Conservamos exactamente la distribución
      * que ya estaba funcionando.
      */
-    const pokemonAreaWidth = Math.min(width * 0.38, 360);
-    const pokemonAreaHeight = Math.min(battleFieldHeight * 0.42, 220);
+    const pokemonAreaWidth = Math.min(width * 0.44, 420);
+    const pokemonAreaHeight = Math.min(battleFieldHeight * 0.52, 280);
     const horizontalPadding = Math.max(24, width * 0.06);
 
     /*

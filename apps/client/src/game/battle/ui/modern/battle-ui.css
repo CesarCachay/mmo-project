@@ -114,20 +114,6 @@
   flex-direction: row;
 }
 
-.battle-modern-hud__sprite {
-  width: clamp(68px, 34%, 122px);
-  height: clamp(68px, 34%, 122px);
-  flex: 0 0 auto;
-  object-fit: contain;
-  /*
-     * El Pokémon puede seguir siendo pixel art.
-     * La UI alrededor ya no lo es.
-     */
-  image-rendering: pixelated;
-  filter: drop-shadow(0 12px 14px rgba(0, 0, 0, 0.4));
-  transform: translateZ(0);
-}
-
 .battle-modern-hud__card {
   width: min(240px, 68%);
   min-width: 150px;
@@ -1088,6 +1074,43 @@
 }
 
 /* =========================================================
+   BATTLE POKÉMON SPRITES
+   ========================================================= */
+
+.battle-modern-hud__sprite {
+  flex: 0 0 auto;
+  object-fit: contain;
+  image-rendering: pixelated;
+  transform-origin: center bottom;
+  filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.42));
+}
+
+.battle-modern-hud__sprite--battle {
+  width: clamp(180px, 58%, 270px);
+  height: clamp(180px, 58%, 270px);
+}
+
+/* Pokémon del jugador: más cercano a cámara. */
+.battle-modern-hud--trainer .battle-modern-hud__sprite--battle {
+  width: clamp(205px, 66%, 300px);
+  height: clamp(205px, 66%, 300px);
+  transform: scale(1.08);
+}
+
+/* Pokémon rival: un poco más pequeño por perspectiva. */
+.battle-modern-hud--wild .battle-modern-hud__sprite--battle {
+  width: clamp(180px, 60%, 270px);
+  height: clamp(180px, 60%, 270px);
+
+  transform: scale(1.05);
+}
+
+.battle-modern-hud__sprite--icon {
+  width: clamp(76px, 30%, 118px);
+  height: clamp(76px, 30%, 118px);
+}
+
+/* =========================================================
      VICTORY
      ========================================================= */
 
@@ -1134,13 +1157,11 @@
 @keyframes battle-completion-card-in {
   from {
     opacity: 0;
-
     transform: translateY(10px) scale(0.97);
   }
 
   to {
     opacity: 1;
-
     transform: translateY(0) scale(1);
   }
 }

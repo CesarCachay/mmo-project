@@ -107,4 +107,42 @@ export class PokemonTrainerService {
     // Only after durable persistence succeeds do we update runtime Trainer state.
     return this.trainerStateStore.setParty(trainerId, updatedParty);
   }
+
+  // TO REMOVE - TEST
+  public async ensureDevelopmentBattleTestParty(
+    trainerId: PokemonTrainerId,
+  ): Promise<PokemonTrainerState> {
+    const trainerState = this.trainerStateStore.get(trainerId);
+
+    if (!trainerState) {
+      throw new Error(
+        `Pokémon trainer state not found for trainer ${trainerId}`,
+      );
+    }
+
+    /*
+     * Protección importante:
+     * este seed JAMÁS debe ejecutarse
+     * accidentalmente en producción.
+     */
+    if (process.env.NODE_ENV === 'production') {
+      return trainerState;
+    }
+    const hasLatios = trainerState.party.pokemon.some(
+      (pokemon) => pokemon.speciesId === 381,
+    );
+    const hasLarvitar = trainerState.party.pokemon.some(
+      (pokemon) => pokemon.speciesId === 246,
+    );
+    let updatedState = trainerState;
+
+    if (!hasLatios) {
+      updatedState = await this.addPokemon(trainerId, 381, 20);
+    }
+    if (!hasLarvitar) {
+      updatedState = await this.addPokemon(trainerId, 246, 10);
+    }
+
+    return updatedState;
+  }
 }
