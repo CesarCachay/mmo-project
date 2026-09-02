@@ -5,6 +5,7 @@ import type {
   BattlePokemonState,
 } from "./pokemon-battle.types.js";
 import type { BattleCommandAction } from "./pokemon-battle-command.js";
+import { isPokemonItemId } from "../inventory/pokemon-inventory.js";
 
 export interface PokemonBattleStartedPayload {
   readonly battle: BattleInstance;
@@ -236,6 +237,13 @@ function isBattleCommandAction(value: unknown): value is BattleCommandAction {
 
     case "run":
       return true;
+
+    case "use-item":
+      return (
+        isPokemonItemId(value.itemId) &&
+        typeof value.targetPokemonInstanceId === "string" &&
+        value.targetPokemonInstanceId.trim().length > 0
+      );
 
     default:
       return false;

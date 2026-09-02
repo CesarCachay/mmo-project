@@ -276,6 +276,8 @@ export type {
   BattleRunFailedEvent,
   BattleRunSucceededEvent,
   BattlePresentationEvent,
+  BattleItemUsedEvent,
+  BattleHpRestoredEvent,
 } from "./pokemon/battles/pokemon-battle-presentation.js";
 export { isPokemonBattleTurnResolvedPayload } from "./pokemon/battles/pokemon-battle-presentation-network.js";
 export type { PokemonBattleTurnResolvedPayload } from "./pokemon/battles/pokemon-battle-presentation-network.js";
@@ -284,3 +286,34 @@ export type {
   BattleRunRandomSource,
   BattleRunResolution,
 } from "./pokemon/battles/run/pokemon-battle-run.js";
+
+// INVENTORY
+export {
+  PokemonInventory,
+  PokemonInventoryItemStack,
+  PokemonItemId,
+} from "./pokemon/inventory/pokemon-inventory.js";
+export {
+  POKEMON_ITEM_IDS,
+  createPokemonInventory,
+  getPokemonInventoryItemQuantity,
+  setPokemonInventoryItemQuantity,
+  consumePokemonInventoryItem,
+  isPokemonItemId,
+  addPokemonInventoryItem,
+} from "./pokemon/inventory/pokemon-inventory.js";
+
+// ITEMS
+export {
+  POKEMON_ITEM_REGISTRY,
+  getPokemonItem,
+} from "./pokemon/items/pokemon-item.registry.js";
+export type {
+  PokemonItemCategory,
+  PokemonItemBattleTarget,
+  PokemonItemEffect,
+  PokemonItemDefinition,
+} from "./pokemon/items/pokemon-item.registry.js";
+export { calculatePokemonMaxHp } from "./pokemon/pokemon-stat.js";
+export { planBattleHealingItemUse } from "./pokemon/inventory/pokemon-battle-healing-item.js";
+export type { BattleHealingItemPlan } from "./pokemon/inventory/pokemon-battle-healing-item.js";

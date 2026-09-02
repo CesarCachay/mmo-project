@@ -32,3 +32,8 @@ export type PokemonInstance = Prisma.PokemonInstanceModel
  * 
  */
 export type PokemonInstanceMove = Prisma.PokemonInstanceMoveModel
+/**
+ * Model PokemonTrainerInventoryItem
+ * 
+ */
+export type PokemonTrainerInventoryItem = Prisma.PokemonTrainerInventoryItemModel

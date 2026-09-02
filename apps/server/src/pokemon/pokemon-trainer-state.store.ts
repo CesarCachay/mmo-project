@@ -1,7 +1,11 @@
-import { createPokemonParty } from '@cesar-mmo/shared';
+import { createPokemonParty, createPokemonInventory } from '@cesar-mmo/shared';
 
 import type { PokemonTrainerId } from './pokemon-trainer-identity';
-import type { PokemonParty, PokemonTrainerState } from '@cesar-mmo/shared';
+import type {
+  PokemonParty,
+  PokemonTrainerState,
+  PokemonInventory,
+} from '@cesar-mmo/shared';
 
 export class PokemonTrainerStateStore {
   private readonly trainerStates = new Map<
@@ -14,6 +18,7 @@ export class PokemonTrainerStateStore {
   create(
     trainerId: PokemonTrainerId,
     party: PokemonParty = createPokemonParty(),
+    inventory: PokemonInventory = createPokemonInventory(),
   ): PokemonTrainerState {
     if (this.trainerStates.has(trainerId)) {
       throw new Error(`Trainer state already exists for trainer ${trainerId}`);
@@ -21,9 +26,11 @@ export class PokemonTrainerStateStore {
 
     const trainerState: PokemonTrainerState = {
       party,
+      inventory,
     };
 
     this.trainerStates.set(trainerId, trainerState);
+
     return trainerState;
   }
 
@@ -45,6 +52,26 @@ export class PokemonTrainerStateStore {
       party,
     };
     this.trainerStates.set(trainerId, updatedTrainerState);
+    return updatedTrainerState;
+  }
+
+  setInventory(
+    trainerId: PokemonTrainerId,
+    inventory: PokemonInventory,
+  ): PokemonTrainerState {
+    const trainerState = this.trainerStates.get(trainerId);
+
+    if (!trainerState) {
+      throw new Error(`Trainer state not found for trainer ${trainerId}`);
+    }
+
+    const updatedTrainerState: PokemonTrainerState = {
+      ...trainerState,
+      inventory,
+    };
+
+    this.trainerStates.set(trainerId, updatedTrainerState);
+
     return updatedTrainerState;
   }
 

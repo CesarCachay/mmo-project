@@ -100,6 +100,7 @@ function getCommandActionPriority(command: BattleCommand): number {
   switch (command.action.type) {
     case "switch-pokemon":
     case "run":
+    case "use-item":
       return 1;
 
     case "use-move":
@@ -111,6 +112,7 @@ function getCommandMovePriority(command: BattleCommand): number {
   switch (command.action.type) {
     case "switch-pokemon":
     case "run":
+    case "use-item":
       return 0;
 
     case "use-move": {

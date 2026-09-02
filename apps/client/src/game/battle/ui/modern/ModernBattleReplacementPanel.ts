@@ -21,7 +21,7 @@ export interface ModernBattleReplacementPanelViewport {
   height: number;
 }
 
-export type ModernBattleReplacementPanelMode = "forced" | "voluntary";
+export type ModernBattleReplacementPanelMode = "forced" | "voluntary" | "item-target";
 
 interface ModernBattleReplacementPanelOptions {
   onPartyPokemonSelected: (pokemonIndex: number) => void;
@@ -113,7 +113,7 @@ export class ModernBattleReplacementPanel {
 
   public render(
     battle: BattleInstance,
-    replacementPokemonIndexes: readonly number[]
+    selectablePokemonIndexes: readonly number[]
   ): void {
     this.slots = [];
 
@@ -136,7 +136,7 @@ export class ModernBattleReplacementPanel {
         pokemonState,
         pokemonIndex,
         trainer.activePokemonIndex,
-        replacementPokemonIndexes
+        selectablePokemonIndexes
       );
     });
 
@@ -167,6 +167,23 @@ export class ModernBattleReplacementPanel {
   public setMode(mode: ModernBattleReplacementPanelMode): void {
     this.mode = mode;
 
+    switch (mode) {
+      case "forced":
+        this.title.textContent = "Choose your next Pokémon";
+        this.waitingLabel.textContent = "Switching Pokémon…";
+        break;
+
+      case "voluntary":
+        this.title.textContent = "Choose a Pokémon";
+        this.waitingLabel.textContent = "Switching Pokémon…";
+        break;
+
+      case "item-target":
+        this.title.textContent = "Use item on which Pokémon?";
+        this.waitingLabel.textContent = "Using item…";
+        break;
+    }
+
     this.updateBackButton();
     this.refreshInteractionState();
   }
@@ -175,19 +192,22 @@ export class ModernBattleReplacementPanel {
     pokemonState: BattlePokemonState,
     pokemonIndex: number,
     activePokemonIndex: number,
-    replacementPokemonIndexes: readonly number[]
+    selectablePokemonIndexes: readonly number[]
   ): void {
     const pokemon = pokemonState.pokemon;
     const isActive = pokemonIndex === activePokemonIndex;
     const isFainted = pokemonState.currentHp <= 0;
 
-    const serverAllowsReplacement = replacementPokemonIndexes.includes(pokemonIndex);
-
-    const selectable = serverAllowsReplacement && !isActive && !isFainted;
-
     const maxHp = getPokemonMaxHp(pokemon);
-
     const currentHp = Math.max(0, pokemonState.currentHp);
+    const isFullHp = currentHp >= maxHp;
+
+    const isAllowed = selectablePokemonIndexes.includes(pokemonIndex);
+
+    const selectable =
+      this.mode === "item-target"
+        ? isAllowed && !isFainted && !isFullHp
+        : isAllowed && !isActive && !isFainted;
 
     const hpRatio = maxHp > 0 ? Math.max(0, Math.min(1, currentHp / maxHp)) : 0;
 
@@ -272,19 +292,34 @@ export class ModernBattleReplacementPanel {
     const status = document.createElement("div");
 
     status.className = "battle-modern-replacement-card__status";
-
-    if (isFainted) {
-      status.textContent = "FAINTED";
-      status.classList.add("battle-modern-replacement-card__status--fainted");
-    } else if (isActive) {
-      status.textContent = "ACTIVE";
-      status.classList.add("battle-modern-replacement-card__status--active");
-    } else if (serverAllowsReplacement) {
-      status.textContent = "READY";
-      status.classList.add("battle-modern-replacement-card__status--ready");
+    if (this.mode === "item-target") {
+      if (isFainted) {
+        status.textContent = "FAINTED";
+        status.classList.add("battle-modern-replacement-card__status--fainted");
+      } else if (isFullHp) {
+        status.textContent = "FULL HP";
+        status.classList.add("battle-modern-replacement-card__status--unavailable");
+      } else if (selectable) {
+        status.textContent = "READY";
+        status.classList.add("battle-modern-replacement-card__status--ready");
+      } else {
+        status.textContent = "UNAVAILABLE";
+        status.classList.add("battle-modern-replacement-card__status--unavailable");
+      }
     } else {
-      status.textContent = "UNAVAILABLE";
-      status.classList.add("battle-modern-replacement-card__status--unavailable");
+      if (isFainted) {
+        status.textContent = "FAINTED";
+        status.classList.add("battle-modern-replacement-card__status--fainted");
+      } else if (isActive) {
+        status.textContent = "ACTIVE";
+        status.classList.add("battle-modern-replacement-card__status--active");
+      } else if (isAllowed) {
+        status.textContent = "READY";
+        status.classList.add("battle-modern-replacement-card__status--ready");
+      } else {
+        status.textContent = "UNAVAILABLE";
+        status.classList.add("battle-modern-replacement-card__status--unavailable");
+      }
     }
 
     content.append(top, hpRow, hpTrack, status);
@@ -293,7 +328,8 @@ export class ModernBattleReplacementPanel {
     button.addEventListener("click", () => {
       const canChoose =
         this.interactionState === "replacement-required" ||
-        this.interactionState === "pokemon-selection";
+        this.interactionState === "pokemon-selection" ||
+        this.interactionState === "item-target-selection";
 
       if (!canChoose || !selectable) {
         return;
@@ -314,7 +350,8 @@ export class ModernBattleReplacementPanel {
   private refreshInteractionState(): void {
     const canChoose =
       this.interactionState === "replacement-required" ||
-      this.interactionState === "pokemon-selection";
+      this.interactionState === "pokemon-selection" ||
+      this.interactionState === "item-target-selection";
 
     const waiting = this.interactionState === "waiting-for-server";
     this.waitingLabel.hidden = !waiting;
@@ -326,13 +363,16 @@ export class ModernBattleReplacementPanel {
       slot.button.classList.toggle("battle-modern-replacement-card--selectable", enabled);
     }
 
-    this.backButton.disabled = !(
-      this.mode === "voluntary" && this.interactionState === "pokemon-selection"
-    );
+    const backEnabled =
+      (this.mode === "voluntary" && this.interactionState === "pokemon-selection") ||
+      (this.mode === "item-target" && this.interactionState === "item-target-selection");
+
+    this.backButton.disabled = !backEnabled;
   }
 
   private updateBackButton(): void {
-    const isVoluntary = this.mode === "voluntary";
-    this.backButton.style.display = isVoluntary ? "block" : "none";
+    const visible = this.mode === "voluntary" || this.mode === "item-target";
+
+    this.backButton.style.display = visible ? "block" : "none";
   }
 }

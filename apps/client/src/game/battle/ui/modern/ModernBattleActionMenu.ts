@@ -3,6 +3,7 @@ import type { BattlePokemonState } from "@cesar-mmo/shared";
 export interface ModernBattleActionMenuCallbacks {
   readonly onFightSelected: () => void;
   readonly onPokemonSelected: () => void;
+  readonly onItemSelected: () => void;
   readonly onRunSelected: () => void;
 }
 
@@ -59,7 +60,13 @@ export class ModernBattleActionMenu {
       }
     );
 
-    this.itemButton = document.createElement("button");
+    this.itemButton = this.createButton(
+      "ITEM",
+      "battle-action-menu__button battle-action-menu__button--item",
+      () => {
+        this.callbacks.onItemSelected();
+      }
+    );
     this.itemButton.type = "button";
     this.itemButton.className = [
       "battle-action-menu__button",
@@ -134,9 +141,7 @@ export class ModernBattleActionMenu {
     this.fightButton.disabled = !enabled;
     this.pokemonButton.disabled = !enabled;
     this.runButton.disabled = !enabled;
-
-    // ITEM permanece bloqueado hasta Inventory Foundation.
-    this.itemButton.disabled = true;
+    this.itemButton.disabled = !enabled;
   }
 
   public clear(): void {

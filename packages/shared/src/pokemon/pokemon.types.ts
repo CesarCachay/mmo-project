@@ -1,3 +1,5 @@
+import { PokemonInventory } from "./inventory/pokemon-inventory.js";
+
 export type PokemonType =
   | "normal"
   | "fire"
@@ -137,6 +139,7 @@ export interface PokemonParty {
 
 export interface PokemonTrainerState {
   party: PokemonParty;
+  inventory: PokemonInventory;
 }
 
 // Follower for multiplayers

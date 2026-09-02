@@ -1,6 +1,11 @@
 import Phaser from "phaser";
 
-import type { BattleInstance, PokemonBattleCompletedPayload } from "@cesar-mmo/shared";
+import type {
+  BattleInstance,
+  PokemonBattleCompletedPayload,
+  PokemonInventory,
+  PokemonItemId,
+} from "@cesar-mmo/shared";
 
 import { BattleDomRoot } from "./modern/BattleDomRoot";
 import { ModernBattleStage } from "./modern/ModernBattleStage";
@@ -10,6 +15,7 @@ import { ModernBattleMovePanel } from "./modern/ModernBattleMovePanel";
 import { ModernBattleReplacementPanel } from "./modern/ModernBattleReplacementPanel";
 import { ModernBattleCompletionPanel } from "./modern/ModernBattleCompletionPanel";
 import { ModernBattleActionMenu } from "./modern/ModernBattleActionMenu";
+import { ModernBattleBagPanel } from "./modern/ModernBattleBagPanel";
 
 // presentation
 import { ModernBattleMessagePanel } from "./modern/ModernBattleMessagePanel";
@@ -30,15 +36,20 @@ export class BattleOverlay {
   private readonly completionPanel: ModernBattleCompletionPanel;
   private readonly actionMenu: ModernBattleActionMenu;
 
+  private readonly bagPanel: ModernBattleBagPanel;
+
   constructor(
     scene: Phaser.Scene,
     onFightSelected: () => void,
     onPokemonSelected: () => void,
-    onRunSelected: () => void,
+    onItemSelected: () => void,
+    onBagItemSelected: (itemId: PokemonItemId) => void,
     onMoveSelected: (moveId: number) => void,
     onMoveBack: () => void,
     onPartyPokemonSelected: (pokemonIndex: number) => void,
     onPokemonBack: () => void,
+    onItemBack: () => void,
+    onRunSelected: () => void,
     onCompletionContinue: () => void
   ) {
     this.scene = scene;
@@ -52,6 +63,7 @@ export class BattleOverlay {
     this.actionMenu = new ModernBattleActionMenu(this.modernRoot.element, {
       onFightSelected,
       onPokemonSelected,
+      onItemSelected,
       onRunSelected,
     });
     this.movePanel = new ModernBattleMovePanel(this.modernRoot.element, {
@@ -65,6 +77,10 @@ export class BattleOverlay {
     this.messagePanel = new ModernBattleMessagePanel(this.modernRoot.element);
     this.completionPanel = new ModernBattleCompletionPanel(this.modernRoot.element, {
       onContinue: onCompletionContinue,
+    });
+    this.bagPanel = new ModernBattleBagPanel(this.modernRoot.element, {
+      onItemSelected: onBagItemSelected,
+      onBack: onItemBack,
     });
 
     this.layout();
@@ -90,6 +106,7 @@ export class BattleOverlay {
     this.actionMenu.clear();
     this.movePanel.clear();
     this.replacementPanel.clear();
+    this.bagPanel.clear();
   }
 
   public renderBattle(battle: BattleInstance): void {
@@ -137,6 +154,8 @@ export class BattleOverlay {
     this.movePanel.destroy();
     this.replacementPanel.destroy();
 
+    this.bagPanel.destroy();
+
     this.messagePanel.destroy();
 
     this.completionPanel.destroy();
@@ -173,6 +192,7 @@ export class BattleOverlay {
     this.movePanel.setBounds(commandBounds, viewport);
     this.replacementPanel.setBounds(commandBounds, viewport);
     this.messagePanel.setBounds(commandBounds, viewport);
+    this.bagPanel.setBounds(commandBounds, viewport);
 
     /*
      * Conservamos exactamente la distribución
@@ -230,6 +250,7 @@ export class BattleOverlay {
 
         this.movePanel.setVisible(false);
         this.replacementPanel.setVisible(false);
+        this.bagPanel.setVisible(false);
         break;
 
       case "move-selection":
@@ -237,6 +258,7 @@ export class BattleOverlay {
 
         this.movePanel.setVisible(true);
         this.replacementPanel.setVisible(false);
+        this.bagPanel.setVisible(false);
         break;
 
       case "pokemon-selection":
@@ -244,6 +266,7 @@ export class BattleOverlay {
 
         this.movePanel.setVisible(false);
         this.replacementPanel.setVisible(true);
+        this.bagPanel.setVisible(false);
         break;
 
       case "replacement-required":
@@ -251,6 +274,7 @@ export class BattleOverlay {
 
         this.movePanel.setVisible(false);
         this.replacementPanel.setVisible(true);
+        this.bagPanel.setVisible(false);
         break;
 
       case "completed":
@@ -258,6 +282,27 @@ export class BattleOverlay {
 
         this.movePanel.setVisible(false);
         this.replacementPanel.setVisible(false);
+        this.bagPanel.setVisible(false);
+        break;
+
+      case "item-selection":
+        this.actionMenu.setVisible(false);
+
+        this.movePanel.setVisible(false);
+        this.replacementPanel.setVisible(false);
+
+        this.bagPanel.setEnabled(true);
+        this.bagPanel.setVisible(true);
+        break;
+
+      case "item-target-selection":
+        this.actionMenu.setVisible(false);
+
+        this.movePanel.setVisible(false);
+        this.bagPanel.setVisible(false);
+
+        this.replacementPanel.setVisible(true);
+
         break;
 
       case "waiting-for-server":
@@ -272,6 +317,7 @@ export class BattleOverlay {
          * deshabilitan mediante sus reglas internas.
          */
         this.actionMenu.setEnabled(false);
+        this.bagPanel.setVisible(false);
         break;
     }
   }
@@ -288,6 +334,7 @@ export class BattleOverlay {
     this.actionMenu.setVisible(false);
     this.movePanel.setVisible(false);
     this.replacementPanel.setVisible(false);
+    this.bagPanel.setVisible(false);
     this.completionPanel.show(outcome);
   }
 
@@ -438,5 +485,17 @@ export class BattleOverlay {
     }
 
     return participant.type === "trainer" ? this.trainerHud : this.wildHud;
+  }
+
+  public setBagInventory(inventory: PokemonInventory): void {
+    this.bagPanel.render(inventory);
+  }
+
+  public setItemTargetOptions(
+    battle: BattleInstance,
+    selectablePokemonIndexes: readonly number[]
+  ): void {
+    this.replacementPanel.setMode("item-target");
+    this.replacementPanel.render(battle, selectablePokemonIndexes);
   }
 }

@@ -53,7 +53,8 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   PokemonTrainer: 'PokemonTrainer',
   PokemonInstance: 'PokemonInstance',
-  PokemonInstanceMove: 'PokemonInstanceMove'
+  PokemonInstanceMove: 'PokemonInstanceMove',
+  PokemonTrainerInventoryItem: 'PokemonTrainerInventoryItem'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -108,6 +109,15 @@ export const PokemonInstanceMoveScalarFieldEnum = {
 } as const
 
 export type PokemonInstanceMoveScalarFieldEnum = (typeof PokemonInstanceMoveScalarFieldEnum)[keyof typeof PokemonInstanceMoveScalarFieldEnum]
+
+
+export const PokemonTrainerInventoryItemScalarFieldEnum = {
+  trainerId: 'trainerId',
+  itemId: 'itemId',
+  quantity: 'quantity'
+} as const
+
+export type PokemonTrainerInventoryItemScalarFieldEnum = (typeof PokemonTrainerInventoryItemScalarFieldEnum)[keyof typeof PokemonTrainerInventoryItemScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -399,7 +399,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   PokemonTrainer: 'PokemonTrainer',
   PokemonInstance: 'PokemonInstance',
-  PokemonInstanceMove: 'PokemonInstanceMove'
+  PokemonInstanceMove: 'PokemonInstanceMove',
+  PokemonTrainerInventoryItem: 'PokemonTrainerInventoryItem'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -415,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "pokemonTrainer" | "pokemonInstance" | "pokemonInstanceMove"
+    modelProps: "pokemonTrainer" | "pokemonInstance" | "pokemonInstanceMove" | "pokemonTrainerInventoryItem"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -641,6 +642,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PokemonTrainerInventoryItem: {
+      payload: Prisma.$PokemonTrainerInventoryItemPayload<ExtArgs>
+      fields: Prisma.PokemonTrainerInventoryItemFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PokemonTrainerInventoryItemFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerInventoryItemPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PokemonTrainerInventoryItemFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerInventoryItemPayload>
+        }
+        findFirst: {
+          args: Prisma.PokemonTrainerInventoryItemFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerInventoryItemPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PokemonTrainerInventoryItemFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerInventoryItemPayload>
+        }
+        findMany: {
+          args: Prisma.PokemonTrainerInventoryItemFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerInventoryItemPayload>[]
+        }
+        create: {
+          args: Prisma.PokemonTrainerInventoryItemCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerInventoryItemPayload>
+        }
+        createMany: {
+          args: Prisma.PokemonTrainerInventoryItemCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PokemonTrainerInventoryItemCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerInventoryItemPayload>[]
+        }
+        delete: {
+          args: Prisma.PokemonTrainerInventoryItemDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerInventoryItemPayload>
+        }
+        update: {
+          args: Prisma.PokemonTrainerInventoryItemUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerInventoryItemPayload>
+        }
+        deleteMany: {
+          args: Prisma.PokemonTrainerInventoryItemDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PokemonTrainerInventoryItemUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PokemonTrainerInventoryItemUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerInventoryItemPayload>[]
+        }
+        upsert: {
+          args: Prisma.PokemonTrainerInventoryItemUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerInventoryItemPayload>
+        }
+        aggregate: {
+          args: Prisma.PokemonTrainerInventoryItemAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePokemonTrainerInventoryItem>
+        }
+        groupBy: {
+          args: Prisma.PokemonTrainerInventoryItemGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PokemonTrainerInventoryItemGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PokemonTrainerInventoryItemCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PokemonTrainerInventoryItemCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -716,6 +791,15 @@ export const PokemonInstanceMoveScalarFieldEnum = {
 } as const
 
 export type PokemonInstanceMoveScalarFieldEnum = (typeof PokemonInstanceMoveScalarFieldEnum)[keyof typeof PokemonInstanceMoveScalarFieldEnum]
+
+
+export const PokemonTrainerInventoryItemScalarFieldEnum = {
+  trainerId: 'trainerId',
+  itemId: 'itemId',
+  quantity: 'quantity'
+} as const
+
+export type PokemonTrainerInventoryItemScalarFieldEnum = (typeof PokemonTrainerInventoryItemScalarFieldEnum)[keyof typeof PokemonTrainerInventoryItemScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -957,6 +1041,7 @@ export type GlobalOmitConfig = {
   pokemonTrainer?: Prisma.PokemonTrainerOmit
   pokemonInstance?: Prisma.PokemonInstanceOmit
   pokemonInstanceMove?: Prisma.PokemonInstanceMoveOmit
+  pokemonTrainerInventoryItem?: Prisma.PokemonTrainerInventoryItemOmit
 }
 
 /* Types for Logging */

@@ -892,6 +892,7 @@ export class GameScene extends Phaser.Scene {
     trainerState: PokemonTrainerState
   ): Promise<void> {
     this.pokemonTrainerState = trainerState;
+    this.battleController?.setTrainerState(trainerState);
 
     const party = trainerState.party.pokemon;
 

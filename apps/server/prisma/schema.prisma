@@ -11,9 +11,11 @@ model PokemonTrainer {
   id               String @id @db.Uuid
   sessionTokenHash String @unique @map("session_token_hash")
 
-  createdAt        DateTime          @default(now()) @map("created_at")
-  updatedAt        DateTime          @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
   pokemonInstances PokemonInstance[]
+  inventoryItems   PokemonTrainerInventoryItem[]
 
   @@map("pokemon_trainers")
 }
@@ -57,4 +59,15 @@ model PokemonInstanceMove {
 
   @@id([pokemonInstanceId, slot])
   @@map("pokemon_instance_moves")
+}
+
+model PokemonTrainerInventoryItem {
+  trainerId String @map("trainer_id") @db.Uuid
+  itemId    String @map("item_id") @db.VarChar(64)
+  quantity  Int
+
+  trainer PokemonTrainer @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+
+  @@id([trainerId, itemId])
+  @@map("pokemon_trainer_inventory_items")
 }

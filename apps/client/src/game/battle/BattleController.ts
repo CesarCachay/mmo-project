@@ -10,6 +10,13 @@ import type {
   PokemonBattleReplacementInput,
   BattlePresentationEvent,
   PokemonBattleTurnResolvedPayload,
+  PokemonTrainerState,
+  PokemonItemId,
+} from "@cesar-mmo/shared";
+
+import {
+  calculatePokemonMaxHp,
+  getPokemonInventoryItemQuantity,
 } from "@cesar-mmo/shared";
 
 import { PokemonSpriteLoader } from "../pokemon/PokemonSpriteLoader";
@@ -48,6 +55,10 @@ export class BattleController {
   private readonly sendBattleReplacement: (input: PokemonBattleReplacementInput) => void;
   private replacementPokemonIndexes: readonly number[] = [];
 
+  private trainerState?: PokemonTrainerState;
+
+  private selectedItemId?: PokemonItemId;
+
   constructor(
     scene: Phaser.Scene,
     pokemonSpriteLoader: PokemonSpriteLoader,
@@ -59,27 +70,47 @@ export class BattleController {
     this.sendBattleReplacement = sendBattleReplacement;
     this.overlay = new BattleOverlay(
       scene,
+      // FIGHT
       () => {
         this.handleFightSelected();
       },
+      // POKÉMON
       () => {
         this.handlePokemonSelected();
       },
+      // ITEM
       () => {
-        this.handleRunSelected();
+        this.handleItemSelected();
       },
+      // ITEM BAG SELECTED
+      (itemId) => {
+        this.handleBagItemSelected(itemId);
+      },
+      // MOVE
       (moveId) => {
         this.handleMoveSelected(moveId);
       },
+      // MOVE BACK
       () => {
         this.handleMoveBack();
       },
+      // PARTY POKÉMON
       (pokemonIndex) => {
         this.handlePartyPokemonSelected(pokemonIndex);
       },
+      // POKÉMON BACK
       () => {
         this.handlePokemonBack();
       },
+      // ITEM BACK
+      () => {
+        this.handleItemBack();
+      },
+      // RUN
+      () => {
+        this.handleRunSelected();
+      },
+      // COMPLETION CONTINUE
       () => {
         this.handleCompletionAcknowledged();
       }
@@ -122,6 +153,9 @@ export class BattleController {
 
     this.activeBattlePayload = payload;
     this.replacementPokemonIndexes = [];
+
+    this.selectedItemId = undefined;
+
     this.setInteractionState("waiting-for-server");
 
     this.overlay.show();
@@ -249,6 +283,8 @@ export class BattleController {
 
     this.pendingStateUpdates.clear();
     this.pendingCompletion = undefined;
+
+    this.selectedItemId = undefined;
 
     this.interactionState = "completed";
     this.replacementPokemonIndexes = [];
@@ -444,8 +480,8 @@ export class BattleController {
     this.pendingStateUpdates.clear();
     this.pendingCompletion = undefined;
 
-    //  Aqui si liberamos Battle.
     this.replacementPokemonIndexes = [];
+    this.selectedItemId = undefined;
     this.activeBattlePayload = undefined;
     this.overlay.hide();
   }
@@ -516,10 +552,22 @@ export class BattleController {
   }
 
   private handlePokemonBack(): void {
-    if (this.interactionState !== "pokemon-selection") {
-      return;
+    switch (this.interactionState) {
+      case "pokemon-selection":
+        this.setInteractionState("action-menu");
+        return;
+
+      case "item-target-selection":
+        this.selectedItemId = undefined;
+        if (this.trainerState) {
+          this.overlay.setBagInventory(this.trainerState.inventory);
+        }
+        this.setInteractionState("item-selection");
+        return;
+
+      default:
+        return;
     }
-    this.setInteractionState("action-menu");
   }
 
   private handlePartyPokemonSelected(pokemonIndex: number): void {
@@ -530,6 +578,10 @@ export class BattleController {
 
       case "replacement-required":
         this.handleForcedReplacementSelected(pokemonIndex);
+        return;
+
+      case "item-target-selection":
+        this.handleItemTargetSelected(pokemonIndex);
         return;
 
       default:
@@ -699,6 +751,18 @@ export class BattleController {
       return;
     }
 
+    if (event.type === "hp-restored" && event.appliedHealing > 0) {
+      await this.overlay.animatePokemonHp(
+        activeBattle,
+        event.participantId,
+        event.pokemonInstanceId,
+        event.previousHp,
+        event.currentHp
+      );
+
+      return;
+    }
+
     if (event.type === "damage-applied" && event.appliedDamage > 0) {
       await Promise.all([
         this.overlay.animatePokemonHit(
@@ -785,6 +849,7 @@ export class BattleController {
         ? [...payload.replacementPokemonIndexes]
         : [];
 
+    this.selectedItemId = undefined;
     this.setInteractionState("waiting-for-server");
 
     try {
@@ -820,8 +885,146 @@ export class BattleController {
       return;
     }
 
+    this.selectedItemId = undefined;
     this.setInteractionState("completed");
     this.replacementPokemonIndexes = [];
     this.overlay.showCompletion(payload.outcome);
+  }
+
+  public setTrainerState(trainerState: PokemonTrainerState): void {
+    this.trainerState = trainerState;
+
+    if (this.interactionState === "item-selection") {
+      this.overlay.setBagInventory(trainerState.inventory);
+    }
+  }
+
+  private handleItemSelected(): void {
+    if (this.interactionState !== "action-menu") {
+      return;
+    }
+    if (!this.trainerState) {
+      return;
+    }
+    this.overlay.setBagInventory(this.trainerState.inventory);
+    this.setInteractionState("item-selection");
+  }
+
+  private handleItemBack(): void {
+    if (this.interactionState !== "item-selection") {
+      return;
+    }
+    this.selectedItemId = undefined;
+    this.setInteractionState("action-menu");
+  }
+
+  private getHealingItemTargetPokemonIndexes(battle: BattleInstance): number[] {
+    const trainer = battle.participants.find(
+      (participant) => participant.type === "trainer"
+    );
+
+    if (!trainer) {
+      return [];
+    }
+
+    return trainer.pokemon
+      .map((pokemonState, pokemonIndex) => ({
+        pokemonState,
+        pokemonIndex,
+      }))
+      .filter(({ pokemonState }) => {
+        if (pokemonState.currentHp <= 0) {
+          return false;
+        }
+
+        const maxHp = calculatePokemonMaxHp(pokemonState.pokemon);
+
+        return pokemonState.currentHp < maxHp;
+      })
+      .map(({ pokemonIndex }) => pokemonIndex);
+  }
+
+  private handleBagItemSelected(itemId: PokemonItemId): void {
+    if (this.interactionState !== "item-selection") {
+      return;
+    }
+
+    const payload = this.activeBattlePayload;
+    const trainerState = this.trainerState;
+
+    if (!payload || !trainerState) {
+      return;
+    }
+
+    const quantity = getPokemonInventoryItemQuantity(trainerState.inventory, itemId);
+
+    if (quantity <= 0) {
+      return;
+    }
+
+    this.selectedItemId = itemId;
+    const selectablePokemonIndexes = this.getHealingItemTargetPokemonIndexes(
+      payload.battle
+    );
+    this.overlay.setItemTargetOptions(payload.battle, selectablePokemonIndexes);
+    this.setInteractionState("item-target-selection");
+  }
+
+  private handleItemTargetSelected(pokemonIndex: number): void {
+    if (this.interactionState !== "item-target-selection") {
+      return;
+    }
+
+    const payload = this.activeBattlePayload;
+    const itemId = this.selectedItemId;
+
+    if (!payload || !itemId) {
+      return;
+    }
+
+    const trainer = payload.battle.participants.find(
+      (participant) => participant.type === "trainer"
+    );
+
+    if (!trainer) {
+      return;
+    }
+
+    const pokemonState = trainer.pokemon[pokemonIndex];
+
+    if (!pokemonState) {
+      return;
+    }
+
+    if (pokemonState.currentHp <= 0) {
+      return;
+    }
+
+    const maxHp = calculatePokemonMaxHp(pokemonState.pokemon);
+
+    if (pokemonState.currentHp >= maxHp) {
+      return;
+    }
+
+    this.setInteractionState("waiting-for-server");
+
+    try {
+      this.sendBattleCommand({
+        battleId: payload.battle.battleId,
+        action: {
+          type: "use-item",
+          itemId,
+          targetPokemonInstanceId: pokemonState.pokemon.instanceId,
+        },
+      });
+    } catch (error) {
+      const selectablePokemonIndexes = this.getHealingItemTargetPokemonIndexes(
+        payload.battle
+      );
+
+      this.overlay.setItemTargetOptions(payload.battle, selectablePokemonIndexes);
+      this.setInteractionState("item-target-selection");
+      console.error("[BattleController] failed to submit item", error);
+    }
   }
 }

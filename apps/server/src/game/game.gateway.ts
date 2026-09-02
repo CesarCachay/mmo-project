@@ -45,6 +45,7 @@ import {
   evaluateBattleMoveExecutionEligibility,
   resolveWildBattleContinuationOutcome,
   isPokemonBattleReplacementInput,
+  planBattleHealingItemUse,
 } from '@cesar-mmo/shared';
 import {
   getServerMapSpawn,
@@ -85,6 +86,7 @@ import type { PokemonWildEncounterSession } from 'src/pokemon/encounters/pokemon
 // db and repositories
 import { PokemonTrainerRepository } from 'src/pokemon/pokemon-trainer.repository';
 import { PokemonPartyRepository } from 'src/pokemon/pokemon-party.repository';
+import { PokemonInventoryRepository } from 'src/pokemon/inventory/pokemon-inventory.repository';
 
 // services
 import { PokemonTrainerService } from 'src/pokemon/pokemon-trainer.service';
@@ -108,12 +110,14 @@ import type { PokemonBattleSession } from 'src/pokemon/battles/pokemon-battle-se
 import { assertPokemonTrainerBattleSwitchAllowed } from '../pokemon/battles/pokemon-trainer-battle-switch.validator';
 import { applyPokemonTrainerBattleSwitch } from 'src/pokemon/battles/pokemon-trainer-battle-switch.runtime';
 import { resolvePokemonWildBattleRun } from '../pokemon/battles/run/pokemon-wild-battle-run.runtime';
+import { applyPokemonTrainerBattleHealingItem } from 'src/pokemon/items/pokemon-trainer-battle-healing-item.runtime';
 
 type BattleTurnTerminalOutcome = 'trainer-escaped';
 
 interface BattleTurnEntryExecutionResult {
   readonly events: readonly BattlePresentationEvent[];
-  readonly terminalOutcome: BattleTurnTerminalOutcome | null;
+  readonly terminalOutcome: 'trainer-escaped' | null;
+  readonly trainerStateUpdate?: PokemonTrainerState;
 }
 
 @WebSocketGateway({
@@ -160,10 +164,12 @@ export class GameGateway
     private readonly chatService: ChatService,
     private readonly pokemonTrainerRepository: PokemonTrainerRepository,
     private readonly pokemonPartyRepository: PokemonPartyRepository,
+    private readonly pokemonInventoryRepository: PokemonInventoryRepository,
   ) {
     this.pokemonTrainerService = new PokemonTrainerService(
       this.pokemonTrainerStateStore,
       this.pokemonPartyRepository,
+      this.pokemonInventoryRepository,
     );
   }
 
@@ -251,13 +257,17 @@ export class GameGateway
       if (existingTrainerState) {
         trainerState = existingTrainerState;
       } else {
-        const persistedParty = await this.pokemonPartyRepository.loadParty(
-          trainerIdentity.trainerId,
-        );
+        const [persistedParty, persistedInventory] = await Promise.all([
+          this.pokemonPartyRepository.loadParty(trainerIdentity.trainerId),
+          this.pokemonInventoryRepository.loadInventory(
+            trainerIdentity.trainerId,
+          ),
+        ]);
 
         trainerState = this.pokemonTrainerStateStore.create(
           trainerIdentity.trainerId,
           persistedParty,
+          persistedInventory,
         );
       }
 
@@ -568,6 +578,25 @@ export class GameGateway
     }
 
     try {
+      if (payload.action.type === 'use-item') {
+        const trainerState = this.pokemonTrainerStateStore.get(
+          trainerBinding.trainerId,
+        );
+
+        if (!trainerState) {
+          throw new Error(
+            `Pokémon Trainer state not found for trainer "${trainerBinding.trainerId}"`,
+          );
+        }
+
+        planBattleHealingItemUse(
+          session.battle,
+          trainerBinding.participantId,
+          payload.action,
+          trainerState.inventory,
+        );
+      }
+
       if (payload.action.type === 'switch-pokemon') {
         assertPokemonTrainerBattleSwitchAllowed({
           session,
@@ -609,10 +638,20 @@ export class GameGateway
 
       let terminalOutcome: BattleTurnTerminalOutcome | null = null;
 
+      let trainerStateUpdate: PokemonTrainerState | null = null;
+
       for (const entry of resolutionOrder.entries) {
-        const executionResult = this.executeBattleTurnEntry(session, entry);
+        const executionResult = await this.executeBattleTurnEntry(
+          session,
+          entry,
+          client.id,
+        );
 
         presentationEvents.push(...executionResult.events);
+
+        if (executionResult.trainerStateUpdate) {
+          trainerStateUpdate = executionResult.trainerStateUpdate;
+        }
 
         if (executionResult.terminalOutcome) {
           terminalOutcome = executionResult.terminalOutcome;
@@ -656,6 +695,16 @@ export class GameGateway
       const continuationOutcome = resolveWildBattleContinuationOutcome(
         session.battle,
       );
+
+      if (
+        trainerStateUpdate &&
+        (continuationOutcome.type === 'continue' ||
+          continuationOutcome.type === 'trainer-replacement-required')
+      ) {
+        client.emit(POKEMON_EVENTS.TRAINER_STATE, {
+          trainerState: trainerStateUpdate,
+        } satisfies PokemonTrainerStatePayload);
+      }
 
       const battleIsTerminal =
         continuationOutcome.type === 'trainer-defeated' ||
@@ -1307,10 +1356,11 @@ export class GameGateway
     ownerSocket.emit(POKEMON_EVENTS.BATTLE_STARTED, payload);
   }
 
-  private executeBattleTurnEntry(
+  private async executeBattleTurnEntry(
     session: PokemonBattleSession,
     entry: BattleTurnResolutionEntry,
-  ): BattleTurnEntryExecutionResult {
+    playerId: string,
+  ): Promise<BattleTurnEntryExecutionResult> {
     switch (entry.command.action.type) {
       case 'switch-pokemon': {
         const result = applyPokemonTrainerBattleSwitch({
@@ -1360,6 +1410,37 @@ export class GameGateway
             },
           ],
           terminalOutcome: null,
+        };
+      }
+
+      case 'use-item': {
+        const result = await applyPokemonTrainerBattleHealingItem({
+          session,
+          entry,
+          playerId,
+          trainerStateStore: this.pokemonTrainerStateStore,
+          trainerService: this.pokemonTrainerService,
+        });
+
+        return {
+          events: [
+            {
+              type: 'item-used',
+              participantId: result.participantId,
+              itemId: result.itemId,
+              targetPokemonInstanceId: result.targetPokemonInstanceId,
+            },
+            {
+              type: 'hp-restored',
+              participantId: result.participantId,
+              pokemonInstanceId: result.targetPokemonInstanceId,
+              previousHp: result.previousHp,
+              currentHp: result.currentHp,
+              appliedHealing: result.appliedHealing,
+            },
+          ],
+          terminalOutcome: null,
+          trainerStateUpdate: result.trainerState,
         };
       }
 

@@ -175,6 +175,7 @@ export type PokemonTrainerWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"PokemonTrainer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PokemonTrainer"> | Date | string
   pokemonInstances?: Prisma.PokemonInstanceListRelationFilter
+  inventoryItems?: Prisma.PokemonTrainerInventoryItemListRelationFilter
 }
 
 export type PokemonTrainerOrderByWithRelationInput = {
@@ -183,6 +184,7 @@ export type PokemonTrainerOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   pokemonInstances?: Prisma.PokemonInstanceOrderByRelationAggregateInput
+  inventoryItems?: Prisma.PokemonTrainerInventoryItemOrderByRelationAggregateInput
 }
 
 export type PokemonTrainerWhereUniqueInput = Prisma.AtLeast<{
@@ -194,6 +196,7 @@ export type PokemonTrainerWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"PokemonTrainer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PokemonTrainer"> | Date | string
   pokemonInstances?: Prisma.PokemonInstanceListRelationFilter
+  inventoryItems?: Prisma.PokemonTrainerInventoryItemListRelationFilter
 }, "id" | "sessionTokenHash">
 
 export type PokemonTrainerOrderByWithAggregationInput = {
@@ -222,6 +225,7 @@ export type PokemonTrainerCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pokemonInstances?: Prisma.PokemonInstanceCreateNestedManyWithoutTrainerInput
+  inventoryItems?: Prisma.PokemonTrainerInventoryItemCreateNestedManyWithoutTrainerInput
 }
 
 export type PokemonTrainerUncheckedCreateInput = {
@@ -230,6 +234,7 @@ export type PokemonTrainerUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   pokemonInstances?: Prisma.PokemonInstanceUncheckedCreateNestedManyWithoutTrainerInput
+  inventoryItems?: Prisma.PokemonTrainerInventoryItemUncheckedCreateNestedManyWithoutTrainerInput
 }
 
 export type PokemonTrainerUpdateInput = {
@@ -238,6 +243,7 @@ export type PokemonTrainerUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pokemonInstances?: Prisma.PokemonInstanceUpdateManyWithoutTrainerNestedInput
+  inventoryItems?: Prisma.PokemonTrainerInventoryItemUpdateManyWithoutTrainerNestedInput
 }
 
 export type PokemonTrainerUncheckedUpdateInput = {
@@ -246,6 +252,7 @@ export type PokemonTrainerUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pokemonInstances?: Prisma.PokemonInstanceUncheckedUpdateManyWithoutTrainerNestedInput
+  inventoryItems?: Prisma.PokemonTrainerInventoryItemUncheckedUpdateManyWithoutTrainerNestedInput
 }
 
 export type PokemonTrainerCreateManyInput = {
@@ -317,11 +324,26 @@ export type PokemonTrainerUpdateOneRequiredWithoutPokemonInstancesNestedInput = 
   update?: Prisma.XOR<Prisma.XOR<Prisma.PokemonTrainerUpdateToOneWithWhereWithoutPokemonInstancesInput, Prisma.PokemonTrainerUpdateWithoutPokemonInstancesInput>, Prisma.PokemonTrainerUncheckedUpdateWithoutPokemonInstancesInput>
 }
 
+export type PokemonTrainerCreateNestedOneWithoutInventoryItemsInput = {
+  create?: Prisma.XOR<Prisma.PokemonTrainerCreateWithoutInventoryItemsInput, Prisma.PokemonTrainerUncheckedCreateWithoutInventoryItemsInput>
+  connectOrCreate?: Prisma.PokemonTrainerCreateOrConnectWithoutInventoryItemsInput
+  connect?: Prisma.PokemonTrainerWhereUniqueInput
+}
+
+export type PokemonTrainerUpdateOneRequiredWithoutInventoryItemsNestedInput = {
+  create?: Prisma.XOR<Prisma.PokemonTrainerCreateWithoutInventoryItemsInput, Prisma.PokemonTrainerUncheckedCreateWithoutInventoryItemsInput>
+  connectOrCreate?: Prisma.PokemonTrainerCreateOrConnectWithoutInventoryItemsInput
+  upsert?: Prisma.PokemonTrainerUpsertWithoutInventoryItemsInput
+  connect?: Prisma.PokemonTrainerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PokemonTrainerUpdateToOneWithWhereWithoutInventoryItemsInput, Prisma.PokemonTrainerUpdateWithoutInventoryItemsInput>, Prisma.PokemonTrainerUncheckedUpdateWithoutInventoryItemsInput>
+}
+
 export type PokemonTrainerCreateWithoutPokemonInstancesInput = {
   id: string
   sessionTokenHash: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  inventoryItems?: Prisma.PokemonTrainerInventoryItemCreateNestedManyWithoutTrainerInput
 }
 
 export type PokemonTrainerUncheckedCreateWithoutPokemonInstancesInput = {
@@ -329,6 +351,7 @@ export type PokemonTrainerUncheckedCreateWithoutPokemonInstancesInput = {
   sessionTokenHash: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  inventoryItems?: Prisma.PokemonTrainerInventoryItemUncheckedCreateNestedManyWithoutTrainerInput
 }
 
 export type PokemonTrainerCreateOrConnectWithoutPokemonInstancesInput = {
@@ -352,6 +375,7 @@ export type PokemonTrainerUpdateWithoutPokemonInstancesInput = {
   sessionTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  inventoryItems?: Prisma.PokemonTrainerInventoryItemUpdateManyWithoutTrainerNestedInput
 }
 
 export type PokemonTrainerUncheckedUpdateWithoutPokemonInstancesInput = {
@@ -359,6 +383,55 @@ export type PokemonTrainerUncheckedUpdateWithoutPokemonInstancesInput = {
   sessionTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  inventoryItems?: Prisma.PokemonTrainerInventoryItemUncheckedUpdateManyWithoutTrainerNestedInput
+}
+
+export type PokemonTrainerCreateWithoutInventoryItemsInput = {
+  id: string
+  sessionTokenHash: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  pokemonInstances?: Prisma.PokemonInstanceCreateNestedManyWithoutTrainerInput
+}
+
+export type PokemonTrainerUncheckedCreateWithoutInventoryItemsInput = {
+  id: string
+  sessionTokenHash: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  pokemonInstances?: Prisma.PokemonInstanceUncheckedCreateNestedManyWithoutTrainerInput
+}
+
+export type PokemonTrainerCreateOrConnectWithoutInventoryItemsInput = {
+  where: Prisma.PokemonTrainerWhereUniqueInput
+  create: Prisma.XOR<Prisma.PokemonTrainerCreateWithoutInventoryItemsInput, Prisma.PokemonTrainerUncheckedCreateWithoutInventoryItemsInput>
+}
+
+export type PokemonTrainerUpsertWithoutInventoryItemsInput = {
+  update: Prisma.XOR<Prisma.PokemonTrainerUpdateWithoutInventoryItemsInput, Prisma.PokemonTrainerUncheckedUpdateWithoutInventoryItemsInput>
+  create: Prisma.XOR<Prisma.PokemonTrainerCreateWithoutInventoryItemsInput, Prisma.PokemonTrainerUncheckedCreateWithoutInventoryItemsInput>
+  where?: Prisma.PokemonTrainerWhereInput
+}
+
+export type PokemonTrainerUpdateToOneWithWhereWithoutInventoryItemsInput = {
+  where?: Prisma.PokemonTrainerWhereInput
+  data: Prisma.XOR<Prisma.PokemonTrainerUpdateWithoutInventoryItemsInput, Prisma.PokemonTrainerUncheckedUpdateWithoutInventoryItemsInput>
+}
+
+export type PokemonTrainerUpdateWithoutInventoryItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pokemonInstances?: Prisma.PokemonInstanceUpdateManyWithoutTrainerNestedInput
+}
+
+export type PokemonTrainerUncheckedUpdateWithoutInventoryItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pokemonInstances?: Prisma.PokemonInstanceUncheckedUpdateManyWithoutTrainerNestedInput
 }
 
 
@@ -368,10 +441,12 @@ export type PokemonTrainerUncheckedUpdateWithoutPokemonInstancesInput = {
 
 export type PokemonTrainerCountOutputType = {
   pokemonInstances: number
+  inventoryItems: number
 }
 
 export type PokemonTrainerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pokemonInstances?: boolean | PokemonTrainerCountOutputTypeCountPokemonInstancesArgs
+  inventoryItems?: boolean | PokemonTrainerCountOutputTypeCountInventoryItemsArgs
 }
 
 /**
@@ -391,6 +466,13 @@ export type PokemonTrainerCountOutputTypeCountPokemonInstancesArgs<ExtArgs exten
   where?: Prisma.PokemonInstanceWhereInput
 }
 
+/**
+ * PokemonTrainerCountOutputType without action
+ */
+export type PokemonTrainerCountOutputTypeCountInventoryItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PokemonTrainerInventoryItemWhereInput
+}
+
 
 export type PokemonTrainerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -398,6 +480,7 @@ export type PokemonTrainerSelect<ExtArgs extends runtime.Types.Extensions.Intern
   createdAt?: boolean
   updatedAt?: boolean
   pokemonInstances?: boolean | Prisma.PokemonTrainer$pokemonInstancesArgs<ExtArgs>
+  inventoryItems?: boolean | Prisma.PokemonTrainer$inventoryItemsArgs<ExtArgs>
   _count?: boolean | Prisma.PokemonTrainerCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["pokemonTrainer"]>
 
@@ -425,6 +508,7 @@ export type PokemonTrainerSelectScalar = {
 export type PokemonTrainerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sessionTokenHash" | "createdAt" | "updatedAt", ExtArgs["result"]["pokemonTrainer"]>
 export type PokemonTrainerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pokemonInstances?: boolean | Prisma.PokemonTrainer$pokemonInstancesArgs<ExtArgs>
+  inventoryItems?: boolean | Prisma.PokemonTrainer$inventoryItemsArgs<ExtArgs>
   _count?: boolean | Prisma.PokemonTrainerCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PokemonTrainerIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -434,6 +518,7 @@ export type $PokemonTrainerPayload<ExtArgs extends runtime.Types.Extensions.Inte
   name: "PokemonTrainer"
   objects: {
     pokemonInstances: Prisma.$PokemonInstancePayload<ExtArgs>[]
+    inventoryItems: Prisma.$PokemonTrainerInventoryItemPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -835,6 +920,7 @@ readonly fields: PokemonTrainerFieldRefs;
 export interface Prisma__PokemonTrainerClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   pokemonInstances<T extends Prisma.PokemonTrainer$pokemonInstancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PokemonTrainer$pokemonInstancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PokemonInstancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  inventoryItems<T extends Prisma.PokemonTrainer$inventoryItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PokemonTrainer$inventoryItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PokemonTrainerInventoryItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1282,6 +1368,30 @@ export type PokemonTrainer$pokemonInstancesArgs<ExtArgs extends runtime.Types.Ex
   take?: number
   skip?: number
   distinct?: Prisma.PokemonInstanceScalarFieldEnum | Prisma.PokemonInstanceScalarFieldEnum[]
+}
+
+/**
+ * PokemonTrainer.inventoryItems
+ */
+export type PokemonTrainer$inventoryItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PokemonTrainerInventoryItem
+   */
+  select?: Prisma.PokemonTrainerInventoryItemSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PokemonTrainerInventoryItem
+   */
+  omit?: Prisma.PokemonTrainerInventoryItemOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PokemonTrainerInventoryItemInclude<ExtArgs> | null
+  where?: Prisma.PokemonTrainerInventoryItemWhereInput
+  orderBy?: Prisma.PokemonTrainerInventoryItemOrderByWithRelationInput | Prisma.PokemonTrainerInventoryItemOrderByWithRelationInput[]
+  cursor?: Prisma.PokemonTrainerInventoryItemWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PokemonTrainerInventoryItemScalarFieldEnum | Prisma.PokemonTrainerInventoryItemScalarFieldEnum[]
 }
 
 /**

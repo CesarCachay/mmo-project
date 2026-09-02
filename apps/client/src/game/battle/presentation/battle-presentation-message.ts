@@ -1,4 +1,5 @@
 import {
+  getPokemonItem,
   getPokemonMove,
   type BattleInstance,
   type BattlePresentationEvent,
@@ -77,6 +78,15 @@ export function formatBattlePresentationMessage(
 
     case "run-succeeded": {
       return "Got away safely!";
+    }
+
+    case "item-used": {
+      const item = getPokemonItem(event.itemId);
+      return `Used a ${item.name}!`;
+    }
+
+    case "hp-restored": {
+      return null;
     }
   }
 }

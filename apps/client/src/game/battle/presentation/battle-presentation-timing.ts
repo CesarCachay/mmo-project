@@ -14,6 +14,8 @@ export const BATTLE_PRESENTATION_TIMING = {
    * authoritative acknowledgement flow.
    */
   forcedReplacementMessageMs: 650,
+  itemUsedMessageMs: 650,
+  hpRestoredMessageMs: 500,
 } as const;
 
 export function getBattlePresentationMessageDuration(
@@ -38,5 +40,11 @@ export function getBattlePresentationMessageDuration(
     case "run-failed":
     case "run-succeeded":
       return BATTLE_PRESENTATION_TIMING.trainerEscapedMessageMs;
+
+    case "item-used":
+      return BATTLE_PRESENTATION_TIMING.itemUsedMessageMs;
+
+    case "hp-restored":
+      return BATTLE_PRESENTATION_TIMING.hpRestoredMessageMs;
   }
 }

@@ -1,5 +1,8 @@
 import type { BattleParticipantId } from "./pokemon-battle.types.js";
+import { isPokemonItemId } from "../inventory/pokemon-inventory.js";
+import type { PokemonItemId } from "../inventory/pokemon-inventory.js";
 
+// moves
 export interface BattleMoveUsedEvent {
   readonly type: "move-used";
   readonly participantId: BattleParticipantId;
@@ -50,6 +53,7 @@ export interface BattlePokemonSwitchedEvent {
   readonly currentPokemonInstanceId: string;
 }
 
+// run
 export interface BattleRunFailedEvent {
   readonly type: "run-failed";
   readonly participantId: BattleParticipantId;
@@ -60,6 +64,23 @@ export interface BattleRunSucceededEvent {
   readonly participantId: BattleParticipantId;
 }
 
+// items
+export interface BattleItemUsedEvent {
+  readonly type: "item-used";
+  readonly participantId: BattleParticipantId;
+  readonly itemId: PokemonItemId;
+  readonly targetPokemonInstanceId: string;
+}
+
+export interface BattleHpRestoredEvent {
+  readonly type: "hp-restored";
+  readonly participantId: BattleParticipantId;
+  readonly pokemonInstanceId: string;
+  readonly previousHp: number;
+  readonly currentHp: number;
+  readonly appliedHealing: number;
+}
+
 export type BattlePresentationEvent =
   | BattleMoveUsedEvent
   | BattleMoveMissedEvent
@@ -67,7 +88,9 @@ export type BattlePresentationEvent =
   | BattlePokemonFaintedEvent
   | BattlePokemonSwitchedEvent
   | BattleRunFailedEvent
-  | BattleRunSucceededEvent;
+  | BattleRunSucceededEvent
+  | BattleItemUsedEvent
+  | BattleHpRestoredEvent;
 
 export function isBattlePresentationEvent(
   value: unknown
@@ -97,6 +120,12 @@ export function isBattlePresentationEvent(
     case "run-failed":
     case "run-succeeded":
       return isNonEmptyString(value.participantId);
+
+    case "item-used":
+      return isItemUsedEvent(value);
+
+    case "hp-restored":
+      return isHpRestoredEvent(value);
 
     default:
       return false;
@@ -166,4 +195,30 @@ function isNonEmptyString(value: unknown): value is string {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isItemUsedEvent(value: Record<string, unknown>): boolean {
+  return (
+    isNonEmptyString(value.participantId) &&
+    isPokemonItemId(value.itemId) &&
+    isNonEmptyString(value.targetPokemonInstanceId)
+  );
+}
+
+function isHpRestoredEvent(value: Record<string, unknown>): boolean {
+  if (
+    !isNonEmptyString(value.participantId) ||
+    !isNonEmptyString(value.pokemonInstanceId) ||
+    !isNonNegativeInteger(value.previousHp) ||
+    !isNonNegativeInteger(value.currentHp) ||
+    !isPositiveInteger(value.appliedHealing)
+  ) {
+    return false;
+  }
+
+  if (value.currentHp <= value.previousHp) {
+    return false;
+  }
+
+  return value.appliedHealing === value.currentHp - value.previousHp;
 }

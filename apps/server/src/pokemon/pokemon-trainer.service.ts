@@ -2,12 +2,15 @@ import type {
   PokemonTrainerState,
   BattleParticipant,
   PokemonStarterId,
+  PokemonItemId,
 } from '@cesar-mmo/shared';
 import {
   addPokemonToParty,
   createPokemonInstance,
   POKEMON_STARTERS,
   syncPokemonPartyFromBattleParticipant,
+  addPokemonInventoryItem,
+  consumePokemonInventoryItem,
 } from '@cesar-mmo/shared';
 
 import type { PokemonTrainerId } from './pokemon-trainer-identity';
@@ -15,11 +18,13 @@ import type { PokemonTrainerId } from './pokemon-trainer-identity';
 import { PokemonTrainerStateStore } from './pokemon-trainer-state.store.js';
 
 import { PokemonPartyRepository } from './pokemon-party.repository';
+import { PokemonInventoryRepository } from './inventory/pokemon-inventory.repository';
 
 export class PokemonTrainerService {
   constructor(
     private readonly trainerStateStore: PokemonTrainerStateStore,
     private readonly pokemonPartyRepository: PokemonPartyRepository,
+    private readonly pokemonInventoryRepository: PokemonInventoryRepository,
   ) {
     this.trainerStateStore = trainerStateStore;
   }
@@ -144,5 +149,59 @@ export class PokemonTrainerService {
     }
 
     return updatedState;
+  }
+
+  public async addInventoryItem(
+    trainerId: PokemonTrainerId,
+    itemId: PokemonItemId,
+    quantity: number = 1,
+  ): Promise<PokemonTrainerState> {
+    const trainerState = this.trainerStateStore.get(trainerId);
+
+    if (!trainerState) {
+      throw new Error(
+        `Pokémon trainer state not found for trainer ${trainerId}`,
+      );
+    }
+
+    const updatedInventory = addPokemonInventoryItem(
+      trainerState.inventory,
+      itemId,
+      quantity,
+    );
+
+    await this.pokemonInventoryRepository.saveInventory(
+      trainerId,
+      updatedInventory,
+    );
+
+    return this.trainerStateStore.setInventory(trainerId, updatedInventory);
+  }
+
+  public async consumeInventoryItem(
+    trainerId: PokemonTrainerId,
+    itemId: PokemonItemId,
+    quantity: number = 1,
+  ): Promise<PokemonTrainerState> {
+    const trainerState = this.trainerStateStore.get(trainerId);
+
+    if (!trainerState) {
+      throw new Error(
+        `Pokémon trainer state not found for trainer ${trainerId}`,
+      );
+    }
+
+    const updatedInventory = consumePokemonInventoryItem(
+      trainerState.inventory,
+      itemId,
+      quantity,
+    );
+
+    await this.pokemonInventoryRepository.saveInventory(
+      trainerId,
+      updatedInventory,
+    );
+
+    return this.trainerStateStore.setInventory(trainerId, updatedInventory);
   }
 }
