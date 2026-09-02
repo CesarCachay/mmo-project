@@ -6,6 +6,7 @@ export const BATTLE_PRESENTATION_TIMING = {
   damageResultMessageMs: 650,
   switchMessageMs: 650,
   faintMessageMs: 700,
+  trainerEscapedMessageMs: 650,
 
   /*
    * Forced replacement does not come from
@@ -33,5 +34,9 @@ export function getBattlePresentationMessageDuration(
 
     case "pokemon-fainted":
       return BATTLE_PRESENTATION_TIMING.faintMessageMs;
+
+    case "run-failed":
+    case "run-succeeded":
+      return BATTLE_PRESENTATION_TIMING.trainerEscapedMessageMs;
   }
 }

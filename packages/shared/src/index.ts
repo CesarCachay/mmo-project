@@ -207,6 +207,7 @@ export { createBattleCommand } from "./pokemon/battles/pokemon-battle-command.js
 export type {
   BattleUseMoveAction,
   BattleCommandAction,
+  BattleRunAction,
   BattleCommand,
   CreateBattleCommandInput,
   BattleSwitchPokemonAction,
@@ -272,7 +273,14 @@ export type {
   BattleDamageAppliedEvent,
   BattlePokemonFaintedEvent,
   BattlePokemonSwitchedEvent,
+  BattleRunFailedEvent,
+  BattleRunSucceededEvent,
   BattlePresentationEvent,
 } from "./pokemon/battles/pokemon-battle-presentation.js";
 export { isPokemonBattleTurnResolvedPayload } from "./pokemon/battles/pokemon-battle-presentation-network.js";
 export type { PokemonBattleTurnResolvedPayload } from "./pokemon/battles/pokemon-battle-presentation-network.js";
+export { resolveBattleRunAttempt } from "./pokemon/battles/run/pokemon-battle-run.js";
+export type {
+  BattleRunRandomSource,
+  BattleRunResolution,
+} from "./pokemon/battles/run/pokemon-battle-run.js";

@@ -65,6 +65,9 @@ export class BattleController {
       () => {
         this.handlePokemonSelected();
       },
+      () => {
+        this.handleRunSelected();
+      },
       (moveId) => {
         this.handleMoveSelected(moveId);
       },
@@ -476,6 +479,33 @@ export class BattleController {
     }
     this.overlay.setVoluntaryPokemonOptions(payload.battle);
     this.setInteractionState("pokemon-selection");
+  }
+
+  private handleRunSelected(): void {
+    if (this.interactionState !== "action-menu") {
+      return;
+    }
+
+    const payload = this.activeBattlePayload;
+
+    if (!payload) {
+      return;
+    }
+
+    this.setInteractionState("waiting-for-server");
+
+    try {
+      this.sendBattleCommand({
+        battleId: payload.battle.battleId,
+        action: {
+          type: "run",
+        },
+      });
+    } catch (error) {
+      this.setInteractionState("action-menu");
+
+      console.error("[BattleController] failed to submit run", error);
+    }
   }
 
   private handleMoveBack(): void {

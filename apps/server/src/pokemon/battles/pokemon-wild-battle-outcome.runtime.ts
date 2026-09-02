@@ -37,6 +37,17 @@ export interface ApplyPokemonWildBattleOutcomeInput {
   readonly battleTurnStore: PokemonBattleTurnCleanupStore;
 }
 
+export interface ApplyPokemonWildBattleEscapeOutcomeInput {
+  readonly battleId: BattleId;
+  readonly battleSessionStore: PokemonBattleCompletionStore;
+  readonly battleTurnStore: PokemonBattleTurnCleanupStore;
+}
+
+export interface PokemonWildBattleEscapeOutcomeRuntimeResult {
+  readonly type: 'trainer-escaped';
+  readonly battleCompleted: true;
+}
+
 export function applyPokemonWildBattleOutcome(
   input: ApplyPokemonWildBattleOutcomeInput,
 ): PokemonWildBattleOutcomeRuntimeResult {
@@ -78,4 +89,18 @@ export function applyPokemonWildBattleOutcome(
       };
     }
   }
+}
+
+export function applyPokemonWildBattleEscapeOutcome(
+  input: ApplyPokemonWildBattleEscapeOutcomeInput,
+): PokemonWildBattleEscapeOutcomeRuntimeResult {
+  const { battleId, battleSessionStore, battleTurnStore } = input;
+
+  battleSessionStore.complete(battleId);
+  battleTurnStore.remove(battleId);
+
+  return {
+    type: 'trainer-escaped',
+    battleCompleted: true,
+  };
 }

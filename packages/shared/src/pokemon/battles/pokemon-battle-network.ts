@@ -234,6 +234,9 @@ function isBattleCommandAction(value: unknown): value is BattleCommandAction {
     case "switch-pokemon":
       return Number.isInteger(value.pokemonIndex) && (value.pokemonIndex as number) >= 0;
 
+    case "run":
+      return true;
+
     default:
       return false;
   }

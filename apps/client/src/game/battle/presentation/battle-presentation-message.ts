@@ -70,6 +70,14 @@ export function formatBattlePresentationMessage(
 
       return `${pokemonName} entered the battle!`;
     }
+
+    case "run-failed": {
+      return "Couldn't get away!";
+    }
+
+    case "run-succeeded": {
+      return "Got away safely!";
+    }
   }
 }
 

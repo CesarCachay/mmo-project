@@ -200,7 +200,8 @@ export function isPokemonBattleReplacementResolvedPayload(
   });
 }
 
-export type PokemonBattleCompletedOutcome = "trainer-defeated" | "wild-defeated";
+export type PokemonBattleCompletedOutcome =
+  "trainer-defeated" | "wild-defeated" | "trainer-escaped";
 
 export interface PokemonBattleCompletedPayload {
   readonly battleId: string;
@@ -220,7 +221,11 @@ export function isPokemonBattleCompletedPayload(
     return false;
   }
 
-  if (candidate.outcome !== "trainer-defeated" && candidate.outcome !== "wild-defeated") {
+  if (
+    candidate.outcome !== "trainer-defeated" &&
+    candidate.outcome !== "wild-defeated" &&
+    candidate.outcome !== "trainer-escaped"
+  ) {
     return false;
   }
 

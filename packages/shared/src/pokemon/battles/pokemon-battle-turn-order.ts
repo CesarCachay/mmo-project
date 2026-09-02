@@ -99,6 +99,7 @@ function createResolutionEntry(
 function getCommandActionPriority(command: BattleCommand): number {
   switch (command.action.type) {
     case "switch-pokemon":
+    case "run":
       return 1;
 
     case "use-move":
@@ -109,6 +110,7 @@ function getCommandActionPriority(command: BattleCommand): number {
 function getCommandMovePriority(command: BattleCommand): number {
   switch (command.action.type) {
     case "switch-pokemon":
+    case "run":
       return 0;
 
     case "use-move": {

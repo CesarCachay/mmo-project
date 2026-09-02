@@ -34,6 +34,7 @@ export class BattleOverlay {
     scene: Phaser.Scene,
     onFightSelected: () => void,
     onPokemonSelected: () => void,
+    onRunSelected: () => void,
     onMoveSelected: (moveId: number) => void,
     onMoveBack: () => void,
     onPartyPokemonSelected: (pokemonIndex: number) => void,
@@ -51,6 +52,7 @@ export class BattleOverlay {
     this.actionMenu = new ModernBattleActionMenu(this.modernRoot.element, {
       onFightSelected,
       onPokemonSelected,
+      onRunSelected,
     });
     this.movePanel = new ModernBattleMovePanel(this.modernRoot.element, {
       onMoveSelected,

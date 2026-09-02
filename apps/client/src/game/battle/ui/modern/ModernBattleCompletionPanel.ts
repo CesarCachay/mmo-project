@@ -100,6 +100,12 @@ export class ModernBattleCompletionPanel {
         this.message.textContent = "Your party can no longer continue the battle.";
         break;
 
+      case "trainer-escaped": {
+        this.title.textContent = "Escaped!";
+        this.message.textContent = "You got away safely.";
+        break;
+      }
+
       default: {
         const exhaustive: never = outcome;
         throw new Error(`Unsupported battle completion outcome: ${String(exhaustive)}`);

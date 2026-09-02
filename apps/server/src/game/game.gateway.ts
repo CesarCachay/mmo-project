@@ -73,6 +73,7 @@ import type {
   PokemonBattleStateUpdatedPayload,
   BattlePresentationEvent,
   PokemonBattleTurnResolvedPayload,
+  PokemonBattleCompletedPayload,
 } from '@cesar-mmo/shared';
 import type {
   PokemonTrainerId,
@@ -98,11 +99,22 @@ import { PokemonBattleSessionStore } from '../pokemon/battles/pokemon-battle-ses
 import { createWildBattleInstance } from '../pokemon/battles/pokemon-wild-battle.factory';
 import { PokemonBattleTurnStore } from 'src/pokemon/battles/pokemon-battle-turn.store';
 import { createWildBattleCommand } from '../pokemon/battles/pokemon-wild-battle-command.factory';
-import { applyPokemonWildBattleOutcome } from '../pokemon/battles/pokemon-wild-battle-outcome.runtime';
+import {
+  applyPokemonWildBattleOutcome,
+  applyPokemonWildBattleEscapeOutcome,
+} from '../pokemon/battles/pokemon-wild-battle-outcome.runtime';
 import { applyPokemonTrainerBattleReplacement } from '../pokemon/battles/pokemon-trainer-battle-replacement.runtime';
 import type { PokemonBattleSession } from 'src/pokemon/battles/pokemon-battle-session';
 import { assertPokemonTrainerBattleSwitchAllowed } from '../pokemon/battles/pokemon-trainer-battle-switch.validator';
 import { applyPokemonTrainerBattleSwitch } from 'src/pokemon/battles/pokemon-trainer-battle-switch.runtime';
+import { resolvePokemonWildBattleRun } from '../pokemon/battles/run/pokemon-wild-battle-run.runtime';
+
+type BattleTurnTerminalOutcome = 'trainer-escaped';
+
+interface BattleTurnEntryExecutionResult {
+  readonly events: readonly BattlePresentationEvent[];
+  readonly terminalOutcome: BattleTurnTerminalOutcome | null;
+}
 
 @WebSocketGateway({
   cors: {
@@ -595,8 +607,17 @@ export class GameGateway
 
       const presentationEvents: BattlePresentationEvent[] = [];
 
+      let terminalOutcome: BattleTurnTerminalOutcome | null = null;
+
       for (const entry of resolutionOrder.entries) {
-        presentationEvents.push(...this.executeBattleTurnEntry(session, entry));
+        const executionResult = this.executeBattleTurnEntry(session, entry);
+
+        presentationEvents.push(...executionResult.events);
+
+        if (executionResult.terminalOutcome) {
+          terminalOutcome = executionResult.terminalOutcome;
+          break;
+        }
       }
 
       const turnResolvedPayload = {
@@ -606,6 +627,31 @@ export class GameGateway
       } satisfies PokemonBattleTurnResolvedPayload;
 
       client.emit(POKEMON_EVENTS.BATTLE_TURN_RESOLVED, turnResolvedPayload);
+
+      if (terminalOutcome === 'trainer-escaped') {
+        const updatedTrainerState = await this.syncBattleResultToTrainer(
+          session,
+          trainerBinding.trainerId,
+          trainerBinding.participantId,
+        );
+
+        const escapeOutcome = applyPokemonWildBattleEscapeOutcome({
+          battleId: session.battle.battleId,
+          battleSessionStore: this.pokemonBattleSessionStore,
+          battleTurnStore: this.pokemonBattleTurnStore,
+        });
+
+        client.emit(POKEMON_EVENTS.TRAINER_STATE, {
+          trainerState: updatedTrainerState,
+        } satisfies PokemonTrainerStatePayload);
+
+        client.emit(POKEMON_EVENTS.BATTLE_COMPLETED, {
+          battleId: session.battle.battleId,
+          outcome: escapeOutcome.type,
+        } satisfies PokemonBattleCompletedPayload);
+
+        return;
+      }
 
       const continuationOutcome = resolveWildBattleContinuationOutcome(
         session.battle,
@@ -1264,7 +1310,7 @@ export class GameGateway
   private executeBattleTurnEntry(
     session: PokemonBattleSession,
     entry: BattleTurnResolutionEntry,
-  ): BattlePresentationEvent[] {
+  ): BattleTurnEntryExecutionResult {
     switch (entry.command.action.type) {
       case 'switch-pokemon': {
         const result = applyPokemonTrainerBattleSwitch({
@@ -1272,25 +1318,49 @@ export class GameGateway
           entry,
         });
 
-        console.log('[BattleSwitch] resolved', {
-          battleId: result.battleId,
-          participantId: result.participantId,
-          previousActivePokemonIndex: result.previousActivePokemonIndex,
-          currentActivePokemonIndex: result.currentActivePokemonIndex,
-          previousPokemonInstanceId: result.previousPokemonInstanceId,
-          activePokemonInstanceId: result.activePokemonInstanceId,
+        return {
+          events: [
+            {
+              type: 'pokemon-switched',
+              participantId: result.participantId,
+              previousActivePokemonIndex: result.previousActivePokemonIndex,
+              currentActivePokemonIndex: result.currentActivePokemonIndex,
+              previousPokemonInstanceId: result.previousPokemonInstanceId,
+              currentPokemonInstanceId: result.activePokemonInstanceId,
+            },
+          ],
+          terminalOutcome: null,
+        };
+      }
+
+      case 'run': {
+        const result = resolvePokemonWildBattleRun({
+          session,
+          entry,
+          random: Math.random,
         });
 
-        return [
-          {
-            type: 'pokemon-switched',
-            participantId: result.participantId,
-            previousActivePokemonIndex: result.previousActivePokemonIndex,
-            currentActivePokemonIndex: result.currentActivePokemonIndex,
-            previousPokemonInstanceId: result.previousPokemonInstanceId,
-            currentPokemonInstanceId: result.activePokemonInstanceId,
-          },
-        ];
+        if (result.type === 'run-succeeded') {
+          return {
+            events: [
+              {
+                type: 'run-succeeded',
+                participantId: entry.command.participantId,
+              },
+            ],
+            terminalOutcome: result.terminalOutcome,
+          };
+        }
+
+        return {
+          events: [
+            {
+              type: 'run-failed',
+              participantId: entry.command.participantId,
+            },
+          ],
+          terminalOutcome: null,
+        };
       }
 
       case 'use-move': {
@@ -1312,7 +1382,10 @@ export class GameGateway
      * Therefore no presentation event.
      */
     if (!eligibility.canExecute) {
-      return [];
+      return {
+        events: [],
+        terminalOutcome: null,
+      };
     }
 
     const executionContext = createBattleMoveExecutionContext(
@@ -1335,15 +1408,18 @@ export class GameGateway
     );
 
     if (!accuracyResult.hit) {
-      return [
-        moveUsedEvent,
-        {
-          type: 'move-missed',
-          participantId: executionContext.actorParticipantId,
-          pokemonInstanceId: executionContext.actorPokemon.pokemon.instanceId,
-          moveId: executionContext.move.id,
-        },
-      ];
+      return {
+        events: [
+          moveUsedEvent,
+          {
+            type: 'move-missed',
+            participantId: executionContext.actorParticipantId,
+            pokemonInstanceId: executionContext.actorPokemon.pokemon.instanceId,
+            moveId: executionContext.move.id,
+          },
+        ],
+        terminalOutcome: null,
+      };
     }
 
     const targetPreviousHp = executionContext.targetPokemon.currentHp;
@@ -1361,7 +1437,10 @@ export class GameGateway
       damageResult.damageClass !== 'status' && damageResult.power !== null;
 
     if (!resolvesDirectDamage) {
-      return events;
+      return {
+        events,
+        terminalOutcome: null,
+      };
     }
 
     const targetPokemonInstanceId =
@@ -1398,7 +1477,10 @@ export class GameGateway
       });
     }
 
-    return events;
+    return {
+      events,
+      terminalOutcome: null,
+    };
   }
 
   private async syncBattleResultToTrainer(

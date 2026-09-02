@@ -50,12 +50,24 @@ export interface BattlePokemonSwitchedEvent {
   readonly currentPokemonInstanceId: string;
 }
 
+export interface BattleRunFailedEvent {
+  readonly type: "run-failed";
+  readonly participantId: BattleParticipantId;
+}
+
+export interface BattleRunSucceededEvent {
+  readonly type: "run-succeeded";
+  readonly participantId: BattleParticipantId;
+}
+
 export type BattlePresentationEvent =
   | BattleMoveUsedEvent
   | BattleMoveMissedEvent
   | BattleDamageAppliedEvent
   | BattlePokemonFaintedEvent
-  | BattlePokemonSwitchedEvent;
+  | BattlePokemonSwitchedEvent
+  | BattleRunFailedEvent
+  | BattleRunSucceededEvent;
 
 export function isBattlePresentationEvent(
   value: unknown
@@ -81,6 +93,10 @@ export function isBattlePresentationEvent(
 
     case "pokemon-switched":
       return isPokemonSwitchedEvent(value);
+
+    case "run-failed":
+    case "run-succeeded":
+      return isNonEmptyString(value.participantId);
 
     default:
       return false;

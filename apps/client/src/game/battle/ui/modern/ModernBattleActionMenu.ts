@@ -3,6 +3,7 @@ import type { BattlePokemonState } from "@cesar-mmo/shared";
 export interface ModernBattleActionMenuCallbacks {
   readonly onFightSelected: () => void;
   readonly onPokemonSelected: () => void;
+  readonly onRunSelected: () => void;
 }
 
 interface BattleUiBounds {
@@ -23,6 +24,8 @@ export class ModernBattleActionMenu {
 
   private readonly fightButton: HTMLButtonElement;
   private readonly pokemonButton: HTMLButtonElement;
+  private readonly itemButton: HTMLButtonElement;
+  private readonly runButton: HTMLButtonElement;
 
   private readonly callbacks: ModernBattleActionMenuCallbacks;
 
@@ -56,7 +59,28 @@ export class ModernBattleActionMenu {
       }
     );
 
-    actions.append(this.fightButton, this.pokemonButton);
+    this.itemButton = document.createElement("button");
+    this.itemButton.type = "button";
+    this.itemButton.className = [
+      "battle-action-menu__button",
+      "battle-action-menu__button--item",
+    ].join(" ");
+
+    this.itemButton.textContent = "ITEM";
+    this.itemButton.disabled = true;
+
+    this.runButton = document.createElement("button");
+    this.runButton.type = "button";
+    this.runButton.className = [
+      "battle-action-menu__button",
+      "battle-action-menu__button--run",
+    ].join(" ");
+    this.runButton.textContent = "RUN";
+    this.runButton.addEventListener("click", () => {
+      this.callbacks.onRunSelected();
+    });
+
+    actions.append(this.fightButton, this.pokemonButton, this.itemButton, this.runButton);
 
     this.root.append(this.prompt, actions);
 
@@ -109,6 +133,10 @@ export class ModernBattleActionMenu {
   public setEnabled(enabled: boolean): void {
     this.fightButton.disabled = !enabled;
     this.pokemonButton.disabled = !enabled;
+    this.runButton.disabled = !enabled;
+
+    // ITEM permanece bloqueado hasta Inventory Foundation.
+    this.itemButton.disabled = true;
   }
 
   public clear(): void {

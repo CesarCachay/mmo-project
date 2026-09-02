@@ -12,13 +12,16 @@ export interface BattleUseMoveAction {
   readonly type: "use-move";
   readonly moveId: number;
 }
-
 export interface BattleSwitchPokemonAction {
   readonly type: "switch-pokemon";
   readonly pokemonIndex: number;
 }
+export interface BattleRunAction {
+  readonly type: "run";
+}
 
-export type BattleCommandAction = BattleUseMoveAction | BattleSwitchPokemonAction;
+export type BattleCommandAction =
+  BattleUseMoveAction | BattleSwitchPokemonAction | BattleRunAction;
 
 export interface BattleCommand {
   readonly battleId: BattleId;
@@ -58,6 +61,10 @@ export function createBattleCommand(
     }
     case "switch-pokemon": {
       assertValidSwitchPokemonAction(battle, input.action);
+      break;
+    }
+    case "run": {
+      assertValidRunAction(battle, participant.id);
       break;
     }
   }
@@ -114,6 +121,27 @@ function assertValidSwitchPokemonAction(
   if (!Number.isInteger(action.pokemonIndex) || action.pokemonIndex < 0) {
     throw new Error(
       `Invalid Pokémon index "${action.pokemonIndex}" for battle "${battle.battleId}"`
+    );
+  }
+}
+
+function assertValidRunAction(
+  battle: BattleInstance,
+  participantId: BattleParticipantId
+): void {
+  const participant = battle.participants.find(
+    (candidate) => candidate.id === participantId
+  );
+
+  if (!participant) {
+    throw new Error(
+      `Battle participant "${participantId}" not found in battle "${battle.battleId}"`
+    );
+  }
+
+  if (participant.type !== "trainer") {
+    throw new Error(
+      `Battle participant "${participantId}" cannot run because it is not a Trainer`
     );
   }
 }
