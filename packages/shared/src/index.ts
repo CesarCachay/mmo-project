@@ -265,3 +265,14 @@ export { replaceFaintedTrainerBattlePokemon } from "./pokemon/battles/pokemon-ba
 export type { BattleTrainerPokemonReplacementResult } from "./pokemon/battles/pokemon-battle-participant-replacement.js";
 export { calculateBattleNonHpStat } from "./pokemon/battles/pokemon-battle-stat.js";
 export { syncPokemonPartyFromBattleParticipant } from "./pokemon/battles/pokemon-battle-trainer-party-sync.js";
+export { isBattlePresentationEvent } from "./pokemon/battles/pokemon-battle-presentation.js";
+export type {
+  BattleMoveUsedEvent,
+  BattleMoveMissedEvent,
+  BattleDamageAppliedEvent,
+  BattlePokemonFaintedEvent,
+  BattlePokemonSwitchedEvent,
+  BattlePresentationEvent,
+} from "./pokemon/battles/pokemon-battle-presentation.js";
+export { isPokemonBattleTurnResolvedPayload } from "./pokemon/battles/pokemon-battle-presentation-network.js";
+export type { PokemonBattleTurnResolvedPayload } from "./pokemon/battles/pokemon-battle-presentation-network.js";

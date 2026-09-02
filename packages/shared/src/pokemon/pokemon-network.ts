@@ -27,6 +27,8 @@ export const POKEMON_EVENTS = {
   BATTLE_COMPLETED: "pokemon:battle-completed",
 
   BATTLE_STATE_UPDATED: "pokemon:battle-state-updated",
+
+  BATTLE_TURN_RESOLVED: "battleTurnResolved",
 } as const;
 
 export interface PokemonTrainerStatePayload {

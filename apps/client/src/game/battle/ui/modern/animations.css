@@ -1,0 +1,154 @@
+/* =========================================================
+   BATTLE UI — ANIMATIONS
+   ========================================================= */
+
+/*
+ * Keep animation definitions separated from battle-ui.css.
+ *
+ * IMPORTANT:
+ * Pokémon battle sprites already use transform: scale(...)
+ * depending on trainer / wild side.
+ *
+ * Do not animate transform here unless we later compose
+ * transforms explicitly.
+ */
+
+/* =========================================================
+   POKÉMON SPRITE PRESENTATION
+   ========================================================= */
+
+.battle-modern-hud__sprite {
+  will-change: opacity, filter;
+}
+
+/* ---------------------------------------------------------
+     SWITCH OUT
+     --------------------------------------------------------- */
+
+.battle-modern-hud__sprite--switching-out {
+  animation: battle-pokemon-switch-out var(--battle-sprite-animation-duration, 260ms)
+    ease-in forwards;
+}
+
+.battle-modern-hud__sprite--switched-out {
+  opacity: 0;
+}
+
+/* ---------------------------------------------------------
+     SWITCH IN
+     --------------------------------------------------------- */
+
+.battle-modern-hud__sprite--switching-in {
+  animation: battle-pokemon-switch-in var(--battle-sprite-animation-duration, 340ms)
+    ease-out forwards;
+}
+
+/* ---------------------------------------------------------
+     FAINT
+     --------------------------------------------------------- */
+
+.battle-modern-hud__sprite--fainting {
+  animation: battle-pokemon-faint var(--battle-sprite-animation-duration, 420ms) ease-in
+    forwards;
+}
+
+.battle-modern-hud__sprite--fainted {
+  opacity: 0;
+}
+
+/* =========================================================
+     POKÉMON KEYFRAMES
+     ========================================================= */
+
+@keyframes battle-pokemon-switch-out {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes battle-pokemon-switch-in {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes battle-pokemon-faint {
+  0% {
+    opacity: 1;
+  }
+
+  30% {
+    opacity: 0.9;
+  }
+
+  65% {
+    opacity: 0.45;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+/* =========================================================
+     COMPLETION
+     ========================================================= */
+
+@keyframes battle-completion-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes battle-completion-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .battle-modern-hud__sprite--switching-out,
+  .battle-modern-hud__sprite--switching-in,
+  .battle-modern-hud__sprite--fainting {
+    animation-duration: 1ms;
+  }
+}
+
+/* =========================================================
+   POKÉMON HIT LAYER
+   ========================================================= */
+
+.battle-modern-hud__hit-sprite {
+  position: absolute;
+  display: block;
+  margin: 0;
+  object-fit: contain;
+  image-rendering: pixelated;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 5;
+  filter: brightness(0) invert(1) drop-shadow(0 0 10px rgba(255, 255, 255, 1));
+  will-change: opacity;
+}

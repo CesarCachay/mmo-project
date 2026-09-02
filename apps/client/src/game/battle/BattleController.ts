@@ -8,6 +8,8 @@ import type {
   PokemonBattleStateUpdatedPayload,
   PokemonBattleCommandInput,
   PokemonBattleReplacementInput,
+  BattlePresentationEvent,
+  PokemonBattleTurnResolvedPayload,
 } from "@cesar-mmo/shared";
 
 import { PokemonSpriteLoader } from "../pokemon/PokemonSpriteLoader";
@@ -16,17 +18,34 @@ import { BattleOverlay } from "./ui/BattleOverlay";
 
 import type { BattleClientInteractionState } from "./battle-client.types";
 
+import {
+  BattlePresentationQueue,
+  type BattlePresentationEventContext,
+} from "./presentation/BattlePresentationQueue";
+
+import { formatBattlePresentationMessage } from "./presentation/battle-presentation-message";
+import {
+  BATTLE_PRESENTATION_TIMING,
+  getBattlePresentationMessageDuration,
+} from "./presentation/battle-presentation-timing";
+import { getPokemonDisplayName } from "../pokemon/pokemon-presentation.utils";
+
 export class BattleController {
   private activeBattlePayload?: PokemonBattleStartedPayload;
   private readonly overlay: BattleOverlay;
   private readonly pokemonSpriteLoader: PokemonSpriteLoader;
 
+  private readonly presentationQueue: BattlePresentationQueue;
+
+  private readonly pendingStateUpdates = new Map<
+    number,
+    PokemonBattleStateUpdatedPayload
+  >();
+  private pendingCompletion?: PokemonBattleCompletedPayload;
+
   private interactionState: BattleClientInteractionState = "completed";
-
   private readonly sendBattleCommand: (input: PokemonBattleCommandInput) => void;
-
   private readonly sendBattleReplacement: (input: PokemonBattleReplacementInput) => void;
-
   private replacementPokemonIndexes: readonly number[] = [];
 
   constructor(
@@ -62,6 +81,16 @@ export class BattleController {
         this.handleCompletionAcknowledged();
       }
     );
+
+    this.presentationQueue = new BattlePresentationQueue({
+      presentEvent: (event, context) => this.presentBattleEvent(event, context),
+      onTurnCompleted: async (payload) => {
+        await this.handlePresentationTurnCompleted(payload);
+      },
+      onIdle: () => {
+        this.handlePresentationQueueIdle();
+      },
+    });
   }
 
   public get isActive(): boolean {
@@ -73,6 +102,11 @@ export class BattleController {
   }
 
   public async start(payload: PokemonBattleStartedPayload): Promise<void> {
+    this.presentationQueue.clear();
+
+    this.pendingStateUpdates.clear();
+    this.pendingCompletion = undefined;
+
     const currentBattleId = this.activeBattlePayload?.battle.battleId;
     const nextBattleId = payload.battle.battleId;
 
@@ -117,15 +151,12 @@ export class BattleController {
     if (currentBattle.battle.battleId !== payload.battle.battleId) {
       console.warn("[BattleController] replacement battle mismatch", {
         activeBattleId: currentBattle.battle.battleId,
+
         receivedBattleId: payload.battle.battleId,
       });
 
       return;
     }
-
-    this.activeBattlePayload = {
-      battle: payload.battle,
-    };
 
     this.replacementPokemonIndexes = [];
 
@@ -138,11 +169,44 @@ export class BattleController {
         return;
       }
 
+      const trainerParticipant = payload.battle.participants.find(
+        (participant) => participant.type === "trainer"
+      );
+
+      const replacementPokemon = trainerParticipant
+        ? trainerParticipant.pokemon[trainerParticipant.activePokemonIndex]
+        : undefined;
+
+      if (trainerParticipant && replacementPokemon) {
+        const pokemonName = getPokemonDisplayName(replacementPokemon.pokemon);
+
+        await this.overlay.presentMessage(
+          `Go! ${pokemonName}!`,
+          BATTLE_PRESENTATION_TIMING.forcedReplacementMessageMs
+        );
+
+        await this.overlay.animatePokemonSwitchIn(
+          payload.battle,
+          trainerParticipant.id,
+          replacementPokemon.pokemon.instanceId
+        );
+      }
+
+      /*
+       * Only after presentation do we adopt
+       * the authoritative replacement snapshot.
+       */
+      this.activeBattlePayload = {
+        battle: payload.battle,
+      };
+
       this.overlay.renderBattle(payload.battle);
+
       this.setInteractionState("action-menu");
 
       console.log("[BattleController] replacement presentation applied", {
         battleId: payload.battle.battleId,
+
         nextTurnNumber: payload.nextTurnNumber,
       });
     } catch (error) {
@@ -165,18 +229,28 @@ export class BattleController {
         activeBattleId: currentBattle.battle.battleId,
         completedBattleId: payload.battleId,
       });
+
       return;
     }
 
-    this.setInteractionState("completed");
-    this.replacementPokemonIndexes = [];
-    this.overlay.showCompletion(payload.outcome);
+    if (this.presentationQueue.isBusy) {
+      this.pendingCompletion = payload;
+      return;
+    }
+
+    this.commitCompletion(payload);
   }
 
   public destroy(): void {
+    this.presentationQueue.clear();
+
+    this.pendingStateUpdates.clear();
+    this.pendingCompletion = undefined;
+
     this.interactionState = "completed";
     this.replacementPokemonIndexes = [];
     this.activeBattlePayload = undefined;
+
     this.overlay.destroy();
   }
 
@@ -223,48 +297,15 @@ export class BattleController {
         activeBattleId: currentBattle.battle.battleId,
         receivedBattleId: payload.battle.battleId,
       });
-
       return;
     }
 
-    this.activeBattlePayload = {
-      battle: payload.battle,
-    };
-
-    this.replacementPokemonIndexes =
-      payload.interactionState === "replacement-required"
-        ? [...payload.replacementPokemonIndexes]
-        : [];
-
-    this.setInteractionState("waiting-for-server");
-
-    try {
-      await this.ensureBattleSpritesLoaded(payload.battle);
-
-      if (this.activeBattlePayload?.battle.battleId !== payload.battle.battleId) {
-        return;
-      }
-
-      this.overlay.renderBattle(payload.battle);
-
-      if (payload.interactionState === "replacement-required") {
-        this.overlay.setReplacementOptions(
-          payload.battle,
-          this.replacementPokemonIndexes
-        );
-      }
-
-      this.setInteractionState(this.mapServerInteractionState(payload.interactionState));
-
-      console.log("[BattleController] state updated", {
-        battleId: payload.battle.battleId,
-        resolvedTurnNumber: payload.resolvedTurnNumber,
-        interactionState: payload.interactionState,
-        nextTurnNumber: payload.nextTurnNumber,
-      });
-    } catch (error) {
-      console.error("[BattleController] failed to refresh battle presentation", error);
+    if (this.presentationQueue.isBusy) {
+      this.pendingStateUpdates.set(payload.resolvedTurnNumber, payload);
+      return;
     }
+
+    await this.commitStateUpdate(payload);
   }
 
   private setInteractionState(state: BattleClientInteractionState): void {
@@ -394,6 +435,11 @@ export class BattleController {
     if (!this.activeBattlePayload) {
       return;
     }
+
+    this.presentationQueue.clear();
+
+    this.pendingStateUpdates.clear();
+    this.pendingCompletion = undefined;
 
     //  Aqui si liberamos Battle.
     this.replacementPokemonIndexes = [];
@@ -526,5 +572,226 @@ export class BattleController {
       this.setInteractionState("pokemon-selection");
       console.error("[BattleController] failed to submit voluntary switch", error);
     }
+  }
+
+  public enqueueTurnPresentation(payload: PokemonBattleTurnResolvedPayload): void {
+    const currentBattle = this.activeBattlePayload;
+
+    if (!currentBattle) {
+      console.warn(
+        "[BattleController] turn presentation received without active battle",
+        {
+          battleId: payload.battleId,
+          turnNumber: payload.turnNumber,
+        }
+      );
+      return;
+    }
+
+    if (currentBattle.battle.battleId !== payload.battleId) {
+      console.warn("[BattleController] turn presentation battle mismatch", {
+        activeBattleId: currentBattle.battle.battleId,
+        receivedBattleId: payload.battleId,
+        turnNumber: payload.turnNumber,
+      });
+      return;
+    }
+
+    this.presentationQueue.enqueue(payload);
+  }
+
+  private async presentBattleEvent(
+    event: BattlePresentationEvent,
+    context: BattlePresentationEventContext
+  ): Promise<void> {
+    console.log("[BattlePresentation] event", {
+      type: event.type,
+      event,
+      turnNumber: context.turnNumber,
+      eventIndex: context.eventIndex,
+    });
+    const activeBattle = this.activeBattlePayload?.battle;
+
+    if (!activeBattle) {
+      return;
+    }
+
+    if (activeBattle.battleId !== context.battleId) {
+      console.warn("[BattleController] presentation event battle mismatch", {
+        activeBattleId: activeBattle.battleId,
+        receivedBattleId: context.battleId,
+        turnNumber: context.turnNumber,
+      });
+      return;
+    }
+
+    if (event.type === "pokemon-switched") {
+      await this.overlay.animatePokemonSwitchOut(
+        activeBattle,
+        event.participantId,
+        event.previousPokemonInstanceId
+      );
+
+      const message = formatBattlePresentationMessage(activeBattle, event);
+
+      if (message) {
+        await this.overlay.presentMessage(
+          message,
+          getBattlePresentationMessageDuration(event)
+        );
+      }
+
+      await this.overlay.animatePokemonSwitchIn(
+        activeBattle,
+        event.participantId,
+        event.currentPokemonInstanceId
+      );
+
+      return;
+    }
+
+    if (event.type === "pokemon-fainted") {
+      const message = formatBattlePresentationMessage(activeBattle, event);
+
+      if (message) {
+        await this.overlay.presentMessage(
+          message,
+          getBattlePresentationMessageDuration(event)
+        );
+      }
+
+      await this.overlay.animatePokemonFaint(
+        activeBattle,
+        event.participantId,
+        event.pokemonInstanceId
+      );
+
+      return;
+    }
+
+    if (event.type === "damage-applied" && event.appliedDamage > 0) {
+      await Promise.all([
+        this.overlay.animatePokemonHit(
+          activeBattle,
+          event.participantId,
+          event.pokemonInstanceId
+        ),
+
+        this.overlay.animatePokemonHp(
+          activeBattle,
+          event.participantId,
+          event.pokemonInstanceId,
+          event.previousHp,
+          event.currentHp
+        ),
+      ]);
+    }
+
+    const message = formatBattlePresentationMessage(activeBattle, event);
+    if (!message) {
+      return;
+    }
+    await this.overlay.presentMessage(
+      message,
+      getBattlePresentationMessageDuration(event)
+    );
+  }
+
+  private async handlePresentationTurnCompleted(
+    payload: PokemonBattleTurnResolvedPayload
+  ): Promise<void> {
+    const pendingState = this.pendingStateUpdates.get(payload.turnNumber);
+
+    if (!pendingState) {
+      return;
+    }
+
+    if (pendingState.battle.battleId !== payload.battleId) {
+      console.warn("[BattleController] pending state battle mismatch", {
+        presentationBattleId: payload.battleId,
+        stateBattleId: pendingState.battle.battleId,
+        turnNumber: payload.turnNumber,
+      });
+      return;
+    }
+
+    this.pendingStateUpdates.delete(payload.turnNumber);
+    await this.commitStateUpdate(pendingState);
+  }
+
+  private handlePresentationQueueIdle(): void {
+    if (!this.pendingCompletion) {
+      return;
+    }
+    const payload = this.pendingCompletion;
+    this.pendingCompletion = undefined;
+    this.commitCompletion(payload);
+  }
+
+  private async commitStateUpdate(
+    payload: PokemonBattleStateUpdatedPayload
+  ): Promise<void> {
+    const currentBattle = this.activeBattlePayload;
+
+    if (!currentBattle) {
+      return;
+    }
+
+    if (currentBattle.battle.battleId !== payload.battle.battleId) {
+      console.warn("[BattleController] cannot commit state for another battle", {
+        activeBattleId: currentBattle.battle.battleId,
+        receivedBattleId: payload.battle.battleId,
+      });
+
+      return;
+    }
+
+    this.activeBattlePayload = {
+      battle: payload.battle,
+    };
+
+    this.replacementPokemonIndexes =
+      payload.interactionState === "replacement-required"
+        ? [...payload.replacementPokemonIndexes]
+        : [];
+
+    this.setInteractionState("waiting-for-server");
+
+    try {
+      await this.ensureBattleSpritesLoaded(payload.battle);
+
+      if (this.activeBattlePayload?.battle.battleId !== payload.battle.battleId) {
+        return;
+      }
+
+      this.overlay.renderBattle(payload.battle);
+
+      if (payload.interactionState === "replacement-required") {
+        this.overlay.setReplacementOptions(
+          payload.battle,
+          this.replacementPokemonIndexes
+        );
+      }
+
+      this.setInteractionState(this.mapServerInteractionState(payload.interactionState));
+    } catch (error) {
+      console.error("[BattleController] failed to commit battle state", error);
+    }
+  }
+
+  private commitCompletion(payload: PokemonBattleCompletedPayload): void {
+    const currentBattle = this.activeBattlePayload;
+
+    if (!currentBattle) {
+      return;
+    }
+
+    if (currentBattle.battle.battleId !== payload.battleId) {
+      return;
+    }
+
+    this.setInteractionState("completed");
+    this.replacementPokemonIndexes = [];
+    this.overlay.showCompletion(payload.outcome);
   }
 }

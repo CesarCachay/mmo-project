@@ -192,6 +192,10 @@
   box-shadow: 0 0 12px rgba(255, 255, 255, 0.08);
 }
 
+.battle-modern-hud__hp-fill--animating {
+  transition: background 180ms ease;
+}
+
 .battle-modern-hud__hp-fill--healthy {
   background: linear-gradient(90deg, #16a34a, var(--battle-hp-healthy));
 }
@@ -1152,32 +1156,6 @@
 }
 
 /* =========================================================
-     ANIMATIONS
-     ========================================================= */
-
-@keyframes battle-completion-fade-in {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes battle-completion-card-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.97);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* =========================================================
      BATTLE MENU ACTION
      ========================================================= */
 
@@ -1331,4 +1309,42 @@
 .battle-replacement-panel__back:disabled {
   opacity: 0.4;
   cursor: default;
+}
+
+/* =========================================================
+   BATTLE MESSAGE PRESENTATION
+   ========================================================= */
+
+.battle-modern-message {
+  position: absolute;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 14px 24px;
+  pointer-events: none;
+}
+
+.battle-modern-message[hidden] {
+  display: none;
+}
+
+.battle-modern-message__surface {
+  display: flex;
+  align-items: center;
+  width: min(760px, 92%);
+  min-height: 72px;
+  box-sizing: border-box;
+  padding: 18px 24px;
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(10, 18, 32, 0.99));
+}
+
+.battle-modern-message__text {
+  width: 100%;
+  color: var(--battle-text-primary);
+  font-size: clamp(16px, 1.55vw, 22px);
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
 }

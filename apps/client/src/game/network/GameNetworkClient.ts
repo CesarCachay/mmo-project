@@ -10,6 +10,7 @@ import {
   isPokemonBattleReplacementResolvedPayload,
   isPokemonBattleCompletedPayload,
   isPokemonBattleStateUpdatedPayload,
+  isPokemonBattleTurnResolvedPayload,
 } from "@cesar-mmo/shared";
 
 import type {
@@ -35,6 +36,7 @@ import type {
   PokemonBattleReplacementResolvedPayload,
   PokemonBattleCompletedPayload,
   PokemonBattleStateUpdatedPayload,
+  PokemonBattleTurnResolvedPayload,
 } from "@cesar-mmo/shared";
 
 type ConnectionRejectedError = {
@@ -226,7 +228,9 @@ export class GameNetworkClient {
     this.socket.on(POKEMON_EVENTS.TRAINER_SESSION, callback);
   }
 
-  onBattleStarted(callback: (payload: PokemonBattleStartedPayload) => void): () => void {
+  public onBattleStarted(
+    callback: (payload: PokemonBattleStartedPayload) => void
+  ): () => void {
     const handler = (payload: unknown) => {
       if (!isPokemonBattleStartedPayload(payload)) {
         console.warn("Ignoring invalid battle started payload", payload);
@@ -234,11 +238,22 @@ export class GameNetworkClient {
       }
       callback(payload);
     };
-
     this.socket.on(POKEMON_EVENTS.BATTLE_STARTED, handler);
-
     return () => {
       this.socket.off(POKEMON_EVENTS.BATTLE_STARTED, handler);
     };
+  }
+
+  public onBattleTurnResolved(
+    callback: (payload: PokemonBattleTurnResolvedPayload) => void
+  ): void {
+    this.socket.on(POKEMON_EVENTS.BATTLE_TURN_RESOLVED, (payload: unknown) => {
+      if (!isPokemonBattleTurnResolvedPayload(payload)) {
+        console.warn("[BattleTurnResolved] invalid payload", payload);
+        return;
+      }
+
+      callback(payload);
+    });
   }
 }

@@ -137,10 +137,10 @@ export class PokemonTrainerService {
     let updatedState = trainerState;
 
     if (!hasLatios) {
-      updatedState = await this.addPokemon(trainerId, 381, 20);
+      updatedState = await this.addPokemon(trainerId, 381, 10);
     }
     if (!hasLarvitar) {
-      updatedState = await this.addPokemon(trainerId, 246, 10);
+      updatedState = await this.addPokemon(trainerId, 246, 7);
     }
 
     return updatedState;

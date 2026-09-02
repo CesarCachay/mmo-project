@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import "./style.css";
 import "./game/battle/ui/modern/battle-ui.css";
+import "./game/battle/ui/modern/animations.css";
 
 import { GameScene } from "./game/GameScene";
 import { JoinScene } from "./game/JoinScene";

@@ -526,6 +526,16 @@ export class GameScene extends Phaser.Scene {
       void this.battleController.start(payload);
     });
 
+    this.network.onBattleTurnResolved((payload) => {
+      console.log("[GameScene] Battle turn presentation", {
+        battleId: payload.battleId,
+        turnNumber: payload.turnNumber,
+        events: payload.events.map((event) => event.type),
+      });
+
+      this.battleController.enqueueTurnPresentation(payload);
+    });
+
     this.network.onBattleStateUpdated((payload) => {
       void this.battleController.applyStateUpdate(payload);
     });

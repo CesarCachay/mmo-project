@@ -11,6 +11,9 @@ import { ModernBattleReplacementPanel } from "./modern/ModernBattleReplacementPa
 import { ModernBattleCompletionPanel } from "./modern/ModernBattleCompletionPanel";
 import { ModernBattleActionMenu } from "./modern/ModernBattleActionMenu";
 
+// presentation
+import { ModernBattleMessagePanel } from "./modern/ModernBattleMessagePanel";
+
 import type { BattleClientInteractionState } from "../battle-client.types";
 
 export class BattleOverlay {
@@ -23,6 +26,7 @@ export class BattleOverlay {
   private readonly trainerHud: ModernBattlePokemonHud;
   private readonly movePanel: ModernBattleMovePanel;
   private readonly replacementPanel: ModernBattleReplacementPanel;
+  private readonly messagePanel: ModernBattleMessagePanel;
   private readonly completionPanel: ModernBattleCompletionPanel;
   private readonly actionMenu: ModernBattleActionMenu;
 
@@ -56,6 +60,7 @@ export class BattleOverlay {
       onPartyPokemonSelected,
       onBack: onPokemonBack,
     });
+    this.messagePanel = new ModernBattleMessagePanel(this.modernRoot.element);
     this.completionPanel = new ModernBattleCompletionPanel(this.modernRoot.element, {
       onContinue: onCompletionContinue,
     });
@@ -74,6 +79,8 @@ export class BattleOverlay {
     this.modernRoot.hide();
 
     this.completionPanel.hide();
+
+    this.messagePanel.clear();
 
     this.trainerHud.clear();
     this.wildHud.clear();
@@ -128,6 +135,8 @@ export class BattleOverlay {
     this.movePanel.destroy();
     this.replacementPanel.destroy();
 
+    this.messagePanel.destroy();
+
     this.completionPanel.destroy();
 
     this.stage.destroy();
@@ -161,6 +170,7 @@ export class BattleOverlay {
     this.actionMenu.setBounds(commandBounds, viewport);
     this.movePanel.setBounds(commandBounds, viewport);
     this.replacementPanel.setBounds(commandBounds, viewport);
+    this.messagePanel.setBounds(commandBounds, viewport);
 
     /*
      * Conservamos exactamente la distribución
@@ -204,6 +214,10 @@ export class BattleOverlay {
   }
 
   public setInteractionState(state: BattleClientInteractionState): void {
+    if (state !== "waiting-for-server") {
+      this.messagePanel.clear();
+    }
+
     this.movePanel.setInteractionState(state);
     this.replacementPanel.setInteractionState(state);
 
@@ -298,5 +312,129 @@ export class BattleOverlay {
 
     this.replacementPanel.setMode("voluntary");
     this.replacementPanel.render(battle, selectablePokemonIndexes);
+  }
+
+  public presentMessage(message: string, durationMs?: number): Promise<void> {
+    return this.messagePanel.present(message, durationMs);
+  }
+
+  public animatePokemonHp(
+    battle: BattleInstance,
+    participantId: string,
+    pokemonInstanceId: string,
+    previousHp: number,
+    currentHp: number
+  ): Promise<void> {
+    const participant = battle.participants.find(
+      (candidate) => candidate.id === participantId
+    );
+
+    if (!participant) {
+      return Promise.resolve();
+    }
+
+    const hud = participant.type === "trainer" ? this.trainerHud : this.wildHud;
+
+    if (!hud.isDisplayingPokemon(pokemonInstanceId)) {
+      return Promise.resolve();
+    }
+
+    return hud.animateHp(pokemonInstanceId, previousHp, currentHp);
+  }
+
+  public animatePokemonHit(
+    battle: BattleInstance,
+    participantId: string,
+    pokemonInstanceId: string
+  ): Promise<void> {
+    const hud = this.getParticipantHud(battle, participantId);
+
+    if (!hud) {
+      return Promise.resolve();
+    }
+
+    if (!hud.isDisplayingPokemon(pokemonInstanceId)) {
+      return Promise.resolve();
+    }
+
+    return hud.animateHit(pokemonInstanceId);
+  }
+
+  public animatePokemonSwitchOut(
+    battle: BattleInstance,
+    participantId: string,
+    pokemonInstanceId: string
+  ): Promise<void> {
+    const hud = this.getParticipantHud(battle, participantId);
+
+    if (!hud) {
+      return Promise.resolve();
+    }
+
+    return hud.animateSwitchOut(pokemonInstanceId);
+  }
+
+  public animatePokemonSwitchIn(
+    battle: BattleInstance,
+    participantId: string,
+    pokemonInstanceId: string
+  ): Promise<void> {
+    const participant = battle.participants.find(
+      (candidate) => candidate.id === participantId
+    );
+
+    if (!participant) {
+      return Promise.resolve();
+    }
+
+    const pokemonState = participant.pokemon.find(
+      (candidate) => candidate.pokemon.instanceId === pokemonInstanceId
+    );
+
+    if (!pokemonState) {
+      console.warn("[BattleOverlay] switch-in Pokémon not found", {
+        battleId: battle.battleId,
+        participantId,
+        pokemonInstanceId,
+      });
+      return Promise.resolve();
+    }
+
+    const hud = participant.type === "trainer" ? this.trainerHud : this.wildHud;
+
+    return hud.animateSwitchIn(pokemonState);
+  }
+
+  public animatePokemonFaint(
+    battle: BattleInstance,
+    participantId: string,
+    pokemonInstanceId: string
+  ): Promise<void> {
+    const hud = this.getParticipantHud(battle, participantId);
+
+    if (!hud) {
+      return Promise.resolve();
+    }
+
+    return hud.animateFaint(pokemonInstanceId);
+  }
+
+  private getParticipantHud(
+    battle: BattleInstance,
+    participantId: string
+  ): ModernBattlePokemonHud | undefined {
+    const participant = battle.participants.find(
+      (candidate) => candidate.id === participantId
+    );
+
+    if (!participant) {
+      console.warn("[BattleOverlay] participant HUD not found", {
+        battleId: battle.battleId,
+        participantId,
+      });
+      return undefined;
+    }
+
+    return participant.type === "trainer" ? this.trainerHud : this.wildHud;
   }
 }

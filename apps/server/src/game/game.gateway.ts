@@ -71,6 +71,8 @@ import type {
   PokemonBattleStartedPayload,
   BattleTurnResolutionEntry,
   PokemonBattleStateUpdatedPayload,
+  BattlePresentationEvent,
+  PokemonBattleTurnResolvedPayload,
 } from '@cesar-mmo/shared';
 import type {
   PokemonTrainerId,
@@ -591,9 +593,19 @@ export class GameGateway
         Math.random,
       );
 
+      const presentationEvents: BattlePresentationEvent[] = [];
+
       for (const entry of resolutionOrder.entries) {
-        this.executeBattleTurnEntry(session, entry);
+        presentationEvents.push(...this.executeBattleTurnEntry(session, entry));
       }
+
+      const turnResolvedPayload = {
+        battleId: session.battle.battleId,
+        turnNumber: turn.number,
+        events: presentationEvents,
+      } satisfies PokemonBattleTurnResolvedPayload;
+
+      client.emit(POKEMON_EVENTS.BATTLE_TURN_RESOLVED, turnResolvedPayload);
 
       const continuationOutcome = resolveWildBattleContinuationOutcome(
         session.battle,
@@ -1252,7 +1264,7 @@ export class GameGateway
   private executeBattleTurnEntry(
     session: PokemonBattleSession,
     entry: BattleTurnResolutionEntry,
-  ): void {
+  ): BattlePresentationEvent[] {
     switch (entry.command.action.type) {
       case 'switch-pokemon': {
         const result = applyPokemonTrainerBattleSwitch({
@@ -1268,7 +1280,17 @@ export class GameGateway
           previousPokemonInstanceId: result.previousPokemonInstanceId,
           activePokemonInstanceId: result.activePokemonInstanceId,
         });
-        return;
+
+        return [
+          {
+            type: 'pokemon-switched',
+            participantId: result.participantId,
+            previousActivePokemonIndex: result.previousActivePokemonIndex,
+            currentActivePokemonIndex: result.currentActivePokemonIndex,
+            previousPokemonInstanceId: result.previousPokemonInstanceId,
+            currentPokemonInstanceId: result.activePokemonInstanceId,
+          },
+        ];
       }
 
       case 'use-move': {
@@ -1281,8 +1303,16 @@ export class GameGateway
       entry,
     );
 
+    /*
+     * Example:
+     * actor fainted earlier in the same Turn.
+     *
+     * No PP consumed.
+     * No move actually used.
+     * Therefore no presentation event.
+     */
     if (!eligibility.canExecute) {
-      return;
+      return [];
     }
 
     const executionContext = createBattleMoveExecutionContext(
@@ -1292,17 +1322,83 @@ export class GameGateway
 
     consumeBattleMovePp(executionContext);
 
+    const moveUsedEvent: BattlePresentationEvent = {
+      type: 'move-used',
+      participantId: executionContext.actorParticipantId,
+      pokemonInstanceId: executionContext.actorPokemon.pokemon.instanceId,
+      moveId: executionContext.move.id,
+    };
+
     const accuracyResult = resolveBattleMoveAccuracy(
       executionContext,
       Math.random,
     );
 
     if (!accuracyResult.hit) {
-      return;
+      return [
+        moveUsedEvent,
+        {
+          type: 'move-missed',
+          participantId: executionContext.actorParticipantId,
+          pokemonInstanceId: executionContext.actorPokemon.pokemon.instanceId,
+          moveId: executionContext.move.id,
+        },
+      ];
     }
 
+    const targetPreviousHp = executionContext.targetPokemon.currentHp;
+
     const damageResult = calculateBattleMoveDamage(executionContext);
-    applyBattleMoveDamage(executionContext, damageResult);
+
+    const damageApplication = applyBattleMoveDamage(
+      executionContext,
+      damageResult,
+    );
+
+    const events: BattlePresentationEvent[] = [moveUsedEvent];
+
+    const resolvesDirectDamage =
+      damageResult.damageClass !== 'status' && damageResult.power !== null;
+
+    if (!resolvesDirectDamage) {
+      return events;
+    }
+
+    const targetPokemonInstanceId =
+      executionContext.targetPokemon.pokemon.instanceId;
+
+    const targetParticipant = session.battle.participants.find((participant) =>
+      participant.pokemon.some(
+        (pokemonState) =>
+          pokemonState.pokemon.instanceId === targetPokemonInstanceId,
+      ),
+    );
+
+    if (!targetParticipant) {
+      throw new Error(
+        `Battle participant for target Pokémon "${targetPokemonInstanceId}" not found in battle "${session.battle.battleId}"`,
+      );
+    }
+
+    events.push({
+      type: 'damage-applied',
+      participantId: targetParticipant.id,
+      pokemonInstanceId: targetPokemonInstanceId,
+      previousHp: targetPreviousHp,
+      currentHp: damageApplication.currentHp,
+      appliedDamage: damageApplication.appliedDamage,
+      typeEffectiveness: damageResult.typeEffectiveness,
+    });
+
+    if (targetPreviousHp > 0 && damageApplication.currentHp === 0) {
+      events.push({
+        type: 'pokemon-fainted',
+        participantId: targetParticipant.id,
+        pokemonInstanceId: targetPokemonInstanceId,
+      });
+    }
+
+    return events;
   }
 
   private async syncBattleResultToTrainer(
