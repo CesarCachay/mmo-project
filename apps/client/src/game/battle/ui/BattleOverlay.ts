@@ -16,11 +16,17 @@ import { ModernBattleReplacementPanel } from "./modern/ModernBattleReplacementPa
 import { ModernBattleCompletionPanel } from "./modern/ModernBattleCompletionPanel";
 import { ModernBattleActionMenu } from "./modern/ModernBattleActionMenu";
 import { ModernBattleBagPanel } from "./modern/ModernBattleBagPanel";
+import { ModernBattleCaptureLayer } from "./modern/ModernBattleCaptureLayer";
 
 // presentation
 import { ModernBattleMessagePanel } from "./modern/ModernBattleMessagePanel";
 
+// items assets
+import { getPokemonItemSpriteAsset } from "../../pokemon/pokemon-item-sprite.registry";
+
 import type { BattleClientInteractionState } from "../battle-client.types";
+
+const CAPTURE_TARGET_HEAD_OFFSET_PX = 44;
 
 export class BattleOverlay {
   private readonly scene: Phaser.Scene;
@@ -37,6 +43,8 @@ export class BattleOverlay {
   private readonly actionMenu: ModernBattleActionMenu;
 
   private readonly bagPanel: ModernBattleBagPanel;
+
+  private readonly captureLayer: ModernBattleCaptureLayer;
 
   constructor(
     scene: Phaser.Scene,
@@ -57,6 +65,8 @@ export class BattleOverlay {
     this.modernRoot = new BattleDomRoot();
 
     this.stage = new ModernBattleStage(this.modernRoot.element);
+
+    this.captureLayer = new ModernBattleCaptureLayer(this.modernRoot.element);
 
     this.trainerHud = new ModernBattlePokemonHud(this.modernRoot.element, "trainer");
     this.wildHud = new ModernBattlePokemonHud(this.modernRoot.element, "wild");
@@ -99,6 +109,8 @@ export class BattleOverlay {
     this.completionPanel.hide();
 
     this.messagePanel.clear();
+
+    this.captureLayer.clear();
 
     this.trainerHud.clear();
     this.wildHud.clear();
@@ -153,6 +165,8 @@ export class BattleOverlay {
     this.actionMenu.destroy();
     this.movePanel.destroy();
     this.replacementPanel.destroy();
+
+    this.captureLayer.clear();
 
     this.bagPanel.destroy();
 
@@ -497,5 +511,83 @@ export class BattleOverlay {
   ): void {
     this.replacementPanel.setMode("item-target");
     this.replacementPanel.render(battle, selectablePokemonIndexes);
+  }
+
+  public async animatePokemonCapture(
+    battle: BattleInstance,
+    itemId: PokemonItemId,
+    wildParticipantId: string,
+    pokemonInstanceId: string,
+    shakeCount: number,
+    captured: boolean
+  ): Promise<void> {
+    const participant = battle.participants.find(
+      (candidate) => candidate.id === wildParticipantId
+    );
+
+    if (!participant || participant.type !== "wild") {
+      console.warn("[BattleOverlay] invalid Wild participant for Capture", {
+        battleId: battle.battleId,
+        wildParticipantId,
+      });
+      return;
+    }
+
+    if (!this.wildHud.isDisplayingPokemon(pokemonInstanceId)) {
+      return;
+    }
+
+    /* Capture presentation usa específicamente el asset 64×64 */
+    const itemAsset = getPokemonItemSpriteAsset(itemId, 64);
+
+    if (!itemAsset) {
+      console.warn("[BattleOverlay] Capture item asset not found", {
+        battleId: battle.battleId,
+        itemId,
+      });
+      /* Un asset faltante NO puede alterar el resultado del gameplay */
+      return;
+    }
+
+    const overlayElement = this.modernRoot.element;
+
+    const throwStart = this.trainerHud.getCaptureThrowOrigin(overlayElement);
+
+    const rawTargetPoint = this.wildHud.getCaptureTargetPoint(overlayElement);
+
+    const targetPoint = rawTargetPoint
+      ? {
+          x: rawTargetPoint.x,
+          y: rawTargetPoint.y - CAPTURE_TARGET_HEAD_OFFSET_PX,
+        }
+      : null;
+
+    const groundPoint = this.wildHud.getCaptureGroundPoint(overlayElement);
+
+    if (!throwStart || !targetPoint || !groundPoint) {
+      console.warn("[BattleOverlay] missing capture anchors", {
+        battleId: battle.battleId,
+        itemId,
+        wildParticipantId,
+        pokemonInstanceId,
+      });
+      return;
+    }
+
+    this.captureLayer.setAnchors({
+      throwStart,
+      targetPoint,
+      groundPoint,
+    });
+
+    await this.captureLayer.playCapture({
+      itemAssetPath: itemAsset.path,
+      shakeCount,
+      captured,
+      onAbsorb: () => this.wildHud.animateCaptureAbsorb(pokemonInstanceId),
+      onBreakFree: captured
+        ? undefined
+        : () => this.wildHud.animateCaptureBreakFree(pokemonInstanceId),
+    });
   }
 }

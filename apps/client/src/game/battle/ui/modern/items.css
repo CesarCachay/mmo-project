@@ -1,0 +1,188 @@
+/* =========================================================
+   BATTLE BAG — ITEM ASSETS
+   ========================================================= */
+
+.battle-modern-bag__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.battle-modern-bag__item-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+  border-radius: 10px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.battle-modern-bag__item-icon {
+  display: block;
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  pointer-events: none;
+  user-select: none;
+}
+
+.battle-modern-bag__item-content {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  flex: 1;
+}
+
+.battle-modern-bag__item-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.battle-modern-bag__item-quantity {
+  flex: 0 0 auto;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   CAPTURE PRESENTATION
+   ========================================================= */
+
+.battle-modern-capture {
+  position: absolute;
+  inset: 0;
+  z-index: 26;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.battle-modern-capture[hidden] {
+  display: none;
+}
+
+.battle-modern-capture__particles {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.battle-modern-capture__particle {
+  position: absolute;
+  display: block;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  margin-top: -2.5px;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow:
+    0 0 5px rgba(255, 255, 255, 1),
+    0 0 11px rgba(191, 219, 254, 0.9),
+    0 0 18px rgba(96, 165, 250, 0.42);
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.battle-modern-capture__ball {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  display: block;
+  object-fit: contain;
+  image-rendering: pixelated;
+  transform-origin: center center;
+  pointer-events: none;
+  user-select: none;
+  will-change: left, top, transform, opacity, filter;
+  z-index: 3;
+}
+
+.battle-modern-capture__ball--absorbing {
+  filter: drop-shadow(0 0 12px rgba(96, 165, 250, 0.9)) brightness(1.2);
+}
+
+.battle-modern-capture__ball--success {
+  filter: drop-shadow(0 0 16px rgba(96, 165, 250, 0.95)) brightness(1.18);
+}
+
+.battle-modern-capture__ball--failed {
+  filter: drop-shadow(0 0 14px rgba(248, 113, 113, 0.8));
+}
+
+.battle-modern-capture__flash {
+  position: absolute;
+  z-index: 1;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.82) 18%,
+    rgba(191, 219, 254, 0.46) 42%,
+    rgba(96, 165, 250, 0.12) 68%,
+    transparent 78%
+  );
+  filter: blur(1px);
+  will-change: transform, opacity;
+}
+
+.battle-modern-capture__focus {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 67% 32%,
+    rgba(15, 23, 42, 0.02) 0%,
+    rgba(7, 17, 31, 0.14) 35%,
+    rgba(2, 6, 23, 0.42) 100%
+  );
+  backdrop-filter: saturate(0.82) brightness(0.82);
+  -webkit-backdrop-filter: saturate(0.82) brightness(0.82);
+  will-change: opacity;
+}
+
+.battle-modern-capture__shockwave {
+  position: absolute;
+  z-index: 1;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow:
+    0 0 10px rgba(255, 255, 255, 0.9),
+    0 0 24px rgba(147, 197, 253, 0.5),
+    inset 0 0 12px rgba(255, 255, 255, 0.45);
+  will-change: transform, opacity;
+}
+
+.battle-modern-capture__particle--success {
+  border-radius: 1px;
+  background: #ffffff;
+  box-shadow:
+    0 0 5px rgba(255, 255, 255, 1),
+    0 0 12px rgba(191, 219, 254, 0.95),
+    0 0 22px rgba(96, 165, 250, 0.55);
+  clip-path: polygon(
+    50% 0%,
+    61% 37%,
+    100% 50%,
+    61% 63%,
+    50% 100%,
+    39% 63%,
+    0% 50%,
+    39% 37%
+  );
+}

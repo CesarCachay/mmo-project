@@ -287,10 +287,10 @@ export class GameGateway
       }
 
       // TO REMOVE - TEST
-      trainerState =
-        await this.pokemonTrainerService.ensureDevelopmentBattleTestParty(
-          trainerIdentity.trainerId,
-        );
+      // trainerState =
+      //   await this.pokemonTrainerService.ensureDevelopmentBattleTestParty(
+      //     trainerIdentity.trainerId,
+      //   );
     } catch (error: unknown) {
       console.error('[PokemonTrainerIdentity] resolution failed', error);
 
@@ -1472,6 +1472,7 @@ export class GameGateway
             trainerService: this.pokemonTrainerService,
             captureService: this.pokemonCaptureService,
             random: Math.random,
+            // random: () => 0.999999,
           });
 
           const wildParticipant = session.battle.participants.find(

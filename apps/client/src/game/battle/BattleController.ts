@@ -21,9 +21,7 @@ import {
 } from "@cesar-mmo/shared";
 
 import { PokemonSpriteLoader } from "../pokemon/PokemonSpriteLoader";
-
 import { BattleOverlay } from "./ui/BattleOverlay";
-
 import type { BattleClientInteractionState } from "./battle-client.types";
 
 import {
@@ -729,7 +727,6 @@ export class BattleController {
         event.participantId,
         event.currentPokemonInstanceId
       );
-
       return;
     }
 
@@ -748,6 +745,29 @@ export class BattleController {
         event.participantId,
         event.pokemonInstanceId
       );
+      return;
+    }
+
+    if (event.type === "capture-failed" || event.type === "capture-succeeded") {
+      const captured = event.type === "capture-succeeded";
+
+      await this.overlay.animatePokemonCapture(
+        activeBattle,
+        /* El Server ya nos dijo qué item produjo el Capture. */
+        event.itemId,
+        event.wildParticipantId,
+        event.pokemonInstanceId,
+        event.shakeCount,
+        captured
+      );
+
+      const message = formatBattlePresentationMessage(activeBattle, event);
+      if (message) {
+        await this.overlay.presentMessage(
+          message,
+          getBattlePresentationMessageDuration(event)
+        );
+      }
 
       return;
     }
@@ -760,7 +780,6 @@ export class BattleController {
         event.previousHp,
         event.currentHp
       );
-
       return;
     }
 
@@ -771,7 +790,6 @@ export class BattleController {
           event.participantId,
           event.pokemonInstanceId
         ),
-
         this.overlay.animatePokemonHp(
           activeBattle,
           event.participantId,

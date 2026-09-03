@@ -4,6 +4,8 @@ import {
   type PokemonItemId,
 } from "@cesar-mmo/shared";
 
+import { getPokemonItemSpriteAsset } from "../../../pokemon/pokemon-item-sprite.registry";
+
 export interface ModernBattleBagPanelCallbacks {
   readonly onItemSelected: (itemId: PokemonItemId) => void;
   readonly onBack: () => void;
@@ -89,27 +91,59 @@ export class ModernBattleBagPanel {
         continue;
       }
 
+      /* El Bag siempre usa el asset nativo de 48×48 */
+      const itemAsset = getPokemonItemSpriteAsset(stack.itemId, 48);
+
       const card = document.createElement("button");
+
       card.type = "button";
       card.disabled = !this.enabled;
+      card.className = "battle-modern-bag__item";
+
       card.addEventListener("click", () => {
         if (!this.enabled) {
           return;
         }
+
         this.onItemSelected(stack.itemId);
       });
+
       this.itemButtons.push(card);
-      card.className = "battle-modern-bag__item";
+
+      /* ICON */
+      if (itemAsset) {
+        const iconWrap = document.createElement("span");
+        iconWrap.className = "battle-modern-bag__item-icon-wrap";
+
+        const icon = document.createElement("img");
+        icon.className = "battle-modern-bag__item-icon";
+        icon.src = itemAsset.path;
+        icon.alt = "";
+
+        icon.ariaHidden = "true";
+        icon.draggable = false;
+
+        iconWrap.appendChild(icon);
+
+        card.appendChild(iconWrap);
+      }
+
+      /* CONTENT */
+      const content = document.createElement("span");
+      content.className = "battle-modern-bag__item-content";
 
       const name = document.createElement("span");
       name.className = "battle-modern-bag__item-name";
       name.textContent = definition.name;
 
+      content.appendChild(name);
+
+      /* QUANTITY */
       const quantity = document.createElement("span");
       quantity.className = "battle-modern-bag__item-quantity";
       quantity.textContent = `×${stack.quantity}`;
 
-      card.append(name, quantity);
+      card.append(content, quantity);
       this.list.appendChild(card);
     }
 

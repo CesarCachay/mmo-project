@@ -12,6 +12,9 @@ const SWITCH_OUT_DURATION_MS = 260;
 const SWITCH_IN_DURATION_MS = 340;
 const FAINT_DURATION_MS = 420;
 
+const CAPTURE_ABSORB_DURATION_MS = 1500;
+const CAPTURE_BREAK_FREE_DURATION_MS = 1500;
+
 export type ModernBattlePokemonHudSide = "trainer" | "wild";
 
 export interface ModernBattlePokemonHudBounds {
@@ -140,7 +143,8 @@ export class ModernBattlePokemonHud {
 
     this.sprite.classList.remove(
       "battle-modern-hud__sprite--switched-out",
-      "battle-modern-hud__sprite--fainted"
+      "battle-modern-hud__sprite--fainted",
+      "battle-modern-hud__sprite--captured-hidden"
     );
 
     this.pokemonState = state;
@@ -217,7 +221,11 @@ export class ModernBattlePokemonHud {
       "battle-modern-hud__sprite--switching-in",
       "battle-modern-hud__sprite--switched-out",
       "battle-modern-hud__sprite--fainting",
-      "battle-modern-hud__sprite--fainted"
+      "battle-modern-hud__sprite--fainted",
+
+      "battle-modern-hud__sprite--capture-absorbing",
+      "battle-modern-hud__sprite--capture-breaking-free",
+      "battle-modern-hud__sprite--captured-hidden"
     );
 
     this.sprite.removeAttribute("src");
@@ -403,6 +411,31 @@ export class ModernBattlePokemonHud {
     this.sprite.classList.add("battle-modern-hud__sprite--fainted");
   }
 
+  public async animateCaptureAbsorb(pokemonInstanceId: string): Promise<void> {
+    if (!this.isDisplayingPokemon(pokemonInstanceId)) {
+      return;
+    }
+    await this.playSpriteAnimation(
+      "battle-modern-hud__sprite--capture-absorbing",
+      CAPTURE_ABSORB_DURATION_MS
+    );
+    if (!this.isDisplayingPokemon(pokemonInstanceId)) {
+      return;
+    }
+    this.sprite.classList.add("battle-modern-hud__sprite--captured-hidden");
+  }
+
+  public async animateCaptureBreakFree(pokemonInstanceId: string): Promise<void> {
+    if (!this.isDisplayingPokemon(pokemonInstanceId)) {
+      return;
+    }
+    this.sprite.classList.remove("battle-modern-hud__sprite--captured-hidden");
+    await this.playSpriteAnimation(
+      "battle-modern-hud__sprite--capture-breaking-free",
+      CAPTURE_BREAK_FREE_DURATION_MS
+    );
+  }
+
   private playSpriteAnimation(className: string, durationMs: number): Promise<void> {
     this.finishPendingSpriteAnimation();
 
@@ -450,7 +483,10 @@ export class ModernBattlePokemonHud {
     this.sprite.classList.remove(
       "battle-modern-hud__sprite--switching-out",
       "battle-modern-hud__sprite--switching-in",
-      "battle-modern-hud__sprite--fainting"
+      "battle-modern-hud__sprite--fainting",
+
+      "battle-modern-hud__sprite--capture-absorbing",
+      "battle-modern-hud__sprite--capture-breaking-free"
     );
 
     this.sprite.style.removeProperty("--battle-sprite-animation-duration");
@@ -484,5 +520,48 @@ export class ModernBattlePokemonHud {
 
     this.hitSprite.style.transform = computedStyle.transform;
     this.hitSprite.style.transformOrigin = computedStyle.transformOrigin;
+  }
+
+  public getCaptureThrowOrigin(container: HTMLElement): { x: number; y: number } | null {
+    const spriteRect = this.sprite.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    if (spriteRect.width <= 0 || spriteRect.height <= 0) {
+      return null;
+    }
+
+    return {
+      x: spriteRect.left - containerRect.left + spriteRect.width * 0.72,
+
+      y: spriteRect.top - containerRect.top + spriteRect.height * 0.18,
+    };
+  }
+
+  public getCaptureTargetPoint(container: HTMLElement): { x: number; y: number } | null {
+    const spriteRect = this.sprite.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    if (spriteRect.width <= 0 || spriteRect.height <= 0) {
+      return null;
+    }
+
+    return {
+      x: spriteRect.left - containerRect.left + spriteRect.width * 0.5,
+      y: spriteRect.top - containerRect.top + spriteRect.height * 0.52,
+    };
+  }
+
+  public getCaptureGroundPoint(container: HTMLElement): { x: number; y: number } | null {
+    const spriteRect = this.sprite.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    if (spriteRect.width <= 0 || spriteRect.height <= 0) {
+      return null;
+    }
+
+    return {
+      x: spriteRect.left - containerRect.left + spriteRect.width * 0.5,
+      y: spriteRect.bottom - containerRect.top - 6,
+    };
   }
 }
