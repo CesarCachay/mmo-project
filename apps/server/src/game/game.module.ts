@@ -5,6 +5,7 @@ import { PrismaService } from 'src/database/prisma.service';
 import { PokemonPartyRepository } from 'src/pokemon/pokemon-party.repository';
 import { PokemonTrainerRepository } from 'src/pokemon/pokemon-trainer.repository';
 import { PokemonInventoryRepository } from 'src/pokemon/inventory/pokemon-inventory.repository';
+import { PokemonCaptureRepository } from 'src/pokemon/battles/capture/pokemon-capture.repository';
 
 import { GameGateway } from './game.gateway';
 
@@ -16,6 +17,7 @@ import { GameGateway } from './game.gateway';
     PokemonTrainerRepository,
     PokemonPartyRepository,
     PokemonInventoryRepository,
+    PokemonCaptureRepository,
   ],
 })
 export class GameModule {}

@@ -1436,3 +1436,21 @@
   text-align: center;
   color: var(--battle-text-muted);
 }
+
+/* =========================================================
+   CAPTURED
+   ========================================================= */
+
+.battle-modern-completion--captured {
+  --completion-accent: #60a5fa;
+  --completion-accent-soft: rgba(59, 130, 246, 0.13);
+  --completion-accent-border: rgba(96, 165, 250, 0.32);
+
+  --completion-glow: rgba(59, 130, 246, 0.24);
+
+  --completion-button-start: #2563eb;
+  --completion-button-end: #1d4ed8;
+
+  --completion-button-shadow: rgba(37, 99, 235, 0.28);
+  --completion-focus: rgba(96, 165, 250, 0.24);
+}

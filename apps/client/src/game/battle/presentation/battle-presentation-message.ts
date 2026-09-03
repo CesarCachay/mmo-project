@@ -88,6 +88,20 @@ export function formatBattlePresentationMessage(
     case "hp-restored": {
       return null;
     }
+
+    case "capture-failed": {
+      return "Oh no! The Pokémon broke free!";
+    }
+
+    case "capture-succeeded": {
+      const pokemonName = getBattlePokemonDisplayName(
+        battle,
+        event.wildParticipantId,
+        event.pokemonInstanceId
+      );
+
+      return `Gotcha! ${pokemonName} was caught!`;
+    }
   }
 }
 

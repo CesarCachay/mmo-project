@@ -223,6 +223,23 @@ export function isPokemonBattleCommandInput(
   return isBattleCommandAction(value.action);
 }
 
+function isBattleUseItemTarget(value: unknown): boolean {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  switch (value.type) {
+    case "trainer-pokemon":
+      return isNonEmptyString(value.pokemonInstanceId);
+
+    case "wild-active":
+      return true;
+
+    default:
+      return false;
+  }
+}
+
 function isBattleCommandAction(value: unknown): value is BattleCommandAction {
   if (!isRecord(value)) {
     return false;
@@ -239,11 +256,7 @@ function isBattleCommandAction(value: unknown): value is BattleCommandAction {
       return true;
 
     case "use-item":
-      return (
-        isPokemonItemId(value.itemId) &&
-        typeof value.targetPokemonInstanceId === "string" &&
-        value.targetPokemonInstanceId.trim().length > 0
-      );
+      return isPokemonItemId(value.itemId) && isBattleUseItemTarget(value.target);
 
     default:
       return false;

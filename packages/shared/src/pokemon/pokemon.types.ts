@@ -37,6 +37,7 @@ export interface PokemonSpecies {
   height: number;
   weight: number;
   baseExperience: number | null;
+  captureRate: number;
   generation: number;
   evolutionChainId: number | null;
 }

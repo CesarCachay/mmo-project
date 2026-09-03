@@ -37,6 +37,7 @@ const FORMS_OUTPUT_PATH = resolve(
 );
 
 const LEARNSET_VERSION_GROUP = "heartgold-soulsilver";
+const IMPORT_SPECIES_ONLY = process.argv.includes("--species-only");
 
 // generic helpers
 function getIdFromUrl(url) {
@@ -100,6 +101,8 @@ function normalizePokemon(pokemon, species) {
     height: pokemon.height,
     weight: pokemon.weight,
     baseExperience: pokemon.base_experience,
+
+    captureRate: species.capture_rate,
 
     generation: getIdFromUrl(species.generation.url),
     evolutionChainId: getIdFromUrl(species.evolution_chain?.url),
@@ -320,14 +323,32 @@ async function main() {
   for (let id = 1; id <= MAX_POKEMON_ID; id += 1) {
     const pokemon = await fetchPokemon(id);
     const pokemonSpecies = await fetchPokemonSpecies(id);
-    species.push(normalizePokemon(pokemon, pokemonSpecies));
-    learnsets.push(normalizeLevelUpLearnset(pokemon));
-    pokemonAbilities.push(normalizePokemonAbilities(pokemon));
 
-    const pokemonForms = await importPokemonForms(id, pokemonSpecies);
-    forms.push(...pokemonForms);
+    species.push(normalizePokemon(pokemon, pokemonSpecies));
+
+    if (!IMPORT_SPECIES_ONLY) {
+      learnsets.push(normalizeLevelUpLearnset(pokemon));
+      pokemonAbilities.push(normalizePokemonAbilities(pokemon));
+
+      const pokemonForms = await importPokemonForms(id, pokemonSpecies);
+      forms.push(...pokemonForms);
+    }
 
     console.log(`[${String(id).padStart(3, "0")}/${MAX_POKEMON_ID}] ${pokemon.name}`);
+  }
+
+  if (IMPORT_SPECIES_ONLY) {
+    await mkdir(dirname(OUTPUT_PATH), {
+      recursive: true,
+    });
+
+    await writeFile(OUTPUT_PATH, `${JSON.stringify(species, null, 2)}\n`, "utf8");
+
+    console.log("");
+    console.log(`Imported ${species.length} Pokémon species.`);
+    console.log(`Output: ${OUTPUT_PATH}`);
+
+    return;
   }
 
   const evolutionChainIds = [

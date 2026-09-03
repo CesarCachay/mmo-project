@@ -201,7 +201,7 @@ export function isPokemonBattleReplacementResolvedPayload(
 }
 
 export type PokemonBattleCompletedOutcome =
-  "trainer-defeated" | "wild-defeated" | "trainer-escaped";
+  "trainer-defeated" | "wild-defeated" | "trainer-escaped" | "wild-captured";
 
 export interface PokemonBattleCompletedPayload {
   readonly battleId: string;
@@ -224,7 +224,8 @@ export function isPokemonBattleCompletedPayload(
   if (
     candidate.outcome !== "trainer-defeated" &&
     candidate.outcome !== "wild-defeated" &&
-    candidate.outcome !== "trainer-escaped"
+    candidate.outcome !== "trainer-escaped" &&
+    candidate.outcome !== "wild-captured"
   ) {
     return false;
   }

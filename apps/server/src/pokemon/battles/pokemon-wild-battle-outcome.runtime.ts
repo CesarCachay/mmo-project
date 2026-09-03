@@ -104,3 +104,23 @@ export function applyPokemonWildBattleEscapeOutcome(
     battleCompleted: true,
   };
 }
+
+export interface ApplyPokemonWildBattleCaptureOutcomeInput {
+  readonly battleId: BattleId;
+  readonly battleSessionStore: PokemonBattleCompletionStore;
+  readonly battleTurnStore: PokemonBattleTurnCleanupStore;
+}
+
+export function applyPokemonWildBattleCaptureOutcome(
+  input: ApplyPokemonWildBattleCaptureOutcomeInput,
+) {
+  const { battleId, battleSessionStore, battleTurnStore } = input;
+
+  battleSessionStore.complete(battleId);
+  battleTurnStore.remove(battleId);
+
+  return {
+    type: 'wild-captured' as const,
+    battleCompleted: true as const,
+  };
+}

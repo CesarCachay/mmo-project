@@ -23,6 +23,8 @@ const POKEMON_SPECIES = new Map<number, PokemonSpecies>(
       weight: pokemon.weight,
       baseExperience: pokemon.baseExperience,
 
+      captureRate: pokemon.captureRate,
+
       generation: pokemon.generation,
       evolutionChainId: pokemon.evolutionChainId,
     },

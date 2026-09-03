@@ -16,6 +16,7 @@ export const BATTLE_PRESENTATION_TIMING = {
   forcedReplacementMessageMs: 650,
   itemUsedMessageMs: 650,
   hpRestoredMessageMs: 500,
+  captureMessageMs: 1200,
 } as const;
 
 export function getBattlePresentationMessageDuration(
@@ -46,5 +47,9 @@ export function getBattlePresentationMessageDuration(
 
     case "hp-restored":
       return BATTLE_PRESENTATION_TIMING.hpRestoredMessageMs;
+
+    case "capture-failed":
+    case "capture-succeeded":
+      return BATTLE_PRESENTATION_TIMING.captureMessageMs;
   }
 }

@@ -64,9 +64,28 @@ export class PokemonTrainerStateStore {
     if (!trainerState) {
       throw new Error(`Trainer state not found for trainer ${trainerId}`);
     }
+    const updatedTrainerState: PokemonTrainerState = {
+      ...trainerState,
+      inventory,
+    };
+    this.trainerStates.set(trainerId, updatedTrainerState);
+    return updatedTrainerState;
+  }
+
+  setPartyAndInventory(
+    trainerId: PokemonTrainerId,
+    party: PokemonParty,
+    inventory: PokemonInventory,
+  ): PokemonTrainerState {
+    const trainerState = this.trainerStates.get(trainerId);
+
+    if (!trainerState) {
+      throw new Error(`Trainer state not found for trainer ${trainerId}`);
+    }
 
     const updatedTrainerState: PokemonTrainerState = {
       ...trainerState,
+      party,
       inventory,
     };
 

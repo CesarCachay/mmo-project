@@ -19,10 +19,6 @@ export interface BattleMoveMissedEvent {
 
 export interface BattleDamageAppliedEvent {
   readonly type: "damage-applied";
-
-  /**
-   * Participant / Pokémon that received the damage.
-   */
   readonly participantId: BattleParticipantId;
   readonly pokemonInstanceId: string;
   readonly previousHp: number;
@@ -79,57 +75,6 @@ export interface BattleHpRestoredEvent {
   readonly previousHp: number;
   readonly currentHp: number;
   readonly appliedHealing: number;
-}
-
-export type BattlePresentationEvent =
-  | BattleMoveUsedEvent
-  | BattleMoveMissedEvent
-  | BattleDamageAppliedEvent
-  | BattlePokemonFaintedEvent
-  | BattlePokemonSwitchedEvent
-  | BattleRunFailedEvent
-  | BattleRunSucceededEvent
-  | BattleItemUsedEvent
-  | BattleHpRestoredEvent;
-
-export function isBattlePresentationEvent(
-  value: unknown
-): value is BattlePresentationEvent {
-  if (!isRecord(value)) {
-    return false;
-  }
-
-  switch (value.type) {
-    case "move-used":
-      return isMoveEvent(value);
-
-    case "move-missed":
-      return isMoveEvent(value);
-
-    case "damage-applied":
-      return isDamageAppliedEvent(value);
-
-    case "pokemon-fainted":
-      return (
-        isNonEmptyString(value.participantId) && isNonEmptyString(value.pokemonInstanceId)
-      );
-
-    case "pokemon-switched":
-      return isPokemonSwitchedEvent(value);
-
-    case "run-failed":
-    case "run-succeeded":
-      return isNonEmptyString(value.participantId);
-
-    case "item-used":
-      return isItemUsedEvent(value);
-
-    case "hp-restored":
-      return isHpRestoredEvent(value);
-
-    default:
-      return false;
-  }
 }
 
 function isMoveEvent(value: Record<string, unknown>): boolean {
@@ -221,4 +166,104 @@ function isHpRestoredEvent(value: Record<string, unknown>): boolean {
   }
 
   return value.appliedHealing === value.currentHp - value.previousHp;
+}
+
+// Capture
+export interface BattleCaptureFailedPresentationEvent {
+  readonly type: "capture-failed";
+  readonly participantId: BattleParticipantId;
+  readonly wildParticipantId: BattleParticipantId;
+  readonly pokemonInstanceId: string;
+  readonly itemId: PokemonItemId;
+  readonly shakeCount: number;
+}
+
+export interface BattleCaptureSucceededPresentationEvent {
+  readonly type: "capture-succeeded";
+  readonly participantId: BattleParticipantId;
+  readonly wildParticipantId: BattleParticipantId;
+  readonly pokemonInstanceId: string;
+  readonly itemId: PokemonItemId;
+  readonly shakeCount: number;
+}
+
+function isCaptureFailedEvent(value: Record<string, unknown>): boolean {
+  return (
+    isNonEmptyString(value.participantId) &&
+    isNonEmptyString(value.wildParticipantId) &&
+    isNonEmptyString(value.pokemonInstanceId) &&
+    isPokemonItemId(value.itemId) &&
+    Number.isInteger(value.shakeCount) &&
+    (value.shakeCount as number) >= 0 &&
+    (value.shakeCount as number) <= 3
+  );
+}
+
+function isCaptureSucceededEvent(value: Record<string, unknown>): boolean {
+  return (
+    isNonEmptyString(value.participantId) &&
+    isNonEmptyString(value.wildParticipantId) &&
+    isNonEmptyString(value.pokemonInstanceId) &&
+    isPokemonItemId(value.itemId) &&
+    value.shakeCount === 4
+  );
+}
+
+export type BattlePresentationEvent =
+  | BattleMoveUsedEvent
+  | BattleMoveMissedEvent
+  | BattleDamageAppliedEvent
+  | BattlePokemonFaintedEvent
+  | BattlePokemonSwitchedEvent
+  | BattleRunFailedEvent
+  | BattleRunSucceededEvent
+  | BattleItemUsedEvent
+  | BattleHpRestoredEvent
+  | BattleCaptureFailedPresentationEvent
+  | BattleCaptureSucceededPresentationEvent;
+
+export function isBattlePresentationEvent(
+  value: unknown
+): value is BattlePresentationEvent {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  switch (value.type) {
+    case "move-used":
+      return isMoveEvent(value);
+
+    case "move-missed":
+      return isMoveEvent(value);
+
+    case "damage-applied":
+      return isDamageAppliedEvent(value);
+
+    case "pokemon-fainted":
+      return (
+        isNonEmptyString(value.participantId) && isNonEmptyString(value.pokemonInstanceId)
+      );
+
+    case "pokemon-switched":
+      return isPokemonSwitchedEvent(value);
+
+    case "run-failed":
+    case "run-succeeded":
+      return isNonEmptyString(value.participantId);
+
+    case "item-used":
+      return isItemUsedEvent(value);
+
+    case "hp-restored":
+      return isHpRestoredEvent(value);
+
+    case "capture-failed":
+      return isCaptureFailedEvent(value);
+
+    case "capture-succeeded":
+      return isCaptureSucceededEvent(value);
+
+    default:
+      return false;
+  }
 }

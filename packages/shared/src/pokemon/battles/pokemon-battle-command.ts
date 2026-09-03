@@ -11,6 +11,8 @@ import { isBattleActive } from "./pokemon-battle-lifecycle.js";
 import type { PokemonItemId } from "../inventory/pokemon-inventory.js";
 import { isPokemonItemId } from "../inventory/pokemon-inventory.js";
 
+import { getPokemonItem } from "../items/pokemon-item.registry.js";
+
 export interface BattleUseMoveAction {
   readonly type: "use-move";
   readonly moveId: number;
@@ -22,10 +24,19 @@ export interface BattleSwitchPokemonAction {
 export interface BattleRunAction {
   readonly type: "run";
 }
+export type BattleUseItemTarget =
+  | {
+      readonly type: "trainer-pokemon";
+      readonly pokemonInstanceId: string;
+    }
+  | {
+      readonly type: "wild-active";
+    };
+
 export interface BattleUseItemAction {
   readonly type: "use-item";
   readonly itemId: PokemonItemId;
-  readonly targetPokemonInstanceId: string;
+  readonly target: BattleUseItemTarget;
 }
 
 export type BattleCommandAction =
@@ -183,12 +194,42 @@ function assertValidUseItemAction(
     );
   }
 
-  if (
-    typeof action.targetPokemonInstanceId !== "string" ||
-    action.targetPokemonInstanceId.trim().length === 0
-  ) {
+  if (!action.target || typeof action.target !== "object") {
+    throw new Error(`Invalid item target for battle "${battle.battleId}"`);
+  }
+
+  switch (action.target.type) {
+    case "trainer-pokemon": {
+      if (
+        typeof action.target.pokemonInstanceId !== "string" ||
+        action.target.pokemonInstanceId.trim().length === 0
+      ) {
+        throw new Error(
+          `Invalid Trainer Pokémon item target for battle "${battle.battleId}"`
+        );
+      }
+
+      break;
+    }
+
+    case "wild-active": {
+      break;
+    }
+
+    default: {
+      throw new Error(`Invalid item target for battle "${battle.battleId}"`);
+    }
+  }
+
+  const item = getPokemonItem(action.itemId);
+
+  if (!item.battleUsable) {
+    throw new Error(`Pokémon item "${action.itemId}" cannot be used in battle`);
+  }
+
+  if (item.battleTarget !== action.target.type) {
     throw new Error(
-      `Invalid item target Pokémon instance id for battle "${battle.battleId}"`
+      `Pokémon item "${action.itemId}" cannot target "${action.target.type}"`
     );
   }
 }

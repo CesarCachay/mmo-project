@@ -82,7 +82,8 @@ export class ModernBattleCompletionPanel {
   public show(outcome: BattleCompletionOutcome): void {
     this.root.classList.remove(
       "battle-modern-completion--victory",
-      "battle-modern-completion--defeat"
+      "battle-modern-completion--defeat",
+      "battle-modern-completion--captured"
     );
 
     switch (outcome) {
@@ -103,6 +104,15 @@ export class ModernBattleCompletionPanel {
       case "trainer-escaped": {
         this.title.textContent = "Escaped!";
         this.message.textContent = "You got away safely.";
+        break;
+      }
+
+      case "wild-captured": {
+        this.root.classList.add("battle-modern-completion--captured");
+        this.eyebrow.textContent = "CAPTURE COMPLETE";
+        this.title.textContent = "GOTCHA!";
+        this.message.textContent = "The wild Pokémon was successfully captured.";
+
         break;
       }
 

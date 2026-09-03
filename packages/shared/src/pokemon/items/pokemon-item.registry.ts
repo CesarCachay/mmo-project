@@ -3,7 +3,7 @@ import type { PokemonItemId } from "../inventory/pokemon-inventory.js";
 export type PokemonItemCategory =
   "medicine" | "ball" | "battle-item" | "evolution" | "held-item" | "key-item" | "other";
 
-export type PokemonItemBattleTarget = "trainer-pokemon";
+export type PokemonItemBattleTarget = "trainer-pokemon" | "wild-active";
 
 export type PokemonItemEffect =
   | {
@@ -14,6 +14,10 @@ export type PokemonItemEffect =
   | {
       readonly type: "heal-hp";
       readonly mode: "full";
+    }
+  | {
+      readonly type: "capture";
+      readonly ballModifier: number;
     };
 
 export interface PokemonItemDefinition {
@@ -84,6 +88,20 @@ export const POKEMON_ITEM_REGISTRY = {
     effect: {
       type: "heal-hp",
       mode: "full",
+    },
+  },
+
+  "poke-ball": {
+    id: "poke-ball",
+    name: "Poké Ball",
+    category: "ball",
+
+    battleUsable: true,
+    battleTarget: "wild-active",
+
+    effect: {
+      type: "capture",
+      ballModifier: 1,
     },
   },
 } satisfies Record<PokemonItemId, PokemonItemDefinition>;

@@ -208,6 +208,8 @@ export type {
   BattleUseMoveAction,
   BattleCommandAction,
   BattleRunAction,
+  BattleUseItemAction,
+  BattleUseItemTarget,
   BattleCommand,
   CreateBattleCommandInput,
   BattleSwitchPokemonAction,
@@ -278,6 +280,8 @@ export type {
   BattlePresentationEvent,
   BattleItemUsedEvent,
   BattleHpRestoredEvent,
+  BattleCaptureFailedPresentationEvent,
+  BattleCaptureSucceededPresentationEvent,
 } from "./pokemon/battles/pokemon-battle-presentation.js";
 export { isPokemonBattleTurnResolvedPayload } from "./pokemon/battles/pokemon-battle-presentation-network.js";
 export type { PokemonBattleTurnResolvedPayload } from "./pokemon/battles/pokemon-battle-presentation-network.js";
@@ -317,3 +321,11 @@ export type {
 export { calculatePokemonMaxHp } from "./pokemon/pokemon-stat.js";
 export { planBattleHealingItemUse } from "./pokemon/inventory/pokemon-battle-healing-item.js";
 export type { BattleHealingItemPlan } from "./pokemon/inventory/pokemon-battle-healing-item.js";
+
+// CAPTURE
+export { resolvePokemonCapture } from "./pokemon/battles/capture/pokemon-battle-capture.js";
+export type {
+  PokemonCaptureRandomSource,
+  PokemonCaptureResolution,
+  ResolvePokemonCaptureInput,
+} from "./pokemon/battles/capture/pokemon-battle-capture.js";

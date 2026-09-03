@@ -17,6 +17,7 @@ import type {
 import {
   calculatePokemonMaxHp,
   getPokemonInventoryItemQuantity,
+  getPokemonItem,
 } from "@cesar-mmo/shared";
 
 import { PokemonSpriteLoader } from "../pokemon/PokemonSpriteLoader";
@@ -951,14 +952,53 @@ export class BattleController {
 
     const payload = this.activeBattlePayload;
     const trainerState = this.trainerState;
-
     if (!payload || !trainerState) {
       return;
     }
 
     const quantity = getPokemonInventoryItemQuantity(trainerState.inventory, itemId);
-
     if (quantity <= 0) {
+      return;
+    }
+
+    const item = getPokemonItem(itemId);
+    if (!item.battleUsable) {
+      return;
+    }
+
+    const effect = item.effect;
+    if (!effect) {
+      return;
+    }
+
+    /* CAPTURE ITEM */
+    if (item.battleTarget === "wild-active" && item.effect.type === "capture") {
+      this.selectedItemId = itemId;
+      this.setInteractionState("waiting-for-server");
+
+      try {
+        this.sendBattleCommand({
+          battleId: payload.battle.battleId,
+          action: {
+            type: "use-item",
+            itemId,
+            target: {
+              type: "wild-active",
+            },
+          },
+        });
+      } catch (error) {
+        this.selectedItemId = undefined;
+        this.overlay.setBagInventory(trainerState.inventory);
+        this.setInteractionState("item-selection");
+        console.error("[BattleController] failed to submit capture item", error);
+      }
+
+      return;
+    }
+
+    /* HEALING ITEM */
+    if (item.battleTarget !== "trainer-pokemon" || item.effect.type !== "heal-hp") {
       return;
     }
 
@@ -966,6 +1006,7 @@ export class BattleController {
     const selectablePokemonIndexes = this.getHealingItemTargetPokemonIndexes(
       payload.battle
     );
+
     this.overlay.setItemTargetOptions(payload.battle, selectablePokemonIndexes);
     this.setInteractionState("item-target-selection");
   }
@@ -977,7 +1018,6 @@ export class BattleController {
 
     const payload = this.activeBattlePayload;
     const itemId = this.selectedItemId;
-
     if (!payload || !itemId) {
       return;
     }
@@ -985,23 +1025,18 @@ export class BattleController {
     const trainer = payload.battle.participants.find(
       (participant) => participant.type === "trainer"
     );
-
     if (!trainer) {
       return;
     }
 
     const pokemonState = trainer.pokemon[pokemonIndex];
-
     if (!pokemonState) {
       return;
     }
-
     if (pokemonState.currentHp <= 0) {
       return;
     }
-
     const maxHp = calculatePokemonMaxHp(pokemonState.pokemon);
-
     if (pokemonState.currentHp >= maxHp) {
       return;
     }
@@ -1014,14 +1049,16 @@ export class BattleController {
         action: {
           type: "use-item",
           itemId,
-          targetPokemonInstanceId: pokemonState.pokemon.instanceId,
+          target: {
+            type: "trainer-pokemon",
+            pokemonInstanceId: pokemonState.pokemon.instanceId,
+          },
         },
       });
     } catch (error) {
       const selectablePokemonIndexes = this.getHealingItemTargetPokemonIndexes(
         payload.battle
       );
-
       this.overlay.setItemTargetOptions(payload.battle, selectablePokemonIndexes);
       this.setInteractionState("item-target-selection");
       console.error("[BattleController] failed to submit item", error);

@@ -11,6 +11,7 @@ import {
   syncPokemonPartyFromBattleParticipant,
   addPokemonInventoryItem,
   consumePokemonInventoryItem,
+  getPokemonInventoryItemQuantity,
 } from '@cesar-mmo/shared';
 
 import type { PokemonTrainerId } from './pokemon-trainer-identity';
@@ -125,11 +126,7 @@ export class PokemonTrainerService {
       );
     }
 
-    /*
-     * Protección importante:
-     * este seed JAMÁS debe ejecutarse
-     * accidentalmente en producción.
-     */
+    /* Importante: este seed JAMÁS debe ejecutarse accidentalmente en producción. */
     if (process.env.NODE_ENV === 'production') {
       return trainerState;
     }
@@ -146,6 +143,13 @@ export class PokemonTrainerService {
     }
     if (!hasLarvitar) {
       updatedState = await this.addPokemon(trainerId, 246, 7);
+    }
+    const pokeBallQuantity = getPokemonInventoryItemQuantity(
+      updatedState.inventory,
+      'poke-ball',
+    );
+    if (pokeBallQuantity <= 0) {
+      updatedState = await this.addInventoryItem(trainerId, 'poke-ball', 100);
     }
 
     return updatedState;

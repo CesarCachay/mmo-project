@@ -87,6 +87,7 @@ import type { PokemonWildEncounterSession } from 'src/pokemon/encounters/pokemon
 import { PokemonTrainerRepository } from 'src/pokemon/pokemon-trainer.repository';
 import { PokemonPartyRepository } from 'src/pokemon/pokemon-party.repository';
 import { PokemonInventoryRepository } from 'src/pokemon/inventory/pokemon-inventory.repository';
+import { PokemonCaptureRepository } from 'src/pokemon/battles/capture/pokemon-capture.repository';
 
 // services
 import { PokemonTrainerService } from 'src/pokemon/pokemon-trainer.service';
@@ -101,22 +102,29 @@ import { PokemonBattleSessionStore } from '../pokemon/battles/pokemon-battle-ses
 import { createWildBattleInstance } from '../pokemon/battles/pokemon-wild-battle.factory';
 import { PokemonBattleTurnStore } from 'src/pokemon/battles/pokemon-battle-turn.store';
 import { createWildBattleCommand } from '../pokemon/battles/pokemon-wild-battle-command.factory';
-import {
-  applyPokemonWildBattleOutcome,
-  applyPokemonWildBattleEscapeOutcome,
-} from '../pokemon/battles/pokemon-wild-battle-outcome.runtime';
+
 import { applyPokemonTrainerBattleReplacement } from '../pokemon/battles/pokemon-trainer-battle-replacement.runtime';
 import type { PokemonBattleSession } from 'src/pokemon/battles/pokemon-battle-session';
 import { assertPokemonTrainerBattleSwitchAllowed } from '../pokemon/battles/pokemon-trainer-battle-switch.validator';
 import { applyPokemonTrainerBattleSwitch } from 'src/pokemon/battles/pokemon-trainer-battle-switch.runtime';
 import { resolvePokemonWildBattleRun } from '../pokemon/battles/run/pokemon-wild-battle-run.runtime';
 import { applyPokemonTrainerBattleHealingItem } from 'src/pokemon/items/pokemon-trainer-battle-healing-item.runtime';
+import { PokemonCaptureService } from 'src/pokemon/battles/capture/pokemon-capture.service';
+import {
+  planPokemonWildBattleCapture,
+  executePokemonWildBattleCapture,
+} from 'src/pokemon/battles/capture/pokemon-wild-battle-capture.runtime';
+import {
+  applyPokemonWildBattleOutcome,
+  applyPokemonWildBattleEscapeOutcome,
+  applyPokemonWildBattleCaptureOutcome,
+} from '../pokemon/battles/pokemon-wild-battle-outcome.runtime';
 
-type BattleTurnTerminalOutcome = 'trainer-escaped';
+type BattleTurnTerminalOutcome = 'trainer-escaped' | 'wild-captured';
 
 interface BattleTurnEntryExecutionResult {
   readonly events: readonly BattlePresentationEvent[];
-  readonly terminalOutcome: 'trainer-escaped' | null;
+  readonly terminalOutcome: BattleTurnTerminalOutcome | null;
   readonly trainerStateUpdate?: PokemonTrainerState;
 }
 
@@ -157,6 +165,8 @@ export class GameGateway
   private readonly pokemonBattleSessionStore = new PokemonBattleSessionStore();
   private readonly pokemonBattleTurnStore = new PokemonBattleTurnStore();
 
+  private readonly pokemonCaptureService: PokemonCaptureService;
+
   private nextColorIndex = 0;
   private gameLoop?: ReturnType<typeof setInterval>;
 
@@ -165,11 +175,16 @@ export class GameGateway
     private readonly pokemonTrainerRepository: PokemonTrainerRepository,
     private readonly pokemonPartyRepository: PokemonPartyRepository,
     private readonly pokemonInventoryRepository: PokemonInventoryRepository,
+    private readonly pokemonCaptureRepository: PokemonCaptureRepository,
   ) {
     this.pokemonTrainerService = new PokemonTrainerService(
       this.pokemonTrainerStateStore,
       this.pokemonPartyRepository,
       this.pokemonInventoryRepository,
+    );
+    this.pokemonCaptureService = new PokemonCaptureService(
+      this.pokemonTrainerStateStore,
+      this.pokemonCaptureRepository,
     );
   }
 
@@ -579,22 +594,31 @@ export class GameGateway
 
     try {
       if (payload.action.type === 'use-item') {
-        const trainerState = this.pokemonTrainerStateStore.get(
-          trainerBinding.trainerId,
-        );
+        if (payload.action.target.type === 'wild-active') {
+          planPokemonWildBattleCapture({
+            session,
+            playerId: client.id,
+            action: payload.action,
+            trainerStateStore: this.pokemonTrainerStateStore,
+          });
+        } else {
+          const trainerState = this.pokemonTrainerStateStore.get(
+            trainerBinding.trainerId,
+          );
 
-        if (!trainerState) {
-          throw new Error(
-            `Pokémon Trainer state not found for trainer "${trainerBinding.trainerId}"`,
+          if (!trainerState) {
+            throw new Error(
+              `Pokémon Trainer state not found for trainer "${trainerBinding.trainerId}"`,
+            );
+          }
+
+          planBattleHealingItemUse(
+            session.battle,
+            trainerBinding.participantId,
+            payload.action,
+            trainerState.inventory,
           );
         }
-
-        planBattleHealingItemUse(
-          session.battle,
-          trainerBinding.participantId,
-          payload.action,
-          trainerState.inventory,
-        );
       }
 
       if (payload.action.type === 'switch-pokemon') {
@@ -687,6 +711,31 @@ export class GameGateway
         client.emit(POKEMON_EVENTS.BATTLE_COMPLETED, {
           battleId: session.battle.battleId,
           outcome: escapeOutcome.type,
+        } satisfies PokemonBattleCompletedPayload);
+
+        return;
+      }
+
+      if (terminalOutcome === 'wild-captured') {
+        if (!trainerStateUpdate) {
+          throw new Error(
+            `Trainer state missing after successful capture in battle "${session.battle.battleId}"`,
+          );
+        }
+
+        const captureOutcome = applyPokemonWildBattleCaptureOutcome({
+          battleId: session.battle.battleId,
+          battleSessionStore: this.pokemonBattleSessionStore,
+          battleTurnStore: this.pokemonBattleTurnStore,
+        });
+
+        client.emit(POKEMON_EVENTS.TRAINER_STATE, {
+          trainerState: trainerStateUpdate,
+        } satisfies PokemonTrainerStatePayload);
+
+        client.emit(POKEMON_EVENTS.BATTLE_COMPLETED, {
+          battleId: session.battle.battleId,
+          outcome: captureOutcome.type,
         } satisfies PokemonBattleCompletedPayload);
 
         return;
@@ -1414,6 +1463,81 @@ export class GameGateway
       }
 
       case 'use-item': {
+        if (entry.command.action.target.type === 'wild-active') {
+          const result = await executePokemonWildBattleCapture({
+            session,
+            entry,
+            playerId,
+            trainerStateStore: this.pokemonTrainerStateStore,
+            trainerService: this.pokemonTrainerService,
+            captureService: this.pokemonCaptureService,
+            random: Math.random,
+          });
+
+          const wildParticipant = session.battle.participants.find(
+            (participant) => participant.type === 'wild',
+          );
+
+          if (!wildParticipant) {
+            throw new Error(
+              `Wild participant not found in battle "${session.battle.battleId}"`,
+            );
+          }
+
+          const wildPokemonState =
+            wildParticipant.pokemon[wildParticipant.activePokemonIndex];
+
+          if (!wildPokemonState) {
+            throw new Error(
+              `Wild active Pokémon not found in battle "${session.battle.battleId}"`,
+            );
+          }
+
+          /* Primer evento: Trainer usó una Poké Ball */
+          const itemUsedEvent: BattlePresentationEvent = {
+            type: 'item-used',
+            participantId: entry.command.participantId,
+            itemId: entry.command.action.itemId,
+            targetPokemonInstanceId: wildPokemonState.pokemon.instanceId,
+          };
+
+          /* CAPTURE FAILURE */
+          if (result.type === 'capture-failed') {
+            return {
+              events: [
+                itemUsedEvent,
+                {
+                  type: 'capture-failed',
+                  participantId: entry.command.participantId,
+                  wildParticipantId: wildParticipant.id,
+                  pokemonInstanceId: wildPokemonState.pokemon.instanceId,
+                  itemId: entry.command.action.itemId,
+                  shakeCount: result.shakeCount,
+                },
+              ],
+              terminalOutcome: null,
+              trainerStateUpdate: result.trainerState,
+            };
+          }
+
+          /* CAPTURE SUCCESS */
+          return {
+            events: [
+              itemUsedEvent,
+              {
+                type: 'capture-succeeded',
+                participantId: entry.command.participantId,
+                wildParticipantId: wildParticipant.id,
+                pokemonInstanceId: wildPokemonState.pokemon.instanceId,
+                itemId: entry.command.action.itemId,
+                shakeCount: result.shakeCount,
+              },
+            ],
+            terminalOutcome: result.terminalOutcome,
+            trainerStateUpdate: result.trainerState,
+          };
+        }
+
         const result = await applyPokemonTrainerBattleHealingItem({
           session,
           entry,
@@ -1423,22 +1547,7 @@ export class GameGateway
         });
 
         return {
-          events: [
-            {
-              type: 'item-used',
-              participantId: result.participantId,
-              itemId: result.itemId,
-              targetPokemonInstanceId: result.targetPokemonInstanceId,
-            },
-            {
-              type: 'hp-restored',
-              participantId: result.participantId,
-              pokemonInstanceId: result.targetPokemonInstanceId,
-              previousHp: result.previousHp,
-              currentHp: result.currentHp,
-              appliedHealing: result.appliedHealing,
-            },
-          ],
+          events: [],
           terminalOutcome: null,
           trainerStateUpdate: result.trainerState,
         };
@@ -1454,14 +1563,6 @@ export class GameGateway
       entry,
     );
 
-    /*
-     * Example:
-     * actor fainted earlier in the same Turn.
-     *
-     * No PP consumed.
-     * No move actually used.
-     * Therefore no presentation event.
-     */
     if (!eligibility.canExecute) {
       return {
         events: [],

@@ -67,13 +67,19 @@ export function planBattleHealingItemUse(
     throw new Error(`Trainer does not have Pokémon item "${action.itemId}" available`);
   }
 
+  if (action.target.type !== "trainer-pokemon") {
+    throw new Error(`Healing item "${action.itemId}" requires a Trainer Pokémon target`);
+  }
+
+  const targetPokemonInstanceId = action.target.pokemonInstanceId;
+
   const target = participant.pokemon.find(
-    (pokemonState) => pokemonState.pokemon.instanceId === action.targetPokemonInstanceId
+    (pokemonState) => pokemonState.pokemon.instanceId === targetPokemonInstanceId
   );
 
   if (!target) {
     throw new Error(
-      `Pokémon "${action.targetPokemonInstanceId}" does not belong to Trainer participant "${participant.id}" in battle "${battle.battleId}"`
+      `Pokémon "${targetPokemonInstanceId}" does not belong to Trainer participant "${participant.id}" in battle "${battle.battleId}"`
     );
   }
 

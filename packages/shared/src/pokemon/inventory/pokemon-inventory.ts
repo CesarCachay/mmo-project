@@ -3,6 +3,7 @@ export const POKEMON_ITEM_IDS = [
   "super-potion",
   "hyper-potion",
   "max-potion",
+  "poke-ball",
 ] as const;
 
 export type PokemonItemId = (typeof POKEMON_ITEM_IDS)[number];
