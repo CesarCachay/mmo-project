@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="50" height="40" tilewidth="16" tileheight="16" infinite="0" nextlayerid="8" nextobjectid="8">
+<?xml version='1.0' encoding='UTF-8'?>
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="50" height="40" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="6">
  <editorsettings>
-  <export target="route-01.json" format="json"/>
+  <export target="route-01.json" format="json" />
  </editorsettings>
- <tileset firstgid="1" source="../tilesets/route/route-01-terrain.tsx"/>
- <tileset firstgid="2001" source="../tilesets/route/route-01/route-01-collision.tsx"/>
- <layer id="1" name="Ground" width="50" height="40" locked="1">
+ <tileset firstgid="1" source="../tilesets/route/route-01-terrain.tsx" />
+ <tileset firstgid="2001" source="../tilesets/route/route-01-collision.tsx" />
+ <layer id="1" name="Ground" width="50" height="40">
   <data encoding="csv">
 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,
 51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,
@@ -181,12 +181,12 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer id="5" name="Collision" width="50" height="40" locked="1" opacity="0.45">
+ <layer id="5" name="Collision" width="50" height="40" visible="0" opacity="0.45">
   <data encoding="csv">
-2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,
-2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,0,0,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,
-2001,2001,2001,2001,2001,2001,2001,2001,0,0,0,0,0,0,0,0,2001,2001,2001,2001,2001,2001,2001,2001,0,0,0,0,0,0,2001,2001,2001,2001,2001,2001,0,2001,0,0,0,0,0,0,2001,2001,2001,2001,2001,2001,
-2001,2001,2001,2001,2001,2001,2001,2001,0,0,0,0,0,0,2001,0,2001,2001,2001,2001,2001,2001,2001,2001,0,0,0,0,0,0,2001,2001,2001,2001,2001,0,2001,2001,0,0,0,0,0,0,2001,2001,2001,2001,2001,2001,
+2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,0,0,0,0,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,
+2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,0,0,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,0,0,0,0,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,2001,
+2001,2001,2001,2001,2001,2001,2001,2001,0,0,0,0,0,0,0,0,2001,2001,2001,2001,2001,2001,2001,0,0,0,0,0,0,0,2001,2001,2001,2001,2001,2001,0,2001,0,0,0,0,0,0,2001,2001,2001,2001,2001,2001,
+2001,2001,2001,2001,2001,2001,2001,2001,0,0,0,0,0,0,2001,0,2001,2001,2001,2001,2001,2001,0,0,0,0,0,0,0,0,2001,2001,2001,2001,2001,0,2001,2001,0,0,0,0,0,0,2001,2001,2001,2001,2001,2001,
 2001,2001,2001,2001,2001,2001,2001,2001,0,0,0,0,0,0,2001,2001,2001,2001,0,0,2001,2001,0,0,0,0,0,0,0,0,0,0,0,0,2001,2001,2001,2001,0,0,0,0,0,0,0,2001,2001,2001,2001,2001,
 2001,2001,2001,2001,2001,2001,2001,2001,0,0,0,0,0,0,2001,2001,2001,2001,2001,2001,2001,2001,0,0,0,0,0,0,0,0,0,0,0,0,2001,2001,2001,2001,0,0,0,0,0,0,0,2001,2001,2001,2001,2001,
 2001,2001,2001,2001,2001,2001,2001,2001,0,0,0,0,0,0,0,0,2001,2001,2001,2001,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2001,2001,2001,2001,0,0,0,0,0,0,0,0,0,0,2001,2001,
@@ -226,20 +226,23 @@
 </data>
  </layer>
  <objectgroup id="6" name="Objects">
-  <object id="1" name="playerSpawn" type="spawn" x="400" y="336">
-   <point/>
-  </object>
-  <object id="2" name="town01Entrance" type="mapSpawn" x="352" y="336">
-   <point/>
-  </object>
+  <object id="1" name="playerSpawn" type="spawn" x="400" y="336"/>
+  <object id="2" name="town01Entrance" type="mapSpawn" x="352" y="336"/>
   <object id="3" name="returnTown01" type="mapExit" x="336" y="368" width="32" height="16">
    <properties>
     <property name="targetMapId" value="town-01"/>
     <property name="targetSpawn" value="route01Entrance"/>
    </properties>
   </object>
+  <object id="4" name="town02Entrance" type="mapSpawn" x="400" y="64"/>
+  <object id="5" name="enterTown02" type="mapExit" x="384" y="0" width="32" height="16">
+   <properties>
+    <property name="targetMapId" value="town-02"/>
+    <property name="targetSpawn" value="route01Entrance"/>
+   </properties>
+  </object>
  </objectgroup>
- <objectgroup color="#ff8c00" id="7" name="EncounterZones">
+ <objectgroup id="7" name="EncounterZones">
   <object id="4" name="route-grass-zone-01" type="encounter-zone" x="144" y="64" width="288" height="96">
    <properties>
     <property name="encounterTableId" value="town-grass"/>

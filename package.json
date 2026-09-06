@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "generate:maps": "node scripts/generate-map-data.mjs",
+    "generate:maps": "node scripts/generate-map-data-full-route-chain.mjs",
     "build": "pnpm run build:shared && pnpm --filter server build && pnpm --filter client build",
     "build:shared": "pnpm --filter @cesar-mmo/shared build",
     "build:server": "pnpm --filter server build",

@@ -1,0 +1,532 @@
+import { dirname, resolve } from "node:path";
+import { access, readFile, mkdir, writeFile } from "node:fs/promises";
+
+const MAPS = [
+  {
+    name: "town-01",
+    exportName: "TOWN_01_MAP",
+  },
+  {
+    name: "house-01",
+    exportName: "HOUSE_01_MAP",
+  },
+  {
+    name: "route-01",
+    exportName: "ROUTE_01_MAP",
+  },
+  {
+    name: "town-02",
+    exportName: "TOWN_02_MAP",
+  },
+  {
+    name: "route-02",
+    exportName: "ROUTE_02_MAP",
+  },
+  {
+    name: "city-01",
+    exportName: "CITY_01_MAP",
+  },
+  {
+    name: "poke-center",
+    exportName: "POKE_CENTER_MAP",
+  },
+  {
+    name: "poke-shop",
+    exportName: "POKE_SHOP_MAP",
+  },
+  {
+    name: "gym-01",
+    exportName: "GYM_01_MAP",
+  },
+];
+
+const availableMapIds = new Set(MAPS.map((mapDefinition) => mapDefinition.name));
+
+function getRequiredStringProperty(object, propertyName) {
+  const property = object.properties?.find(
+    (candidate) => candidate.name === propertyName
+  );
+
+  if (
+    !property ||
+    typeof property.value !== "string" ||
+    property.value.trim().length === 0
+  ) {
+    throw new Error(`Object "${object.name}" requires string property "${propertyName}"`);
+  }
+
+  return property.value.trim();
+}
+
+function getOptionalStringProperty(object, propertyName) {
+  const property = object.properties?.find(
+    (candidate) => candidate.name === propertyName
+  );
+
+  if (!property) {
+    return undefined;
+  }
+
+  if (typeof property.value !== "string" || property.value.trim().length === 0) {
+    throw new Error(
+      `Object "${object.name}" property "${propertyName}" must be a non-empty string`
+    );
+  }
+
+  return property.value.trim();
+}
+
+function parseMapSpawn(object, mapName) {
+  if (typeof object.name !== "string" || object.name.trim().length === 0) {
+    throw new Error(`Map "${mapName}" contains a mapSpawn without a name`);
+  }
+
+  if (typeof object.x !== "number" || typeof object.y !== "number") {
+    throw new Error(
+      `Invalid coordinates for mapSpawn "${object.name}" in map "${mapName}"`
+    );
+  }
+
+  return {
+    id: object.name.trim(),
+    x: object.x,
+    y: object.y,
+  };
+}
+
+function parseNpc(object, mapName) {
+  if (typeof object.name !== "string" || object.name.trim().length === 0) {
+    throw new Error(`Map "${mapName}" contains an NPC without a name`);
+  }
+
+  if (!Number.isFinite(object.x) || !Number.isFinite(object.y)) {
+    throw new Error(`Invalid coordinates for NPC "${object.name}" in map "${mapName}"`);
+  }
+
+  const dialogueId = getOptionalStringProperty(object, "dialogueId");
+
+  const postDialogueAction = getOptionalStringProperty(object, "postDialogueAction");
+
+  return {
+    id: object.name.trim(),
+    x: object.x,
+    y: object.y,
+    dialogueId,
+    postDialogueAction,
+  };
+}
+function parseMapTransition(object, mapName) {
+  if (typeof object.name !== "string" || object.name.trim().length === 0) {
+    throw new Error(`Map "${mapName}" contains a mapExit without a name`);
+  }
+
+  if (
+    typeof object.x !== "number" ||
+    typeof object.y !== "number" ||
+    typeof object.width !== "number" ||
+    typeof object.height !== "number"
+  ) {
+    throw new Error(`Invalid rectangle for mapExit "${object.name}" in map "${mapName}"`);
+  }
+
+  if (object.width <= 0 || object.height <= 0) {
+    throw new Error(
+      `mapExit "${object.name}" in map "${mapName}" must have width and height greater than zero`
+    );
+  }
+
+  const targetMapId = getRequiredStringProperty(object, "targetMapId");
+
+  const targetSpawn = getRequiredStringProperty(object, "targetSpawn");
+
+  if (!availableMapIds.has(targetMapId)) {
+    throw new Error(
+      `mapExit "${object.name}" in map "${mapName}" targets unknown map "${targetMapId}"`
+    );
+  }
+
+  return {
+    id: object.name.trim(),
+
+    targetMapId,
+    targetSpawn,
+
+    trigger: {
+      x: object.x,
+      y: object.y,
+      width: object.width,
+      height: object.height,
+    },
+  };
+}
+
+function getTiledObjectType(object) {
+  if (typeof object.class === "string" && object.class.trim().length > 0) {
+    return object.class.trim();
+  }
+
+  if (typeof object.type === "string" && object.type.trim().length > 0) {
+    return object.type.trim();
+  }
+
+  return "";
+}
+
+function parseEncounterZone(object, mapName) {
+  if (typeof object.name !== "string" || object.name.trim().length === 0) {
+    throw new Error(`Map "${mapName}" contains an encounter zone without a name`);
+  }
+
+  const objectType = getTiledObjectType(object);
+
+  if (objectType !== "encounter-zone") {
+    throw new Error(
+      `Object "${object.name}" in EncounterZones of map "${mapName}" must have class/type "encounter-zone"`
+    );
+  }
+
+  if (
+    typeof object.x !== "number" ||
+    typeof object.y !== "number" ||
+    typeof object.width !== "number" ||
+    typeof object.height !== "number"
+  ) {
+    throw new Error(
+      `Invalid rectangle for encounter zone "${object.name}" in map "${mapName}"`
+    );
+  }
+
+  if (object.width <= 0 || object.height <= 0) {
+    throw new Error(
+      `Encounter zone "${object.name}" in map "${mapName}" must have width and height greater than zero`
+    );
+  }
+
+  const encounterTableId = getRequiredStringProperty(object, "encounterTableId");
+
+  return {
+    id: object.name.trim(),
+
+    encounterTableId,
+
+    bounds: {
+      x: object.x,
+      y: object.y,
+      width: object.width,
+      height: object.height,
+    },
+  };
+}
+
+function ensureUniqueIds(items, kind, mapName) {
+  const ids = new Set();
+
+  for (const item of items) {
+    if (ids.has(item.id)) {
+      throw new Error(`Duplicate ${kind} "${item.id}" in map "${mapName}"`);
+    }
+
+    ids.add(item.id);
+  }
+}
+
+function formatSpawns(spawns) {
+  if (spawns.length === 0) {
+    return `  spawns: {},`;
+  }
+
+  const entries = spawns.map(
+    (spawn) =>
+      `    ${JSON.stringify(spawn.id)}: {
+      x: ${spawn.x},
+      y: ${spawn.y},
+    },`
+  );
+
+  return `  spawns: {
+${entries.join("\n")}
+  },`;
+}
+
+function formatNpcs(npcs) {
+  if (npcs.length === 0) {
+    return `  npcs: {},`;
+  }
+
+  const entries = npcs.map((npc) => {
+    const properties = [`      x: ${npc.x},`, `      y: ${npc.y},`];
+
+    if (npc.dialogueId) {
+      properties.push(`      dialogueId: ${JSON.stringify(npc.dialogueId)},`);
+    }
+
+    if (npc.postDialogueAction) {
+      properties.push(
+        `      postDialogueAction: ${JSON.stringify(npc.postDialogueAction)},`
+      );
+    }
+
+    return `    ${JSON.stringify(npc.id)}: {
+${properties.join("\n")}
+    },`;
+  });
+
+  return `  npcs: {
+${entries.join("\n")}
+  },`;
+}
+
+function formatTransitions(transitions) {
+  if (transitions.length === 0) {
+    return `  transitions: {},`;
+  }
+
+  const entries = transitions.map(
+    (transition) =>
+      `    ${JSON.stringify(transition.id)}: {
+      targetMapId: ${JSON.stringify(transition.targetMapId)},
+      targetSpawn: ${JSON.stringify(transition.targetSpawn)},
+      trigger: {
+        x: ${transition.trigger.x},
+        y: ${transition.trigger.y},
+        width: ${transition.trigger.width},
+        height: ${transition.trigger.height},
+      },
+    },`
+  );
+
+  return `  transitions: {
+${entries.join("\n")}
+  },`;
+}
+
+function formatEncounterZones(encounterZones) {
+  if (encounterZones.length === 0) {
+    return `  encounterZones: {},`;
+  }
+
+  const entries = encounterZones.map(
+    (zone) => `    ${JSON.stringify(zone.id)}: {
+      encounterTableId: ${JSON.stringify(zone.encounterTableId)},
+      bounds: {
+        x: ${zone.bounds.x},
+        y: ${zone.bounds.y},
+        width: ${zone.bounds.width},
+        height: ${zone.bounds.height},
+      },
+    },`
+  );
+
+  return `  encounterZones: {
+${entries.join("\n")}
+  },`;
+}
+
+const parsedMaps = [];
+
+for (const mapDefinition of MAPS) {
+  const { name, exportName } = mapDefinition;
+
+  const sourcePath = resolve(`apps/client/public/assets/maps/${name}/${name}.json`);
+
+  const outputPath = resolve(`packages/shared/src/maps/generated/${name}.ts`);
+
+  try {
+    await access(sourcePath);
+  } catch {
+    throw new Error(`Map file not found:\n${sourcePath}`);
+  }
+
+  const rawMap = await readFile(sourcePath, "utf8");
+
+  const map = JSON.parse(rawMap);
+
+  const collisionLayer = map.layers.find(
+    (layer) => layer.name === "Collision" && layer.type === "tilelayer"
+  );
+
+  if (!collisionLayer) {
+    throw new Error(`Layer "Collision" was not found in map "${name}"`);
+  }
+
+  const objectsLayer = map.layers.find(
+    (layer) => layer.name === "Objects" && layer.type === "objectgroup"
+  );
+
+  const encounterZonesLayer = map.layers.find(
+    (layer) => layer.name === "EncounterZones" && layer.type === "objectgroup"
+  );
+
+  if (!objectsLayer) {
+    throw new Error(`Layer "Objects" was not found in map "${name}"`);
+  }
+
+  const playerSpawn = objectsLayer.objects.find(
+    (object) => object.name === "playerSpawn"
+  );
+
+  if (!playerSpawn) {
+    throw new Error(`Object "playerSpawn" was not found in map "${name}"`);
+  }
+
+  if (typeof playerSpawn.x !== "number" || typeof playerSpawn.y !== "number") {
+    throw new Error(`Invalid playerSpawn coordinates in map "${name}"`);
+  }
+
+  const expectedCollisionCells = map.width * map.height;
+
+  if (collisionLayer.data.length !== expectedCollisionCells) {
+    throw new Error(
+      `Map "${name}" expected ${expectedCollisionCells} collision cells, received ${collisionLayer.data.length}`
+    );
+  }
+
+  const collision = collisionLayer.data.map((tileId) => (tileId === 0 ? 0 : 1));
+
+  const collisionRows = [];
+
+  for (let y = 0; y < map.height; y++) {
+    const start = y * map.width;
+
+    const end = start + map.width;
+
+    collisionRows.push(`    ${collision.slice(start, end).join(", ")},`);
+  }
+
+  const spawns = objectsLayer.objects
+    .filter((object) => object.type === "mapSpawn")
+    .map((object) => parseMapSpawn(object, name));
+
+  const npcs = objectsLayer.objects
+    .filter((object) => object.type === "npc")
+    .map((object) => parseNpc(object, name));
+
+  const transitions = objectsLayer.objects
+    .filter((object) => object.type === "mapExit")
+    .map((object) => parseMapTransition(object, name));
+
+  const encounterZones = encounterZonesLayer
+    ? encounterZonesLayer.objects.map((object) => parseEncounterZone(object, name))
+    : [];
+
+  ensureUniqueIds(spawns, "mapSpawn", name);
+
+  ensureUniqueIds(npcs, "NPC", name);
+
+  ensureUniqueIds(transitions, "mapExit", name);
+
+  ensureUniqueIds(encounterZones, "encounter zone", name);
+
+  parsedMaps.push({
+    name,
+    exportName,
+    outputPath,
+    map,
+    playerSpawn,
+    collision,
+    collisionRows,
+    spawns,
+    npcs,
+    transitions,
+    encounterZones,
+  });
+}
+
+for (const parsedMap of parsedMaps) {
+  for (const transition of parsedMap.transitions) {
+    const targetMap = parsedMaps.find(
+      (candidate) => candidate.name === transition.targetMapId
+    );
+
+    if (!targetMap) {
+      throw new Error(
+        `Transition "${transition.id}" targets unknown map "${transition.targetMapId}"`
+      );
+    }
+
+    const targetSpawnExists = targetMap.spawns.some(
+      (spawn) => spawn.id === transition.targetSpawn
+    );
+
+    if (!targetSpawnExists) {
+      throw new Error(
+        `Transition "${transition.id}" in map "${parsedMap.name}" targets missing spawn "${transition.targetSpawn}" in map "${transition.targetMapId}"`
+      );
+    }
+  }
+}
+
+for (const parsedMap of parsedMaps) {
+  const {
+    name,
+    exportName,
+    outputPath,
+    map,
+    playerSpawn,
+    collision,
+    collisionRows,
+    spawns,
+    npcs,
+    transitions,
+    encounterZones,
+  } = parsedMap;
+
+  const generatedFile = `// AUTO-GENERATED FILE.
+// Do not edit manually.
+// Source: client/public/assets/maps/${name}/${name}.json
+
+export const ${exportName} = {
+  id: "${name}",
+
+  width: ${map.width},
+  height: ${map.height},
+
+  tileWidth: ${map.tilewidth},
+  tileHeight: ${map.tileheight},
+
+  widthInPixels: ${map.width * map.tilewidth},
+  heightInPixels: ${map.height * map.tileheight},
+
+  spawn: {
+    x: ${playerSpawn.x},
+    y: ${playerSpawn.y},
+  },
+
+${formatSpawns(spawns)}
+
+${formatNpcs(npcs)}
+
+${formatTransitions(transitions)}
+
+${formatEncounterZones(encounterZones)}
+
+  collision: [
+${collisionRows.join("\n")}
+  ],
+} as const;
+`;
+
+  await mkdir(dirname(outputPath), {
+    recursive: true,
+  });
+
+  await writeFile(outputPath, generatedFile, "utf8");
+
+  console.log(`Generated ${outputPath}`);
+
+  console.log(`Map: ${map.width}x${map.height} tiles`);
+
+  console.log(`Spawn: (${playerSpawn.x}, ${playerSpawn.y})`);
+
+  console.log(`Map spawns: ${spawns.length}`);
+
+  console.log(`NPCs: ${npcs.length}`);
+
+  console.log(`Map transitions: ${transitions.length}`);
+
+  console.log(`Encounter zones: ${encounterZones.length}`);
+
+  console.log(`Blocked cells: ${collision.filter(Boolean).length}`);
+
+  console.log("");
+}

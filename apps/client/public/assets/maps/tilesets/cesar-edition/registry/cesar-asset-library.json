@@ -1,0 +1,2777 @@
+{
+  "version": 1,
+  "tileBase": 16,
+  "integrationMode": "Tiled image-collection tilesets / tile objects",
+  "masters": [
+    "cesar-houses-master.png",
+    "cesar-outdoor-props-master.png",
+    "cesar-special-buildings-master.png",
+    "cesar-terrain-nature-master.png"
+  ],
+  "collections": {
+    "houses": 12,
+    "houses-modular": 3,
+    "outdoor-props": 77,
+    "special-buildings": 10,
+    "special-modular": 1,
+    "terrain-nature-stamps": 21
+  },
+  "assets": [
+    {
+      "id": "house-01",
+      "category": "houses",
+      "file": "objects/houses/house-01.png",
+      "width": 227,
+      "height": 255,
+      "source": "cesar-houses-master.png",
+      "sourceBBox": [
+        11,
+        20,
+        238,
+        275
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "building-footprint",
+      "tags": [
+        "residential",
+        "building",
+        "exterior"
+      ]
+    },
+    {
+      "id": "house-02",
+      "category": "houses",
+      "file": "objects/houses/house-02.png",
+      "width": 232,
+      "height": 261,
+      "source": "cesar-houses-master.png",
+      "sourceBBox": [
+        238,
+        14,
+        470,
+        275
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "building-footprint",
+      "tags": [
+        "residential",
+        "building",
+        "exterior"
+      ]
+    },
+    {
+      "id": "house-03",
+      "category": "houses",
+      "file": "objects/houses/house-03.png",
+      "width": 235,
+      "height": 255,
+      "source": "cesar-houses-master.png",
+      "sourceBBox": [
+        470,
+        20,
+        705,
+        275
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "building-footprint",
+      "tags": [
+        "residential",
+        "building",
+        "exterior"
+      ]
+    },
+    {
+      "id": "house-04",
+      "category": "houses",
+      "file": "objects/houses/house-04.png",
+      "width": 243,
+      "height": 264,
+      "source": "cesar-houses-master.png",
+      "sourceBBox": [
+        705,
+        11,
+        948,
+        275
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "building-footprint",
+      "tags": [
+        "residential",
+        "building",
+        "exterior"
+      ]
+    },
+    {
+      "id": "house-05",
+      "category": "houses",
+      "file": "objects/houses/house-05.png",
+      "width": 216,
+      "height": 253,
+      "source": "cesar-houses-master.png",
+      "sourceBBox": [
+        948,
+        22,
+        1164,
+        275
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "building-footprint",
+      "tags": [
+        "residential",
+        "building",
+        "exterior"
+      ]
+    },
+    {
+      "id": "house-06",
+      "category": "houses",
+      "file": "objects/houses/house-06.png",
+      "width": 275,
+      "height": 257,
+      "source": "cesar-houses-master.png",
+      "sourceBBox": [
+        1164,
+        18,
+        1439,
+        275
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "building-footprint",
+      "tags": [
+        "residential",
+        "building",
+        "exterior"
+      ]
+    },
+    {
+      "id": "house-07",
+      "category": "houses",
+      "file": "objects/houses/house-07.png",
+      "width": 218,
+      "height": 245,
+      "source": "cesar-houses-master.png",
+      "sourceBBox": [
+        10,
+        275,
+        228,
+        520
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "building-footprint",
+      "tags": [
+        "residential",
+        "building",
+        "exterior"
+      ]
+    },
+    {
+      "id": "house-08",
+      "category": "houses",
+      "file": "objects/houses/house-08.png",
+      "width": 227,
+      "height": 242,
+      "source": "cesar-houses-master.png",
+      "sourceBBox": [
+        228,
+        278,
+        455,
+        520
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "building-footprint",
+      "tags": [
+        "residential",
+        "building",
+        "exterior"
+      ]
+    },
+    {
+      "id": "house-09",
+      "category": "houses",
+      "file": "objects/houses/house-09.png",
+      "width": 220,
+      "height": 245,
+      "source": "cesar-houses-master.png",
+      "sourceBBox": [
+        455,
+        275,
+        675,
+        520
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "building-footprint",
+      "tags": [
+        "residential",
+        "building",
+        "exterior"
+      ]
+    },
+    {
+      "id": "house-10",
+      "category": "houses",
+      "file": "objects/houses/house-10.png",
+      "width": 225,
+      "height": 245,
+      "source": "cesar-houses-master.png",
+      "sourceBBox": [
+        675,
+        275,
+        900,
+        520
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "building-footprint",
+      "tags": [
+        "shopfront",
+        "building",
+        "exterior"
+      ]
+    },
+    {
+      "id": "house-11",
+      "category": "houses",
+      "file": "objects/houses/house-11.png",
+      "width": 228,
+      "height": 243,
+      "source": "cesar-houses-master.png",
+      "sourceBBox": [
+        900,
+        277,
+        1128,
+        520
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "building-footprint",
+      "tags": [
+        "residential",
+        "building",
+        "exterior"
+      ]
+    },
+    {
+      "id": "house-12",
+      "category": "houses",
+      "file": "objects/houses/house-12.png",
+      "width": 303,
+      "height": 221,
+      "source": "cesar-houses-master.png",
+      "sourceBBox": [
+        1128,
+        299,
+        1431,
+        520
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "building-footprint",
+      "tags": [
+        "shopfront",
+        "building",
+        "exterior"
+      ]
+    },
+    {
+      "id": "houses-modular-01",
+      "category": "houses-modular",
+      "file": "objects/houses-modular/houses-modular-01.png",
+      "width": 585,
+      "height": 556,
+      "source": "cesar-houses-master.png",
+      "sourceBBox": [
+        15,
+        520,
+        600,
+        1076
+      ],
+      "usage": "reference-stamp",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "modular",
+        "walls",
+        "roofs",
+        "doors",
+        "windows"
+      ]
+    },
+    {
+      "id": "houses-modular-02",
+      "category": "houses-modular",
+      "file": "objects/houses-modular/houses-modular-02.png",
+      "width": 430,
+      "height": 558,
+      "source": "cesar-houses-master.png",
+      "sourceBBox": [
+        600,
+        520,
+        1030,
+        1078
+      ],
+      "usage": "reference-stamp",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "modular",
+        "walls",
+        "roofs",
+        "doors",
+        "windows"
+      ]
+    },
+    {
+      "id": "houses-modular-03",
+      "category": "houses-modular",
+      "file": "objects/houses-modular/houses-modular-03.png",
+      "width": 407,
+      "height": 562,
+      "source": "cesar-houses-master.png",
+      "sourceBBox": [
+        1030,
+        520,
+        1437,
+        1082
+      ],
+      "usage": "reference-stamp",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "modular",
+        "walls",
+        "roofs",
+        "doors",
+        "windows"
+      ]
+    },
+    {
+      "id": "hospital-red",
+      "category": "special-buildings",
+      "file": "objects/special-buildings/hospital-red.png",
+      "width": 380,
+      "height": 330,
+      "source": "cesar-special-buildings-master.png",
+      "sourceBBox": [
+        10,
+        14,
+        390,
+        344
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "building-footprint",
+      "tags": [
+        "building",
+        "special",
+        "hospital-red"
+      ]
+    },
+    {
+      "id": "shop-blue",
+      "category": "special-buildings",
+      "file": "objects/special-buildings/shop-blue.png",
+      "width": 352,
+      "height": 328,
+      "source": "cesar-special-buildings-master.png",
+      "sourceBBox": [
+        390,
+        16,
+        742,
+        344
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "building-footprint",
+      "tags": [
+        "building",
+        "special",
+        "shop-blue"
+      ]
+    },
+    {
+      "id": "lab-science",
+      "category": "special-buildings",
+      "file": "objects/special-buildings/lab-science.png",
+      "width": 351,
+      "height": 333,
+      "source": "cesar-special-buildings-master.png",
+      "sourceBBox": [
+        745,
+        11,
+        1096,
+        344
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "building-footprint",
+      "tags": [
+        "building",
+        "special",
+        "lab-science"
+      ]
+    },
+    {
+      "id": "gym-rock",
+      "category": "special-buildings",
+      "file": "objects/special-buildings/gym-rock.png",
+      "width": 343,
+      "height": 322,
+      "source": "cesar-special-buildings-master.png",
+      "sourceBBox": [
+        1096,
+        21,
+        1439,
+        343
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "building-footprint",
+      "tags": [
+        "building",
+        "special",
+        "gym-rock"
+      ]
+    },
+    {
+      "id": "gym-water",
+      "category": "special-buildings",
+      "file": "objects/special-buildings/gym-water.png",
+      "width": 438,
+      "height": 285,
+      "source": "cesar-special-buildings-master.png",
+      "sourceBBox": [
+        11,
+        350,
+        449,
+        635
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "building-footprint",
+      "tags": [
+        "building",
+        "special",
+        "gym-water"
+      ]
+    },
+    {
+      "id": "gym-fire",
+      "category": "special-buildings",
+      "file": "objects/special-buildings/gym-fire.png",
+      "width": 463,
+      "height": 289,
+      "source": "cesar-special-buildings-master.png",
+      "sourceBBox": [
+        493,
+        350,
+        956,
+        639
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "building-footprint",
+      "tags": [
+        "building",
+        "special",
+        "gym-fire"
+      ]
+    },
+    {
+      "id": "gym-grass",
+      "category": "special-buildings",
+      "file": "objects/special-buildings/gym-grass.png",
+      "width": 455,
+      "height": 289,
+      "source": "cesar-special-buildings-master.png",
+      "sourceBBox": [
+        977,
+        350,
+        1432,
+        639
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "building-footprint",
+      "tags": [
+        "building",
+        "special",
+        "gym-grass"
+      ]
+    },
+    {
+      "id": "station",
+      "category": "special-buildings",
+      "file": "objects/special-buildings/station.png",
+      "width": 478,
+      "height": 317,
+      "source": "cesar-special-buildings-master.png",
+      "sourceBBox": [
+        7,
+        642,
+        485,
+        959
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "building-footprint",
+      "tags": [
+        "building",
+        "special",
+        "station"
+      ]
+    },
+    {
+      "id": "civic-hall",
+      "category": "special-buildings",
+      "file": "objects/special-buildings/civic-hall.png",
+      "width": 447,
+      "height": 320,
+      "source": "cesar-special-buildings-master.png",
+      "sourceBBox": [
+        485,
+        639,
+        932,
+        959
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "building-footprint",
+      "tags": [
+        "building",
+        "special",
+        "civic-hall"
+      ]
+    },
+    {
+      "id": "mansion",
+      "category": "special-buildings",
+      "file": "objects/special-buildings/mansion.png",
+      "width": 493,
+      "height": 317,
+      "source": "cesar-special-buildings-master.png",
+      "sourceBBox": [
+        950,
+        643,
+        1443,
+        960
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "building-footprint",
+      "tags": [
+        "building",
+        "special",
+        "mansion"
+      ]
+    },
+    {
+      "id": "special-icons-signage",
+      "category": "special-modular",
+      "file": "objects/special-modular/special-icons-signage.png",
+      "width": 1437,
+      "height": 115,
+      "source": "cesar-special-buildings-master.png",
+      "sourceBBox": [
+        8,
+        960,
+        1445,
+        1075
+      ],
+      "usage": "reference-stamp",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "signage",
+        "icons",
+        "fences",
+        "vegetation"
+      ]
+    },
+    {
+      "id": "outdoor-props-001",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-001.png",
+      "width": 167,
+      "height": 162,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        19,
+        17,
+        186,
+        179
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-1"
+      ]
+    },
+    {
+      "id": "outdoor-props-002",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-002.png",
+      "width": 134,
+      "height": 162,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        205,
+        17,
+        339,
+        179
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-1"
+      ]
+    },
+    {
+      "id": "outdoor-props-003",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-003.png",
+      "width": 142,
+      "height": 162,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        356,
+        17,
+        498,
+        179
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-1"
+      ]
+    },
+    {
+      "id": "outdoor-props-004",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-004.png",
+      "width": 139,
+      "height": 162,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        511,
+        17,
+        650,
+        179
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-1"
+      ]
+    },
+    {
+      "id": "outdoor-props-005",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-005.png",
+      "width": 153,
+      "height": 163,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        662,
+        17,
+        815,
+        180
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-1"
+      ]
+    },
+    {
+      "id": "outdoor-props-006",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-006.png",
+      "width": 132,
+      "height": 164,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        831,
+        17,
+        963,
+        181
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-1"
+      ]
+    },
+    {
+      "id": "outdoor-props-007",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-007.png",
+      "width": 137,
+      "height": 165,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        973,
+        17,
+        1110,
+        182
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-1"
+      ]
+    },
+    {
+      "id": "outdoor-props-008",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-008.png",
+      "width": 312,
+      "height": 166,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        1119,
+        17,
+        1431,
+        183
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-1"
+      ]
+    },
+    {
+      "id": "outdoor-props-009",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-009.png",
+      "width": 91,
+      "height": 120,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        19,
+        188,
+        110,
+        308
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-2"
+      ]
+    },
+    {
+      "id": "outdoor-props-010",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-010.png",
+      "width": 91,
+      "height": 112,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        118,
+        189,
+        209,
+        301
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-2"
+      ]
+    },
+    {
+      "id": "outdoor-props-011",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-011.png",
+      "width": 92,
+      "height": 112,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        217,
+        189,
+        309,
+        301
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-2"
+      ]
+    },
+    {
+      "id": "outdoor-props-012",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-012.png",
+      "width": 92,
+      "height": 112,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        318,
+        189,
+        410,
+        301
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-2"
+      ]
+    },
+    {
+      "id": "outdoor-props-013",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-013.png",
+      "width": 94,
+      "height": 112,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        419,
+        189,
+        513,
+        301
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-2"
+      ]
+    },
+    {
+      "id": "outdoor-props-014",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-014.png",
+      "width": 93,
+      "height": 112,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        521,
+        189,
+        614,
+        301
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-2"
+      ]
+    },
+    {
+      "id": "outdoor-props-015",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-015.png",
+      "width": 92,
+      "height": 112,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        623,
+        189,
+        715,
+        301
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-2"
+      ]
+    },
+    {
+      "id": "outdoor-props-016",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-016.png",
+      "width": 95,
+      "height": 115,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        724,
+        188,
+        819,
+        303
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-2"
+      ]
+    },
+    {
+      "id": "outdoor-props-017",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-017.png",
+      "width": 131,
+      "height": 119,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        831,
+        189,
+        962,
+        308
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-2"
+      ]
+    },
+    {
+      "id": "outdoor-props-018",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-018.png",
+      "width": 140,
+      "height": 113,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        972,
+        190,
+        1112,
+        303
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-2"
+      ]
+    },
+    {
+      "id": "outdoor-props-019",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-019.png",
+      "width": 142,
+      "height": 120,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        1131,
+        188,
+        1273,
+        308
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-2"
+      ]
+    },
+    {
+      "id": "outdoor-props-020",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-020.png",
+      "width": 141,
+      "height": 120,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        1290,
+        188,
+        1431,
+        308
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-2"
+      ]
+    },
+    {
+      "id": "outdoor-props-021",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-021.png",
+      "width": 86,
+      "height": 134,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        17,
+        309,
+        103,
+        443
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-3"
+      ]
+    },
+    {
+      "id": "outdoor-props-022",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-022.png",
+      "width": 61,
+      "height": 123,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        112,
+        319,
+        173,
+        442
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-3"
+      ]
+    },
+    {
+      "id": "outdoor-props-023",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-023.png",
+      "width": 68,
+      "height": 112,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        187,
+        326,
+        255,
+        438
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-3"
+      ]
+    },
+    {
+      "id": "outdoor-props-024",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-024.png",
+      "width": 112,
+      "height": 127,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        262,
+        309,
+        374,
+        436
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-3"
+      ]
+    },
+    {
+      "id": "outdoor-props-025",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-025.png",
+      "width": 89,
+      "height": 113,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        384,
+        326,
+        473,
+        439
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-3"
+      ]
+    },
+    {
+      "id": "outdoor-props-026",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-026.png",
+      "width": 55,
+      "height": 119,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        482,
+        323,
+        537,
+        442
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-3"
+      ]
+    },
+    {
+      "id": "outdoor-props-027",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-027.png",
+      "width": 77,
+      "height": 122,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        544,
+        320,
+        621,
+        442
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-3"
+      ]
+    },
+    {
+      "id": "outdoor-props-028",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-028.png",
+      "width": 70,
+      "height": 142,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        638,
+        314,
+        708,
+        456
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-3"
+      ]
+    },
+    {
+      "id": "outdoor-props-029",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-029.png",
+      "width": 65,
+      "height": 141,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        729,
+        315,
+        794,
+        456
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-3"
+      ]
+    },
+    {
+      "id": "outdoor-props-030",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-030.png",
+      "width": 60,
+      "height": 133,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        806,
+        323,
+        866,
+        456
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-3"
+      ]
+    },
+    {
+      "id": "outdoor-props-031",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-031.png",
+      "width": 58,
+      "height": 131,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        878,
+        325,
+        936,
+        456
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-3"
+      ]
+    },
+    {
+      "id": "outdoor-props-032",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-032.png",
+      "width": 73,
+      "height": 145,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        951,
+        311,
+        1024,
+        456
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-3"
+      ]
+    },
+    {
+      "id": "outdoor-props-033",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-033.png",
+      "width": 50,
+      "height": 138,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        1042,
+        318,
+        1092,
+        456
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-3"
+      ]
+    },
+    {
+      "id": "outdoor-props-034",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-034.png",
+      "width": 47,
+      "height": 137,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        1116,
+        319,
+        1163,
+        456
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-3"
+      ]
+    },
+    {
+      "id": "outdoor-props-035",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-035.png",
+      "width": 108,
+      "height": 134,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        1182,
+        322,
+        1290,
+        456
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-3"
+      ]
+    },
+    {
+      "id": "outdoor-props-036",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-036.png",
+      "width": 61,
+      "height": 142,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        1305,
+        314,
+        1366,
+        456
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-3"
+      ]
+    },
+    {
+      "id": "outdoor-props-037",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-037.png",
+      "width": 56,
+      "height": 140,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        1377,
+        316,
+        1433,
+        456
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-3"
+      ]
+    },
+    {
+      "id": "outdoor-props-038",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-038.png",
+      "width": 849,
+      "height": 212,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        17,
+        456,
+        866,
+        668
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-4"
+      ]
+    },
+    {
+      "id": "outdoor-props-039",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-039.png",
+      "width": 86,
+      "height": 212,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        878,
+        456,
+        964,
+        668
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-4"
+      ]
+    },
+    {
+      "id": "outdoor-props-040",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-040.png",
+      "width": 118,
+      "height": 215,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        975,
+        456,
+        1093,
+        671
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-4"
+      ]
+    },
+    {
+      "id": "outdoor-props-041",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-041.png",
+      "width": 45,
+      "height": 215,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        1110,
+        456,
+        1155,
+        671
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-4"
+      ]
+    },
+    {
+      "id": "outdoor-props-042",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-042.png",
+      "width": 75,
+      "height": 215,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        1211,
+        456,
+        1286,
+        671
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-4"
+      ]
+    },
+    {
+      "id": "outdoor-props-043",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-043.png",
+      "width": 130,
+      "height": 215,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        1301,
+        456,
+        1431,
+        671
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-4"
+      ]
+    },
+    {
+      "id": "outdoor-props-044",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-044.png",
+      "width": 89,
+      "height": 144,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        21,
+        677,
+        110,
+        821
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-5"
+      ]
+    },
+    {
+      "id": "outdoor-props-045",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-045.png",
+      "width": 78,
+      "height": 133,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        121,
+        688,
+        199,
+        821
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-5"
+      ]
+    },
+    {
+      "id": "outdoor-props-046",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-046.png",
+      "width": 86,
+      "height": 145,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        215,
+        676,
+        301,
+        821
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-5"
+      ]
+    },
+    {
+      "id": "outdoor-props-047",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-047.png",
+      "width": 104,
+      "height": 126,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        321,
+        695,
+        425,
+        821
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-5"
+      ]
+    },
+    {
+      "id": "outdoor-props-048",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-048.png",
+      "width": 195,
+      "height": 150,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        441,
+        671,
+        636,
+        821
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-5"
+      ]
+    },
+    {
+      "id": "outdoor-props-049",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-049.png",
+      "width": 73,
+      "height": 135,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        648,
+        683,
+        721,
+        818
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-5"
+      ]
+    },
+    {
+      "id": "outdoor-props-050",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-050.png",
+      "width": 98,
+      "height": 142,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        741,
+        679,
+        839,
+        821
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-5"
+      ]
+    },
+    {
+      "id": "outdoor-props-051",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-051.png",
+      "width": 93,
+      "height": 86,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        855,
+        735,
+        948,
+        821
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-5"
+      ]
+    },
+    {
+      "id": "outdoor-props-052",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-052.png",
+      "width": 127,
+      "height": 142,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        957,
+        671,
+        1084,
+        813
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-5"
+      ]
+    },
+    {
+      "id": "outdoor-props-053",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-053.png",
+      "width": 99,
+      "height": 150,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        1091,
+        671,
+        1190,
+        821
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-5"
+      ]
+    },
+    {
+      "id": "outdoor-props-054",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-054.png",
+      "width": 231,
+      "height": 150,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        1200,
+        671,
+        1431,
+        821
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-5"
+      ]
+    },
+    {
+      "id": "outdoor-props-055",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-055.png",
+      "width": 141,
+      "height": 117,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        19,
+        834,
+        160,
+        951
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-6"
+      ]
+    },
+    {
+      "id": "outdoor-props-056",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-056.png",
+      "width": 130,
+      "height": 116,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        167,
+        835,
+        297,
+        951
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-6"
+      ]
+    },
+    {
+      "id": "outdoor-props-057",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-057.png",
+      "width": 131,
+      "height": 116,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        304,
+        835,
+        435,
+        951
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-6"
+      ]
+    },
+    {
+      "id": "outdoor-props-058",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-058.png",
+      "width": 123,
+      "height": 117,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        442,
+        834,
+        565,
+        951
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-6"
+      ]
+    },
+    {
+      "id": "outdoor-props-059",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-059.png",
+      "width": 134,
+      "height": 118,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        568,
+        833,
+        702,
+        951
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-6"
+      ]
+    },
+    {
+      "id": "outdoor-props-060",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-060.png",
+      "width": 80,
+      "height": 113,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        713,
+        830,
+        793,
+        943
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-6"
+      ]
+    },
+    {
+      "id": "outdoor-props-061",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-061.png",
+      "width": 89,
+      "height": 113,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        802,
+        830,
+        891,
+        943
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-6"
+      ]
+    },
+    {
+      "id": "outdoor-props-062",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-062.png",
+      "width": 136,
+      "height": 106,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        906,
+        838,
+        1042,
+        944
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-6"
+      ]
+    },
+    {
+      "id": "outdoor-props-063",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-063.png",
+      "width": 127,
+      "height": 110,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        1053,
+        832,
+        1180,
+        942
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-6"
+      ]
+    },
+    {
+      "id": "outdoor-props-064",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-064.png",
+      "width": 99,
+      "height": 92,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        1195,
+        850,
+        1294,
+        942
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-6"
+      ]
+    },
+    {
+      "id": "outdoor-props-065",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-065.png",
+      "width": 128,
+      "height": 98,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        1303,
+        850,
+        1431,
+        948
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-6"
+      ]
+    },
+    {
+      "id": "outdoor-props-066",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-066.png",
+      "width": 132,
+      "height": 82,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        19,
+        966,
+        151,
+        1048
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-7"
+      ]
+    },
+    {
+      "id": "outdoor-props-067",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-067.png",
+      "width": 134,
+      "height": 78,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        167,
+        969,
+        301,
+        1047
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-7"
+      ]
+    },
+    {
+      "id": "outdoor-props-068",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-068.png",
+      "width": 134,
+      "height": 79,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        318,
+        969,
+        452,
+        1048
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-7"
+      ]
+    },
+    {
+      "id": "outdoor-props-069",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-069.png",
+      "width": 130,
+      "height": 78,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        468,
+        969,
+        598,
+        1047
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-7"
+      ]
+    },
+    {
+      "id": "outdoor-props-070",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-070.png",
+      "width": 131,
+      "height": 80,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        611,
+        968,
+        742,
+        1048
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-7"
+      ]
+    },
+    {
+      "id": "outdoor-props-071",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-071.png",
+      "width": 50,
+      "height": 103,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        756,
+        957,
+        806,
+        1060
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-7"
+      ]
+    },
+    {
+      "id": "outdoor-props-072",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-072.png",
+      "width": 57,
+      "height": 91,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        818,
+        966,
+        875,
+        1057
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-7"
+      ]
+    },
+    {
+      "id": "outdoor-props-073",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-073.png",
+      "width": 41,
+      "height": 110,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        894,
+        955,
+        935,
+        1065
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-7"
+      ]
+    },
+    {
+      "id": "outdoor-props-074",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-074.png",
+      "width": 45,
+      "height": 103,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        957,
+        957,
+        1002,
+        1060
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-7"
+      ]
+    },
+    {
+      "id": "outdoor-props-075",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-075.png",
+      "width": 120,
+      "height": 97,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        1014,
+        963,
+        1134,
+        1060
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-7"
+      ]
+    },
+    {
+      "id": "outdoor-props-076",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-076.png",
+      "width": 126,
+      "height": 100,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        1147,
+        963,
+        1273,
+        1063
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-7"
+      ]
+    },
+    {
+      "id": "outdoor-props-077",
+      "category": "outdoor-props",
+      "file": "objects/outdoor-props/outdoor-props-077.png",
+      "width": 145,
+      "height": 102,
+      "source": "cesar-outdoor-props-master.png",
+      "sourceBBox": [
+        1286,
+        963,
+        1431,
+        1065
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "rectangle",
+      "tags": [
+        "prop",
+        "outdoor",
+        "band-7"
+      ]
+    },
+    {
+      "id": "terrain-nature-stamps-001",
+      "category": "terrain-nature-stamps",
+      "file": "objects/terrain-nature-stamps/terrain-nature-stamps-001.png",
+      "width": 99,
+      "height": 203,
+      "source": "cesar-terrain-nature-master.png",
+      "sourceBBox": [
+        13,
+        8,
+        112,
+        211
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "terrain",
+        "nature",
+        "stamp",
+        "band-1"
+      ]
+    },
+    {
+      "id": "terrain-nature-stamps-002",
+      "category": "terrain-nature-stamps",
+      "file": "objects/terrain-nature-stamps/terrain-nature-stamps-002.png",
+      "width": 1319,
+      "height": 205,
+      "source": "cesar-terrain-nature-master.png",
+      "sourceBBox": [
+        117,
+        6,
+        1436,
+        211
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "terrain",
+        "nature",
+        "stamp",
+        "band-1"
+      ]
+    },
+    {
+      "id": "terrain-nature-stamps-003",
+      "category": "terrain-nature-stamps",
+      "file": "objects/terrain-nature-stamps/terrain-nature-stamps-003.png",
+      "width": 92,
+      "height": 227,
+      "source": "cesar-terrain-nature-master.png",
+      "sourceBBox": [
+        14,
+        211,
+        106,
+        438
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "terrain",
+        "nature",
+        "stamp",
+        "band-2"
+      ]
+    },
+    {
+      "id": "terrain-nature-stamps-004",
+      "category": "terrain-nature-stamps",
+      "file": "objects/terrain-nature-stamps/terrain-nature-stamps-004.png",
+      "width": 692,
+      "height": 228,
+      "source": "cesar-terrain-nature-master.png",
+      "sourceBBox": [
+        111,
+        211,
+        803,
+        439
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "terrain",
+        "nature",
+        "stamp",
+        "band-2"
+      ]
+    },
+    {
+      "id": "terrain-nature-stamps-005",
+      "category": "terrain-nature-stamps",
+      "file": "objects/terrain-nature-stamps/terrain-nature-stamps-005.png",
+      "width": 629,
+      "height": 228,
+      "source": "cesar-terrain-nature-master.png",
+      "sourceBBox": [
+        808,
+        211,
+        1437,
+        439
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "terrain",
+        "nature",
+        "stamp",
+        "band-2"
+      ]
+    },
+    {
+      "id": "terrain-nature-stamps-006",
+      "category": "terrain-nature-stamps",
+      "file": "objects/terrain-nature-stamps/terrain-nature-stamps-006.png",
+      "width": 188,
+      "height": 120,
+      "source": "cesar-terrain-nature-master.png",
+      "sourceBBox": [
+        13,
+        441,
+        201,
+        561
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "terrain",
+        "nature",
+        "stamp",
+        "band-3"
+      ]
+    },
+    {
+      "id": "terrain-nature-stamps-007",
+      "category": "terrain-nature-stamps",
+      "file": "objects/terrain-nature-stamps/terrain-nature-stamps-007.png",
+      "width": 105,
+      "height": 120,
+      "source": "cesar-terrain-nature-master.png",
+      "sourceBBox": [
+        212,
+        441,
+        317,
+        561
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "terrain",
+        "nature",
+        "stamp",
+        "band-3"
+      ]
+    },
+    {
+      "id": "terrain-nature-stamps-008",
+      "category": "terrain-nature-stamps",
+      "file": "objects/terrain-nature-stamps/terrain-nature-stamps-008.png",
+      "width": 260,
+      "height": 120,
+      "source": "cesar-terrain-nature-master.png",
+      "sourceBBox": [
+        331,
+        441,
+        591,
+        561
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "terrain",
+        "nature",
+        "stamp",
+        "band-3"
+      ]
+    },
+    {
+      "id": "terrain-nature-stamps-009",
+      "category": "terrain-nature-stamps",
+      "file": "objects/terrain-nature-stamps/terrain-nature-stamps-009.png",
+      "width": 97,
+      "height": 120,
+      "source": "cesar-terrain-nature-master.png",
+      "sourceBBox": [
+        603,
+        441,
+        700,
+        561
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "terrain",
+        "nature",
+        "stamp",
+        "band-3"
+      ]
+    },
+    {
+      "id": "terrain-nature-stamps-010",
+      "category": "terrain-nature-stamps",
+      "file": "objects/terrain-nature-stamps/terrain-nature-stamps-010.png",
+      "width": 67,
+      "height": 116,
+      "source": "cesar-terrain-nature-master.png",
+      "sourceBBox": [
+        712,
+        442,
+        779,
+        558
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "terrain",
+        "nature",
+        "stamp",
+        "band-3"
+      ]
+    },
+    {
+      "id": "terrain-nature-stamps-011",
+      "category": "terrain-nature-stamps",
+      "file": "objects/terrain-nature-stamps/terrain-nature-stamps-011.png",
+      "width": 182,
+      "height": 118,
+      "source": "cesar-terrain-nature-master.png",
+      "sourceBBox": [
+        784,
+        443,
+        966,
+        561
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "terrain",
+        "nature",
+        "stamp",
+        "band-3"
+      ]
+    },
+    {
+      "id": "terrain-nature-stamps-012",
+      "category": "terrain-nature-stamps",
+      "file": "objects/terrain-nature-stamps/terrain-nature-stamps-012.png",
+      "width": 160,
+      "height": 118,
+      "source": "cesar-terrain-nature-master.png",
+      "sourceBBox": [
+        971,
+        443,
+        1131,
+        561
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "terrain",
+        "nature",
+        "stamp",
+        "band-3"
+      ]
+    },
+    {
+      "id": "terrain-nature-stamps-013",
+      "category": "terrain-nature-stamps",
+      "file": "objects/terrain-nature-stamps/terrain-nature-stamps-013.png",
+      "width": 59,
+      "height": 117,
+      "source": "cesar-terrain-nature-master.png",
+      "sourceBBox": [
+        1142,
+        444,
+        1201,
+        561
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "terrain",
+        "nature",
+        "stamp",
+        "band-3"
+      ]
+    },
+    {
+      "id": "terrain-nature-stamps-014",
+      "category": "terrain-nature-stamps",
+      "file": "objects/terrain-nature-stamps/terrain-nature-stamps-014.png",
+      "width": 145,
+      "height": 116,
+      "source": "cesar-terrain-nature-master.png",
+      "sourceBBox": [
+        1207,
+        445,
+        1352,
+        561
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "terrain",
+        "nature",
+        "stamp",
+        "band-3"
+      ]
+    },
+    {
+      "id": "terrain-nature-stamps-015",
+      "category": "terrain-nature-stamps",
+      "file": "objects/terrain-nature-stamps/terrain-nature-stamps-015.png",
+      "width": 79,
+      "height": 119,
+      "source": "cesar-terrain-nature-master.png",
+      "sourceBBox": [
+        1359,
+        442,
+        1438,
+        561
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "terrain",
+        "nature",
+        "stamp",
+        "band-3"
+      ]
+    },
+    {
+      "id": "terrain-nature-stamps-016",
+      "category": "terrain-nature-stamps",
+      "file": "objects/terrain-nature-stamps/terrain-nature-stamps-016.png",
+      "width": 1420,
+      "height": 216,
+      "source": "cesar-terrain-nature-master.png",
+      "sourceBBox": [
+        14,
+        564,
+        1434,
+        780
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "terrain",
+        "nature",
+        "stamp",
+        "band-4"
+      ]
+    },
+    {
+      "id": "terrain-nature-stamps-017",
+      "category": "terrain-nature-stamps",
+      "file": "objects/terrain-nature-stamps/terrain-nature-stamps-017.png",
+      "width": 301,
+      "height": 169,
+      "source": "cesar-terrain-nature-master.png",
+      "sourceBBox": [
+        12,
+        782,
+        313,
+        951
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "terrain",
+        "nature",
+        "stamp",
+        "band-5"
+      ]
+    },
+    {
+      "id": "terrain-nature-stamps-018",
+      "category": "terrain-nature-stamps",
+      "file": "objects/terrain-nature-stamps/terrain-nature-stamps-018.png",
+      "width": 1118,
+      "height": 170,
+      "source": "cesar-terrain-nature-master.png",
+      "sourceBBox": [
+        319,
+        781,
+        1437,
+        951
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "terrain",
+        "nature",
+        "stamp",
+        "band-5"
+      ]
+    },
+    {
+      "id": "terrain-nature-stamps-019",
+      "category": "terrain-nature-stamps",
+      "file": "objects/terrain-nature-stamps/terrain-nature-stamps-019.png",
+      "width": 79,
+      "height": 124,
+      "source": "cesar-terrain-nature-master.png",
+      "sourceBBox": [
+        16,
+        951,
+        95,
+        1075
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "terrain",
+        "nature",
+        "stamp",
+        "band-6"
+      ]
+    },
+    {
+      "id": "terrain-nature-stamps-020",
+      "category": "terrain-nature-stamps",
+      "file": "objects/terrain-nature-stamps/terrain-nature-stamps-020.png",
+      "width": 1269,
+      "height": 124,
+      "source": "cesar-terrain-nature-master.png",
+      "sourceBBox": [
+        105,
+        951,
+        1374,
+        1075
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "terrain",
+        "nature",
+        "stamp",
+        "band-6"
+      ]
+    },
+    {
+      "id": "terrain-nature-stamps-021",
+      "category": "terrain-nature-stamps",
+      "file": "objects/terrain-nature-stamps/terrain-nature-stamps-021.png",
+      "width": 59,
+      "height": 124,
+      "source": "cesar-terrain-nature-master.png",
+      "sourceBBox": [
+        1378,
+        951,
+        1437,
+        1075
+      ],
+      "usage": "tiled-object",
+      "anchor": "bottom-center",
+      "collisionHint": "custom",
+      "tags": [
+        "terrain",
+        "nature",
+        "stamp",
+        "band-6"
+      ]
+    }
+  ]
+}

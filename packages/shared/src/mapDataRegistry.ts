@@ -4,6 +4,12 @@ import type { MapId } from "./map.js";
 import { TOWN_01_MAP } from "./maps/generated/town-01.js";
 import { HOUSE_01_MAP } from "./maps/generated/house-01.js";
 import { ROUTE_01_MAP } from "./maps/generated/route-01.js";
+import { TOWN_02_MAP } from "./maps/generated/town-02.js";
+import { ROUTE_02_MAP } from "./maps/generated/route-02.js";
+import { CITY_01_MAP } from "./maps/generated/city-01.js";
+import { GYM_01_MAP } from "./maps/generated/gym-01.js";
+import { POKE_CENTER_MAP } from "./maps/generated/poke-center.js";
+import { POKE_SHOP_MAP } from "./maps/generated/poke-shop.js";
 
 import { PokemonEncounterTableId } from "./pokemon/encounters/pokemon-encounter-table.registry.js";
 
@@ -58,11 +64,19 @@ export type SharedMapData = {
   readonly encounterZones: Readonly<Record<string, SharedMapEncounterZone>>;
 };
 
-export const MAP_DATA_REGISTRY: Record<MapId, SharedMapData> = {
+export const MAP_DATA_REGISTRY = {
   [MAP_IDS.TOWN_01]: TOWN_01_MAP,
   [MAP_IDS.HOUSE_01]: HOUSE_01_MAP,
+
   [MAP_IDS.ROUTE_01]: ROUTE_01_MAP,
-};
+  [MAP_IDS.TOWN_02]: TOWN_02_MAP,
+  [MAP_IDS.ROUTE_02]: ROUTE_02_MAP,
+  [MAP_IDS.CITY_01]: CITY_01_MAP,
+
+  [MAP_IDS.GYM_01]: GYM_01_MAP,
+  [MAP_IDS.POKE_CENTER]: POKE_CENTER_MAP,
+  [MAP_IDS.POKE_SHOP]: POKE_SHOP_MAP,
+} as const;
 
 export type SharedMapEncounterZoneBounds = {
   readonly x: number;
