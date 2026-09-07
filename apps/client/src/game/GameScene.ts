@@ -1,5 +1,10 @@
 import Phaser from "phaser";
-import { isChatMessageInput, DEFAULT_MAP_ID, getDialogue } from "@cesar-mmo/shared";
+import {
+  isChatMessageInput,
+  DEFAULT_MAP_ID,
+  getDialogue,
+  isPlayerMoving,
+} from "@cesar-mmo/shared";
 
 // assets
 import {
@@ -47,6 +52,7 @@ import { MapTransitionController } from "./maps/MapTransitionController";
 import { MovementInputController } from "./player/MovementInputController";
 import type { NpcDirection, NpcInstance, NpcInteractionType } from "./npc/types";
 import { RemotePokemonFollowerManager } from "./pokemon/RemotePokemonFollowerManager";
+import { OverworldCameraController } from "./camera/OverworldCameraController";
 
 // types
 import type {
@@ -72,6 +78,7 @@ export class GameScene extends Phaser.Scene {
   private player!: Phaser.GameObjects.Sprite;
   private localPlayerController!: LocalPlayerController;
   private movementInputController!: MovementInputController;
+  private overworldCameraController!: OverworldCameraController;
 
   private interactKey!: Phaser.Input.Keyboard.Key;
   private chatKey!: Phaser.Input.Keyboard.Key;
@@ -186,6 +193,11 @@ export class GameScene extends Phaser.Scene {
 
     this.npcManager.create(this.mapManager.map);
     this.createNpcInteractionPrompt();
+
+    this.overworldCameraController = new OverworldCameraController(
+      this.cameras.main,
+      this.player
+    );
     this.setupCamera();
     this.createDialogueUi();
     this.createChatUi();
@@ -227,6 +239,11 @@ export class GameScene extends Phaser.Scene {
       this.isMapTransitioning
     );
     this.localPlayerController.reconcile(delta);
+    this.overworldCameraController.update(
+      delta,
+      this.localPlayerController.direction,
+      isPlayerMoving(input)
+    );
 
     this.pokemonFollowerController.update(
       this.player.x,
@@ -671,7 +688,7 @@ export class GameScene extends Phaser.Scene {
     );
 
     this.mapTransitionController.resetExitTracking();
-    this.updateCameraBounds();
+    this.overworldCameraController.resetForMap(this.currentMapId, this.mapManager.map);
     this.movementInputController.resetLastInputToNeutral();
     this.localPlayerController.setIdle();
 
@@ -702,7 +719,7 @@ export class GameScene extends Phaser.Scene {
       transition.y,
       this.localPlayerController.direction
     );
-    this.updateCameraBounds();
+    this.overworldCameraController.resetForMap(this.currentMapId, this.mapManager.map);
     this.movementInputController.resetLastInputToNeutral();
     this.localPlayerController.setIdle();
   }
@@ -730,30 +747,13 @@ export class GameScene extends Phaser.Scene {
   }
 
   private updateCameraBounds(): void {
-    const map = this.mapManager.map;
-    const camera = this.cameras.main;
-
-    const mapWidth = map.widthInPixels;
-    const mapHeight = map.heightInPixels;
-    const viewportWidth = camera.width / camera.zoom;
-    const viewportHeight = camera.height / camera.zoom;
-
-    const horizontalPadding = Math.max(0, (viewportWidth - mapWidth) / 2);
-    const verticalPadding = Math.max(0, (viewportHeight - mapHeight) / 2);
-
-    camera.setBounds(
-      -horizontalPadding,
-      -verticalPadding,
-      mapWidth + horizontalPadding * 2,
-      mapHeight + verticalPadding * 2
-    );
+    this.overworldCameraController.applyMap(this.currentMapId, this.mapManager.map);
   }
 
   private setupCamera(): void {
     const camera = this.cameras.main;
     camera.setAlpha(0);
-    this.updateCameraBounds();
-    camera.startFollow(this.player, true);
+    this.overworldCameraController.start(this.currentMapId, this.mapManager.map);
   }
 
   private createPlayerNameLabel(displayName: string): Phaser.GameObjects.Text {
