@@ -28,6 +28,8 @@ export const HOUSE_01_MAP = {
 
   npcs: {},
 
+  storageTerminals: {},
+
   transitions: {
     "exitToTown": {
       targetMapId: "town-01",

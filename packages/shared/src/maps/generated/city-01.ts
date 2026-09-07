@@ -40,6 +40,8 @@ export const CITY_01_MAP = {
 
   npcs: {},
 
+  storageTerminals: {},
+
   transitions: {
     "returnRoute02": {
       targetMapId: "route-02",

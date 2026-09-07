@@ -46,6 +46,8 @@ import {
   resolveWildBattleContinuationOutcome,
   isPokemonBattleReplacementInput,
   planBattleHealingItemUse,
+  isPokemonStorageOpenInput,
+  isPokemonStorageCommand,
 } from '@cesar-mmo/shared';
 import {
   getServerMapSpawn,
@@ -54,6 +56,8 @@ import {
   getServerMapNpc,
   isPlayerNearMapNpc,
   getServerEncounterZoneAtPosition,
+  getServerMapStorageTerminal,
+  isPlayerNearMapStorageTerminal,
 } from './maps/serverMapRegistry';
 import { ChatService } from 'src/chat/chat.service';
 
@@ -75,6 +79,9 @@ import type {
   BattlePresentationEvent,
   PokemonBattleTurnResolvedPayload,
   PokemonBattleCompletedPayload,
+  PokemonStorageStatePayload,
+  PokemonStorageErrorPayload,
+  PokemonStorageErrorCode,
 } from '@cesar-mmo/shared';
 import type {
   PokemonTrainerId,
@@ -88,6 +95,10 @@ import { PokemonTrainerRepository } from 'src/pokemon/pokemon-trainer.repository
 import { PokemonPartyRepository } from 'src/pokemon/pokemon-party.repository';
 import { PokemonInventoryRepository } from 'src/pokemon/inventory/pokemon-inventory.repository';
 import { PokemonCaptureRepository } from 'src/pokemon/battles/capture/pokemon-capture.repository';
+import {
+  PokemonStorageRepository,
+  PokemonStoragePersistenceError,
+} from 'src/pokemon/storage/pokemon-storage.repository';
 
 // services
 import { PokemonTrainerService } from 'src/pokemon/pokemon-trainer.service';
@@ -119,6 +130,9 @@ import {
   applyPokemonWildBattleEscapeOutcome,
   applyPokemonWildBattleCaptureOutcome,
 } from '../pokemon/battles/pokemon-wild-battle-outcome.runtime';
+
+import { PokemonStorageService } from 'src/pokemon/storage/pokemon-storage.service';
+import { PokemonStorageAccessSessionStore } from 'src/pokemon/storage/pokemon-storage-access-session.store';
 
 type BattleTurnTerminalOutcome = 'trainer-escaped' | 'wild-captured';
 
@@ -166,6 +180,9 @@ export class GameGateway
   private readonly pokemonBattleTurnStore = new PokemonBattleTurnStore();
 
   private readonly pokemonCaptureService: PokemonCaptureService;
+  private readonly pokemonStorageService: PokemonStorageService;
+  private readonly pokemonStorageAccessSessionStore =
+    new PokemonStorageAccessSessionStore();
 
   private nextColorIndex = 0;
   private gameLoop?: ReturnType<typeof setInterval>;
@@ -176,6 +193,7 @@ export class GameGateway
     private readonly pokemonPartyRepository: PokemonPartyRepository,
     private readonly pokemonInventoryRepository: PokemonInventoryRepository,
     private readonly pokemonCaptureRepository: PokemonCaptureRepository,
+    private readonly pokemonStorageRepository: PokemonStorageRepository,
   ) {
     this.pokemonTrainerService = new PokemonTrainerService(
       this.pokemonTrainerStateStore,
@@ -185,6 +203,11 @@ export class GameGateway
     this.pokemonCaptureService = new PokemonCaptureService(
       this.pokemonTrainerStateStore,
       this.pokemonCaptureRepository,
+    );
+    this.pokemonStorageService = new PokemonStorageService(
+      this.pokemonTrainerStateStore,
+      this.pokemonPartyRepository,
+      this.pokemonStorageRepository,
     );
   }
 
@@ -207,9 +230,7 @@ export class GameGateway
         code: 'INVALID_AVATAR',
         message: 'Invalid character selected.',
       });
-
       client.disconnect();
-
       return;
     }
 
@@ -293,16 +314,12 @@ export class GameGateway
       //   );
     } catch (error: unknown) {
       console.error('[PokemonTrainerIdentity] resolution failed', error);
-
       this.pokemonTrainerIdentityStore.unbind(newPlayer.id);
-
       client.emit('connectionRejected', {
         code: 'TRAINER_SESSION_ERROR',
         message: 'Could not restore the trainer session.',
       });
-
       client.disconnect(true);
-
       return;
     }
 
@@ -353,8 +370,8 @@ export class GameGateway
     }
 
     this.pokemonTrainerIdentityStore.unbind(client.id);
-
     this.dialogueSessionStore.remove(client.id);
+    this.pokemonStorageAccessSessionStore.remove(client.id);
 
     if (!player) {
       return;
@@ -401,13 +418,11 @@ export class GameGateway
     }
 
     const player = this.players[client.id];
-
     if (!player) {
       return;
     }
 
     const message = this.chatService.createMessage(player, payload);
-
     this.server.emit(CHAT_EVENTS.MESSAGE_RECEIVED, message);
   }
 
@@ -424,21 +439,24 @@ export class GameGateway
     }
 
     const player = this.players[client.id];
-
     if (!player) {
       return;
     }
 
-    const npc = getServerMapNpc(player.mapId, payload.npcId);
+    if (
+      this.pokemonStorageAccessSessionStore.has(client.id) ||
+      this.pokemonBattleSessionStore.getByPlayerId(client.id)
+    ) {
+      return;
+    }
 
+    const npc = getServerMapNpc(player.mapId, payload.npcId);
     if (!npc) {
       return;
     }
-
     if (!npc.dialogueId) {
       return;
     }
-
     if (!isPlayerNearMapNpc(player.x, player.y, npc)) {
       return;
     }
@@ -891,7 +909,11 @@ export class GameGateway
       return;
     }
 
-    if (this.dialogueSessionStore.has(client.id)) {
+    if (
+      this.dialogueSessionStore.has(client.id) ||
+      this.pokemonStorageAccessSessionStore.has(client.id) ||
+      this.pokemonBattleSessionStore.getByPlayerId(client.id)
+    ) {
       return;
     }
 
@@ -917,7 +939,6 @@ export class GameGateway
         x: player.x,
         y: player.y,
       });
-
       return;
     }
 
@@ -966,6 +987,196 @@ export class GameGateway
     client.to(targetRoom).emit('playerJoined', player);
 
     client.emit(MAP_EVENTS.TRANSITION_RESOLVED, resolvedTransition);
+  }
+
+  @SubscribeMessage(POKEMON_EVENTS.STORAGE_OPEN)
+  async handlePokemonStorageOpen(
+    @ConnectedSocket()
+    client: Socket,
+
+    @MessageBody()
+    payload: unknown,
+  ): Promise<void> {
+    if (!isPokemonStorageOpenInput(payload)) {
+      this.emitPokemonStorageError(
+        client,
+        'INVALID_COMMAND',
+        'Invalid Pokémon Storage request.',
+      );
+
+      return;
+    }
+
+    const player = this.players[client.id];
+
+    const trainerId = this.getTrainerId(client.id);
+
+    if (!player || !trainerId) {
+      this.emitPokemonStorageError(
+        client,
+        'STORAGE_NOT_AVAILABLE',
+        'Pokémon Storage is not available.',
+      );
+
+      return;
+    }
+
+    if (
+      this.dialogueSessionStore.has(client.id) ||
+      this.pokemonBattleSessionStore.getByPlayerId(client.id)
+    ) {
+      this.emitPokemonStorageError(
+        client,
+        'STORAGE_NOT_AVAILABLE',
+        'Pokémon Storage cannot be used right now.',
+      );
+
+      return;
+    }
+
+    const terminal = getServerMapStorageTerminal(
+      player.mapId,
+      payload.terminalId,
+    );
+
+    if (
+      !terminal ||
+      !isPlayerNearMapStorageTerminal(player.x, player.y, terminal)
+    ) {
+      this.emitPokemonStorageError(
+        client,
+        'STORAGE_NOT_AVAILABLE',
+        'You are not close enough to this Pokémon Storage terminal.',
+      );
+
+      return;
+    }
+
+    this.pokemonStorageAccessSessionStore.start(
+      client.id,
+      player.mapId,
+      payload.terminalId,
+    );
+
+    try {
+      const state = await this.pokemonStorageService.getState(trainerId);
+
+      this.syncPlayerPokemonFollower(client.id, state.trainerState);
+
+      client.emit(POKEMON_EVENTS.TRAINER_STATE, {
+        trainerState: state.trainerState,
+      } satisfies PokemonTrainerStatePayload);
+
+      client.emit(POKEMON_EVENTS.STORAGE_STATE, {
+        party: state.trainerState.party,
+        storage: state.storage,
+      } satisfies PokemonStorageStatePayload);
+    } catch (error: unknown) {
+      this.pokemonStorageAccessSessionStore.remove(client.id);
+      console.warn(
+        `[PokemonStorage] Open rejected for player ${client.id}`,
+        error,
+      );
+      this.emitPokemonStorageError(
+        client,
+        'STORAGE_NOT_AVAILABLE',
+        'Pokémon Storage could not be opened.',
+      );
+    }
+  }
+
+  @SubscribeMessage(POKEMON_EVENTS.STORAGE_CLOSE)
+  handlePokemonStorageClose(
+    @ConnectedSocket()
+    client: Socket,
+  ): void {
+    this.pokemonStorageAccessSessionStore.remove(client.id);
+  }
+
+  @SubscribeMessage(POKEMON_EVENTS.STORAGE_COMMAND)
+  async handlePokemonStorageCommand(
+    @ConnectedSocket()
+    client: Socket,
+
+    @MessageBody()
+    payload: unknown,
+  ): Promise<void> {
+    if (!isPokemonStorageCommand(payload)) {
+      this.emitPokemonStorageError(
+        client,
+        'INVALID_COMMAND',
+        'Invalid Pokémon Storage command.',
+      );
+
+      return;
+    }
+
+    const access = this.resolvePokemonStorageAccess(client.id);
+
+    if (!access) {
+      this.emitPokemonStorageError(
+        client,
+        'STORAGE_NOT_AVAILABLE',
+        'Pokémon Storage access is no longer available.',
+      );
+
+      return;
+    }
+
+    try {
+      let state;
+
+      switch (payload.type) {
+        case 'withdraw':
+          state = await this.pokemonStorageService.withdraw(
+            access.trainerId,
+            payload.pokemonInstanceId,
+          );
+          break;
+
+        case 'deposit':
+          state = await this.pokemonStorageService.deposit(
+            access.trainerId,
+            payload.pokemonInstanceId,
+          );
+          break;
+
+        case 'swap':
+          state = await this.pokemonStorageService.swap(
+            access.trainerId,
+            payload.storedPokemonInstanceId,
+            payload.partyPokemonInstanceId,
+          );
+          break;
+      }
+
+      this.syncPlayerPokemonFollower(client.id, state.trainerState);
+
+      /* Global TrainerState owner-only */
+      client.emit(POKEMON_EVENTS.TRAINER_STATE, {
+        trainerState: state.trainerState,
+      } satisfies PokemonTrainerStatePayload);
+
+      /* PC snapshot owner-only */
+      client.emit(POKEMON_EVENTS.STORAGE_STATE, {
+        party: state.trainerState.party,
+        storage: state.storage,
+      } satisfies PokemonStorageStatePayload);
+    } catch (error: unknown) {
+      if (error instanceof PokemonStoragePersistenceError) {
+        this.emitPokemonStorageError(client, error.code, error.message);
+        return;
+      }
+      console.warn(
+        `[PokemonStorage] Command rejected for player ${client.id}`,
+        error,
+      );
+      this.emitPokemonStorageError(
+        client,
+        'STORAGE_NOT_AVAILABLE',
+        'Pokémon Storage command failed.',
+      );
+    }
   }
 
   private handleDialoguePostAction(client: Socket, npc: SharedMapNpc): void {
@@ -1029,7 +1240,12 @@ export class GameGateway
     input: PlayerInput,
     deltaSeconds: number,
   ) {
-    if (this.dialogueSessionStore.has(player.id)) {
+    const isInDialogue = this.dialogueSessionStore.has(player.id);
+    const isUsingStorage = this.pokemonStorageAccessSessionStore.has(player.id);
+    const isInBattle =
+      this.pokemonBattleSessionStore.getByPlayerId(player.id) !== undefined;
+
+    if (isInDialogue || isUsingStorage || isInBattle) {
       player.isMoving = false;
       return;
     }
@@ -1389,11 +1605,11 @@ export class GameGateway
     }
 
     this.pokemonWildEncounterSessionStore.remove(encounterSession.playerId);
+    this.pokemonStorageAccessSessionStore.remove(encounterSession.playerId);
 
     const ownerSocket = this.server.sockets.sockets.get(
       encounterSession.playerId,
     );
-
     if (!ownerSocket) {
       return;
     }
@@ -1691,5 +1907,76 @@ export class GameGateway
       trainerId,
       trainerParticipant,
     );
+  }
+
+  private resolvePokemonStorageAccess(playerId: string):
+    | {
+        trainerId: PokemonTrainerId;
+      }
+    | undefined {
+    const player = this.players[playerId];
+
+    if (!player) {
+      return undefined;
+    }
+
+    const trainerId = this.getTrainerId(playerId);
+
+    if (!trainerId) {
+      return undefined;
+    }
+
+    if (this.pokemonBattleSessionStore.getByPlayerId(playerId)) {
+      this.pokemonStorageAccessSessionStore.remove(playerId);
+      return undefined;
+    }
+
+    if (this.dialogueSessionStore.has(playerId)) {
+      this.pokemonStorageAccessSessionStore.remove(playerId);
+      return undefined;
+    }
+
+    const session = this.pokemonStorageAccessSessionStore.get(playerId);
+
+    if (!session) {
+      return undefined;
+    }
+
+    /* El mapa actual debe seguir siendo exactamente aquel donde se abrió la PC */
+    if (session.mapId !== player.mapId) {
+      this.pokemonStorageAccessSessionStore.remove(playerId);
+      return undefined;
+    }
+
+    const terminal = getServerMapStorageTerminal(
+      player.mapId,
+      session.terminalId,
+    );
+
+    if (!terminal) {
+      this.pokemonStorageAccessSessionStore.remove(playerId);
+      return undefined;
+    }
+
+    /* Revalidamos proximity EN CADA COMMAND. Abrir la PC una vez no concede acceso eterno */
+    if (!isPlayerNearMapStorageTerminal(player.x, player.y, terminal)) {
+      this.pokemonStorageAccessSessionStore.remove(playerId);
+      return undefined;
+    }
+
+    return {
+      trainerId,
+    };
+  }
+
+  private emitPokemonStorageError(
+    client: Socket,
+    code: PokemonStorageErrorCode,
+    message: string,
+  ): void {
+    client.emit(POKEMON_EVENTS.STORAGE_ERROR, {
+      code,
+      message,
+    } satisfies PokemonStorageErrorPayload);
   }
 }

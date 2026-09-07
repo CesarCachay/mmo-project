@@ -6,6 +6,7 @@ import type {
   SharedMapTransition,
   SharedMapNpc,
   SharedMapEncounterZone,
+  SharedMapStorageTerminal,
 } from '@cesar-mmo/shared';
 
 const MAP_TRANSITION_TRIGGER_TOLERANCE = 8;
@@ -16,6 +17,13 @@ const NPC_INTERACTION_SERVER_TOLERANCE = 4;
 
 const MAX_NPC_INTERACTION_DISTANCE =
   NPC_INTERACTION_DISTANCE + NPC_INTERACTION_SERVER_TOLERANCE;
+
+const STORAGE_TERMINAL_INTERACTION_DISTANCE = 36;
+
+const STORAGE_TERMINAL_SERVER_TOLERANCE = 4;
+
+const MAX_STORAGE_TERMINAL_INTERACTION_DISTANCE =
+  STORAGE_TERMINAL_INTERACTION_DISTANCE + STORAGE_TERMINAL_SERVER_TOLERANCE;
 
 export type ServerMapEncounterZone = SharedMapEncounterZone & {
   readonly id: string;
@@ -112,4 +120,28 @@ export function getServerEncounterZoneAtPosition(
   }
 
   return undefined;
+}
+
+export function getServerMapStorageTerminal(
+  mapId: MapId,
+  terminalId: string,
+): SharedMapStorageTerminal | undefined {
+  return MAP_DATA_REGISTRY[mapId].storageTerminals[terminalId.trim()];
+}
+
+export function isPlayerNearMapStorageTerminal(
+  playerX: number,
+  playerY: number,
+  terminal: SharedMapStorageTerminal,
+): boolean {
+  const deltaX = playerX - terminal.x;
+  const deltaY = playerY - terminal.y;
+
+  const distanceSquared = deltaX * deltaX + deltaY * deltaY;
+
+  const maxDistanceSquared =
+    MAX_STORAGE_TERMINAL_INTERACTION_DISTANCE *
+    MAX_STORAGE_TERMINAL_INTERACTION_DISTANCE;
+
+  return distanceSquared <= maxDistanceSquared;
 }

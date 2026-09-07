@@ -43,6 +43,7 @@ export type {
   SharedMapNpc,
   SharedMapEncounterZone,
   SharedMapEncounterZoneBounds,
+  SharedMapStorageTerminal,
 } from "./mapDataRegistry.js";
 export { MAP_DATA_REGISTRY } from "./mapDataRegistry.js";
 
@@ -329,3 +330,21 @@ export type {
   PokemonCaptureResolution,
   ResolvePokemonCaptureInput,
 } from "./pokemon/battles/capture/pokemon-battle-capture.js";
+
+// STORAGE
+export { isPokemonStorageOpenInput } from "./pokemon/storage/pokemon-storage-network.js";
+export type {
+  PokemonStorageStatePayload,
+  PokemonStorageOpenInput,
+  PokemonStorageErrorCode,
+  PokemonStorageErrorPayload,
+} from "./pokemon/storage/pokemon-storage-network.js";
+export { isPokemonStorageCommand } from "./pokemon/storage/pokemon-storage-command.js";
+export type {
+  PokemonStorageWithdrawCommand,
+  PokemonStorageDepositCommand,
+  PokemonStorageSwapCommand,
+  PokemonStorageCommand,
+} from "./pokemon/storage/pokemon-storage-command.js";
+export { createPokemonStorage } from "./pokemon/storage/pokemon-storage.js";
+export type { PokemonStorage } from "./pokemon/storage/pokemon-storage.js";

@@ -62,6 +62,13 @@ export type SharedMapData = {
   readonly npcs?: Readonly<Record<string, SharedMapNpc>>;
 
   readonly encounterZones: Readonly<Record<string, SharedMapEncounterZone>>;
+
+  readonly storageTerminals: Readonly<Record<string, SharedMapStorageTerminal>>;
+};
+
+export type SharedMapStorageTerminal = {
+  readonly x: number;
+  readonly y: number;
 };
 
 export const MAP_DATA_REGISTRY = {

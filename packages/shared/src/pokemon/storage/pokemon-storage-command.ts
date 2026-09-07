@@ -10,7 +10,6 @@ export interface PokemonStorageDepositCommand {
 
 export interface PokemonStorageSwapCommand {
   readonly type: "swap";
-
   readonly storedPokemonInstanceId: string;
   readonly partyPokemonInstanceId: string;
 }
@@ -28,10 +27,18 @@ export function isPokemonStorageCommand(value: unknown): value is PokemonStorage
   switch (value.type) {
     case "withdraw":
     case "deposit":
-      return isNonEmptyString(value.pokemonInstanceId);
+      return (
+        hasExactKeys(value, ["type", "pokemonInstanceId"]) &&
+        isNonEmptyString(value.pokemonInstanceId)
+      );
 
     case "swap":
       return (
+        hasExactKeys(value, [
+          "type",
+          "storedPokemonInstanceId",
+          "partyPokemonInstanceId",
+        ]) &&
         isNonEmptyString(value.storedPokemonInstanceId) &&
         isNonEmptyString(value.partyPokemonInstanceId) &&
         value.storedPokemonInstanceId !== value.partyPokemonInstanceId
@@ -48,4 +55,16 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
+}
+
+function hasExactKeys(
+  value: Record<string, unknown>,
+  expectedKeys: readonly string[]
+): boolean {
+  const actualKeys = Object.keys(value);
+
+  return (
+    actualKeys.length === expectedKeys.length &&
+    expectedKeys.every((key) => Object.prototype.hasOwnProperty.call(value, key))
+  );
 }

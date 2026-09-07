@@ -32,6 +32,8 @@ export const ROUTE_02_MAP = {
 
   npcs: {},
 
+  storageTerminals: {},
+
   transitions: {
     "returnTown02": {
       targetMapId: "town-02",
@@ -57,7 +59,7 @@ export const ROUTE_02_MAP = {
 
   encounterZones: {
     "route02-grass-zone-01": {
-      encounterTableId: "town-grass",
+      encounterTableId: "mixed-town-01",
       bounds: {
         x: 48,
         y: 80,
@@ -66,7 +68,7 @@ export const ROUTE_02_MAP = {
       },
     },
     "route02-grass-zone-02": {
-      encounterTableId: "town-grass",
+      encounterTableId: "mixed-town-02",
       bounds: {
         x: 208,
         y: 112,
@@ -75,7 +77,7 @@ export const ROUTE_02_MAP = {
       },
     },
     "route02-grass-zone-03": {
-      encounterTableId: "town-grass",
+      encounterTableId: "mixed-town-01",
       bounds: {
         x: 48,
         y: 464,
@@ -84,7 +86,7 @@ export const ROUTE_02_MAP = {
       },
     },
     "route02-grass-zone-04": {
-      encounterTableId: "town-grass",
+      encounterTableId: "mixed-town-02",
       bounds: {
         x: 640,
         y: 448,

@@ -6,6 +6,7 @@ import { PokemonPartyRepository } from 'src/pokemon/pokemon-party.repository';
 import { PokemonTrainerRepository } from 'src/pokemon/pokemon-trainer.repository';
 import { PokemonInventoryRepository } from 'src/pokemon/inventory/pokemon-inventory.repository';
 import { PokemonCaptureRepository } from 'src/pokemon/battles/capture/pokemon-capture.repository';
+import { PokemonStorageRepository } from 'src/pokemon/storage/pokemon-storage.repository';
 
 import { GameGateway } from './game.gateway';
 
@@ -18,6 +19,7 @@ import { GameGateway } from './game.gateway';
     PokemonPartyRepository,
     PokemonInventoryRepository,
     PokemonCaptureRepository,
+    PokemonStorageRepository,
   ],
 })
 export class GameModule {}

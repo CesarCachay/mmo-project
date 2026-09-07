@@ -1,0 +1,291 @@
+.pokemon-storage-ui {
+  position: absolute;
+  inset: 0;
+  z-index: 2600;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  padding: 4%;
+  background:
+    radial-gradient(circle at 50% 15%, rgba(42, 110, 170, 0.34), transparent 45%),
+    rgba(3, 10, 20, 0.86);
+  font-family: Arial, sans-serif;
+  color: #f8fafc;
+  pointer-events: auto;
+}
+
+.pokemon-storage-ui[hidden] {
+  display: none !important;
+}
+
+.pokemon-storage-ui * {
+  box-sizing: border-box;
+}
+
+.pokemon-storage-ui__shell {
+  width: min(94%, 900px);
+  height: min(90%, 620px);
+  display: grid;
+  grid-template-rows:
+    auto
+    minmax(0, 1fr)
+    auto
+    auto;
+  overflow: hidden;
+  border: 2px solid rgba(148, 210, 255, 0.88);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(16, 48, 78, 0.98), rgba(7, 25, 43, 0.99));
+  box-shadow:
+    0 18px 60px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+}
+
+.pokemon-storage-ui__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(148, 210, 255, 0.24);
+  background: linear-gradient(90deg, rgba(28, 103, 158, 0.85), rgba(15, 63, 102, 0.62));
+}
+
+.pokemon-storage-ui__title {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.pokemon-storage-ui__subtitle {
+  margin-top: 3px;
+  font-size: 11px;
+  color: rgba(226, 240, 250, 0.78);
+}
+
+.pokemon-storage-ui__content {
+  min-height: 0;
+  display: grid;
+  grid-template-columns:
+    minmax(180px, 0.82fr)
+    minmax(0, 1.5fr);
+  gap: 12px;
+  padding: 12px;
+}
+
+.pokemon-storage-ui__section {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(144, 202, 238, 0.24);
+  border-radius: 10px;
+  background: rgba(5, 20, 34, 0.74);
+}
+
+.pokemon-storage-ui__section-header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 11px;
+  border-bottom: 1px solid rgba(148, 210, 255, 0.17);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #dff4ff;
+}
+
+.pokemon-storage-ui__count {
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(71, 152, 205, 0.22);
+  color: #aee2ff;
+  font-size: 10px;
+}
+
+.pokemon-storage-ui__party-grid,
+.pokemon-storage-ui__storage-grid {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px;
+  scrollbar-width: thin;
+}
+
+.pokemon-storage-ui__party-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pokemon-storage-ui__storage-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
+  gap: 7px;
+}
+
+.pokemon-storage-card {
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns:
+    46px
+    minmax(0, 1fr);
+  align-items: center;
+  gap: 7px;
+  padding: 6px;
+  border: 1px solid rgba(131, 190, 226, 0.2);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(30, 64, 88, 0.88), rgba(16, 40, 58, 0.92));
+  color: #f8fafc;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 100ms ease,
+    border-color 100ms ease,
+    background 100ms ease,
+    box-shadow 100ms ease;
+}
+
+.pokemon-storage-card:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(116, 205, 255, 0.7);
+  background: linear-gradient(180deg, rgba(35, 84, 119, 0.96), rgba(17, 50, 73, 0.96));
+}
+
+.pokemon-storage-card--selected {
+  border-color: #7dd3fc;
+  background: linear-gradient(180deg, rgba(31, 112, 164, 0.96), rgba(20, 67, 101, 0.97));
+  box-shadow:
+    inset 0 0 0 1px rgba(186, 230, 253, 0.5),
+    0 0 12px rgba(56, 189, 248, 0.2);
+}
+
+.pokemon-storage-card:disabled {
+  cursor: default;
+  opacity: 0.66;
+}
+
+.pokemon-storage-card__sprite {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.pokemon-storage-card__info {
+  min-width: 0;
+}
+
+.pokemon-storage-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+.pokemon-storage-card__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.pokemon-storage-card__level {
+  flex: 0 0 auto;
+  font-size: 9px;
+  color: rgba(226, 232, 240, 0.82);
+}
+
+.pokemon-storage-card__hp-text {
+  margin-top: 4px;
+  font-size: 8px;
+  color: rgba(226, 232, 240, 0.72);
+}
+
+.pokemon-storage-card__hp-track {
+  height: 4px;
+  margin-top: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(2, 10, 18, 0.75);
+}
+
+.pokemon-storage-card__hp-fill {
+  height: 100%;
+  border-radius: inherit;
+}
+
+.pokemon-storage-card__hp-fill--healthy {
+  background: #22c55e;
+}
+
+.pokemon-storage-card__hp-fill--warning {
+  background: #eab308;
+}
+
+.pokemon-storage-card__hp-fill--danger {
+  background: #ef4444;
+}
+
+.pokemon-storage-ui__empty {
+  padding: 20px 10px;
+  color: rgba(203, 213, 225, 0.62);
+  font-size: 10px;
+  text-align: center;
+}
+
+.pokemon-storage-ui__feedback {
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  padding: 4px 14px;
+  border-top: 1px solid rgba(148, 210, 255, 0.1);
+}
+
+.pokemon-storage-ui__status {
+  font-size: 10px;
+  color: #bae6fd;
+}
+
+.pokemon-storage-ui__error {
+  margin-left: auto;
+  font-size: 10px;
+  color: #fca5a5;
+}
+
+.pokemon-storage-ui__actions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  padding: 10px 12px 12px;
+  border-top: 1px solid rgba(148, 210, 255, 0.15);
+}
+
+.pokemon-storage-ui__action {
+  min-height: 34px;
+  border: 1px solid rgba(125, 211, 252, 0.48);
+  border-radius: 7px;
+  background: linear-gradient(180deg, #1474a9, #0d4c73);
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+.pokemon-storage-ui__action:hover:not(:disabled) {
+  filter: brightness(1.12);
+}
+
+.pokemon-storage-ui__action:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.pokemon-storage-ui__action--close {
+  border-color: rgba(203, 213, 225, 0.38);
+  background: linear-gradient(180deg, #475569, #334155);
+}

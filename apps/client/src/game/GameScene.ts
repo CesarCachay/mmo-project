@@ -1,5 +1,4 @@
 import Phaser from "phaser";
-
 import { isChatMessageInput, DEFAULT_MAP_ID, getDialogue } from "@cesar-mmo/shared";
 
 // assets
@@ -26,6 +25,8 @@ import { DialogueBox } from "./ui/DialogueBox";
 import { StarterSelectionPanel } from "./ui/StarterSelectionPanel";
 import { PartyPanel } from "./ui/PartyPanel";
 import { BattleController } from "./battle/BattleController";
+import { PokemonStorageController } from "./storage/PokemonStorageController";
+import { PokemonStorageTerminalInteractionController } from "./storage/PokemonStorageTerminalInteractionController";
 
 // helpers
 import { MAP_REGISTRY } from "./maps/mapRegistry";
@@ -100,6 +101,9 @@ export class GameScene extends Phaser.Scene {
   private battleController!: BattleController;
 
   private canChooseStarter = false;
+
+  private pokemonStorageController!: PokemonStorageController;
+  private pokemonStorageTerminalInteraction!: PokemonStorageTerminalInteractionController;
 
   // managers
   private npcManager!: NpcManager;
@@ -184,6 +188,12 @@ export class GameScene extends Phaser.Scene {
     this.createChatUi();
     this.createStarterSelectionUi();
 
+    this.pokemonStorageTerminalInteraction =
+      new PokemonStorageTerminalInteractionController(this);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.pokemonStorageTerminalInteraction.destroy();
+    });
+
     this.createPokemonPresentation();
     this.createBattleUi();
 
@@ -196,8 +206,10 @@ export class GameScene extends Phaser.Scene {
     this.handleChatFocus();
 
     this.updateNearbyNpc();
+    this.updatePokemonStorageTerminal();
+
     this.updateNpcInteractionPrompt();
-    this.handleNpcInteraction();
+    this.handleWorldInteraction();
 
     const input = this.movementInputController.getCurrentInput(
       this.isMovementInputBlocked()
@@ -255,6 +267,24 @@ export class GameScene extends Phaser.Scene {
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.battleController.destroy();
+    });
+  }
+
+  private createPokemonStorageUi(): void {
+    this.pokemonStorageController = new PokemonStorageController({
+      openStorage: (terminalId) => {
+        this.network.openPokemonStorage(terminalId);
+      },
+      closeStorage: () => {
+        this.network.closePokemonStorage();
+      },
+      sendCommand: (command) => {
+        this.network.sendPokemonStorageCommand(command);
+      },
+    });
+
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.pokemonStorageController.destroy();
     });
   }
 
@@ -474,10 +504,10 @@ export class GameScene extends Phaser.Scene {
       this.avatarId,
       trainerSessionToken
     );
+    this.createPokemonStorageUi();
 
     this.network.onPokemonTrainerSession(({ sessionToken }) => {
       setPokemonTrainerSessionToken(sessionToken);
-      console.log("[PokemonTrainerSession] stored");
     });
 
     this.network.onConnectionRejected((error) => {
@@ -523,16 +553,11 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.network.onBattleStarted((payload) => {
+      this.pokemonStorageController?.dismiss();
       void this.battleController.start(payload);
     });
 
     this.network.onBattleTurnResolved((payload) => {
-      console.log("[GameScene] Battle turn presentation", {
-        battleId: payload.battleId,
-        turnNumber: payload.turnNumber,
-        events: payload.events.map((event) => event.type),
-      });
-
       this.battleController.enqueueTurnPresentation(payload);
     });
 
@@ -546,6 +571,15 @@ export class GameScene extends Phaser.Scene {
 
     this.network.onBattleCompleted((payload) => {
       this.battleController.complete(payload);
+    });
+
+    this.network.onPokemonStorageState((payload) => {
+      this.pokemonStorageController.applyState(payload);
+    });
+
+    this.network.onPokemonStorageError((payload) => {
+      console.warn("[PokemonStorage] authoritative error", payload);
+      this.pokemonStorageController.applyError(payload);
     });
 
     this.network.onCurrentPlayers((players) => {
@@ -689,43 +723,47 @@ export class GameScene extends Phaser.Scene {
       .setDepth(20);
   }
 
-  private handleNpcInteraction() {
-    if (this.battleController.isActive) {
-      return;
-    }
+  private handleWorldInteraction(): void {
     if (this.isMapTransitioning) {
-      return;
-    }
-    if (this.starterSelectionPanel.isVisible()) {
-      return;
-    }
-    if (this.partyPanel.isVisible()) {
       return;
     }
     if (this.chatBox.isTyping()) {
       return;
     }
-    if (this.pendingDialogueNpc) {
-      return;
-    }
     if (!Phaser.Input.Keyboard.JustDown(this.interactKey)) {
       return;
     }
+
+    /* Dialogue activo tiene prioridad. */
     if (this.dialogueBox.isOpen()) {
       const sessionId = this.activeDialogueSessionId;
-
-      if (!sessionId) {
+      if (!sessionId || this.isDialogueAdvancePending) {
         return;
       }
-      if (this.isDialogueAdvancePending) {
-        return;
-      }
-
       this.isDialogueAdvancePending = true;
       this.network.advanceDialogue(sessionId);
       return;
     }
 
+    /* Otras UIs bloquean interacción overworld */
+    if (
+      this.starterSelectionPanel.isVisible() ||
+      this.partyPanel.isVisible() ||
+      this.battleController?.isActive ||
+      this.pokemonStorageController?.isBlockingGameplay
+    ) {
+      return;
+    }
+
+    const storageTerminalId = this.pokemonStorageTerminalInteraction.nearbyTerminalId;
+
+    if (storageTerminalId) {
+      this.partyPanel.hide();
+      this.pokemonStorageController.requestOpen(storageTerminalId);
+      return;
+    }
+
+    /* NPC sigue funcionando como antes */
     if (!this.nearbyNpc) {
       return;
     }
@@ -733,9 +771,11 @@ export class GameScene extends Phaser.Scene {
     const interactionPrompt = this.getNpcInteractionPromptText(
       this.nearbyNpc.definition.interactionType
     );
+
     if (!interactionPrompt) {
       return;
     }
+
     this.interactWithNpc(this.nearbyNpc);
   }
 
@@ -762,6 +802,12 @@ export class GameScene extends Phaser.Scene {
     if (!prompt) {
       return;
     }
+
+    if (this.pokemonStorageTerminalInteraction.hasNearbyTerminal) {
+      prompt.setVisible(false);
+      return;
+    }
+
     if (
       this.isMapTransitioning ||
       this.starterSelectionPanel.isVisible() ||
@@ -819,6 +865,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private handleChatFocus(): void {
+    if (this.pokemonStorageController?.isBlockingGameplay) {
+      return;
+    }
     if (this.isMapTransitioning) {
       return;
     }
@@ -842,7 +891,15 @@ export class GameScene extends Phaser.Scene {
   }
 
   private requestMapTransition(transitionId: string): void {
-    if (this.isMapTransitioning || this.battleController.isActive) {
+    if (
+      this.isMapTransitioning ||
+      this.dialogueBox.isOpen() ||
+      this.chatBox.isTyping() ||
+      this.starterSelectionPanel.isVisible() ||
+      this.partyPanel.isVisible() ||
+      this.battleController.isActive ||
+      this.pokemonStorageController?.isBlockingGameplay
+    ) {
       return;
     }
     const payload: MapTransitionInput = {
@@ -853,6 +910,7 @@ export class GameScene extends Phaser.Scene {
 
   private destroyCurrentMap(): void {
     this.nearbyNpc = undefined;
+    this.pokemonStorageTerminalInteraction?.clear();
     this.npcManager.destroy();
     this.mapTransitionController.clearZones();
     this.mapManager.destroy();
@@ -880,14 +938,14 @@ export class GameScene extends Phaser.Scene {
   private isMovementInputBlocked(): boolean {
     return (
       this.isMapTransitioning ||
+      this.pokemonStorageController?.isBlockingGameplay ||
       this.dialogueBox.isOpen() ||
-      this.battleController.isActive ||
       this.chatBox.isTyping() ||
       this.starterSelectionPanel.isVisible() ||
-      this.partyPanel.isVisible()
+      this.partyPanel.isVisible() ||
+      this.battleController?.isActive
     );
   }
-
   private async handlePokemonTrainerState(
     trainerState: PokemonTrainerState
   ): Promise<void> {
@@ -935,6 +993,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private handlePartyToggle(): void {
+    if (this.pokemonStorageController?.isBlockingGameplay) {
+      return;
+    }
     if (this.battleController.isActive) {
       return;
     }
@@ -990,5 +1051,23 @@ export class GameScene extends Phaser.Scene {
       speciesId: payload.pokemon.speciesId,
       level: payload.pokemon.level,
     });
+  }
+
+  private updatePokemonStorageTerminal(): void {
+    const blocked =
+      this.isMapTransitioning ||
+      this.dialogueBox.isOpen() ||
+      this.chatBox.isTyping() ||
+      this.starterSelectionPanel.isVisible() ||
+      this.partyPanel.isVisible() ||
+      this.battleController?.isActive ||
+      this.pokemonStorageController?.isBlockingGameplay;
+
+    this.pokemonStorageTerminalInteraction.update(
+      this.currentMapId,
+      this.player.x,
+      this.player.y,
+      blocked
+    );
   }
 }

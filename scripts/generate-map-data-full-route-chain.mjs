@@ -115,6 +115,51 @@ function parseNpc(object, mapName) {
     postDialogueAction,
   };
 }
+
+function parseStorageTerminal(object, mapName) {
+  if (typeof object.name !== "string" || object.name.trim().length === 0) {
+    throw new Error(`Map "${mapName}" contains a storage terminal without a name`);
+  }
+
+  const objectType = getTiledObjectType(object);
+
+  if (objectType !== "storage-terminal") {
+    throw new Error(
+      `Storage terminal "${object.name}" in map "${mapName}" must have class/type "storage-terminal"`
+    );
+  }
+
+  if (!Number.isFinite(object.x) || !Number.isFinite(object.y)) {
+    throw new Error(
+      `Invalid coordinates for storage terminal "${object.name}" in map "${mapName}"`
+    );
+  }
+
+  return {
+    id: object.name.trim(),
+    x: object.x,
+    y: object.y,
+  };
+}
+
+function formatStorageTerminals(storageTerminals) {
+  if (storageTerminals.length === 0) {
+    return `  storageTerminals: {},`;
+  }
+
+  const entries = storageTerminals.map(
+    (terminal) =>
+      `    ${JSON.stringify(terminal.id)}: {
+      x: ${terminal.x},
+      y: ${terminal.y},
+    },`
+  );
+
+  return `  storageTerminals: {
+${entries.join("\n")}
+  },`;
+}
+
 function parseMapTransition(object, mapName) {
   if (typeof object.name !== "string" || object.name.trim().length === 0) {
     throw new Error(`Map "${mapName}" contains a mapExit without a name`);
@@ -401,6 +446,10 @@ for (const mapDefinition of MAPS) {
     .filter((object) => object.type === "npc")
     .map((object) => parseNpc(object, name));
 
+  const storageTerminals = objectsLayer.objects
+    .filter((object) => getTiledObjectType(object) === "storage-terminal")
+    .map((object) => parseStorageTerminal(object, name));
+
   const transitions = objectsLayer.objects
     .filter((object) => object.type === "mapExit")
     .map((object) => parseMapTransition(object, name));
@@ -412,6 +461,8 @@ for (const mapDefinition of MAPS) {
   ensureUniqueIds(spawns, "mapSpawn", name);
 
   ensureUniqueIds(npcs, "NPC", name);
+
+  ensureUniqueIds(storageTerminals, "storage terminal", name);
 
   ensureUniqueIds(transitions, "mapExit", name);
 
@@ -427,6 +478,7 @@ for (const mapDefinition of MAPS) {
     collisionRows,
     spawns,
     npcs,
+    storageTerminals,
     transitions,
     encounterZones,
   });
@@ -469,6 +521,7 @@ for (const parsedMap of parsedMaps) {
     npcs,
     transitions,
     encounterZones,
+    storageTerminals,
   } = parsedMap;
 
   const generatedFile = `// AUTO-GENERATED FILE.
@@ -496,6 +549,8 @@ ${formatSpawns(spawns)}
 
 ${formatNpcs(npcs)}
 
+${formatStorageTerminals(storageTerminals)}
+
 ${formatTransitions(transitions)}
 
 ${formatEncounterZones(encounterZones)}
@@ -521,6 +576,8 @@ ${collisionRows.join("\n")}
   console.log(`Map spawns: ${spawns.length}`);
 
   console.log(`NPCs: ${npcs.length}`);
+
+  console.log(`Storage terminals: ${storageTerminals.length}`);
 
   console.log(`Map transitions: ${transitions.length}`);
 

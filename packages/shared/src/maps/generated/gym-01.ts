@@ -28,6 +28,8 @@ export const GYM_01_MAP = {
 
   npcs: {},
 
+  storageTerminals: {},
+
   transitions: {
     "exitToCity01": {
       targetMapId: "city-01",

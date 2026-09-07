@@ -28,6 +28,8 @@ export const POKE_SHOP_MAP = {
 
   npcs: {},
 
+  storageTerminals: {},
+
   transitions: {
     "exitToCity01": {
       targetMapId: "city-01",

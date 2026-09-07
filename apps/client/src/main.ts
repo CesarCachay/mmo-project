@@ -3,6 +3,7 @@ import "./style.css";
 import "./game/battle/ui/modern/battle-ui.css";
 import "./game/battle/ui/modern/animations.css";
 import "./game/battle/ui/modern/items.css";
+import "./game/storage/ui/pokemon-storage-ui.css";
 
 import { GameScene } from "./game/GameScene";
 import { JoinScene } from "./game/JoinScene";

@@ -37,6 +37,10 @@ import type {
   PokemonBattleCompletedPayload,
   PokemonBattleStateUpdatedPayload,
   PokemonBattleTurnResolvedPayload,
+  PokemonStorageOpenInput,
+  PokemonStorageCommand,
+  PokemonStorageStatePayload,
+  PokemonStorageErrorPayload,
 } from "@cesar-mmo/shared";
 
 type ConnectionRejectedError = {
@@ -193,6 +197,35 @@ export class GameNetworkClient {
       }
       callback(payload);
     });
+  }
+
+  // pokemon storage
+  public openPokemonStorage(terminalId: string): void {
+    const payload: PokemonStorageOpenInput = {
+      terminalId,
+    };
+
+    this.socket.emit(POKEMON_EVENTS.STORAGE_OPEN, payload);
+  }
+
+  public closePokemonStorage(): void {
+    this.socket.emit(POKEMON_EVENTS.STORAGE_CLOSE);
+  }
+
+  public sendPokemonStorageCommand(command: PokemonStorageCommand): void {
+    this.socket.emit(POKEMON_EVENTS.STORAGE_COMMAND, command);
+  }
+
+  public onPokemonStorageState(
+    callback: (payload: PokemonStorageStatePayload) => void
+  ): void {
+    this.socket.on(POKEMON_EVENTS.STORAGE_STATE, callback);
+  }
+
+  public onPokemonStorageError(
+    callback: (payload: PokemonStorageErrorPayload) => void
+  ): void {
+    this.socket.on(POKEMON_EVENTS.STORAGE_ERROR, callback);
   }
 
   // players
