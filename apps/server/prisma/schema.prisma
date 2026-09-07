@@ -11,6 +11,11 @@ model PokemonTrainer {
   id               String @id @db.Uuid
   sessionTokenHash String @unique @map("session_token_hash")
 
+  worldMapId     String? @map("world_map_id") @db.VarChar(64)
+  worldX         Float?  @map("world_x")
+  worldY         Float?  @map("world_y")
+  worldDirection String? @map("world_direction") @db.VarChar(8)
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

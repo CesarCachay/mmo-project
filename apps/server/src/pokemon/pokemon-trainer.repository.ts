@@ -9,7 +9,6 @@ import type {
 } from './pokemon-trainer-identity';
 
 import type { PokemonTrainerRecord } from './pokemon-trainer.repository.types';
-
 import { hashPokemonTrainerSessionToken } from './pokemon-trainer-session-token';
 
 @Injectable()

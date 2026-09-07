@@ -50,6 +50,7 @@ import { RemotePokemonFollowerManager } from "./pokemon/RemotePokemonFollowerMan
 
 // types
 import type {
+  Player,
   PlayerInput,
   PlayerAvatarId,
   ChatMessage,
@@ -65,6 +66,7 @@ import type {
 
 export class GameScene extends Phaser.Scene {
   private currentMapId: MapId = DEFAULT_MAP_ID;
+  private hasAppliedInitialWorldState = false;
 
   private mapManager!: MapManager;
   private player!: Phaser.GameObjects.Sprite;
@@ -121,6 +123,7 @@ export class GameScene extends Phaser.Scene {
   init(data: { displayName: string; avatarId: PlayerAvatarId }) {
     this.displayName = data.displayName;
     this.avatarId = data.avatarId;
+    this.hasAppliedInitialWorldState = false;
   }
 
   preload() {
@@ -583,20 +586,28 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.network.onCurrentPlayers((players) => {
-      console.log("Numero de players:", players);
+      const playerStates = Object.values(players);
+      const localPlayer = playerStates.find((player) => player.id === this.network.id);
+      if (!localPlayer) {
+        console.warn("[PlayerWorld] Local player missing from currentPlayers", {
+          networkId: this.network.id,
+          playerIds: Object.keys(players),
+        });
+        return;
+      }
 
-      Object.values(players).forEach((player) => {
+      this.applyInitialAuthoritativePlayerState(localPlayer);
+
+      for (const player of playerStates) {
         if (player.id === this.network.id) {
-          this.localPlayerController.snapToPosition(player.x, player.y);
-          return;
+          continue;
         }
-
         if (player.mapId !== this.currentMapId) {
-          return;
+          continue;
         }
-
         this.remotePlayerManager.add(player);
-      });
+        this.remotePokemonFollowerManager.sync(player);
+      }
     });
 
     this.network.onPlayerJoined((player) => {
@@ -643,6 +654,39 @@ export class GameScene extends Phaser.Scene {
       this.remotePlayerManager.remove(playerId);
       this.remotePokemonFollowerManager.remove(playerId);
     });
+  }
+
+  private applyInitialAuthoritativePlayerState(player: Player): void {
+    if (player.mapId !== this.currentMapId) {
+      this.changeCurrentMap(player.mapId);
+    }
+
+    this.localPlayerController.setDirection(player.direction);
+    this.localPlayerController.snapToPosition(player.x, player.y);
+
+    this.pokemonFollowerController.resetToPlayerPosition(
+      player.x,
+      player.y,
+      player.direction
+    );
+
+    this.mapTransitionController.resetExitTracking();
+    this.updateCameraBounds();
+    this.movementInputController.resetLastInputToNeutral();
+    this.localPlayerController.setIdle();
+
+    if (!this.hasAppliedInitialWorldState) {
+      this.hasAppliedInitialWorldState = true;
+      const camera = this.cameras.main;
+      this.tweens.killTweensOf(camera);
+      camera.setAlpha(0);
+      this.tweens.add({
+        targets: camera,
+        alpha: 1,
+        duration: 180,
+        ease: "Linear",
+      });
+    }
   }
 
   private handleMapTransitionResolved(transition: MapTransitionResolved): void {
@@ -706,8 +750,10 @@ export class GameScene extends Phaser.Scene {
   }
 
   private setupCamera(): void {
+    const camera = this.cameras.main;
+    camera.setAlpha(0);
     this.updateCameraBounds();
-    this.cameras.main.startFollow(this.player, true);
+    camera.startFollow(this.player, true);
   }
 
   private createPlayerNameLabel(displayName: string): Phaser.GameObjects.Text {

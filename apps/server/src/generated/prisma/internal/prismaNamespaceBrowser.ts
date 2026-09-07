@@ -76,6 +76,10 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 export const PokemonTrainerScalarFieldEnum = {
   id: 'id',
   sessionTokenHash: 'sessionTokenHash',
+  worldMapId: 'worldMapId',
+  worldX: 'worldX',
+  worldY: 'worldY',
+  worldDirection: 'worldDirection',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

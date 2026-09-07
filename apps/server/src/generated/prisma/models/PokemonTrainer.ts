@@ -20,13 +20,29 @@ export type PokemonTrainerModel = runtime.Types.Result.DefaultSelection<Prisma.$
 
 export type AggregatePokemonTrainer = {
   _count: PokemonTrainerCountAggregateOutputType | null
+  _avg: PokemonTrainerAvgAggregateOutputType | null
+  _sum: PokemonTrainerSumAggregateOutputType | null
   _min: PokemonTrainerMinAggregateOutputType | null
   _max: PokemonTrainerMaxAggregateOutputType | null
+}
+
+export type PokemonTrainerAvgAggregateOutputType = {
+  worldX: number | null
+  worldY: number | null
+}
+
+export type PokemonTrainerSumAggregateOutputType = {
+  worldX: number | null
+  worldY: number | null
 }
 
 export type PokemonTrainerMinAggregateOutputType = {
   id: string | null
   sessionTokenHash: string | null
+  worldMapId: string | null
+  worldX: number | null
+  worldY: number | null
+  worldDirection: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -34,6 +50,10 @@ export type PokemonTrainerMinAggregateOutputType = {
 export type PokemonTrainerMaxAggregateOutputType = {
   id: string | null
   sessionTokenHash: string | null
+  worldMapId: string | null
+  worldX: number | null
+  worldY: number | null
+  worldDirection: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -41,15 +61,33 @@ export type PokemonTrainerMaxAggregateOutputType = {
 export type PokemonTrainerCountAggregateOutputType = {
   id: number
   sessionTokenHash: number
+  worldMapId: number
+  worldX: number
+  worldY: number
+  worldDirection: number
   createdAt: number
   updatedAt: number
   _all: number
 }
 
 
+export type PokemonTrainerAvgAggregateInputType = {
+  worldX?: true
+  worldY?: true
+}
+
+export type PokemonTrainerSumAggregateInputType = {
+  worldX?: true
+  worldY?: true
+}
+
 export type PokemonTrainerMinAggregateInputType = {
   id?: true
   sessionTokenHash?: true
+  worldMapId?: true
+  worldX?: true
+  worldY?: true
+  worldDirection?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -57,6 +95,10 @@ export type PokemonTrainerMinAggregateInputType = {
 export type PokemonTrainerMaxAggregateInputType = {
   id?: true
   sessionTokenHash?: true
+  worldMapId?: true
+  worldX?: true
+  worldY?: true
+  worldDirection?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -64,6 +106,10 @@ export type PokemonTrainerMaxAggregateInputType = {
 export type PokemonTrainerCountAggregateInputType = {
   id?: true
   sessionTokenHash?: true
+  worldMapId?: true
+  worldX?: true
+  worldY?: true
+  worldDirection?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -107,6 +153,18 @@ export type PokemonTrainerAggregateArgs<ExtArgs extends runtime.Types.Extensions
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: PokemonTrainerAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: PokemonTrainerSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: PokemonTrainerMinAggregateInputType
@@ -137,6 +195,8 @@ export type PokemonTrainerGroupByArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   _count?: PokemonTrainerCountAggregateInputType | true
+  _avg?: PokemonTrainerAvgAggregateInputType
+  _sum?: PokemonTrainerSumAggregateInputType
   _min?: PokemonTrainerMinAggregateInputType
   _max?: PokemonTrainerMaxAggregateInputType
 }
@@ -144,9 +204,15 @@ export type PokemonTrainerGroupByArgs<ExtArgs extends runtime.Types.Extensions.I
 export type PokemonTrainerGroupByOutputType = {
   id: string
   sessionTokenHash: string
+  worldMapId: string | null
+  worldX: number | null
+  worldY: number | null
+  worldDirection: string | null
   createdAt: Date
   updatedAt: Date
   _count: PokemonTrainerCountAggregateOutputType | null
+  _avg: PokemonTrainerAvgAggregateOutputType | null
+  _sum: PokemonTrainerSumAggregateOutputType | null
   _min: PokemonTrainerMinAggregateOutputType | null
   _max: PokemonTrainerMaxAggregateOutputType | null
 }
@@ -172,6 +238,10 @@ export type PokemonTrainerWhereInput = {
   NOT?: Prisma.PokemonTrainerWhereInput | Prisma.PokemonTrainerWhereInput[]
   id?: Prisma.UuidFilter<"PokemonTrainer"> | string
   sessionTokenHash?: Prisma.StringFilter<"PokemonTrainer"> | string
+  worldMapId?: Prisma.StringNullableFilter<"PokemonTrainer"> | string | null
+  worldX?: Prisma.FloatNullableFilter<"PokemonTrainer"> | number | null
+  worldY?: Prisma.FloatNullableFilter<"PokemonTrainer"> | number | null
+  worldDirection?: Prisma.StringNullableFilter<"PokemonTrainer"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PokemonTrainer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PokemonTrainer"> | Date | string
   pokemonInstances?: Prisma.PokemonInstanceListRelationFilter
@@ -181,6 +251,10 @@ export type PokemonTrainerWhereInput = {
 export type PokemonTrainerOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   sessionTokenHash?: Prisma.SortOrder
+  worldMapId?: Prisma.SortOrderInput | Prisma.SortOrder
+  worldX?: Prisma.SortOrderInput | Prisma.SortOrder
+  worldY?: Prisma.SortOrderInput | Prisma.SortOrder
+  worldDirection?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   pokemonInstances?: Prisma.PokemonInstanceOrderByRelationAggregateInput
@@ -193,6 +267,10 @@ export type PokemonTrainerWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.PokemonTrainerWhereInput | Prisma.PokemonTrainerWhereInput[]
   OR?: Prisma.PokemonTrainerWhereInput[]
   NOT?: Prisma.PokemonTrainerWhereInput | Prisma.PokemonTrainerWhereInput[]
+  worldMapId?: Prisma.StringNullableFilter<"PokemonTrainer"> | string | null
+  worldX?: Prisma.FloatNullableFilter<"PokemonTrainer"> | number | null
+  worldY?: Prisma.FloatNullableFilter<"PokemonTrainer"> | number | null
+  worldDirection?: Prisma.StringNullableFilter<"PokemonTrainer"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PokemonTrainer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PokemonTrainer"> | Date | string
   pokemonInstances?: Prisma.PokemonInstanceListRelationFilter
@@ -202,11 +280,17 @@ export type PokemonTrainerWhereUniqueInput = Prisma.AtLeast<{
 export type PokemonTrainerOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   sessionTokenHash?: Prisma.SortOrder
+  worldMapId?: Prisma.SortOrderInput | Prisma.SortOrder
+  worldX?: Prisma.SortOrderInput | Prisma.SortOrder
+  worldY?: Prisma.SortOrderInput | Prisma.SortOrder
+  worldDirection?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.PokemonTrainerCountOrderByAggregateInput
+  _avg?: Prisma.PokemonTrainerAvgOrderByAggregateInput
   _max?: Prisma.PokemonTrainerMaxOrderByAggregateInput
   _min?: Prisma.PokemonTrainerMinOrderByAggregateInput
+  _sum?: Prisma.PokemonTrainerSumOrderByAggregateInput
 }
 
 export type PokemonTrainerScalarWhereWithAggregatesInput = {
@@ -215,6 +299,10 @@ export type PokemonTrainerScalarWhereWithAggregatesInput = {
   NOT?: Prisma.PokemonTrainerScalarWhereWithAggregatesInput | Prisma.PokemonTrainerScalarWhereWithAggregatesInput[]
   id?: Prisma.UuidWithAggregatesFilter<"PokemonTrainer"> | string
   sessionTokenHash?: Prisma.StringWithAggregatesFilter<"PokemonTrainer"> | string
+  worldMapId?: Prisma.StringNullableWithAggregatesFilter<"PokemonTrainer"> | string | null
+  worldX?: Prisma.FloatNullableWithAggregatesFilter<"PokemonTrainer"> | number | null
+  worldY?: Prisma.FloatNullableWithAggregatesFilter<"PokemonTrainer"> | number | null
+  worldDirection?: Prisma.StringNullableWithAggregatesFilter<"PokemonTrainer"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PokemonTrainer"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PokemonTrainer"> | Date | string
 }
@@ -222,6 +310,10 @@ export type PokemonTrainerScalarWhereWithAggregatesInput = {
 export type PokemonTrainerCreateInput = {
   id: string
   sessionTokenHash: string
+  worldMapId?: string | null
+  worldX?: number | null
+  worldY?: number | null
+  worldDirection?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   pokemonInstances?: Prisma.PokemonInstanceCreateNestedManyWithoutTrainerInput
@@ -231,6 +323,10 @@ export type PokemonTrainerCreateInput = {
 export type PokemonTrainerUncheckedCreateInput = {
   id: string
   sessionTokenHash: string
+  worldMapId?: string | null
+  worldX?: number | null
+  worldY?: number | null
+  worldDirection?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   pokemonInstances?: Prisma.PokemonInstanceUncheckedCreateNestedManyWithoutTrainerInput
@@ -240,6 +336,10 @@ export type PokemonTrainerUncheckedCreateInput = {
 export type PokemonTrainerUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sessionTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  worldMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pokemonInstances?: Prisma.PokemonInstanceUpdateManyWithoutTrainerNestedInput
@@ -249,6 +349,10 @@ export type PokemonTrainerUpdateInput = {
 export type PokemonTrainerUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sessionTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  worldMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pokemonInstances?: Prisma.PokemonInstanceUncheckedUpdateManyWithoutTrainerNestedInput
@@ -258,6 +362,10 @@ export type PokemonTrainerUncheckedUpdateInput = {
 export type PokemonTrainerCreateManyInput = {
   id: string
   sessionTokenHash: string
+  worldMapId?: string | null
+  worldX?: number | null
+  worldY?: number | null
+  worldDirection?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -265,6 +373,10 @@ export type PokemonTrainerCreateManyInput = {
 export type PokemonTrainerUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sessionTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  worldMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -272,6 +384,10 @@ export type PokemonTrainerUpdateManyMutationInput = {
 export type PokemonTrainerUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sessionTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  worldMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -279,13 +395,26 @@ export type PokemonTrainerUncheckedUpdateManyInput = {
 export type PokemonTrainerCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   sessionTokenHash?: Prisma.SortOrder
+  worldMapId?: Prisma.SortOrder
+  worldX?: Prisma.SortOrder
+  worldY?: Prisma.SortOrder
+  worldDirection?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type PokemonTrainerAvgOrderByAggregateInput = {
+  worldX?: Prisma.SortOrder
+  worldY?: Prisma.SortOrder
 }
 
 export type PokemonTrainerMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   sessionTokenHash?: Prisma.SortOrder
+  worldMapId?: Prisma.SortOrder
+  worldX?: Prisma.SortOrder
+  worldY?: Prisma.SortOrder
+  worldDirection?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -293,8 +422,17 @@ export type PokemonTrainerMaxOrderByAggregateInput = {
 export type PokemonTrainerMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   sessionTokenHash?: Prisma.SortOrder
+  worldMapId?: Prisma.SortOrder
+  worldX?: Prisma.SortOrder
+  worldY?: Prisma.SortOrder
+  worldDirection?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type PokemonTrainerSumOrderByAggregateInput = {
+  worldX?: Prisma.SortOrder
+  worldY?: Prisma.SortOrder
 }
 
 export type PokemonTrainerScalarRelationFilter = {
@@ -304,6 +442,18 @@ export type PokemonTrainerScalarRelationFilter = {
 
 export type StringFieldUpdateOperationsInput = {
   set?: string
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
+}
+
+export type NullableFloatFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -341,6 +491,10 @@ export type PokemonTrainerUpdateOneRequiredWithoutInventoryItemsNestedInput = {
 export type PokemonTrainerCreateWithoutPokemonInstancesInput = {
   id: string
   sessionTokenHash: string
+  worldMapId?: string | null
+  worldX?: number | null
+  worldY?: number | null
+  worldDirection?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   inventoryItems?: Prisma.PokemonTrainerInventoryItemCreateNestedManyWithoutTrainerInput
@@ -349,6 +503,10 @@ export type PokemonTrainerCreateWithoutPokemonInstancesInput = {
 export type PokemonTrainerUncheckedCreateWithoutPokemonInstancesInput = {
   id: string
   sessionTokenHash: string
+  worldMapId?: string | null
+  worldX?: number | null
+  worldY?: number | null
+  worldDirection?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   inventoryItems?: Prisma.PokemonTrainerInventoryItemUncheckedCreateNestedManyWithoutTrainerInput
@@ -373,6 +531,10 @@ export type PokemonTrainerUpdateToOneWithWhereWithoutPokemonInstancesInput = {
 export type PokemonTrainerUpdateWithoutPokemonInstancesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sessionTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  worldMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inventoryItems?: Prisma.PokemonTrainerInventoryItemUpdateManyWithoutTrainerNestedInput
@@ -381,6 +543,10 @@ export type PokemonTrainerUpdateWithoutPokemonInstancesInput = {
 export type PokemonTrainerUncheckedUpdateWithoutPokemonInstancesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sessionTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  worldMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inventoryItems?: Prisma.PokemonTrainerInventoryItemUncheckedUpdateManyWithoutTrainerNestedInput
@@ -389,6 +555,10 @@ export type PokemonTrainerUncheckedUpdateWithoutPokemonInstancesInput = {
 export type PokemonTrainerCreateWithoutInventoryItemsInput = {
   id: string
   sessionTokenHash: string
+  worldMapId?: string | null
+  worldX?: number | null
+  worldY?: number | null
+  worldDirection?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   pokemonInstances?: Prisma.PokemonInstanceCreateNestedManyWithoutTrainerInput
@@ -397,6 +567,10 @@ export type PokemonTrainerCreateWithoutInventoryItemsInput = {
 export type PokemonTrainerUncheckedCreateWithoutInventoryItemsInput = {
   id: string
   sessionTokenHash: string
+  worldMapId?: string | null
+  worldX?: number | null
+  worldY?: number | null
+  worldDirection?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   pokemonInstances?: Prisma.PokemonInstanceUncheckedCreateNestedManyWithoutTrainerInput
@@ -421,6 +595,10 @@ export type PokemonTrainerUpdateToOneWithWhereWithoutInventoryItemsInput = {
 export type PokemonTrainerUpdateWithoutInventoryItemsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sessionTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  worldMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pokemonInstances?: Prisma.PokemonInstanceUpdateManyWithoutTrainerNestedInput
@@ -429,6 +607,10 @@ export type PokemonTrainerUpdateWithoutInventoryItemsInput = {
 export type PokemonTrainerUncheckedUpdateWithoutInventoryItemsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sessionTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  worldMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pokemonInstances?: Prisma.PokemonInstanceUncheckedUpdateManyWithoutTrainerNestedInput
@@ -477,6 +659,10 @@ export type PokemonTrainerCountOutputTypeCountInventoryItemsArgs<ExtArgs extends
 export type PokemonTrainerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   sessionTokenHash?: boolean
+  worldMapId?: boolean
+  worldX?: boolean
+  worldY?: boolean
+  worldDirection?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   pokemonInstances?: boolean | Prisma.PokemonTrainer$pokemonInstancesArgs<ExtArgs>
@@ -487,6 +673,10 @@ export type PokemonTrainerSelect<ExtArgs extends runtime.Types.Extensions.Intern
 export type PokemonTrainerSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   sessionTokenHash?: boolean
+  worldMapId?: boolean
+  worldX?: boolean
+  worldY?: boolean
+  worldDirection?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["pokemonTrainer"]>
@@ -494,6 +684,10 @@ export type PokemonTrainerSelectCreateManyAndReturn<ExtArgs extends runtime.Type
 export type PokemonTrainerSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   sessionTokenHash?: boolean
+  worldMapId?: boolean
+  worldX?: boolean
+  worldY?: boolean
+  worldDirection?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["pokemonTrainer"]>
@@ -501,11 +695,15 @@ export type PokemonTrainerSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
 export type PokemonTrainerSelectScalar = {
   id?: boolean
   sessionTokenHash?: boolean
+  worldMapId?: boolean
+  worldX?: boolean
+  worldY?: boolean
+  worldDirection?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PokemonTrainerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sessionTokenHash" | "createdAt" | "updatedAt", ExtArgs["result"]["pokemonTrainer"]>
+export type PokemonTrainerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sessionTokenHash" | "worldMapId" | "worldX" | "worldY" | "worldDirection" | "createdAt" | "updatedAt", ExtArgs["result"]["pokemonTrainer"]>
 export type PokemonTrainerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pokemonInstances?: boolean | Prisma.PokemonTrainer$pokemonInstancesArgs<ExtArgs>
   inventoryItems?: boolean | Prisma.PokemonTrainer$inventoryItemsArgs<ExtArgs>
@@ -523,6 +721,10 @@ export type $PokemonTrainerPayload<ExtArgs extends runtime.Types.Extensions.Inte
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     sessionTokenHash: string
+    worldMapId: string | null
+    worldX: number | null
+    worldY: number | null
+    worldDirection: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["pokemonTrainer"]>
@@ -952,6 +1154,10 @@ export interface Prisma__PokemonTrainerClient<T, Null = never, ExtArgs extends r
 export interface PokemonTrainerFieldRefs {
   readonly id: Prisma.FieldRef<"PokemonTrainer", 'String'>
   readonly sessionTokenHash: Prisma.FieldRef<"PokemonTrainer", 'String'>
+  readonly worldMapId: Prisma.FieldRef<"PokemonTrainer", 'String'>
+  readonly worldX: Prisma.FieldRef<"PokemonTrainer", 'Float'>
+  readonly worldY: Prisma.FieldRef<"PokemonTrainer", 'Float'>
+  readonly worldDirection: Prisma.FieldRef<"PokemonTrainer", 'String'>
   readonly createdAt: Prisma.FieldRef<"PokemonTrainer", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"PokemonTrainer", 'DateTime'>
 }

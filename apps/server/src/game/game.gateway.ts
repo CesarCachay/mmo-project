@@ -13,7 +13,6 @@ import { OnModuleDestroy } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 
 import {
-  DEFAULT_MAP_ID,
   PLAYER_SIZE,
   PLAYER_COLORS,
   SERVER_TICK_RATE,
@@ -61,6 +60,7 @@ import {
 } from './maps/serverMapRegistry';
 import { ChatService } from 'src/chat/chat.service';
 
+import type { PlayerWorldLocation } from './world/player-world.types';
 import type {
   Player,
   PlayerInput,
@@ -130,8 +130,11 @@ import {
   applyPokemonWildBattleEscapeOutcome,
   applyPokemonWildBattleCaptureOutcome,
 } from '../pokemon/battles/pokemon-wild-battle-outcome.runtime';
-
+import { PlayerWorldStateService } from './world/player-world-state.service';
 import { PokemonStorageService } from 'src/pokemon/storage/pokemon-storage.service';
+
+// stores
+import { PlayerWorldRuntimeStore } from './world/player-world-runtime.store';
 import { PokemonStorageAccessSessionStore } from 'src/pokemon/storage/pokemon-storage-access-session.store';
 
 type BattleTurnTerminalOutcome = 'trainer-escaped' | 'wild-captured';
@@ -156,9 +159,6 @@ export class GameGateway
 {
   @WebSocketServer()
   server!: Server;
-
-  private players: Record<string, Player> = {};
-  private playerInputs: Record<string, PlayerInput> = {};
 
   private readonly playerEncounterZoneIds = new Map<string, string>();
 
@@ -194,6 +194,8 @@ export class GameGateway
     private readonly pokemonInventoryRepository: PokemonInventoryRepository,
     private readonly pokemonCaptureRepository: PokemonCaptureRepository,
     private readonly pokemonStorageRepository: PokemonStorageRepository,
+    private readonly playerWorldRuntimeStore: PlayerWorldRuntimeStore,
+    private readonly playerWorldStateService: PlayerWorldStateService,
   ) {
     this.pokemonTrainerService = new PokemonTrainerService(
       this.pokemonTrainerStateStore,
@@ -215,10 +217,37 @@ export class GameGateway
     this.startGameLoop();
   }
 
-  onModuleDestroy() {
+  async onModuleDestroy(): Promise<void> {
     if (this.gameLoop) {
       clearInterval(this.gameLoop);
+      this.gameLoop = undefined;
     }
+
+    const worldSnapshots: Array<{
+      trainerId: PokemonTrainerId;
+      player: Player;
+    }> = [];
+
+    for (const [, player] of this.playerWorldRuntimeStore.entries()) {
+      const trainerId = this.getTrainerId(player.id);
+
+      if (!trainerId) {
+        console.warn(
+          '[PlayerWorld] Skipping shutdown flush: trainer identity missing',
+          {
+            playerId: player.id,
+          },
+        );
+        continue;
+      }
+
+      worldSnapshots.push({
+        trainerId,
+        player,
+      });
+    }
+
+    await this.playerWorldStateService.flushPlayers(worldSnapshots);
   }
 
   async handleConnection(client: Socket): Promise<void> {
@@ -256,36 +285,19 @@ export class GameGateway
 
     this.nextColorIndex++;
 
-    const newPlayer: Player = {
-      id: client.id,
-      mapId: DEFAULT_MAP_ID,
-      displayName,
-      avatarId,
-      x: MAP_DATA_REGISTRY[DEFAULT_MAP_ID].spawn.x,
-      y: MAP_DATA_REGISTRY[DEFAULT_MAP_ID].spawn.y,
-      color,
-      direction: 'down',
-      isMoving: false,
-      lastProcessedInputSequence: 0,
-    };
-
     const requestedTrainerSessionToken =
       this.getRequestedTrainerSessionToken(client);
 
     let trainerIdentity: PokemonTrainerIdentity;
-    let restored: boolean;
     let trainerState: PokemonTrainerState;
+    let initialWorldLocation: PlayerWorldLocation;
 
     try {
       const resolution = await this.resolvePokemonTrainerIdentity(
-        newPlayer.id,
+        client.id,
         requestedTrainerSessionToken,
       );
-
       trainerIdentity = resolution.identity;
-
-      restored = resolution.restored;
-
       const existingTrainerState = this.pokemonTrainerStateStore.get(
         trainerIdentity.trainerId,
       );
@@ -307,6 +319,11 @@ export class GameGateway
         );
       }
 
+      initialWorldLocation =
+        await this.playerWorldStateService.loadInitialLocation(
+          trainerIdentity.trainerId,
+        );
+
       // TO REMOVE - TEST
       // trainerState =
       //   await this.pokemonTrainerService.ensureDevelopmentBattleTestParty(
@@ -314,7 +331,7 @@ export class GameGateway
       //   );
     } catch (error: unknown) {
       console.error('[PokemonTrainerIdentity] resolution failed', error);
-      this.pokemonTrainerIdentityStore.unbind(newPlayer.id);
+      this.pokemonTrainerIdentityStore.unbind(client.id);
       client.emit('connectionRejected', {
         code: 'TRAINER_SESSION_ERROR',
         message: 'Could not restore the trainer session.',
@@ -323,24 +340,27 @@ export class GameGateway
       return;
     }
 
-    this.players[client.id] = newPlayer;
+    const newPlayer: Player = {
+      id: client.id,
+      mapId: initialWorldLocation.mapId,
+      displayName,
+      avatarId,
+      x: initialWorldLocation.x,
+      y: initialWorldLocation.y,
+      color,
+      direction: initialWorldLocation.direction,
+      isMoving: false,
+      lastProcessedInputSequence: 0,
+    };
 
+    this.playerWorldRuntimeStore.addPlayer(newPlayer);
     this.syncPlayerPokemonFollower(client.id, trainerState);
-
-    this.playerInputs[client.id] = {
+    this.playerWorldRuntimeStore.setInput(client.id, {
       sequence: 0,
       up: false,
       down: false,
       left: false,
       right: false,
-    };
-
-    console.log('[PokemonTrainerIdentity]', {
-      restored,
-      source: restored ? 'postgresql' : 'created',
-      playerId: newPlayer.id,
-      trainerId: trainerIdentity.trainerId,
-      partySize: trainerState.party.pokemon.length,
     });
 
     const trainerStatePayload: PokemonTrainerStatePayload = {
@@ -357,14 +377,20 @@ export class GameGateway
     await client.join(mapRoom);
 
     console.log(`Player connected: ${client.id}`);
-    client.emit('currentPlayers', this.getPlayersInMap(newPlayer.mapId));
+    client.emit(
+      'currentPlayers',
+      this.playerWorldRuntimeStore.getPlayersInMap(newPlayer.mapId),
+    );
     client.to(mapRoom).emit('playerJoined', newPlayer);
   }
 
   handleDisconnect(client: Socket) {
-    const player = this.players[client.id];
+    const player = this.playerWorldRuntimeStore.getPlayer(client.id);
     const trainerId = this.getTrainerId(client.id);
 
+    if (player && trainerId) {
+      this.playerWorldStateService.checkpointPlayer(trainerId, player);
+    }
     if (trainerId) {
       this.pokemonTrainerStateStore.lockStarterSelection(trainerId);
     }
@@ -380,8 +406,7 @@ export class GameGateway
     console.log(`Player disconnected: ${client.id}`);
 
     const mapRoom = this.getMapRoom(player.mapId);
-    delete this.players[client.id];
-    delete this.playerInputs[client.id];
+    this.playerWorldRuntimeStore.removePlayer(client.id);
     this.playerEncounterZoneIds.delete(client.id);
     this.pokemonWildEncounterTriggerService.reset(client.id);
     this.pokemonWildEncounterSessionStore.remove(client.id);
@@ -393,18 +418,16 @@ export class GameGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() input: PlayerInput,
   ) {
-    const player = this.players[client.id];
+    const player = this.playerWorldRuntimeStore.getPlayer(client.id);
 
     if (!player) {
       return;
     }
-
     if (input.sequence <= player.lastProcessedInputSequence) {
       return;
     }
 
-    this.playerInputs[client.id] = input;
-
+    this.playerWorldRuntimeStore.setInput(client.id, input);
     player.lastProcessedInputSequence = input.sequence;
   }
 
@@ -417,7 +440,7 @@ export class GameGateway
       return;
     }
 
-    const player = this.players[client.id];
+    const player = this.playerWorldRuntimeStore.getPlayer(client.id);
     if (!player) {
       return;
     }
@@ -438,7 +461,7 @@ export class GameGateway
       return;
     }
 
-    const player = this.players[client.id];
+    const player = this.playerWorldRuntimeStore.getPlayer(client.id);
     if (!player) {
       return;
     }
@@ -486,7 +509,7 @@ export class GameGateway
       return;
     }
 
-    const player = this.players[client.id];
+    const player = this.playerWorldRuntimeStore.getPlayer(client.id);
     if (!player) {
       return;
     }
@@ -539,7 +562,7 @@ export class GameGateway
       return;
     }
 
-    const player = this.players[client.id];
+    const player = this.playerWorldRuntimeStore.getPlayer(client.id);
     if (!player) {
       return;
     }
@@ -904,7 +927,7 @@ export class GameGateway
       return;
     }
 
-    const player = this.players[client.id];
+    const player = this.playerWorldRuntimeStore.getPlayer(client.id);
     if (!player) {
       return;
     }
@@ -951,6 +974,7 @@ export class GameGateway
     }
 
     const fromMapId = player.mapId;
+
     const resolvedTransition: MapTransitionResolved = {
       transitionId: payload.transitionId.trim(),
       fromMapId,
@@ -960,6 +984,30 @@ export class GameGateway
       y: targetSpawn.y,
     };
 
+    const trainerId = this.getTrainerId(client.id);
+
+    if (!trainerId) {
+      console.warn('[MapTransition] trainer identity missing', {
+        playerId: client.id,
+      });
+      return;
+    }
+
+    try {
+      await this.playerWorldStateService.saveLocation(trainerId, {
+        mapId: transition.targetMapId,
+        x: targetSpawn.x,
+        y: targetSpawn.y,
+        direction: player.direction,
+      });
+    } catch (error: unknown) {
+      console.warn('[MapTransition] World persistence failed', {
+        trainerId,
+        error,
+      });
+      return;
+    }
+
     const fromRoom = this.getMapRoom(fromMapId);
     const targetRoom = this.getMapRoom(transition.targetMapId);
 
@@ -967,18 +1015,21 @@ export class GameGateway
     client.to(fromRoom).emit(MAP_EVENTS.PLAYER_LEFT, player.id);
     await client.leave(fromRoom);
 
-    player.mapId = transition.targetMapId;
+    this.playerWorldRuntimeStore.movePlayerToMap(
+      client.id,
+      transition.targetMapId,
+    );
     player.x = targetSpawn.x;
     player.y = targetSpawn.y;
     player.isMoving = false;
 
-    this.playerInputs[client.id] = {
+    this.playerWorldRuntimeStore.setInput(client.id, {
       sequence: player.lastProcessedInputSequence,
       up: false,
       down: false,
       left: false,
       right: false,
-    };
+    });
 
     /* Entramos al nuevo room */
     await client.join(targetRoom);
@@ -1007,7 +1058,7 @@ export class GameGateway
       return;
     }
 
-    const player = this.players[client.id];
+    const player = this.playerWorldRuntimeStore.getPlayer(client.id);
 
     const trainerId = this.getTrainerId(client.id);
 
@@ -1222,13 +1273,11 @@ export class GameGateway
   private updatePlayers(deltaMs: number) {
     const deltaSeconds = deltaMs / 1000;
 
-    for (const [playerId, player] of Object.entries(this.players)) {
-      const input = this.playerInputs[playerId];
-
+    for (const [playerId, player] of this.playerWorldRuntimeStore.entries()) {
+      const input = this.playerWorldRuntimeStore.getInput(playerId);
       if (!input) {
         continue;
       }
-
       this.updatePlayer(player, input, deltaSeconds);
     }
 
@@ -1240,6 +1289,7 @@ export class GameGateway
     input: PlayerInput,
     deltaSeconds: number,
   ) {
+    const wasMoving = player.isMoving;
     const isInDialogue = this.dialogueSessionStore.has(player.id);
     const isUsingStorage = this.pokemonStorageAccessSessionStore.has(player.id);
     const isInBattle =
@@ -1247,6 +1297,9 @@ export class GameGateway
 
     if (isInDialogue || isUsingStorage || isInBattle) {
       player.isMoving = false;
+      if (wasMoving) {
+        this.checkpointPlayerWorldLocation(player);
+      }
       return;
     }
 
@@ -1274,6 +1327,10 @@ export class GameGateway
 
     player.x = resolvedPosition.x;
     player.y = resolvedPosition.y;
+
+    if (wasMoving && !player.isMoving) {
+      this.checkpointPlayerWorldLocation(player);
+    }
 
     const movedDistance = Math.hypot(
       player.x - previousX,
@@ -1358,41 +1415,17 @@ export class GameGateway
   }
 
   private isDisplayNameInUse(displayName: string): boolean {
-    const normalizedDisplayName = displayName.trim().toLowerCase();
-
-    return Object.values(this.players).some(
-      (player) =>
-        player.displayName.trim().toLowerCase() === normalizedDisplayName,
-    );
+    return this.playerWorldRuntimeStore.isDisplayNameInUse(displayName);
   }
 
   private getMapRoom(mapId: MapId): string {
     return `map:${mapId}`;
   }
 
-  private getPlayersInMap(mapId: MapId): Record<string, Player> {
-    const playersInMap: Record<string, Player> = {};
-
-    for (const [playerId, player] of Object.entries(this.players)) {
-      if (player.mapId !== mapId) {
-        continue;
-      }
-      playersInMap[playerId] = player;
-    }
-
-    return playersInMap;
-  }
-
   private emitPlayersStateByMap(): void {
-    const activeMapIds = new Set<MapId>();
-
-    for (const player of Object.values(this.players)) {
-      activeMapIds.add(player.mapId);
-    }
-
-    for (const mapId of activeMapIds) {
+    for (const mapId of this.playerWorldRuntimeStore.getActiveMapIds()) {
       const room = this.getMapRoom(mapId);
-      const players = this.getPlayersInMap(mapId);
+      const players = this.playerWorldRuntimeStore.getPlayersInMap(mapId);
       this.server.to(room).emit('playersState', players);
     }
   }
@@ -1468,7 +1501,7 @@ export class GameGateway
     playerId: string,
     trainerState: PokemonTrainerState,
   ): void {
-    const player = this.players[playerId];
+    const player = this.playerWorldRuntimeStore.getPlayer(playerId);
 
     if (!player) {
       return;
@@ -1914,7 +1947,7 @@ export class GameGateway
         trainerId: PokemonTrainerId;
       }
     | undefined {
-    const player = this.players[playerId];
+    const player = this.playerWorldRuntimeStore.getPlayer(playerId);
 
     if (!player) {
       return undefined;
@@ -1978,5 +2011,13 @@ export class GameGateway
       code,
       message,
     } satisfies PokemonStorageErrorPayload);
+  }
+
+  private checkpointPlayerWorldLocation(player: Player): void {
+    const trainerId = this.getTrainerId(player.id);
+    if (!trainerId) {
+      return;
+    }
+    this.playerWorldStateService.checkpointPlayer(trainerId, player);
   }
 }
