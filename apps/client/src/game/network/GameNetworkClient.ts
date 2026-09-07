@@ -11,6 +11,9 @@ import {
   isPokemonBattleCompletedPayload,
   isPokemonBattleStateUpdatedPayload,
   isPokemonBattleTurnResolvedPayload,
+  POKEMON_OVERWORLD_ITEM_EVENTS,
+  isPokemonOverworldItemUsedPayload,
+  isPokemonOverworldItemErrorPayload,
 } from "@cesar-mmo/shared";
 
 import type {
@@ -41,6 +44,9 @@ import type {
   PokemonStorageCommand,
   PokemonStorageStatePayload,
   PokemonStorageErrorPayload,
+  PokemonOverworldItemUseInput,
+  PokemonOverworldItemUsedPayload,
+  PokemonOverworldItemErrorPayload,
 } from "@cesar-mmo/shared";
 
 type ConnectionRejectedError = {
@@ -193,6 +199,35 @@ export class GameNetworkClient {
     this.socket.on(POKEMON_EVENTS.BATTLE_STATE_UPDATED, (payload: unknown) => {
       if (!isPokemonBattleStateUpdatedPayload(payload)) {
         console.warn("[BattleState] invalid payload", payload);
+        return;
+      }
+      callback(payload);
+    });
+  }
+
+  // pokemon overworld items
+  public usePokemonOverworldItem(input: PokemonOverworldItemUseInput): void {
+    this.socket.emit(POKEMON_OVERWORLD_ITEM_EVENTS.USE, input);
+  }
+
+  public onPokemonOverworldItemUsed(
+    callback: (payload: PokemonOverworldItemUsedPayload) => void
+  ): void {
+    this.socket.on(POKEMON_OVERWORLD_ITEM_EVENTS.USED, (payload: unknown) => {
+      if (!isPokemonOverworldItemUsedPayload(payload)) {
+        console.warn("[PokemonOverworldItem] invalid USED payload", payload);
+        return;
+      }
+      callback(payload);
+    });
+  }
+
+  public onPokemonOverworldItemError(
+    callback: (payload: PokemonOverworldItemErrorPayload) => void
+  ): void {
+    this.socket.on(POKEMON_OVERWORLD_ITEM_EVENTS.ERROR, (payload: unknown) => {
+      if (!isPokemonOverworldItemErrorPayload(payload)) {
+        console.warn("[PokemonOverworldItem] invalid ERROR payload", payload);
         return;
       }
       callback(payload);

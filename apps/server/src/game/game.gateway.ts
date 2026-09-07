@@ -47,6 +47,8 @@ import {
   planBattleHealingItemUse,
   isPokemonStorageOpenInput,
   isPokemonStorageCommand,
+  POKEMON_OVERWORLD_ITEM_EVENTS,
+  isPokemonOverworldItemUseInput,
 } from '@cesar-mmo/shared';
 import {
   getServerMapSpawn,
@@ -82,6 +84,8 @@ import type {
   PokemonStorageStatePayload,
   PokemonStorageErrorPayload,
   PokemonStorageErrorCode,
+  PokemonOverworldItemUsedPayload,
+  PokemonOverworldItemErrorPayload,
 } from '@cesar-mmo/shared';
 import type {
   PokemonTrainerId,
@@ -99,6 +103,7 @@ import {
   PokemonStorageRepository,
   PokemonStoragePersistenceError,
 } from 'src/pokemon/storage/pokemon-storage.repository';
+import { PokemonOverworldItemRepository } from 'src/pokemon/items/pokemon-overworld-item.repository';
 
 // services
 import { PokemonTrainerService } from 'src/pokemon/pokemon-trainer.service';
@@ -132,6 +137,10 @@ import {
 } from '../pokemon/battles/pokemon-wild-battle-outcome.runtime';
 import { PlayerWorldStateService } from './world/player-world-state.service';
 import { PokemonStorageService } from 'src/pokemon/storage/pokemon-storage.service';
+import {
+  PokemonOverworldItemService,
+  PokemonOverworldItemUseError,
+} from 'src/pokemon/items/pokemon-overworld-item.service';
 
 // stores
 import { PlayerWorldRuntimeStore } from './world/player-world-runtime.store';
@@ -144,6 +153,10 @@ interface BattleTurnEntryExecutionResult {
   readonly terminalOutcome: BattleTurnTerminalOutcome | null;
   readonly trainerStateUpdate?: PokemonTrainerState;
 }
+
+type PokemonStorageServiceState = Awaited<
+  ReturnType<PokemonStorageService['getState']>
+>;
 
 @WebSocketGateway({
   cors: {
@@ -181,6 +194,7 @@ export class GameGateway
 
   private readonly pokemonCaptureService: PokemonCaptureService;
   private readonly pokemonStorageService: PokemonStorageService;
+  private readonly pokemonOverworldItemService: PokemonOverworldItemService;
   private readonly pokemonStorageAccessSessionStore =
     new PokemonStorageAccessSessionStore();
 
@@ -196,6 +210,7 @@ export class GameGateway
     private readonly pokemonStorageRepository: PokemonStorageRepository,
     private readonly playerWorldRuntimeStore: PlayerWorldRuntimeStore,
     private readonly playerWorldStateService: PlayerWorldStateService,
+    private readonly pokemonOverworldItemRepository: PokemonOverworldItemRepository,
   ) {
     this.pokemonTrainerService = new PokemonTrainerService(
       this.pokemonTrainerStateStore,
@@ -210,6 +225,10 @@ export class GameGateway
       this.pokemonTrainerStateStore,
       this.pokemonPartyRepository,
       this.pokemonStorageRepository,
+    );
+    this.pokemonOverworldItemService = new PokemonOverworldItemService(
+      this.pokemonTrainerStateStore,
+      this.pokemonOverworldItemRepository,
     );
   }
 
@@ -601,6 +620,72 @@ export class GameGateway
       client.emit(POKEMON_EVENTS.TRAINER_STATE, {
         trainerState,
       });
+    }
+  }
+
+  @SubscribeMessage(POKEMON_OVERWORLD_ITEM_EVENTS.USE)
+  async handlePokemonOverworldItemUse(
+    @ConnectedSocket()
+    client: Socket,
+
+    @MessageBody()
+    payload: unknown,
+  ): Promise<void> {
+    /* 1. Network boundary validation */
+    if (!isPokemonOverworldItemUseInput(payload)) {
+      this.emitPokemonOverworldItemError(client, 'INVALID_INPUT');
+      return;
+    }
+
+    /* 2. Resolve durable Trainer identity from current socket */
+    const trainerId = this.getTrainerId(client.id);
+
+    if (!trainerId) {
+      this.emitPokemonOverworldItemError(client, 'INCOMPATIBLE_STATE');
+      return;
+    }
+
+    /* 3. Gameplay compatibility. Server validates again */
+    if (
+      this.dialogueSessionStore.has(client.id) ||
+      this.pokemonStorageAccessSessionStore.has(client.id) ||
+      this.pokemonWildEncounterSessionStore.has(client.id) ||
+      this.pokemonBattleSessionStore.getByPlayerId(client.id)
+    ) {
+      this.emitPokemonOverworldItemError(client, 'INCOMPATIBLE_STATE');
+      return;
+    }
+
+    try {
+      /* 4. Delegate ALL item/target/healing/ persistence rules to Pokémon service. */
+      const result = await this.pokemonOverworldItemService.useItem({
+        trainerId,
+        itemId: payload.itemId,
+        targetPokemonInstanceId: payload.targetPokemonInstanceId,
+      });
+
+      /* 5. Authoritative TrainerState, owner-only */
+      client.emit(POKEMON_EVENTS.TRAINER_STATE, {
+        trainerState: result.trainerState,
+      } satisfies PokemonTrainerStatePayload);
+
+      /* 6. Action acknowledgement, also owner-only */
+      client.emit(POKEMON_OVERWORLD_ITEM_EVENTS.USED, {
+        itemId: result.itemId,
+
+        targetPokemonInstanceId: result.targetPokemonInstanceId,
+      } satisfies PokemonOverworldItemUsedPayload);
+    } catch (error: unknown) {
+      if (error instanceof PokemonOverworldItemUseError) {
+        this.emitPokemonOverworldItemError(client, error.code);
+        return;
+      }
+      console.error('[PokemonOverworldItem] unexpected failure', {
+        playerId: client.id,
+        trainerId,
+        error,
+      });
+      this.emitPokemonOverworldItemError(client, 'PERSISTENCE_FAILED');
     }
   }
 
@@ -1175,7 +1260,7 @@ export class GameGateway
     }
 
     try {
-      let state;
+      let state: PokemonStorageServiceState | undefined;
 
       switch (payload.type) {
         case 'withdraw':
@@ -2019,5 +2104,14 @@ export class GameGateway
       return;
     }
     this.playerWorldStateService.checkpointPlayer(trainerId, player);
+  }
+
+  private emitPokemonOverworldItemError(
+    client: Socket,
+    code: PokemonOverworldItemErrorPayload['code'],
+  ): void {
+    client.emit(POKEMON_OVERWORLD_ITEM_EVENTS.ERROR, {
+      code,
+    } satisfies PokemonOverworldItemErrorPayload);
   }
 }

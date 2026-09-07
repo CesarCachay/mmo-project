@@ -26,6 +26,7 @@ export interface PokemonItemDefinition {
   readonly category: PokemonItemCategory;
 
   readonly battleUsable: boolean;
+  readonly overworldUsable: boolean;
   readonly battleTarget: PokemonItemBattleTarget | null;
 
   readonly effect: PokemonItemEffect | null;
@@ -38,6 +39,7 @@ export const POKEMON_ITEM_REGISTRY = {
     category: "medicine",
 
     battleUsable: true,
+    overworldUsable: true,
     battleTarget: "trainer-pokemon",
 
     effect: {
@@ -53,6 +55,7 @@ export const POKEMON_ITEM_REGISTRY = {
     category: "medicine",
 
     battleUsable: true,
+    overworldUsable: true,
     battleTarget: "trainer-pokemon",
 
     effect: {
@@ -68,6 +71,7 @@ export const POKEMON_ITEM_REGISTRY = {
     category: "medicine",
 
     battleUsable: true,
+    overworldUsable: true,
     battleTarget: "trainer-pokemon",
 
     effect: {
@@ -83,6 +87,7 @@ export const POKEMON_ITEM_REGISTRY = {
     category: "medicine",
 
     battleUsable: true,
+    overworldUsable: true,
     battleTarget: "trainer-pokemon",
 
     effect: {
@@ -97,6 +102,7 @@ export const POKEMON_ITEM_REGISTRY = {
     category: "ball",
 
     battleUsable: true,
+    overworldUsable: false,
     battleTarget: "wild-active",
 
     effect: {

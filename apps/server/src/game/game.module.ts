@@ -10,6 +10,7 @@ import { PokemonStorageRepository } from 'src/pokemon/storage/pokemon-storage.re
 import { PlayerWorldRuntimeStore } from './world/player-world-runtime.store';
 import { PlayerWorldLocationRepository } from './world/player-world-location.repository';
 import { PlayerWorldStateService } from './world/player-world-state.service';
+import { PokemonOverworldItemRepository } from 'src/pokemon/items/pokemon-overworld-item.repository';
 
 import { GameGateway } from './game.gateway';
 
@@ -26,6 +27,7 @@ import { GameGateway } from './game.gateway';
     PlayerWorldRuntimeStore,
     PlayerWorldLocationRepository,
     PlayerWorldStateService,
+    PokemonOverworldItemRepository,
   ],
 })
 export class GameModule {}

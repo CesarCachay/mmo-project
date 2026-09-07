@@ -322,6 +322,18 @@ export type {
 export { calculatePokemonMaxHp } from "./pokemon/pokemon-stat.js";
 export { planBattleHealingItemUse } from "./pokemon/inventory/pokemon-battle-healing-item.js";
 export type { BattleHealingItemPlan } from "./pokemon/inventory/pokemon-battle-healing-item.js";
+export {
+  POKEMON_OVERWORLD_ITEM_EVENTS,
+  isPokemonOverworldItemUseInput,
+  isPokemonOverworldItemUsedPayload,
+  isPokemonOverworldItemErrorPayload,
+} from "./pokemon/items/pokemon-overworld-item-network.js";
+export type {
+  PokemonOverworldItemUseInput,
+  PokemonOverworldItemUsedPayload,
+  PokemonOverworldItemErrorCode,
+  PokemonOverworldItemErrorPayload,
+} from "./pokemon/items/pokemon-overworld-item-network.js";
 
 // CAPTURE
 export { resolvePokemonCapture } from "./pokemon/battles/capture/pokemon-battle-capture.js";
