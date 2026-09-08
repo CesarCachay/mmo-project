@@ -139,7 +139,7 @@ export class PokemonTrainerService {
   //   let updatedState = trainerState;
 
   //   if (!hasLatios) {
-  //     updatedState = await this.addPokemon(trainerId, 381, 10);
+  //     updatedState = await this.addPokemon(trainerId, 381, 15);
   //   }
   //   if (!hasLarvitar) {
   //     updatedState = await this.addPokemon(trainerId, 246, 7);
@@ -149,9 +149,15 @@ export class PokemonTrainerService {
   //     'poke-ball',
   //   );
   //   if (pokeBallQuantity <= 0) {
-  //     updatedState = await this.addInventoryItem(trainerId, 'poke-ball', 100);
+  //     updatedState = await this.addInventoryItem(trainerId, 'poke-ball', 50);
   //   }
-
+  //   const potionQuantity = getPokemonInventoryItemQuantity(
+  //     updatedState.inventory,
+  //     'potion',
+  //   );
+  //   if (potionQuantity <= 0) {
+  //     updatedState = await this.addInventoryItem(trainerId, 'potion', 30);
+  //   }
   //   return updatedState;
   // }
 

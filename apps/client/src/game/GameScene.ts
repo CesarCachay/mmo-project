@@ -4,6 +4,7 @@ import {
   DEFAULT_MAP_ID,
   getDialogue,
   isPlayerMoving,
+  POKEMON_ITEM_REGISTRY,
 } from "@cesar-mmo/shared";
 
 // assets
@@ -21,17 +22,13 @@ import {
 } from "./config/playerAssets";
 import { POKEMON_STARTER_ASSETS } from "./pokemon/pokemon-starter-assets";
 import { PokemonSpriteLoader } from "./pokemon/PokemonSpriteLoader";
-import { PokemonFollowerController } from "./pokemon/PokemonFollowerController";
 import { PokemonOverworldSpriteLoader } from "./pokemon/PokemonOverworldSpriteLoader";
-import { POKEMON_ITEM_REGISTRY } from "@cesar-mmo/shared";
 import { getPokemonItemIconAsset } from "./items/pokemon-item-icon.registry";
 
 // ui components
 import { ChatBox } from "./ui/ChatBox";
 import { DialogueBox } from "./ui/DialogueBox";
 import { StarterSelectionPanel } from "./ui/StarterSelectionPanel";
-import { PartyPanel } from "./ui/PartyPanel";
-import { InventoryPanel } from "./ui/InventoryPanel";
 import { BattleController } from "./battle/BattleController";
 import { PokemonStorageController } from "./storage/PokemonStorageController";
 import { PokemonStorageTerminalInteractionController } from "./storage/PokemonStorageTerminalInteractionController";
@@ -53,9 +50,15 @@ import { RemotePlayerManager } from "./player/RemotePlayerManager";
 import { LocalPlayerController } from "./player/LocalPlayerController";
 import { MapTransitionController } from "./maps/MapTransitionController";
 import { MovementInputController } from "./player/MovementInputController";
-import type { NpcDirection, NpcInstance, NpcInteractionType } from "./npc/types";
+import type {
+  NpcDirection,
+  NpcInstance,
+  NpcInteractionType,
+} from "./npc/types";
 import { RemotePokemonFollowerManager } from "./pokemon/RemotePokemonFollowerManager";
 import { OverworldCameraController } from "./camera/OverworldCameraController";
+import { TrainerPanelController } from "./ui/TrainerPanelController";
+import { PokemonTrainerPresentationController } from "./pokemon/PokemonTrainerPresentationController";
 
 // types
 import type {
@@ -68,11 +71,7 @@ import type {
   MapTransitionInput,
   MapTransitionResolved,
   DialogueSessionState,
-  PokemonTrainerState,
-  PokemonInstance,
   PokemonWildEncounterStartedPayload,
-  PokemonItemId,
-  PokemonOverworldItemErrorCode,
 } from "@cesar-mmo/shared";
 
 export class GameScene extends Phaser.Scene {
@@ -84,12 +83,10 @@ export class GameScene extends Phaser.Scene {
   private localPlayerController!: LocalPlayerController;
   private movementInputController!: MovementInputController;
   private overworldCameraController!: OverworldCameraController;
+  private trainerPanelController!: TrainerPanelController;
 
   private interactKey!: Phaser.Input.Keyboard.Key;
   private chatKey!: Phaser.Input.Keyboard.Key;
-  private partyKey!: Phaser.Input.Keyboard.Key;
-  private inventoryKey!: Phaser.Input.Keyboard.Key;
-  private escapeKey!: Phaser.Input.Keyboard.Key;
 
   private network!: GameNetworkClient;
 
@@ -107,17 +104,11 @@ export class GameScene extends Phaser.Scene {
 
   private starterSelectionPanel!: StarterSelectionPanel;
 
-  private partyPanel!: PartyPanel;
-  private inventoryPanel!: InventoryPanel;
   private pokemonSpriteLoader!: PokemonSpriteLoader;
-  private pokemonTrainerState?: PokemonTrainerState;
 
-  private pokemonFollowerController!: PokemonFollowerController;
   private pokemonOverworldSpriteLoader!: PokemonOverworldSpriteLoader;
 
   private battleController!: BattleController;
-
-  private canChooseStarter = false;
 
   private pokemonStorageController!: PokemonStorageController;
   private pokemonStorageTerminalInteraction!: PokemonStorageTerminalInteractionController;
@@ -127,15 +118,10 @@ export class GameScene extends Phaser.Scene {
   private remotePlayerManager!: RemotePlayerManager;
   private mapTransitionController!: MapTransitionController;
   private remotePokemonFollowerManager!: RemotePokemonFollowerManager;
+  private pokemonTrainerPresentationController!: PokemonTrainerPresentationController;
 
   private displayName = "";
   private avatarId: PlayerAvatarId = "male-01";
-
-  private selectedOverworldItemId?: PokemonItemId;
-
-  private isOverworldItemUsePending = false;
-  private overworldItemFeedbackText?: Phaser.GameObjects.Text;
-  private overworldItemFeedbackTimer?: Phaser.Time.TimerEvent;
 
   constructor() {
     super("GameScene");
@@ -177,7 +163,7 @@ export class GameScene extends Phaser.Scene {
           {
             frameWidth: 24,
             frameHeight: 24,
-          }
+          },
         );
       });
     });
@@ -197,21 +183,24 @@ export class GameScene extends Phaser.Scene {
 
     this.createPlayerAnimations();
     this.createPlayer();
-    this.localPlayerController = new LocalPlayerController(this.player, this.avatarId);
+    this.localPlayerController = new LocalPlayerController(
+      this.player,
+      this.avatarId,
+    );
 
     this.mapTransitionController = new MapTransitionController(
       this,
       (transitionId) => this.requestMapTransition(transitionId),
       (transition) => this.handleMapTransitionResolved(transition),
-      () => this.localPlayerController.setIdle()
+      () => this.localPlayerController.setIdle(),
     );
     this.mapTransitionController.loadZones(this.mapManager.map);
 
     this.remotePlayerManager = new RemotePlayerManager(this, (displayName) =>
-      this.createPlayerNameLabel(displayName)
+      this.createPlayerNameLabel(displayName),
     );
     this.npcManager = new NpcManager(this, (displayName) =>
-      this.createPlayerNameLabel(displayName)
+      this.createPlayerNameLabel(displayName),
     );
 
     this.npcManager.create(this.mapManager.map);
@@ -219,7 +208,7 @@ export class GameScene extends Phaser.Scene {
 
     this.overworldCameraController = new OverworldCameraController(
       this.cameras.main,
-      this.player
+      this.player,
     );
     this.setupCamera();
     this.createDialogueUi();
@@ -240,9 +229,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   update(_: number, delta: number) {
-    this.handleTrainerPanelClose();
-    this.handlePartyToggle();
-    this.handleInventoryToggle();
+    this.trainerPanelController.update();
     this.handleChatFocus();
 
     this.updateNearbyNpc();
@@ -252,7 +239,7 @@ export class GameScene extends Phaser.Scene {
     this.handleWorldInteraction();
 
     const input = this.movementInputController.getCurrentInput(
-      this.isMovementInputBlocked()
+      this.isMovementInputBlocked(),
     );
     this.localPlayerController.updateAnimation(input);
     this.sendInputIfChanged(input);
@@ -261,20 +248,20 @@ export class GameScene extends Phaser.Scene {
       input,
       delta,
       this.currentMapId,
-      this.isMapTransitioning
+      this.isMapTransitioning,
     );
     this.localPlayerController.reconcile(delta);
     this.overworldCameraController.update(
       delta,
       this.localPlayerController.direction,
-      isPlayerMoving(input)
+      isPlayerMoving(input),
     );
 
-    this.pokemonFollowerController.update(
+    this.pokemonTrainerPresentationController.updateFollower(
       this.player.x,
       this.player.y,
       this.localPlayerController.direction,
-      delta
+      delta,
     );
 
     this.remotePlayerManager.interpolate(delta);
@@ -307,7 +294,7 @@ export class GameScene extends Phaser.Scene {
       },
       (input) => {
         this.network.sendBattleReplacement(input);
-      }
+      },
     );
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -340,7 +327,7 @@ export class GameScene extends Phaser.Scene {
       spawn.x,
       spawn.y,
       getPlayerTextureKey(this.avatarId, "down"),
-      0
+      0,
     );
 
     this.player.setDepth(5);
@@ -352,7 +339,7 @@ export class GameScene extends Phaser.Scene {
     this.nearbyNpc = this.npcManager.findNearby(
       this.player.x,
       this.player.y,
-      this.npcInteractionDistance
+      this.npcInteractionDistance,
     );
 
     if (previousNpc?.definition.id !== this.nearbyNpc?.definition.id) {
@@ -422,7 +409,9 @@ export class GameScene extends Phaser.Scene {
 
     const line = dialogue.lines[state.lineIndex];
     if (line === undefined) {
-      console.warn(`Dialogue line ${state.lineIndex} not found for ${state.dialogueId}`);
+      console.warn(
+        `Dialogue line ${state.lineIndex} not found for ${state.dialogueId}`,
+      );
       return;
     }
 
@@ -443,7 +432,7 @@ export class GameScene extends Phaser.Scene {
     fromY: number,
     targetX: number,
     targetY: number,
-    fallback: NpcDirection
+    fallback: NpcDirection,
   ): NpcDirection {
     const deltaX = targetX - fromX;
     const deltaY = targetY - fromY;
@@ -464,21 +453,24 @@ export class GameScene extends Phaser.Scene {
       this.player.y,
       npc.sprite.x,
       npc.sprite.y,
-      this.localPlayerController.direction
+      this.localPlayerController.direction,
     );
     const npcDirection = this.getFacingDirection(
       npc.sprite.x,
       npc.sprite.y,
       this.player.x,
       this.player.y,
-      npc.definition.direction
+      npc.definition.direction,
     );
 
     this.localPlayerController.setDirection(playerDirection);
     this.localPlayerController.setIdle();
 
     npc.sprite.anims.stop();
-    npc.sprite.setTexture(getNpcTextureKey(npc.definition.sprite, npcDirection), 0);
+    npc.sprite.setTexture(
+      getNpcTextureKey(npc.definition.sprite, npcDirection),
+      0,
+    );
   }
 
   private restoreActiveDialogueNpcDirection(): void {
@@ -489,7 +481,7 @@ export class GameScene extends Phaser.Scene {
     npc.sprite.anims.stop();
     npc.sprite.setTexture(
       getNpcTextureKey(npc.definition.sprite, npc.definition.direction),
-      0
+      0,
     );
     this.activeDialogueNpc = undefined;
   }
@@ -505,9 +497,6 @@ export class GameScene extends Phaser.Scene {
     this.movementInputController = new MovementInputController(keyboard);
     this.interactKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
     this.chatKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
-    this.partyKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P, false);
-    this.inventoryKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.I, false);
-    this.escapeKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC, false);
   }
 
   private preloadNpcSprites() {
@@ -515,10 +504,14 @@ export class GameScene extends Phaser.Scene {
       for (const direction of definition.directions) {
         const textureKey = getNpcTextureKey(spriteId, direction);
 
-        this.load.spritesheet(textureKey, `${definition.folder}/walk-${direction}.png`, {
-          frameWidth: NPC_FRAME_WIDTH,
-          frameHeight: NPC_FRAME_HEIGHT,
-        });
+        this.load.spritesheet(
+          textureKey,
+          `${definition.folder}/walk-${direction}.png`,
+          {
+            frameWidth: NPC_FRAME_WIDTH,
+            frameHeight: NPC_FRAME_HEIGHT,
+          },
+        );
       }
     }
   }
@@ -526,37 +519,45 @@ export class GameScene extends Phaser.Scene {
   private createPokemonPresentation(): void {
     this.pokemonSpriteLoader = new PokemonSpriteLoader(this);
     this.pokemonOverworldSpriteLoader = new PokemonOverworldSpriteLoader(this);
-    this.partyPanel = new PartyPanel(this, {
-      onPokemonSelected: (pokemon) => {
-        this.handleOverworldItemTargetSelected(pokemon);
-      },
-    });
-    this.pokemonFollowerController = new PokemonFollowerController(this);
     this.remotePokemonFollowerManager = new RemotePokemonFollowerManager(
       this,
       this.pokemonOverworldSpriteLoader,
-      (playerId) => this.remotePlayerManager.getRenderPosition(playerId)
+      (playerId) => this.remotePlayerManager.getRenderPosition(playerId),
     );
-    this.inventoryPanel = new InventoryPanel(this, {
-      onItemSelected: (itemId) => {
-        this.handleOverworldItemSelected(itemId);
+    this.trainerPanelController = new TrainerPanelController(this, {
+      isInteractionBlocked: () =>
+        Boolean(this.pokemonStorageController?.isBlockingGameplay) ||
+        Boolean(this.battleController?.isActive) ||
+        this.isMapTransitioning ||
+        this.dialogueBox.isOpen() ||
+        this.chatBox.isTyping() ||
+        this.starterSelectionPanel.isVisible(),
+      onUseOverworldItem: (input) => {
+        this.network.usePokemonOverworldItem(input);
       },
     });
-    this.overworldItemFeedbackText = this.add
-      .text(this.scale.width / 2, 18, "", {
-        fontFamily: "Arial",
-        fontSize: "11px",
-        color: "#ffffff",
-        backgroundColor: "rgba(17, 24, 39, 0.96)",
-        padding: {
-          x: 10,
-          y: 6,
+    this.pokemonTrainerPresentationController =
+      new PokemonTrainerPresentationController(this, {
+        pokemonSpriteLoader: this.pokemonSpriteLoader,
+        pokemonOverworldSpriteLoader: this.pokemonOverworldSpriteLoader,
+        trainerPanelController: this.trainerPanelController,
+        getPlayerPresentationState: () => ({
+          x: this.player.x,
+          y: this.player.y,
+          direction: this.localPlayerController.direction,
+        }),
+        onPartyPresenceChanged: (hasParty) => {
+          this.starterSelectionPanel.setSelectionPending(false);
+          if (!hasParty) {
+            return;
+          }
+          this.starterSelectionPanel.hide();
+          this.chatBox.setVisible(true);
         },
-      })
-      .setOrigin(0.5, 0)
-      .setScrollFactor(0)
-      .setDepth(2200)
-      .setVisible(false);
+      });
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.pokemonTrainerPresentationController.destroy();
+    });
   }
 
   private sendInputIfChanged(input: PlayerInput) {
@@ -573,7 +574,7 @@ export class GameScene extends Phaser.Scene {
     this.network = new GameNetworkClient(
       this.displayName,
       this.avatarId,
-      trainerSessionToken
+      trainerSessionToken,
     );
     this.createPokemonStorageUi();
 
@@ -604,30 +605,30 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.network.onPokemonTrainerState((payload) => {
-      void this.handlePokemonTrainerState(payload.trainerState);
+      this.battleController.setTrainerState(payload.trainerState);
+      void this.pokemonTrainerPresentationController.applyTrainerState(
+        payload.trainerState,
+      );
     });
 
     this.network.onPokemonOverworldItemUsed((payload) => {
-      this.isOverworldItemUsePending = false;
-      const item = POKEMON_ITEM_REGISTRY[payload.itemId];
-      this.showOverworldItemFeedback(`${item.name} usada correctamente.`);
+      this.trainerPanelController.handleOverworldItemUsed(payload);
     });
 
     this.network.onPokemonOverworldItemError((payload) => {
-      this.isOverworldItemUsePending = false;
-      this.showOverworldItemFeedback(this.getOverworldItemErrorMessage(payload.code));
+      this.trainerPanelController.handleOverworldItemError(payload);
     });
 
     this.network.onStarterSelectionStatus((status) => {
       if (!status.unlocked) {
         return;
       }
-      if (!this.canChooseStarter) {
+      if (!this.pokemonTrainerPresentationController.canChooseStarter) {
         return;
       }
 
       this.chatBox.setVisible(false);
-      this.closeTrainerPanels();
+      this.trainerPanelController.close();
       this.starterSelectionPanel.show();
     });
 
@@ -636,7 +637,7 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.network.onBattleStarted((payload) => {
-      this.closeTrainerPanels();
+      this.trainerPanelController.close();
       this.pokemonStorageController?.dismiss();
       void this.battleController.start(payload);
     });
@@ -668,7 +669,9 @@ export class GameScene extends Phaser.Scene {
 
     this.network.onCurrentPlayers((players) => {
       const playerStates = Object.values(players);
-      const localPlayer = playerStates.find((player) => player.id === this.network.id);
+      const localPlayer = playerStates.find(
+        (player) => player.id === this.network.id,
+      );
       if (!localPlayer) {
         console.warn("[PlayerWorld] Local player missing from currentPlayers", {
           networkId: this.network.id,
@@ -723,7 +726,10 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.network.onTransitionResolved((transition) => {
-      this.mapTransitionController.handleResolved(transition, this.currentMapId);
+      this.mapTransitionController.handleResolved(
+        transition,
+        this.currentMapId,
+      );
     });
 
     this.network.onPlayerDisconnected((playerId) => {
@@ -745,14 +751,17 @@ export class GameScene extends Phaser.Scene {
     this.localPlayerController.setDirection(player.direction);
     this.localPlayerController.snapToPosition(player.x, player.y);
 
-    this.pokemonFollowerController.resetToPlayerPosition(
+    this.pokemonTrainerPresentationController.resetFollowerToPlayerPosition(
       player.x,
       player.y,
-      player.direction
+      player.direction,
     );
 
     this.mapTransitionController.resetExitTracking();
-    this.overworldCameraController.resetForMap(this.currentMapId, this.mapManager.map);
+    this.overworldCameraController.resetForMap(
+      this.currentMapId,
+      this.mapManager.map,
+    );
     this.movementInputController.resetLastInputToNeutral();
     this.localPlayerController.setIdle();
 
@@ -775,17 +784,20 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    this.closeTrainerPanels();
+    this.trainerPanelController.close();
 
     this.mapTransitionController.resetExitTracking();
     this.changeCurrentMap(transition.targetMapId);
     this.localPlayerController.snapToPosition(transition.x, transition.y);
-    this.pokemonFollowerController.resetToPlayerPosition(
+    this.pokemonTrainerPresentationController.resetFollowerToPlayerPosition(
       transition.x,
       transition.y,
-      this.localPlayerController.direction
+      this.localPlayerController.direction,
     );
-    this.overworldCameraController.resetForMap(this.currentMapId, this.mapManager.map);
+    this.overworldCameraController.resetForMap(
+      this.currentMapId,
+      this.mapManager.map,
+    );
     this.movementInputController.resetLastInputToNeutral();
     this.localPlayerController.setIdle();
   }
@@ -803,7 +815,7 @@ export class GameScene extends Phaser.Scene {
           key: animationKey,
           frames: this.anims.generateFrameNumbers(
             getPlayerTextureKey(avatar.id, direction),
-            { start: 0, end: 11 }
+            { start: 0, end: 11 },
           ),
           frameRate: 12,
           repeat: -1,
@@ -815,7 +827,10 @@ export class GameScene extends Phaser.Scene {
   private setupCamera(): void {
     const camera = this.cameras.main;
     camera.setAlpha(0);
-    this.overworldCameraController.start(this.currentMapId, this.mapManager.map);
+    this.overworldCameraController.start(
+      this.currentMapId,
+      this.mapManager.map,
+    );
   }
 
   private createPlayerNameLabel(displayName: string): Phaser.GameObjects.Text {
@@ -856,17 +871,18 @@ export class GameScene extends Phaser.Scene {
     /* Otras UIs bloquean interacción overworld */
     if (
       this.starterSelectionPanel.isVisible() ||
-      this.isTrainerPanelOpen ||
+      this.trainerPanelController.isOpen ||
       this.battleController?.isActive ||
       this.pokemonStorageController?.isBlockingGameplay
     ) {
       return;
     }
 
-    const storageTerminalId = this.pokemonStorageTerminalInteraction.nearbyTerminalId;
+    const storageTerminalId =
+      this.pokemonStorageTerminalInteraction.nearbyTerminalId;
 
     if (storageTerminalId) {
-      this.closeTrainerPanels();
+      this.trainerPanelController.close();
       this.pokemonStorageController.requestOpen(storageTerminalId);
       return;
     }
@@ -877,7 +893,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     const interactionPrompt = this.getNpcInteractionPromptText(
-      this.nearbyNpc.definition.interactionType
+      this.nearbyNpc.definition.interactionType,
     );
 
     if (!interactionPrompt) {
@@ -928,7 +944,9 @@ export class GameScene extends Phaser.Scene {
     }
     const npc = this.nearbyNpc;
 
-    const promptText = this.getNpcInteractionPromptText(npc.definition.interactionType);
+    const promptText = this.getNpcInteractionPromptText(
+      npc.definition.interactionType,
+    );
     if (!promptText) {
       prompt.setVisible(false);
       return;
@@ -941,7 +959,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private getNpcInteractionPromptText(
-    interactionType: NpcInteractionType
+    interactionType: NpcInteractionType,
   ): string | undefined {
     switch (interactionType) {
       case "dialogue":
@@ -982,7 +1000,7 @@ export class GameScene extends Phaser.Scene {
     if (this.starterSelectionPanel.isVisible()) {
       return;
     }
-    if (this.isTrainerPanelOpen) {
+    if (this.trainerPanelController.isOpen) {
       return;
     }
     if (this.chatBox.isTyping()) {
@@ -1004,7 +1022,7 @@ export class GameScene extends Phaser.Scene {
       this.dialogueBox.isOpen() ||
       this.chatBox.isTyping() ||
       this.starterSelectionPanel.isVisible() ||
-      this.partyPanel.isVisible() ||
+      this.trainerPanelController.isPartyVisible ||
       this.battleController.isActive ||
       this.pokemonStorageController?.isBlockingGameplay
     ) {
@@ -1050,155 +1068,14 @@ export class GameScene extends Phaser.Scene {
       this.dialogueBox.isOpen() ||
       this.chatBox.isTyping() ||
       this.starterSelectionPanel.isVisible() ||
-      this.isTrainerPanelOpen ||
+      this.trainerPanelController.isOpen ||
       this.battleController?.isActive
     );
   }
 
-  private async handlePokemonTrainerState(
-    trainerState: PokemonTrainerState
-  ): Promise<void> {
-    this.pokemonTrainerState = trainerState;
-    this.battleController?.setTrainerState(trainerState);
-
-    this.inventoryPanel.setInventory(trainerState.inventory);
-    const party = trainerState.party.pokemon;
-
-    const pokemon = party[0];
-
-    this.canChooseStarter = party.length === 0;
-
-    console.log("[Pokemon Trainer State]", {
-      partySize: party.length,
-      instanceId: pokemon?.instanceId,
-      speciesId: pokemon?.speciesId,
-      formId: pokemon?.formId,
-      level: pokemon?.level,
-    });
-
-    this.starterSelectionPanel.setSelectionPending(false);
-
-    if (party.length === 0) {
-      this.partyPanel.setParty([]);
-      this.pokemonFollowerController.destroy();
-      return;
-    }
-
-    this.starterSelectionPanel.hide();
-    this.chatBox.setVisible(true);
-
-    try {
-      await this.pokemonSpriteLoader.ensurePartyLoaded(party);
-
-      /* A newer TRAINER_STATE may have arrived while Phaser was loading the textures. */
-      if (this.pokemonTrainerState !== trainerState) {
-        return;
-      }
-
-      this.partyPanel.setParty(party);
-      await this.preparePokemonFollower(party[0]);
-    } catch (error) {
-      console.error("[Pokemon Party] Failed to prepare party presentation", error);
-    }
-  }
-
-  private handleInventoryToggle(): void {
-    if (this.selectedOverworldItemId || this.isOverworldItemUsePending) {
-      return;
-    }
-    if (this.pokemonStorageController?.isBlockingGameplay) {
-      return;
-    }
-    if (this.battleController.isActive) {
-      return;
-    }
-    if (this.isMapTransitioning) {
-      return;
-    }
-    if (this.dialogueBox.isOpen()) {
-      return;
-    }
-    if (this.chatBox.isTyping()) {
-      return;
-    }
-    if (this.starterSelectionPanel.isVisible()) {
-      return;
-    }
-    if (!Phaser.Input.Keyboard.JustDown(this.inventoryKey)) {
-      return;
-    }
-
-    const willOpen = !this.inventoryPanel.isVisible();
-
-    if (willOpen) {
-      this.partyPanel.hide();
-    }
-
-    this.inventoryPanel.toggle();
-  }
-
-  private handlePartyToggle(): void {
-    if (this.selectedOverworldItemId || this.isOverworldItemUsePending) {
-      return;
-    }
-    if (this.pokemonStorageController?.isBlockingGameplay) {
-      return;
-    }
-    if (this.battleController.isActive) {
-      return;
-    }
-    if (this.isMapTransitioning) {
-      return;
-    }
-    if (this.dialogueBox.isOpen()) {
-      return;
-    }
-    if (this.chatBox.isTyping()) {
-      return;
-    }
-    if (this.starterSelectionPanel.isVisible()) {
-      return;
-    }
-    if (!Phaser.Input.Keyboard.JustDown(this.partyKey)) {
-      return;
-    }
-
-    const party = this.pokemonTrainerState?.party.pokemon;
-
-    if (!party || party.length === 0) {
-      return;
-    }
-
-    const willOpen = !this.partyPanel.isVisible();
-
-    if (willOpen) {
-      this.inventoryPanel.hide();
-    }
-
-    this.partyPanel.toggle();
-  }
-
-  private async preparePokemonFollower(pokemon: PokemonInstance): Promise<void> {
-    try {
-      await this.pokemonOverworldSpriteLoader.ensurePokemonLoaded(pokemon);
-      const currentFirstPokemon = this.pokemonTrainerState?.party.pokemon[0];
-      if (!currentFirstPokemon || currentFirstPokemon.instanceId !== pokemon.instanceId) {
-        return;
-      }
-
-      this.pokemonFollowerController.create(
-        pokemon,
-        this.player.x,
-        this.player.y,
-        this.localPlayerController.direction
-      );
-    } catch (error) {
-      console.error("[Pokemon Follower] Failed to prepare follower", error);
-      this.pokemonFollowerController.destroy();
-    }
-  }
-
-  private handleWildEncounterStarted(payload: PokemonWildEncounterStartedPayload): void {
+  private handleWildEncounterStarted(
+    payload: PokemonWildEncounterStartedPayload,
+  ): void {
     console.log("[WildEncounter] received", {
       encounterId: payload.encounterId,
       zoneId: payload.zoneId,
@@ -1213,7 +1090,7 @@ export class GameScene extends Phaser.Scene {
       this.dialogueBox.isOpen() ||
       this.chatBox.isTyping() ||
       this.starterSelectionPanel.isVisible() ||
-      this.partyPanel.isVisible() ||
+      this.trainerPanelController.isPartyVisible ||
       this.battleController?.isActive ||
       this.pokemonStorageController?.isBlockingGameplay;
 
@@ -1221,108 +1098,7 @@ export class GameScene extends Phaser.Scene {
       this.currentMapId,
       this.player.x,
       this.player.y,
-      blocked
+      blocked,
     );
-  }
-
-  private get isTrainerPanelOpen(): boolean {
-    return this.partyPanel.isVisible() || this.inventoryPanel.isVisible();
-  }
-
-  private closeTrainerPanels(): void {
-    this.selectedOverworldItemId = undefined;
-    this.partyPanel.setTargetSelectionMode(false);
-    this.partyPanel.hide();
-    this.inventoryPanel.hide();
-  }
-
-  private handleTrainerPanelClose(): void {
-    if (!Phaser.Input.Keyboard.JustDown(this.escapeKey)) {
-      return;
-    }
-    if (this.selectedOverworldItemId) {
-      this.cancelOverworldItemTargetSelection();
-      return;
-    }
-    if (!this.isTrainerPanelOpen) {
-      return;
-    }
-    this.closeTrainerPanels();
-  }
-
-  private handleOverworldItemSelected(itemId: PokemonItemId): void {
-    this.selectedOverworldItemId = itemId;
-    this.inventoryPanel.hide();
-    this.partyPanel.setTargetSelectionMode(true);
-    this.partyPanel.show();
-  }
-
-  private handleOverworldItemTargetSelected(pokemon: PokemonInstance): void {
-    if (this.isOverworldItemUsePending) {
-      return;
-    }
-
-    const itemId = this.selectedOverworldItemId;
-
-    if (!itemId) {
-      return;
-    }
-
-    this.isOverworldItemUsePending = true;
-    this.network.usePokemonOverworldItem({
-      itemId,
-      targetPokemonInstanceId: pokemon.instanceId,
-    });
-    this.selectedOverworldItemId = undefined;
-    this.partyPanel.setTargetSelectionMode(false);
-    this.partyPanel.hide();
-  }
-
-  private cancelOverworldItemTargetSelection(): void {
-    this.selectedOverworldItemId = undefined;
-    this.partyPanel.setTargetSelectionMode(false);
-    this.partyPanel.hide();
-    this.inventoryPanel.show();
-  }
-
-  private showOverworldItemFeedback(message: string): void {
-    const text = this.overworldItemFeedbackText;
-    if (!text) {
-      return;
-    }
-    this.overworldItemFeedbackTimer?.remove(false);
-    text.setText(message).setVisible(true);
-    this.overworldItemFeedbackTimer = this.time.delayedCall(2200, () => {
-      text.setVisible(false);
-      this.overworldItemFeedbackTimer = undefined;
-    });
-  }
-
-  private getOverworldItemErrorMessage(code: PokemonOverworldItemErrorCode): string {
-    switch (code) {
-      case "ITEM_NOT_AVAILABLE":
-        return "Ya no tienes ese objeto.";
-
-      case "ITEM_NOT_USABLE":
-        return "Ese objeto no puede usarse aquí.";
-
-      case "INVALID_TARGET":
-        return "Ese Pokémon no es un objetivo válido.";
-
-      case "TARGET_FAINTED":
-        return "No puedes usar ese objeto sobre un Pokémon debilitado.";
-
-      case "TARGET_FULL_HP":
-        return "Ese Pokémon ya tiene todos sus PS.";
-
-      case "INCOMPATIBLE_STATE":
-        return "No puedes usar objetos en este momento.";
-
-      case "INVALID_INPUT":
-        return "No se pudo usar ese objeto.";
-
-      case "PERSISTENCE_FAILED":
-        return "No se pudo guardar el uso del objeto.";
-    }
   }
 }
