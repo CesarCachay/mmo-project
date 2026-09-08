@@ -15,22 +15,52 @@ const PARTY_HEADER_HEIGHT = TRAINER_PANEL.headerHeight;
 const PARTY_SLOT_HEIGHT = 52;
 
 export interface PartyPanelOptions {
-  readonly onPokemonSelected?: (pokemon: PokemonInstance) => void;
+  readonly onPokemonSelected?: (
+    pokemon: PokemonInstance,
+    index: number,
+  ) => void;
+  readonly onChangeRequested?: (
+    pokemon: PokemonInstance,
+    index: number,
+  ) => void;
+}
+
+export interface PartyPanelReorderState {
+  readonly active: boolean;
+  readonly sourcePokemonInstanceId: string | undefined;
+  readonly pending: boolean;
 }
 
 export class PartyPanel {
   private readonly scene: Phaser.Scene;
   private readonly container: Phaser.GameObjects.Container;
   private hasPokemon = false;
-  private readonly onPokemonSelected?: (pokemon: PokemonInstance) => void;
+
+  // 2. Field interno
+  private readonly onPokemonSelected?: (
+    pokemon: PokemonInstance,
+    index: number,
+  ) => void;
+  private readonly onChangeRequested?: (
+    pokemon: PokemonInstance,
+    index: number,
+  ) => void;
+
   private party: readonly PokemonInstance[] = [];
   private targetSelectionMode = false;
+
+  private reorderMode = false;
+  private reorderSourcePokemonInstanceId: string | undefined;
+  private reorderPending = false;
+
+  private contextMenuPokemonInstanceId: string | undefined;
+
   private readonly pokemonIconTweens: Phaser.Tweens.Tween[] = [];
 
   constructor(scene: Phaser.Scene, options: PartyPanelOptions = {}) {
     this.scene = scene;
     this.onPokemonSelected = options.onPokemonSelected;
-
+    this.onChangeRequested = options.onChangeRequested;
     this.container = this.scene.add
       .container(0, 0)
       .setDepth(TRAINER_PANEL.depth)
@@ -40,6 +70,16 @@ export class PartyPanel {
 
   public setParty(pokemon: readonly PokemonInstance[]): void {
     this.party = pokemon;
+
+    if (
+      this.contextMenuPokemonInstanceId &&
+      !pokemon.some(
+        (instance) => instance.instanceId === this.contextMenuPokemonInstanceId,
+      )
+    ) {
+      this.contextMenuPokemonInstanceId = undefined;
+    }
+
     const wasVisible = this.container.visible;
     this.clearPokemonIconTweens();
     this.container.removeAll(true);
@@ -54,7 +94,8 @@ export class PartyPanel {
       PARTY_HEADER_HEIGHT +
       pokemon.length * PARTY_SLOT_HEIGHT +
       TRAINER_PANEL.footerHeight;
-    const x = this.scene.scale.width - TRAINER_PANEL.width - TRAINER_PANEL.margin;
+    const x =
+      this.scene.scale.width - TRAINER_PANEL.width - TRAINER_PANEL.margin;
     const y = TRAINER_PANEL.margin;
 
     this.container.setPosition(x, y);
@@ -66,22 +107,19 @@ export class PartyPanel {
         TRAINER_PANEL.width,
         panelHeight,
         TRAINER_PANEL.backgroundColor,
-        0.96
+        0.96,
       )
       .setOrigin(0)
       .setStrokeStyle(1, TRAINER_PANEL.borderColor);
 
-    const title = this.scene.add.text(
-      12,
-      9,
-      this.targetSelectionMode ? "ELIGE UN POKÉMON" : "EQUIPO",
-      {
-        fontFamily: "Arial",
-        fontSize: "14px",
-        color: TRAINER_PANEL.titleColor,
-        fontStyle: "bold",
-      }
-    );
+    const titleText = this.getTitleText();
+
+    const title = this.scene.add.text(12, 9, titleText, {
+      fontFamily: "Arial",
+      fontSize: "14px",
+      color: TRAINER_PANEL.titleColor,
+      fontStyle: "bold",
+    });
 
     const shortcut = this.scene.add
       .text(TRAINER_PANEL.width - 12, 10, "[P]", {
@@ -105,17 +143,19 @@ export class PartyPanel {
       .rectangle(0, footerY, TRAINER_PANEL.width, 1, TRAINER_PANEL.borderColor)
       .setOrigin(0);
 
-    const footer = this.scene.add.text(12, footerY + 8, "[I] Inventario     [P] Cerrar", {
+    const footer = this.scene.add.text(12, footerY + 8, this.getFooterText(), {
       fontFamily: "Arial",
       fontSize: "9px",
       color: TRAINER_PANEL.secondaryColor,
     });
 
     this.container.add([footerSeparator, footer]);
+    this.createPokemonContextMenu();
     this.container.setScrollFactor(0, 0, true);
   }
 
   public hide(): void {
+    this.contextMenuPokemonInstanceId = undefined;
     this.container.setVisible(false);
     this.pausePokemonIconAnimations();
   }
@@ -139,9 +179,11 @@ export class PartyPanel {
     if (willShow) {
       this.resumePokemonIconAnimations();
     } else {
+      this.contextMenuPokemonInstanceId = undefined;
       this.pausePokemonIconAnimations();
     }
   }
+
   public isVisible(): boolean {
     return this.container.visible;
   }
@@ -167,10 +209,33 @@ export class PartyPanel {
         slotY + 3,
         rowWidth,
         rowHeight,
-        index % 2 === 0 ? TRAINER_PANEL.rowColor : TRAINER_PANEL.alternateRowColor,
-        0.9
+        index % 2 === 0
+          ? TRAINER_PANEL.rowColor
+          : TRAINER_PANEL.alternateRowColor,
+        0.9,
       )
       .setOrigin(0);
+
+    const isReorderSource =
+      this.reorderMode &&
+      this.reorderSourcePokemonInstanceId === pokemon.instanceId;
+
+    const isContextSelected =
+      !this.targetSelectionMode &&
+      !this.reorderMode &&
+      this.contextMenuPokemonInstanceId === pokemon.instanceId;
+
+    if (isReorderSource) {
+      row.setStrokeStyle(2, 0xfacc15);
+    }
+
+    if (isContextSelected) {
+      row.setStrokeStyle(2, 0x60a5fa);
+    }
+
+    if (this.reorderPending) {
+      row.setAlpha(0.72);
+    }
 
     const icon = this.scene.add.image(30, slotY + 20, asset.textureKey);
 
@@ -196,7 +261,7 @@ export class PartyPanel {
         fontFamily: "Arial",
         fontSize: "9px",
         color: "#d1d5db",
-      }
+      },
     );
 
     const hpBackground = this.scene.add
@@ -210,8 +275,13 @@ export class PartyPanel {
     /* Primero row entra en su parentContainer definitivo */
     this.container.add([row, icon, name, level, hpLabel, hpBackground, hpFill]);
 
-    /* Sólo target-selection habilita interacción */
-    if (!this.targetSelectionMode || !this.onPokemonSelected) {
+    const isSpecialSelectionMode = this.targetSelectionMode || this.reorderMode;
+
+    const canInteract =
+      !this.reorderPending &&
+      (!isSpecialSelectionMode || Boolean(this.onPokemonSelected));
+
+    if (!canInteract) {
       return;
     }
 
@@ -240,7 +310,13 @@ export class PartyPanel {
     });
 
     row.on("pointerout", () => {
-      row.setStrokeStyle();
+      if (isReorderSource) {
+        row.setStrokeStyle(2, 0xfacc15);
+      } else if (isContextSelected) {
+        row.setStrokeStyle(2, 0x60a5fa);
+      } else {
+        row.setStrokeStyle();
+      }
       this.scene.tweens.add({
         targets: icon,
         scaleX: baseScaleX,
@@ -260,16 +336,31 @@ export class PartyPanel {
         ease: "Quad.Out",
       });
 
-      this.onPokemonSelected?.(pokemon);
+      // 3. Invocación
+      if (this.targetSelectionMode || this.reorderMode) {
+        this.onPokemonSelected?.(pokemon, index);
+        return;
+      }
+
+      /* En Party normal: click Pokémon → menú contextual */
+      this.openPokemonContextMenu(pokemon.instanceId);
     });
   }
 
   public setTargetSelectionMode(active: boolean): void {
-    if (this.targetSelectionMode === active) {
+    if (this.targetSelectionMode === active && (!active || !this.reorderMode)) {
       return;
     }
+
     this.targetSelectionMode = active;
-    /* Re-render preservando el Party, autoritativo recibido anteriormente */
+
+    if (active) {
+      this.contextMenuPokemonInstanceId = undefined;
+      this.reorderMode = false;
+      this.reorderSourcePokemonInstanceId = undefined;
+      this.reorderPending = false;
+    }
+
     this.setParty(this.party);
   }
 
@@ -277,9 +368,35 @@ export class PartyPanel {
     return this.targetSelectionMode;
   }
 
+  public setReorderState(state: PartyPanelReorderState): void {
+    const changed =
+      this.reorderMode !== state.active ||
+      this.reorderSourcePokemonInstanceId !== state.sourcePokemonInstanceId ||
+      this.reorderPending !== state.pending;
+
+    if (!changed) {
+      return;
+    }
+
+    this.reorderMode = state.active;
+    this.reorderSourcePokemonInstanceId = state.sourcePokemonInstanceId;
+    this.reorderPending = state.pending;
+
+    if (state.active) {
+      this.contextMenuPokemonInstanceId = undefined;
+      this.targetSelectionMode = false;
+    }
+
+    this.setParty(this.party);
+  }
+
+  public isReorderMode(): boolean {
+    return this.reorderMode;
+  }
+
   private createPokemonIconIdleAnimation(
     icon: Phaser.GameObjects.Image,
-    index: number
+    index: number,
   ): void {
     const baseY = icon.y;
     const tween = this.scene.tweens.add({
@@ -314,5 +431,177 @@ export class PartyPanel {
     }
 
     this.pokemonIconTweens.length = 0;
+  }
+
+  private getTitleText(): string {
+    if (this.targetSelectionMode) {
+      return "ELIGE UN POKÉMON";
+    }
+
+    if (this.reorderPending) {
+      return "GUARDANDO ORDEN...";
+    }
+
+    if (this.reorderMode) {
+      return "ELIGE DESTINO";
+    }
+
+    return "EQUIPO";
+  }
+
+  private getFooterText(): string {
+    if (this.targetSelectionMode) {
+      return "[ESC] Volver";
+    }
+
+    if (this.reorderMode) {
+      if (this.reorderPending) {
+        return "Guardando...";
+      }
+
+      return "[ESC] Cancelar";
+    }
+
+    return "[I] Inventario     [P] Cerrar";
+  }
+
+  private openPokemonContextMenu(pokemonInstanceId: string): void {
+    this.contextMenuPokemonInstanceId = pokemonInstanceId;
+
+    this.setParty(this.party);
+  }
+
+  private closePokemonContextMenu(): void {
+    if (!this.contextMenuPokemonInstanceId) {
+      return;
+    }
+
+    this.contextMenuPokemonInstanceId = undefined;
+
+    this.setParty(this.party);
+  }
+
+  private createPokemonContextMenu(): void {
+    const pokemonInstanceId = this.contextMenuPokemonInstanceId;
+
+    if (
+      !pokemonInstanceId ||
+      this.targetSelectionMode ||
+      this.reorderMode ||
+      this.reorderPending
+    ) {
+      return;
+    }
+
+    const pokemonIndex = this.party.findIndex(
+      (pokemon) => pokemon.instanceId === pokemonInstanceId,
+    );
+
+    if (pokemonIndex < 0) {
+      this.contextMenuPokemonInstanceId = undefined;
+
+      return;
+    }
+
+    const pokemon = this.party[pokemonIndex];
+
+    if (!pokemon) {
+      return;
+    }
+
+    const menuWidth = 108;
+    const optionHeight = 24;
+
+    const menuX = TRAINER_PANEL.width - menuWidth - 8;
+
+    const menuY = PARTY_HEADER_HEIGHT + 8;
+
+    const options = [
+      {
+        label: "DATOS",
+        action: "summary",
+        enabled: false,
+      },
+      {
+        label: "CAMBIO",
+        action: "change",
+        enabled: Boolean(this.onChangeRequested),
+      },
+      {
+        label: "OBJETO",
+        action: "item",
+        enabled: false,
+      },
+      {
+        label: "SALIR",
+        action: "exit",
+        enabled: true,
+      },
+    ] as const;
+
+    const menuHeight = options.length * optionHeight + 8;
+
+    const background = this.scene.add
+      .rectangle(menuX, menuY, menuWidth, menuHeight, 0xf3f4f6, 1)
+      .setOrigin(0)
+      .setStrokeStyle(2, 0x475569);
+
+    this.container.add(background);
+
+    options.forEach((option, optionIndex) => {
+      const optionY = menuY + 4 + optionIndex * optionHeight;
+
+      const optionBackground = this.scene.add
+        .rectangle(
+          menuX + 4,
+          optionY,
+          menuWidth - 8,
+          optionHeight - 2,
+          0xffffff,
+          0,
+        )
+        .setOrigin(0);
+
+      const label = this.scene.add.text(menuX + 12, optionY + 4, option.label, {
+        fontFamily: "Arial",
+        fontSize: "12px",
+
+        color: option.enabled ? "#111827" : "#9ca3af",
+
+        fontStyle: option.action === "change" ? "bold" : "normal",
+      });
+
+      this.container.add([optionBackground, label]);
+
+      if (!option.enabled) {
+        return;
+      }
+
+      optionBackground
+        .setInteractive({
+          useHandCursor: true,
+        })
+        .setScrollFactor(0, 0);
+
+      optionBackground.on("pointerover", () => {
+        optionBackground.setFillStyle(0xdbeafe, 1);
+      });
+
+      optionBackground.on("pointerout", () => {
+        optionBackground.setFillStyle(0xffffff, 0);
+      });
+
+      optionBackground.on("pointerdown", () => {
+        switch (option.action) {
+          case "change":
+            this.onChangeRequested?.(pokemon, pokemonIndex);
+            return;
+
+          case "exit":
+            this.closePokemonContextMenu();
+            return;
+        }
+      });
+    });
   }
 }

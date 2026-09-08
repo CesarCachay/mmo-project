@@ -41,13 +41,8 @@ export class PokemonPartyRepository {
       }
 
       /*
-       * First clear the current active-party positions.
-       *
-       * We do NOT delete Pokémon here.
-       *
-       * partyPosition = null means:
-       * trainer owns the Pokémon, but it is not
-       * currently in the active party.
+       * First clear the current active-party positions. We do NOT delete Pokémon here.
+       * partyPosition = null means: trainer owns the Pokémon, but it is not currently in the active party.
        */
       await tx.pokemonInstance.updateMany({
         where: {
@@ -115,11 +110,6 @@ export class PokemonPartyRepository {
           });
         }
 
-        /*
-         * Moves represent a small ordered snapshot
-         * (maximum four), so replacing them is both
-         * simple and deterministic.
-         */
         await tx.pokemonInstanceMove.deleteMany({
           where: {
             pokemonInstanceId: pokemon.instanceId,
@@ -135,6 +125,108 @@ export class PokemonPartyRepository {
               currentPp: move.currentPp,
             })),
           });
+        }
+      }
+    });
+  }
+
+  async savePartyOrder(
+    trainerId: PokemonTrainerId,
+    orderedInstanceIds: readonly string[],
+  ): Promise<void> {
+    if (orderedInstanceIds.length > MAX_POKEMON_PARTY_SIZE) {
+      throw new Error(
+        `Pokémon party cannot contain more than ${MAX_POKEMON_PARTY_SIZE} Pokémon`,
+      );
+    }
+
+    if (new Set(orderedInstanceIds).size !== orderedInstanceIds.length) {
+      throw new Error('Pokémon party order contains duplicate instance ids');
+    }
+
+    await this.prisma.$transaction(async (tx) => {
+      /*
+       * La DB también valida el set actual.
+       *
+       * El reorder jamás debe:
+       * - agregar Pokémon desde Storage
+       * - remover Pokémon del Party
+       * - cambiar ownership
+       */
+      const persistedParty = await tx.pokemonInstance.findMany({
+        where: {
+          trainerId,
+          partyPosition: {
+            not: null,
+          },
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      const persistedIds = persistedParty.map((pokemon) => pokemon.id);
+
+      if (persistedIds.length !== orderedInstanceIds.length) {
+        throw new Error(
+          `Persisted Pokémon party does not match runtime party for trainer ${trainerId}`,
+        );
+      }
+
+      const persistedIdSet = new Set(persistedIds);
+
+      for (const instanceId of orderedInstanceIds) {
+        if (!persistedIdSet.has(instanceId)) {
+          throw new Error(
+            `Pokémon instance ${instanceId} is not in the persisted active party`,
+          );
+        }
+      }
+
+      /*
+       * Existe:
+       * @@unique([trainerId, partyPosition])
+       * Por eso no podemos cambiar:
+       * 0 → 1
+       * 1 → 0
+       */
+      await tx.pokemonInstance.updateMany({
+        where: {
+          trainerId,
+          partyPosition: {
+            not: null,
+          },
+        },
+        data: {
+          partyPosition: null,
+        },
+      });
+
+      for (
+        let partyPosition = 0;
+        partyPosition < orderedInstanceIds.length;
+        partyPosition += 1
+      ) {
+        const instanceId = orderedInstanceIds[partyPosition];
+
+        if (!instanceId) {
+          continue;
+        }
+
+        const result = await tx.pokemonInstance.updateMany({
+          where: {
+            id: instanceId,
+            trainerId,
+          },
+          data: {
+            partyPosition,
+          },
+        });
+
+        if (result.count !== 1) {
+          throw new Error(
+            `Failed to persist party position for Pokémon ${instanceId}`,
+          );
         }
       }
     });

@@ -8,6 +8,9 @@ import {
   type PokemonOverworldItemErrorPayload,
   type PokemonOverworldItemUseInput,
   type PokemonOverworldItemUsedPayload,
+  type PokemonPartyReorderInput,
+  type PokemonPartyReorderedPayload,
+  type PokemonPartyReorderErrorPayload,
 } from "@cesar-mmo/shared";
 
 import { PartyPanel } from "./PartyPanel";
@@ -16,6 +19,7 @@ import { InventoryPanel } from "./InventoryPanel";
 export interface TrainerPanelControllerOptions {
   readonly isInteractionBlocked: () => boolean;
   readonly onUseOverworldItem: (input: PokemonOverworldItemUseInput) => void;
+  readonly onReorderParty: (input: PokemonPartyReorderInput) => void;
 }
 
 export class TrainerPanelController {
@@ -32,9 +36,12 @@ export class TrainerPanelController {
   private readonly onUseOverworldItem: (
     input: PokemonOverworldItemUseInput,
   ) => void;
+  private readonly onReorderParty: (input: PokemonPartyReorderInput) => void;
 
   private selectedOverworldItemId?: PokemonOverworldItemUseInput["itemId"];
   private isOverworldItemUsePending = false;
+  private partyReorderSourceInstanceId: string | undefined;
+  private isPartyReorderPending = false;
 
   private readonly feedbackText: Phaser.GameObjects.Text;
   private feedbackTimer?: Phaser.Time.TimerEvent;
@@ -43,6 +50,7 @@ export class TrainerPanelController {
     this.scene = scene;
     this.isInteractionBlocked = options.isInteractionBlocked;
     this.onUseOverworldItem = options.onUseOverworldItem;
+    this.onReorderParty = options.onReorderParty;
     const keyboard = this.scene.input.keyboard;
 
     if (!keyboard) {
@@ -59,8 +67,11 @@ export class TrainerPanelController {
     this.escapeKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC, false);
 
     this.partyPanel = new PartyPanel(this.scene, {
-      onPokemonSelected: (pokemon) => {
-        this.handleOverworldItemTargetSelected(pokemon);
+      onPokemonSelected: (pokemon, index) => {
+        this.handlePartyPokemonSelected(pokemon, index);
+      },
+      onChangeRequested: (pokemon) => {
+        this.handlePartyChangeRequested(pokemon);
       },
     });
     this.inventoryPanel = new InventoryPanel(this.scene, {
@@ -118,7 +129,13 @@ export class TrainerPanelController {
 
   public close(): void {
     this.selectedOverworldItemId = undefined;
+    this.partyReorderSourceInstanceId = undefined;
     this.partyPanel.setTargetSelectionMode(false);
+    this.partyPanel.setReorderState({
+      active: false,
+      sourcePokemonInstanceId: undefined,
+      pending: false,
+    });
     this.partyPanel.hide();
     this.inventoryPanel.hide();
   }
@@ -139,6 +156,9 @@ export class TrainerPanelController {
   }
 
   private handleInventoryToggle(): void {
+    if (this.isPartyReorderPending || this.partyPanel.isReorderMode()) {
+      return;
+    }
     if (this.selectedOverworldItemId || this.isOverworldItemUsePending) {
       return;
     }
@@ -161,6 +181,9 @@ export class TrainerPanelController {
   }
 
   private handlePartyToggle(): void {
+    if (this.isPartyReorderPending) {
+      return;
+    }
     if (this.selectedOverworldItemId || this.isOverworldItemUsePending) {
       return;
     }
@@ -179,6 +202,9 @@ export class TrainerPanelController {
       this.inventoryPanel.hide();
     }
 
+    if (!willOpen && this.partyPanel.isReorderMode()) {
+      this.exitPartyReorderMode();
+    }
     /* PartyPanel ya sabe si existe al menos un Pokémon */
     this.partyPanel.toggle();
   }
@@ -190,6 +216,15 @@ export class TrainerPanelController {
 
     if (this.selectedOverworldItemId) {
       this.cancelOverworldItemTargetSelection();
+      return;
+    }
+
+    if (this.isPartyReorderPending) {
+      return;
+    }
+
+    if (this.partyPanel.isReorderMode()) {
+      this.exitPartyReorderMode();
       return;
     }
 
@@ -275,6 +310,128 @@ export class TrainerPanelController {
 
       case "PERSISTENCE_FAILED":
         return "No se pudo guardar el uso del objeto.";
+    }
+  }
+
+  private handlePartyChangeRequested(pokemon: PokemonInstance): void {
+    if (
+      this.selectedOverworldItemId ||
+      this.isOverworldItemUsePending ||
+      this.isPartyReorderPending
+    ) {
+      return;
+    }
+
+    if (!this.partyPanel.isVisible()) {
+      return;
+    }
+
+    if (this.isInteractionBlocked()) {
+      return;
+    }
+
+    /*
+     * El Pokémon origen NO se elige en un segundo paso.
+     * Ya fue seleccionado desde el menú contextual:
+     * Pokémon A → CAMBIO → A pasa a ser source.
+     */
+    this.partyReorderSourceInstanceId = pokemon.instanceId;
+
+    this.partyPanel.setReorderState({
+      active: true,
+      sourcePokemonInstanceId: pokemon.instanceId,
+      pending: false,
+    });
+  }
+
+  private handlePartyPokemonSelected(
+    pokemon: PokemonInstance,
+    index: number,
+  ): void {
+    /* Item Target Selection mantiene prioridad y comportamiento actual */
+    if (this.selectedOverworldItemId) {
+      this.handleOverworldItemTargetSelected(pokemon);
+      return;
+    }
+
+    if (!this.partyPanel.isReorderMode()) {
+      return;
+    }
+
+    if (this.isPartyReorderPending) {
+      return;
+    }
+
+    const sourcePokemonInstanceId = this.partyReorderSourceInstanceId;
+
+    if (!sourcePokemonInstanceId) {
+      this.exitPartyReorderMode();
+      return;
+    }
+
+    if (sourcePokemonInstanceId === pokemon.instanceId) {
+      return;
+    }
+
+    this.isPartyReorderPending = true;
+    this.refreshPartyReorderUi();
+    this.onReorderParty({
+      pokemonInstanceId: sourcePokemonInstanceId,
+      targetPosition: index,
+    });
+  }
+
+  private exitPartyReorderMode(): void {
+    this.partyReorderSourceInstanceId = undefined;
+    this.partyPanel.setReorderState({
+      active: false,
+      sourcePokemonInstanceId: undefined,
+      pending: false,
+    });
+  }
+
+  private refreshPartyReorderUi(): void {
+    this.partyPanel.setReorderState({
+      active: this.partyPanel.isReorderMode(),
+      sourcePokemonInstanceId: this.partyReorderSourceInstanceId,
+      pending: this.isPartyReorderPending,
+    });
+  }
+
+  public handlePokemonPartyReordered(
+    _payload: PokemonPartyReorderedPayload,
+  ): void {
+    this.isPartyReorderPending = false;
+    this.exitPartyReorderMode();
+    this.showFeedback("Pokémon intercambiados correctamente.");
+  }
+
+  public handlePokemonPartyReorderError(
+    payload: PokemonPartyReorderErrorPayload,
+  ): void {
+    this.isPartyReorderPending = false;
+    this.exitPartyReorderMode();
+    this.showFeedback(this.getPartyReorderErrorMessage(payload.code));
+  }
+
+  private getPartyReorderErrorMessage(
+    code: PokemonPartyReorderErrorPayload["code"],
+  ): string {
+    switch (code) {
+      case "INVALID_INPUT":
+        return "No se pudo reordenar el equipo.";
+
+      case "POKEMON_NOT_IN_PARTY":
+        return "Ese Pokémon ya no está en tu equipo.";
+
+      case "INVALID_POSITION":
+        return "La posición de destino ya no es válida.";
+
+      case "INCOMPATIBLE_STATE":
+        return "No puedes reordenar el equipo en este momento.";
+
+      case "PERSISTENCE_FAILED":
+        return "No se pudo guardar el nuevo orden.";
     }
   }
 }

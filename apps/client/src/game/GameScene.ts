@@ -535,6 +535,9 @@ export class GameScene extends Phaser.Scene {
       onUseOverworldItem: (input) => {
         this.network.usePokemonOverworldItem(input);
       },
+      onReorderParty: (input) => {
+        this.network.reorderPokemonParty(input);
+      },
     });
     this.pokemonTrainerPresentationController =
       new PokemonTrainerPresentationController(this, {
@@ -609,6 +612,14 @@ export class GameScene extends Phaser.Scene {
       void this.pokemonTrainerPresentationController.applyTrainerState(
         payload.trainerState,
       );
+    });
+
+    this.network.onPokemonPartyReordered((payload) => {
+      this.trainerPanelController.handlePokemonPartyReordered(payload);
+    });
+
+    this.network.onPokemonPartyReorderError((payload) => {
+      this.trainerPanelController.handlePokemonPartyReorderError(payload);
     });
 
     this.network.onPokemonOverworldItemUsed((payload) => {

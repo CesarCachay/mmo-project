@@ -3,6 +3,8 @@ import type {
   BattleParticipant,
   PokemonStarterId,
   PokemonItemId,
+  PokemonParty,
+  PokemonPartyReorderErrorCode,
 } from '@cesar-mmo/shared';
 import {
   addPokemonToParty,
@@ -21,7 +23,22 @@ import { PokemonTrainerStateStore } from './pokemon-trainer-state.store.js';
 import { PokemonPartyRepository } from './pokemon-party.repository';
 import { PokemonInventoryRepository } from './inventory/pokemon-inventory.repository';
 
+export class PokemonPartyReorderError extends Error {
+  constructor(
+    public readonly code: PokemonPartyReorderErrorCode,
+    message: string,
+  ) {
+    super(message);
+    this.name = 'PokemonPartyReorderError';
+  }
+}
+
 export class PokemonTrainerService {
+  private readonly partyReorderQueues = new Map<
+    PokemonTrainerId,
+    Promise<unknown>
+  >();
+
   constructor(
     private readonly trainerStateStore: PokemonTrainerStateStore,
     private readonly pokemonPartyRepository: PokemonPartyRepository,
@@ -49,6 +66,16 @@ export class PokemonTrainerService {
     /* Persistimos primero. Si PostgreSQL falla, NO modificamos el estado runtime. */
     await this.pokemonPartyRepository.saveParty(trainerId, updatedParty);
     return this.trainerStateStore.setParty(trainerId, updatedParty);
+  }
+
+  public reorderParty(
+    trainerId: PokemonTrainerId,
+    pokemonInstanceId: string,
+    targetPosition: number,
+  ): Promise<PokemonTrainerState> {
+    return this.enqueuePartyReorder(trainerId, () =>
+      this.reorderPartyInternal(trainerId, pokemonInstanceId, targetPosition),
+    );
   }
 
   public async chooseStarter(
@@ -213,5 +240,127 @@ export class PokemonTrainerService {
     );
 
     return this.trainerStateStore.setInventory(trainerId, updatedInventory);
+  }
+
+  private async reorderPartyInternal(
+    trainerId: PokemonTrainerId,
+    pokemonInstanceId: string,
+    targetPosition: number,
+  ): Promise<PokemonTrainerState> {
+    /* RAM es el runtime authoritative snapshot desde el que calculamos la intención */
+    const trainerState = this.trainerStateStore.get(trainerId);
+
+    if (!trainerState) {
+      throw new PokemonPartyReorderError(
+        'INCOMPATIBLE_STATE',
+        `Pokémon trainer state not found for trainer ${trainerId}`,
+      );
+    }
+
+    const party = trainerState.party;
+
+    const sourcePosition = party.pokemon.findIndex(
+      (pokemon) => pokemon.instanceId === pokemonInstanceId,
+    );
+
+    if (sourcePosition < 0) {
+      throw new PokemonPartyReorderError(
+        'POKEMON_NOT_IN_PARTY',
+        `Pokémon ${pokemonInstanceId} is not in trainer ${trainerId} active party`,
+      );
+    }
+
+    /*
+     * El network validator ya limita 0..5,
+     * pero el servidor también debe validar
+     * contra el tamaño REAL del Party.
+     */
+    if (
+      !Number.isInteger(targetPosition) ||
+      targetPosition < 0 ||
+      targetPosition >= party.pokemon.length
+    ) {
+      throw new PokemonPartyReorderError(
+        'INVALID_POSITION',
+        `Party position ${targetPosition} is invalid for party size ${party.pokemon.length}`,
+      );
+    }
+
+    if (sourcePosition === targetPosition) {
+      return trainerState;
+    }
+
+    const updatedParty = this.swapPokemonInParty(
+      party,
+      sourcePosition,
+      targetPosition,
+    );
+
+    /* DB FIRST. savePartyOrder() modifica únicamente partyPosition */
+    await this.pokemonPartyRepository.savePartyOrder(
+      trainerId,
+      updatedParty.pokemon.map((pokemon) => pokemon.instanceId),
+    );
+
+    /* RAM SECOND. Sólo después del commit exitoso */
+    return this.trainerStateStore.setParty(trainerId, updatedParty);
+  }
+
+  private swapPokemonInParty(
+    party: PokemonParty,
+    sourcePosition: number,
+    targetPosition: number,
+  ): PokemonParty {
+    const pokemon = [...party.pokemon];
+    const sourcePokemon = pokemon[sourcePosition];
+    const targetPokemon = pokemon[targetPosition];
+
+    if (!sourcePokemon) {
+      throw new PokemonPartyReorderError(
+        'POKEMON_NOT_IN_PARTY',
+        `Pokémon at party position ${sourcePosition} does not exist`,
+      );
+    }
+
+    if (!targetPokemon) {
+      throw new PokemonPartyReorderError(
+        'INVALID_POSITION',
+        `Pokémon at party position ${targetPosition} does not exist`,
+      );
+    }
+
+    pokemon[sourcePosition] = targetPokemon;
+    pokemon[targetPosition] = sourcePokemon;
+
+    return {
+      pokemon,
+    };
+  }
+
+  private enqueuePartyReorder<T>(
+    trainerId: PokemonTrainerId,
+    operation: () => Promise<T>,
+  ): Promise<T> {
+    const previous =
+      this.partyReorderQueues.get(trainerId) ?? Promise.resolve();
+
+    const current = previous.catch(() => undefined).then(operation);
+
+    this.partyReorderQueues.set(trainerId, current);
+
+    void current.then(
+      () => {
+        if (this.partyReorderQueues.get(trainerId) === current) {
+          this.partyReorderQueues.delete(trainerId);
+        }
+      },
+      () => {
+        if (this.partyReorderQueues.get(trainerId) === current) {
+          this.partyReorderQueues.delete(trainerId);
+        }
+      },
+    );
+
+    return current;
   }
 }
