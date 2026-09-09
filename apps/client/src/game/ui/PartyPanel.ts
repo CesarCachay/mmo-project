@@ -31,6 +31,15 @@ export interface PartyPanelReorderState {
   readonly pending: boolean;
 }
 
+interface PartySlotPresentation {
+  readonly row: Phaser.GameObjects.Rectangle;
+  readonly icon: Phaser.GameObjects.Image;
+  readonly hpLabel: Phaser.GameObjects.Text;
+  readonly hpFill: Phaser.GameObjects.Rectangle;
+  readonly faintedLabel: Phaser.GameObjects.Text;
+  readonly maxHp: number;
+}
+
 export class PartyPanel {
   private readonly scene: Phaser.Scene;
   private readonly container: Phaser.GameObjects.Container;
@@ -57,6 +66,8 @@ export class PartyPanel {
 
   private readonly pokemonIconTweens: Phaser.Tweens.Tween[] = [];
 
+  private readonly slotPresentations = new Map<string, PartySlotPresentation>();
+
   constructor(scene: Phaser.Scene, options: PartyPanelOptions = {}) {
     this.scene = scene;
     this.onPokemonSelected = options.onPokemonSelected;
@@ -82,6 +93,7 @@ export class PartyPanel {
 
     const wasVisible = this.container.visible;
     this.clearPokemonIconTweens();
+    this.slotPresentations.clear();
     this.container.removeAll(true);
     this.hasPokemon = pokemon.length > 0;
 
@@ -197,6 +209,8 @@ export class PartyPanel {
 
     const hpRatio = Phaser.Math.Clamp(pokemon.currentHp / maxHp, 0, 1);
 
+    const isFainted = pokemon.currentHp <= 0;
+
     const displayName = getPokemonDisplayName(pokemon);
 
     const rowWidth = TRAINER_PANEL.width - 12;
@@ -215,6 +229,11 @@ export class PartyPanel {
         0.9,
       )
       .setOrigin(0);
+
+    if (isFainted) {
+      row.setAlpha(0.72);
+      row.setStrokeStyle(1, 0x7f1d1d, 0.9);
+    }
 
     const isReorderSource =
       this.reorderMode &&
@@ -239,6 +258,11 @@ export class PartyPanel {
 
     const icon = this.scene.add.image(30, slotY + 20, asset.textureKey);
 
+    if (isFainted) {
+      /* Presentation-only. No altera gameplay ni PokemonInstance */
+      icon.setTint(0x6b7280).setAlpha(0.58);
+    }
+
     this.createPokemonIconIdleAnimation(icon, index);
 
     const name = this.scene.add.text(58, slotY + 5, displayName, {
@@ -252,6 +276,16 @@ export class PartyPanel {
       fontSize: "11px",
       color: "#d1d5db",
     });
+
+    const faintedLabel = this.scene.add
+      .text(TRAINER_PANEL.width - 18, slotY + 6, "FAINTED", {
+        fontFamily: "Arial",
+        fontSize: "9px",
+        color: "#fca5a5",
+        fontStyle: "bold",
+      })
+      .setOrigin(1, 0)
+      .setVisible(isFainted);
 
     const hpLabel = this.scene.add.text(
       58,
@@ -269,11 +303,29 @@ export class PartyPanel {
       .setOrigin(0, 0.5);
 
     const hpFill = this.scene.add
-      .rectangle(58, slotY + 39, 140 * hpRatio, 5, 0x22c55e)
-      .setOrigin(0, 0.5);
+      .rectangle(58, slotY + 39, 140, 5, 0x22c55e)
+      .setOrigin(0, 0.5)
+      .setScale(hpRatio, 1);
 
     /* Primero row entra en su parentContainer definitivo */
-    this.container.add([row, icon, name, level, hpLabel, hpBackground, hpFill]);
+    this.container.add([
+      row,
+      icon,
+      name,
+      level,
+      hpLabel,
+      hpBackground,
+      hpFill,
+      faintedLabel,
+    ]);
+    this.slotPresentations.set(pokemon.instanceId, {
+      row,
+      icon,
+      hpLabel,
+      hpFill,
+      faintedLabel,
+      maxHp,
+    });
 
     const isSpecialSelectionMode = this.targetSelectionMode || this.reorderMode;
 
@@ -314,6 +366,8 @@ export class PartyPanel {
         row.setStrokeStyle(2, 0xfacc15);
       } else if (isContextSelected) {
         row.setStrokeStyle(2, 0x60a5fa);
+      } else if (isFainted) {
+        row.setStrokeStyle(1, 0x7f1d1d, 0.9);
       } else {
         row.setStrokeStyle();
       }
@@ -344,6 +398,158 @@ export class PartyPanel {
 
       /* En Party normal: click Pokémon → menú contextual */
       this.openPokemonContextMenu(pokemon.instanceId);
+    });
+  }
+
+  public animateHpRestore(
+    pokemonInstanceId: string,
+    previousHp: number,
+    currentHp: number,
+    isRevive: boolean,
+    durationMs = 760,
+  ): Promise<void> {
+    const slot = this.slotPresentations.get(pokemonInstanceId);
+
+    if (!slot || !this.container.visible) {
+      return Promise.resolve();
+    }
+
+    const fromHp = Phaser.Math.Clamp(previousHp, 0, slot.maxHp);
+
+    const toHp = Phaser.Math.Clamp(currentHp, 0, slot.maxHp);
+
+    if (toHp <= fromHp) {
+      return Promise.resolve();
+    }
+
+    const prefersReducedMotion =
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+
+    const safeDuration = prefersReducedMotion ? 0 : Math.max(0, durationMs);
+
+    const fxColor = isRevive ? 0xfacc15 : 0x4ade80;
+
+    /* Presentation siempre empieza desde el HP anterior confirmado. */
+    this.updateSlotHpVisual(slot, fromHp);
+
+    if (safeDuration === 0) {
+      this.updateSlotHpVisual(slot, toHp);
+      slot.row.setAlpha(1);
+      slot.row.setStrokeStyle();
+      slot.icon.clearTint().setAlpha(1);
+
+      if (fromHp === 0 && toHp > 0) {
+        slot.faintedLabel.setVisible(false);
+      }
+
+      return Promise.resolve();
+    }
+
+    /* Focus visual del target */
+    slot.row.setStrokeStyle(2, fxColor, 0.95);
+
+    slot.icon.setTint(fxColor);
+
+    /* Ring alrededor del sprite */
+    const ring = this.scene.add
+      .circle(slot.icon.x, slot.icon.y, 17, fxColor, 0)
+      .setStrokeStyle(2, fxColor, 0.9)
+      .setScale(0.4)
+      .setAlpha(0.9);
+
+    this.container.add(ring);
+
+    this.scene.tweens.add({
+      targets: ring,
+      scaleX: 1.55,
+      scaleY: 1.55,
+      alpha: 0,
+      duration: safeDuration,
+      ease: "Cubic.Out",
+      onComplete: () => {
+        ring.destroy();
+      },
+    });
+
+    for (let index = 0; index < 7; index += 1) {
+      const offsetX = Phaser.Math.Between(-18, 18);
+
+      const particle = this.scene.add
+        .circle(
+          slot.icon.x + offsetX,
+          slot.icon.y + 15,
+          Phaser.Math.Between(2, 3),
+          fxColor,
+          1,
+        )
+        .setAlpha(0);
+
+      this.container.add(particle);
+
+      this.scene.tweens.add({
+        targets: particle,
+        x: particle.x + Phaser.Math.Between(-6, 6),
+        y: particle.y - Phaser.Math.Between(28, 46),
+        alpha: {
+          from: 0.95,
+          to: 0,
+        },
+        scaleX: {
+          from: 0.55,
+          to: 1.2,
+        },
+        scaleY: {
+          from: 0.55,
+          to: 1.2,
+        },
+        duration: Math.max(280, safeDuration - Phaser.Math.Between(0, 130)),
+        delay: index * 45,
+        ease: "Cubic.Out",
+        onComplete: () => {
+          particle.destroy();
+        },
+      });
+    }
+
+    /* Pequeño glow/pulse del icono */
+    this.scene.tweens.add({
+      targets: slot.icon,
+      alpha: {
+        from: 0.72,
+        to: 1,
+      },
+      duration: Math.floor(safeDuration / 2),
+      yoyo: true,
+      ease: "Sine.InOut",
+    });
+
+    /* HP count-up */
+    const counter = {
+      value: fromHp,
+    };
+
+    return new Promise<void>((resolve) => {
+      this.scene.tweens.add({
+        targets: counter,
+        value: toHp,
+        duration: safeDuration,
+        ease: "Cubic.Out",
+        onUpdate: () => {
+          this.updateSlotHpVisual(slot, Math.round(counter.value));
+        },
+        onComplete: () => {
+          this.updateSlotHpVisual(slot, toHp);
+          slot.row.setAlpha(1).setStrokeStyle();
+          slot.icon.clearTint().setAlpha(1);
+
+          /* Si el Pokémon estaba debilitado y ahora vuelve a tener HP, deja de mostrarse FAINTED */
+          if (fromHp === 0 && toHp > 0) {
+            slot.faintedLabel.setVisible(false);
+          }
+
+          resolve();
+        },
+      });
     });
   }
 
@@ -603,5 +809,15 @@ export class PartyPanel {
         }
       });
     });
+  }
+
+  private updateSlotHpVisual(
+    slot: PartySlotPresentation,
+    currentHp: number,
+  ): void {
+    const safeHp = Phaser.Math.Clamp(Math.round(currentHp), 0, slot.maxHp);
+    const hpRatio = slot.maxHp > 0 ? safeHp / slot.maxHp : 0;
+    slot.hpLabel.setText(`HP ${safeHp}/${slot.maxHp}`);
+    slot.hpFill.setScale(hpRatio, 1);
   }
 }

@@ -92,6 +92,9 @@ export class PokemonOverworldItemNetworkController {
       client.emit(POKEMON_OVERWORLD_ITEM_EVENTS.USED, {
         itemId: result.itemId,
         targetPokemonInstanceId: result.targetPokemonInstanceId,
+        previousHp: result.previousHp,
+        currentHp: result.currentHp,
+        appliedHealing: result.appliedHealing,
       } satisfies PokemonOverworldItemUsedPayload);
     } catch (error: unknown) {
       if (error instanceof PokemonOverworldItemUseError) {

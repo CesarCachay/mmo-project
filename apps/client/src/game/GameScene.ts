@@ -623,7 +623,7 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.network.onPokemonOverworldItemUsed((payload) => {
-      this.trainerPanelController.handleOverworldItemUsed(payload);
+      void this.trainerPanelController.handleOverworldItemUsed(payload);
     });
 
     this.network.onPokemonOverworldItemError((payload) => {

@@ -22,6 +22,12 @@ export interface TrainerPanelControllerOptions {
   readonly onReorderParty: (input: PokemonPartyReorderInput) => void;
 }
 
+interface PendingOverworldItemPresentation {
+  readonly itemId: PokemonOverworldItemUseInput["itemId"];
+  readonly targetPokemonInstanceId: string;
+  readonly previousHp: number;
+}
+
 export class TrainerPanelController {
   private readonly scene: Phaser.Scene;
 
@@ -40,6 +46,10 @@ export class TrainerPanelController {
 
   private selectedOverworldItemId?: PokemonOverworldItemUseInput["itemId"];
   private isOverworldItemUsePending = false;
+
+  private pendingOverworldItemPresentation?: PendingOverworldItemPresentation;
+  private deferredPartyDuringOverworldItem?: readonly PokemonInstance[];
+
   private partyReorderSourceInstanceId: string | undefined;
   private isPartyReorderPending = false;
 
@@ -104,6 +114,11 @@ export class TrainerPanelController {
   }
 
   public setParty(party: readonly PokemonInstance[]): void {
+    /* Si hay un item esperando presentación, conservamos visualmente la Party anterior */
+    if (this.pendingOverworldItemPresentation) {
+      this.deferredPartyDuringOverworldItem = party;
+      return;
+    }
     this.partyPanel.setParty(party);
   }
 
@@ -129,6 +144,9 @@ export class TrainerPanelController {
 
   public close(): void {
     this.selectedOverworldItemId = undefined;
+    this.isOverworldItemUsePending = false;
+    this.pendingOverworldItemPresentation = undefined;
+    this.deferredPartyDuringOverworldItem = undefined;
     this.partyReorderSourceInstanceId = undefined;
     this.partyPanel.setTargetSelectionMode(false);
     this.partyPanel.setReorderState({
@@ -140,18 +158,53 @@ export class TrainerPanelController {
     this.inventoryPanel.hide();
   }
 
-  public handleOverworldItemUsed(
+  public async handleOverworldItemUsed(
     payload: PokemonOverworldItemUsedPayload,
-  ): void {
-    this.isOverworldItemUsePending = false;
+  ): Promise<void> {
     const item = POKEMON_ITEM_REGISTRY[payload.itemId];
-    this.showFeedback(`${item.name} usada correctamente.`);
+    const pending = this.pendingOverworldItemPresentation;
+    const matchesPendingRequest =
+      pending?.itemId === payload.itemId &&
+      pending.targetPokemonInstanceId === payload.targetPokemonInstanceId;
+
+    if (!matchesPendingRequest) {
+      this.finishOverworldItemPresentation();
+      this.showFeedback(`Used a ${item.name}!`);
+      return;
+    }
+
+    /* Shared registry se usa sólo para presentation. La regla real ya fue validada por server */
+    const isRevive = item.effect?.type === "revive";
+
+    /* El mensaje ocurre ANTES del efecto, igual que en Battle. */
+    this.showFeedback(`Used a ${item.name}!`);
+
+    /* Nos aseguramos de que la Party permanezca como superficie principal durante el FX */
+    this.partyPanel.show();
+
+    try {
+      await this.partyPanel.animateHpRestore(
+        payload.targetPokemonInstanceId,
+        payload.previousHp,
+        payload.currentHp,
+        isRevive,
+        760,
+      );
+    } catch (error: unknown) {
+      /* Un error puramente visual jamás debe impedir aplicar el TrainerState autoritativo */
+      console.error(
+        "[OverworldItemPresentation] HP restore animation failed",
+        error,
+      );
+    } finally {
+      this.finishOverworldItemPresentation();
+    }
   }
 
   public handleOverworldItemError(
     payload: PokemonOverworldItemErrorPayload,
   ): void {
-    this.isOverworldItemUsePending = false;
+    this.finishOverworldItemPresentation();
     this.showFeedback(this.getOverworldItemErrorMessage(payload.code));
   }
 
@@ -219,6 +272,10 @@ export class TrainerPanelController {
       return;
     }
 
+    if (this.isOverworldItemUsePending) {
+      return;
+    }
+
     if (this.isPartyReorderPending) {
       return;
     }
@@ -257,14 +314,25 @@ export class TrainerPanelController {
 
     this.isOverworldItemUsePending = true;
 
-    /* Controller decide la intención UI. Sólo manda itemId + target */
+    this.pendingOverworldItemPresentation = {
+      itemId,
+      targetPokemonInstanceId: pokemon.instanceId,
+      previousHp: pokemon.currentHp,
+    };
+
+    this.deferredPartyDuringOverworldItem = undefined;
+
+    /* Intent solamente. Server continúa teniendo toda la autoridad */
     this.onUseOverworldItem({
       itemId,
       targetPokemonInstanceId: pokemon.instanceId,
     });
+
     this.selectedOverworldItemId = undefined;
+
+    /* Salimos de target-selection para impedir un segundo click, pero mantenemos Party visible */
     this.partyPanel.setTargetSelectionMode(false);
-    this.partyPanel.hide();
+    this.partyPanel.show();
   }
 
   private cancelOverworldItemTargetSelection(): void {
@@ -435,6 +503,17 @@ export class TrainerPanelController {
 
       case "PERSISTENCE_FAILED":
         return "No se pudo guardar el nuevo orden.";
+    }
+  }
+
+  private finishOverworldItemPresentation(): void {
+    this.isOverworldItemUsePending = false;
+    this.pendingOverworldItemPresentation = undefined;
+    const deferredParty = this.deferredPartyDuringOverworldItem;
+    this.deferredPartyDuringOverworldItem = undefined;
+
+    if (deferredParty) {
+      this.partyPanel.setParty(deferredParty);
     }
   }
 }

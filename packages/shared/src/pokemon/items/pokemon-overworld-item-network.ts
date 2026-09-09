@@ -17,6 +17,10 @@ export interface PokemonOverworldItemUseInput {
 export interface PokemonOverworldItemUsedPayload {
   readonly itemId: PokemonItemId;
   readonly targetPokemonInstanceId: string;
+
+  readonly previousHp: number;
+  readonly currentHp: number;
+  readonly appliedHealing: number;
 }
 
 export type PokemonOverworldItemErrorCode =
@@ -80,14 +84,33 @@ export function isPokemonOverworldItemUsedPayload(
     return false;
   }
 
-  if (!hasExactKeys(value, ["itemId", "targetPokemonInstanceId"])) {
+  if (
+    !hasExactKeys(value, [
+      "itemId",
+      "targetPokemonInstanceId",
+      "previousHp",
+      "currentHp",
+      "appliedHealing",
+    ])
+  ) {
     return false;
   }
 
-  return (
-    isPokemonItemId(value.itemId) &&
-    isNonEmptyString(value.targetPokemonInstanceId)
-  );
+  if (
+    !isPokemonItemId(value.itemId) ||
+    !isNonEmptyString(value.targetPokemonInstanceId) ||
+    !isNonNegativeInteger(value.previousHp) ||
+    !isNonNegativeInteger(value.currentHp) ||
+    !isNonNegativeInteger(value.appliedHealing)
+  ) {
+    return false;
+  }
+
+  if (value.currentHp <= value.previousHp) {
+    return false;
+  }
+
+  return value.appliedHealing === value.currentHp - value.previousHp;
 }
 
 export function isPokemonOverworldItemErrorPayload(
@@ -116,4 +139,8 @@ export function isPokemonOverworldItemErrorPayload(
     default:
       return false;
   }
+}
+
+function isNonNegativeInteger(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0;
 }
