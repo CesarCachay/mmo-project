@@ -1,4 +1,7 @@
-import { isPokemonItemId, type PokemonItemId } from "../inventory/pokemon-inventory.js";
+import {
+  isPokemonItemId,
+  type PokemonItemId,
+} from "../inventory/pokemon-inventory.js";
 
 export const POKEMON_OVERWORLD_ITEM_EVENTS = {
   USE: "pokemon:overworld-item-use",
@@ -22,6 +25,7 @@ export type PokemonOverworldItemErrorCode =
   | "ITEM_NOT_USABLE"
   | "INVALID_TARGET"
   | "TARGET_FAINTED"
+  | "TARGET_NOT_FAINTED"
   | "TARGET_FULL_HP"
   | "INCOMPATIBLE_STATE"
   | "PERSISTENCE_FAILED";
@@ -40,7 +44,7 @@ function isNonEmptyString(value: unknown): value is string {
 
 function hasExactKeys(
   value: Record<string, unknown>,
-  expectedKeys: readonly string[]
+  expectedKeys: readonly string[],
 ): boolean {
   const actualKeys = Object.keys(value).sort();
 
@@ -53,7 +57,7 @@ function hasExactKeys(
 }
 
 export function isPokemonOverworldItemUseInput(
-  value: unknown
+  value: unknown,
 ): value is PokemonOverworldItemUseInput {
   if (!isRecord(value)) {
     return false;
@@ -63,11 +67,14 @@ export function isPokemonOverworldItemUseInput(
     return false;
   }
 
-  return isPokemonItemId(value.itemId) && isNonEmptyString(value.targetPokemonInstanceId);
+  return (
+    isPokemonItemId(value.itemId) &&
+    isNonEmptyString(value.targetPokemonInstanceId)
+  );
 }
 
 export function isPokemonOverworldItemUsedPayload(
-  value: unknown
+  value: unknown,
 ): value is PokemonOverworldItemUsedPayload {
   if (!isRecord(value)) {
     return false;
@@ -77,11 +84,14 @@ export function isPokemonOverworldItemUsedPayload(
     return false;
   }
 
-  return isPokemonItemId(value.itemId) && isNonEmptyString(value.targetPokemonInstanceId);
+  return (
+    isPokemonItemId(value.itemId) &&
+    isNonEmptyString(value.targetPokemonInstanceId)
+  );
 }
 
 export function isPokemonOverworldItemErrorPayload(
-  value: unknown
+  value: unknown,
 ): value is PokemonOverworldItemErrorPayload {
   if (!isRecord(value)) {
     return false;
@@ -97,6 +107,7 @@ export function isPokemonOverworldItemErrorPayload(
     case "ITEM_NOT_USABLE":
     case "INVALID_TARGET":
     case "TARGET_FAINTED":
+    case "TARGET_NOT_FAINTED":
     case "TARGET_FULL_HP":
     case "INCOMPATIBLE_STATE":
     case "PERSISTENCE_FAILED":

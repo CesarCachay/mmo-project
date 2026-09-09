@@ -61,13 +61,25 @@
   inset: 0;
 
   background:
-    radial-gradient(circle at 72% 18%, rgba(59, 130, 246, 0.13), transparent 32%),
-    radial-gradient(circle at 18% 66%, rgba(34, 197, 94, 0.08), transparent 30%),
+    radial-gradient(
+      circle at 72% 18%,
+      rgba(59, 130, 246, 0.13),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 18% 66%,
+      rgba(34, 197, 94, 0.08),
+      transparent 30%
+    ),
     linear-gradient(145deg, rgba(7, 17, 31, 0.96), rgba(10, 18, 32, 0.98));
 }
 
 .battle-ui-modern__surface {
-  background: linear-gradient(145deg, rgba(30, 41, 59, 0.86), rgba(15, 23, 42, 0.94));
+  background: linear-gradient(
+    145deg,
+    rgba(30, 41, 59, 0.86),
+    rgba(15, 23, 42, 0.94)
+  );
   border: 1px solid var(--battle-border);
   border-radius: 18px;
   box-shadow:
@@ -313,7 +325,11 @@
   overflow: hidden;
   border: 1px solid rgba(148, 163, 184, 0.16);
   border-radius: 14px;
-  background: linear-gradient(145deg, rgba(30, 41, 59, 0.88), rgba(15, 23, 42, 0.94));
+  background: linear-gradient(
+    145deg,
+    rgba(30, 41, 59, 0.88),
+    rgba(15, 23, 42, 0.94)
+  );
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   color: var(--battle-text-primary);
   font: inherit;
@@ -330,7 +346,11 @@
 .battle-modern-move-card:not(:disabled):hover {
   transform: translateY(-2px);
   border-color: rgba(96, 165, 250, 0.42);
-  background: linear-gradient(145deg, rgba(37, 52, 75, 0.97), rgba(20, 31, 49, 0.98));
+  background: linear-gradient(
+    145deg,
+    rgba(37, 52, 75, 0.97),
+    rgba(20, 31, 49, 0.98)
+  );
   box-shadow:
     0 8px 24px rgba(0, 0, 0, 0.22),
     inset 0 1px 0 rgba(255, 255, 255, 0.055);
@@ -573,7 +593,11 @@
   overflow: hidden;
   border: 1px solid rgba(148, 163, 184, 0.15);
   border-radius: 12px;
-  background: linear-gradient(145deg, rgba(30, 41, 59, 0.88), rgba(15, 23, 42, 0.94));
+  background: linear-gradient(
+    145deg,
+    rgba(30, 41, 59, 0.88),
+    rgba(15, 23, 42, 0.94)
+  );
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   color: var(--battle-text-primary);
   font: inherit;
@@ -594,7 +618,11 @@
 .battle-modern-replacement-card--selectable:hover {
   transform: translateY(-2px);
   border-color: rgba(34, 197, 94, 0.62);
-  background: linear-gradient(145deg, rgba(25, 55, 52, 0.98), rgba(15, 32, 37, 0.98));
+  background: linear-gradient(
+    145deg,
+    rgba(25, 55, 52, 0.98),
+    rgba(15, 32, 37, 0.98)
+  );
   box-shadow:
     0 8px 22px rgba(0, 0, 0, 0.22),
     0 0 0 1px rgba(34, 197, 94, 0.07);
@@ -628,6 +656,8 @@
   justify-content: center;
   border-radius: 11px;
   background: rgba(15, 23, 42, 0.48);
+  position: relative;
+  overflow: visible;
 }
 
 .battle-modern-replacement-card__sprite {
@@ -636,6 +666,8 @@
   object-fit: contain;
   image-rendering: pixelated;
   filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.32));
+  position: relative;
+  z-index: 2;
 }
 
 /* =========================================================
@@ -733,31 +765,230 @@
 }
 
 .battle-modern-replacement-card__status--fainted {
-  background: rgba(239, 68, 68, 0.13);
-  color: #fca5a5;
+  min-width: 28px;
+  padding: 2px 7px;
+  border: 1px solid rgba(248, 113, 113, 0.28);
+  border-radius: 4px;
+  background: linear-gradient(
+    180deg,
+    rgba(127, 29, 29, 0.72),
+    rgba(69, 10, 10, 0.82)
+  );
+  color: #fecaca;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.55);
 }
 
-.battle-modern-replacement-card__status--unavailable {
-  background: rgba(148, 163, 184, 0.09);
-  color: var(--battle-text-muted);
+.battle-modern-replacement-card--revivable {
+  cursor: pointer;
+  border-color: rgba(250, 204, 21, 0.38);
+  box-shadow:
+    inset 4px 0 0 rgba(239, 68, 68, 0.42),
+    0 0 0 1px rgba(250, 204, 21, 0.05);
 }
 
-.battle-modern-replacement--waiting .battle-modern-replacement-card {
-  opacity: 0.55;
+/* =========================================================
+   PARTY HEAL / REVIVE PRESENTATION
+   ========================================================= */
+
+.battle-modern-replacement-card--healing {
+  --battle-party-heal-rgb: 74, 222, 128;
+  --battle-party-heal-accent: #86efac;
+  opacity: 1 !important;
+  border-color: rgba(var(--battle-party-heal-rgb), 0.58);
+  box-shadow:
+    inset 3px 0 0 rgba(var(--battle-party-heal-rgb), 0.72),
+    0 0 18px rgba(var(--battle-party-heal-rgb), 0.13);
+  animation: battle-party-heal-card-pulse 760ms ease-in-out;
 }
 
-@media (max-width: 720px) {
-  .battle-modern-replacement {
-    padding: 8px 10px 10px;
+.battle-modern-replacement-card--reviving {
+  --battle-party-heal-rgb: 250, 204, 21;
+  --battle-party-heal-accent: #fde68a;
+}
+
+/* =========================================================
+   FX CONTAINER
+   ========================================================= */
+
+.battle-modern-replacement-card__heal-fx {
+  position: absolute;
+  inset: -6px;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  overflow: visible;
+  --battle-party-heal-rgb: 74, 222, 128;
+  --battle-party-heal-accent: #86efac;
+}
+
+.battle-modern-replacement-card__heal-fx--revive {
+  --battle-party-heal-rgb: 250, 204, 21;
+  --battle-party-heal-accent: #fde68a;
+}
+
+.battle-modern-replacement-card__heal-fx--active {
+  opacity: 1;
+}
+
+/* =========================================================
+   RING
+   ========================================================= */
+
+.battle-modern-replacement-card__heal-fx::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 54%;
+  width: 58%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--battle-party-heal-rgb), 0.72);
+  box-shadow: 0 0 9px rgba(var(--battle-party-heal-rgb), 0.36);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.35);
+}
+
+.battle-modern-replacement-card__heal-fx--active::before {
+  animation: battle-party-heal-ring 720ms ease-out forwards;
+}
+
+/* =========================================================
+   PARTICLES
+   ========================================================= */
+
+.battle-modern-replacement-card__heal-particle {
+  position: absolute;
+  bottom: 4px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--battle-party-heal-accent);
+  box-shadow: 0 0 6px rgba(var(--battle-party-heal-rgb), 0.85);
+  opacity: 0;
+}
+
+.battle-modern-replacement-card__heal-fx--active
+  .battle-modern-replacement-card__heal-particle {
+  animation: battle-party-heal-particle 700ms ease-out forwards;
+}
+
+.battle-modern-replacement-card__heal-particle:nth-child(1) {
+  left: 12%;
+  animation-delay: 0ms !important;
+}
+
+.battle-modern-replacement-card__heal-particle:nth-child(2) {
+  left: 28%;
+  animation-delay: 70ms !important;
+}
+
+.battle-modern-replacement-card__heal-particle:nth-child(3) {
+  left: 43%;
+  animation-delay: 25ms !important;
+}
+
+.battle-modern-replacement-card__heal-particle:nth-child(4) {
+  left: 58%;
+  animation-delay: 110ms !important;
+}
+
+.battle-modern-replacement-card__heal-particle:nth-child(5) {
+  left: 72%;
+  animation-delay: 45ms !important;
+}
+
+.battle-modern-replacement-card__heal-particle:nth-child(6) {
+  left: 86%;
+  animation-delay: 135ms !important;
+}
+
+/* =========================================================
+   SPRITE
+   ========================================================= */
+
+.battle-modern-replacement-card--healing
+  .battle-modern-replacement-card__sprite {
+  animation: battle-party-heal-sprite 760ms ease-in-out;
+}
+
+.battle-modern-replacement-card--reviving
+  .battle-modern-replacement-card__sprite {
+  animation: battle-party-revive-sprite 760ms ease-in-out;
+}
+
+.battle-modern-replacement-card--healing
+  .battle-modern-replacement-card__hp-fill {
+  box-shadow: 0 0 7px rgba(var(--battle-party-heal-rgb), 0.72);
+}
+
+/* =========================================================
+   KEYFRAMES
+   ========================================================= */
+
+@keyframes battle-party-heal-ring {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3);
   }
-
-  .battle-modern-replacement__grid {
-    gap: 5px;
+  30% {
+    opacity: 1;
   }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.3);
+  }
+}
 
-  .battle-modern-replacement-card {
-    gap: 5px;
-    padding: 5px 6px;
+@keyframes battle-party-heal-particle {
+  0% {
+    opacity: 0;
+
+    transform: translateY(8px) scale(0.5);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+
+    transform: translateY(-34px) scale(1.15);
+  }
+}
+
+@keyframes battle-party-heal-card-pulse {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  45% {
+    filter: brightness(1.12);
+  }
+}
+
+@keyframes battle-party-heal-sprite {
+  0%,
+  100% {
+    filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.32));
+  }
+  50% {
+    filter: brightness(1.18) saturate(1.2)
+      drop-shadow(0 0 8px rgba(74, 222, 128, 0.72));
+  }
+}
+
+@keyframes battle-party-revive-sprite {
+  0% {
+    filter: grayscale(0.8) saturate(0.4) brightness(0.7);
+  }
+  50% {
+    filter: grayscale(0) saturate(1.25) brightness(1.28)
+      drop-shadow(0 0 10px rgba(250, 204, 21, 0.82));
+  }
+  100% {
+    filter: grayscale(0) saturate(1) brightness(1);
   }
 }
 
@@ -781,9 +1012,17 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 78% 23%, rgba(59, 130, 246, 0.18), transparent 27%),
+    radial-gradient(
+      circle at 78% 23%,
+      rgba(59, 130, 246, 0.18),
+      transparent 27%
+    ),
     radial-gradient(circle at 18% 63%, rgba(34, 197, 94, 0.1), transparent 30%),
-    radial-gradient(circle at 50% 48%, rgba(99, 102, 241, 0.07), transparent 44%),
+    radial-gradient(
+      circle at 50% 48%,
+      rgba(99, 102, 241, 0.07),
+      transparent 44%
+    ),
     linear-gradient(160deg, #09111f 0%, #101b2c 42%, #0b1423 100%);
 }
 
@@ -799,7 +1038,11 @@
   height: 72%;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: radial-gradient(ellipse, rgba(148, 163, 184, 0.075), transparent 67%);
+  background: radial-gradient(
+    ellipse,
+    rgba(148, 163, 184, 0.075),
+    transparent 67%
+  );
   filter: blur(12px);
 }
 
@@ -912,7 +1155,11 @@
   width: 100%;
   box-sizing: border-box;
   border-top: 1px solid rgba(148, 163, 184, 0.09);
-  background: linear-gradient(180deg, rgba(7, 15, 28, 0.9), rgba(5, 11, 22, 0.98));
+  background: linear-gradient(
+    180deg,
+    rgba(7, 15, 28, 0.9),
+    rgba(5, 11, 22, 0.98)
+  );
   box-shadow: 0 -18px 45px rgba(0, 0, 0, 0.17);
 }
 
@@ -922,7 +1169,12 @@
   right: 15%;
   top: -1px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.2), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(96, 165, 250, 0.2),
+    transparent
+  );
 }
 
 /* =========================================================
@@ -1002,7 +1254,12 @@
   right: 18%;
   top: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--completion-accent), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--completion-accent),
+    transparent
+  );
 }
 
 .battle-modern-completion__icon {
@@ -1123,6 +1380,195 @@
 .battle-modern-hud__sprite--icon {
   width: clamp(76px, 30%, 118px);
   height: clamp(76px, 30%, 118px);
+}
+
+/* =========================================================
+   POKÉMON HEAL / REVIVE FX
+   ========================================================= */
+
+.battle-modern-hud__heal-fx {
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0;
+  overflow: visible;
+  --battle-heal-rgb: 74, 222, 128;
+  --battle-heal-accent: #86efac;
+}
+
+.battle-modern-hud__heal-fx--revive {
+  --battle-heal-rgb: 250, 204, 21;
+  --battle-heal-accent: #fde68a;
+}
+
+.battle-modern-hud__heal-fx--active {
+  opacity: 1;
+}
+
+/* Halo principal */
+.battle-modern-hud__heal-fx::before,
+.battle-modern-hud__heal-fx::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  width: 54%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0.35);
+  opacity: 0;
+  border: 2px solid rgba(var(--battle-heal-rgb), 0.72);
+  box-shadow:
+    0 0 16px rgba(var(--battle-heal-rgb), 0.22),
+    inset 0 0 16px rgba(var(--battle-heal-rgb), 0.12);
+}
+
+.battle-modern-hud__heal-fx--active::before {
+  animation: battle-heal-ring 720ms ease-out forwards;
+}
+
+.battle-modern-hud__heal-fx--active::after {
+  animation: battle-heal-ring 720ms 120ms ease-out forwards;
+}
+
+/* =========================================================
+   HEAL PARTICLES
+   ========================================================= */
+
+.battle-modern-hud__heal-particle {
+  position: absolute;
+  bottom: 8%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  opacity: 0;
+  background: var(--battle-heal-accent);
+  box-shadow:
+    0 0 8px rgba(var(--battle-heal-rgb), 0.85),
+    0 0 18px rgba(var(--battle-heal-rgb), 0.42);
+}
+
+.battle-modern-hud__heal-fx--active .battle-modern-hud__heal-particle {
+  animation: battle-heal-particle-rise 720ms ease-out forwards;
+}
+
+.battle-modern-hud__heal-particle:nth-child(1) {
+  left: 14%;
+  animation-delay: 0ms !important;
+}
+
+.battle-modern-hud__heal-particle:nth-child(2) {
+  left: 28%;
+  animation-delay: 80ms !important;
+}
+
+.battle-modern-hud__heal-particle:nth-child(3) {
+  left: 42%;
+  animation-delay: 25ms !important;
+}
+
+.battle-modern-hud__heal-particle:nth-child(4) {
+  left: 55%;
+  animation-delay: 120ms !important;
+}
+
+.battle-modern-hud__heal-particle:nth-child(5) {
+  left: 67%;
+  animation-delay: 55ms !important;
+}
+
+.battle-modern-hud__heal-particle:nth-child(6) {
+  left: 78%;
+  animation-delay: 150ms !important;
+}
+
+.battle-modern-hud__heal-particle:nth-child(7) {
+  left: 88%;
+  animation-delay: 95ms !important;
+}
+
+/* =========================================================
+   POKÉMON GLOW
+   ========================================================= */
+
+.battle-modern-hud__sprite--healing {
+  animation: battle-pokemon-heal-glow 760ms ease-in-out;
+}
+
+.battle-modern-hud__sprite--reviving {
+  animation: battle-pokemon-revive-glow 760ms ease-in-out;
+}
+
+/* =========================================================
+   KEYFRAMES
+   ========================================================= */
+
+@keyframes battle-heal-ring {
+  0% {
+    transform: translate(-50%, -50%) scale(0.32);
+
+    opacity: 0;
+  }
+
+  25% {
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(1.25);
+
+    opacity: 0;
+  }
+}
+
+@keyframes battle-heal-particle-rise {
+  0% {
+    transform: translateY(16px) scale(0.5);
+
+    opacity: 0;
+  }
+
+  25% {
+    opacity: 1;
+  }
+
+  75% {
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: translateY(-120px) scale(1.2);
+
+    opacity: 0;
+  }
+}
+
+@keyframes battle-pokemon-heal-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.42));
+  }
+
+  45% {
+    filter: brightness(1.18) saturate(1.18)
+      drop-shadow(0 0 18px rgba(74, 222, 128, 0.68));
+  }
+}
+
+@keyframes battle-pokemon-revive-glow {
+  0% {
+    filter: brightness(0.75) saturate(0.55)
+      drop-shadow(0 14px 18px rgba(0, 0, 0, 0.42));
+  }
+
+  45% {
+    filter: brightness(1.28) saturate(1.2)
+      drop-shadow(0 0 24px rgba(250, 204, 21, 0.78));
+  }
+
+  100% {
+    filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.42));
+  }
 }
 
 /* =========================================================
@@ -1320,17 +1766,17 @@
 }
 
 /* =========================================================
-   BATTLE MESSAGE PRESENTATION
+   BATTLE NARRATION 
    ========================================================= */
 
 .battle-modern-message {
   position: absolute;
-  z-index: 30;
+  z-index: 40;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: stretch;
   box-sizing: border-box;
-  padding: 14px 24px;
+  padding: 0;
   pointer-events: none;
 }
 
@@ -1339,22 +1785,53 @@
 }
 
 .battle-modern-message__surface {
+  position: relative;
   display: flex;
   align-items: center;
-  width: min(760px, 92%);
-  min-height: 72px;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
   box-sizing: border-box;
-  padding: 18px 24px;
-  background: linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(10, 18, 32, 0.99));
+  padding: clamp(18px, 2.3vh, 28px) clamp(26px, 4vw, 56px);
+  border: 0;
+  border-top: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(8, 13, 22, 0.93),
+    rgba(4, 8, 15, 0.985)
+  );
+  box-shadow:
+    0 -14px 34px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.battle-modern-message__surface::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(
+    180deg,
+    rgba(96, 165, 250, 0.9),
+    rgba(59, 130, 246, 0.35)
+  );
 }
 
 .battle-modern-message__text {
-  width: 100%;
-  color: var(--battle-text-primary);
-  font-size: clamp(16px, 1.55vw, 22px);
-  font-weight: 700;
-  line-height: 1.35;
-  letter-spacing: -0.015em;
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  color: #ffffff;
+  font-size: clamp(18px, 2vw, 28px);
+  font-weight: 750;
+  line-height: 1.42;
+  letter-spacing: 0.005em;
+  text-align: left;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
 }
 
 /* =========================================================
@@ -1415,6 +1892,36 @@
   background: rgba(15, 23, 42, 0.84);
   color: var(--battle-text-primary);
   font: inherit;
+  cursor: pointer;
+  transition:
+    transform 120ms ease,
+    border-color 120ms ease,
+    background 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.battle-modern-bag__item:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: rgba(30, 41, 59, 0.98);
+  border-color: rgba(96, 165, 250, 0.72);
+  box-shadow:
+    0 7px 18px rgba(0, 0, 0, 0.24),
+    0 0 0 1px rgba(96, 165, 250, 0.14);
+}
+
+.battle-modern-bag__item:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+}
+
+.battle-modern-bag__item:focus-visible {
+  outline: none;
+  border-color: rgba(96, 165, 250, 0.9);
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.22);
+}
+
+.battle-modern-bag__item:disabled {
+  opacity: 0.76;
+  cursor: default;
 }
 
 .battle-modern-bag__item-name {
@@ -1453,4 +1960,70 @@
 
   --completion-button-shadow: rgba(37, 99, 235, 0.28);
   --completion-focus: rgba(96, 165, 250, 0.24);
+}
+
+/* =========================================================
+   FAINTED POKÉMON 
+   ========================================================= */
+
+.battle-modern-replacement-card--fainted {
+  border-color: rgba(239, 68, 68, 0.26);
+
+  background: linear-gradient(
+    145deg,
+    rgba(62, 42, 48, 0.96),
+    rgba(31, 27, 34, 0.98)
+  );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.025),
+    inset 4px 0 0 rgba(185, 70, 70, 0.36);
+}
+
+/* En los juegos clásicos el Pokémon debilitado pierde protagonismo visual */
+.battle-modern-replacement-card--fainted
+  .battle-modern-replacement-card__sprite {
+  filter: grayscale(0.78) saturate(0.42) brightness(0.68)
+    drop-shadow(0 4px 4px rgba(0, 0, 0, 0.38));
+  opacity: 0.72;
+}
+
+/* Nombre y nivel ligeramente apagados */
+.battle-modern-replacement-card--fainted .battle-modern-replacement-card__name {
+  color: rgba(226, 232, 240, 0.7);
+}
+
+.battle-modern-replacement-card--fainted
+  .battle-modern-replacement-card__level {
+  color: rgba(203, 213, 225, 0.54);
+}
+
+/* HP del Pokémon debilitado */
+.battle-modern-replacement-card--fainted
+  .battle-modern-replacement-card__hp-row {
+  color: #fca5a5;
+}
+
+.battle-modern-replacement-card--fainted
+  .battle-modern-replacement-card__hp-track {
+  background: rgba(69, 10, 10, 0.62);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.55);
+}
+
+.battle-modern-replacement-card__status--revivable {
+  animation: battle-revive-target-pulse 1.15s ease-in-out infinite;
+}
+
+@keyframes battle-revive-target-pulse {
+  0%,
+  100% {
+    border-color: rgba(248, 113, 113, 0.3);
+    box-shadow: none;
+  }
+
+  50% {
+    border-color: rgba(250, 204, 21, 0.6);
+
+    box-shadow: 0 0 8px rgba(250, 204, 21, 0.16);
+  }
 }

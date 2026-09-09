@@ -1,7 +1,13 @@
 import type { PokemonItemId } from "../inventory/pokemon-inventory.js";
 
 export type PokemonItemCategory =
-  "medicine" | "ball" | "battle-item" | "evolution" | "held-item" | "key-item" | "other";
+  | "medicine"
+  | "ball"
+  | "battle-item"
+  | "evolution"
+  | "held-item"
+  | "key-item"
+  | "other";
 
 export type PokemonItemBattleTarget = "trainer-pokemon" | "wild-active";
 
@@ -14,6 +20,18 @@ export type PokemonItemEffect =
   | {
       readonly type: "heal-hp";
       readonly mode: "full";
+    }
+  | {
+      readonly type: "revive";
+      readonly mode: "half";
+    }
+  | {
+      readonly type: "revive";
+      readonly mode: "full";
+    }
+  | {
+      readonly type: "level-up";
+      readonly levels: number;
     }
   | {
       readonly type: "capture";
@@ -93,6 +111,51 @@ export const POKEMON_ITEM_REGISTRY = {
     effect: {
       type: "heal-hp",
       mode: "full",
+    },
+  },
+
+  revive: {
+    id: "revive",
+    name: "Revive",
+    category: "medicine",
+
+    battleUsable: true,
+    overworldUsable: true,
+    battleTarget: "trainer-pokemon",
+
+    effect: {
+      type: "revive",
+      mode: "half",
+    },
+  },
+
+  "max-revive": {
+    id: "max-revive",
+    name: "Max Revive",
+    category: "medicine",
+
+    battleUsable: true,
+    overworldUsable: true,
+    battleTarget: "trainer-pokemon",
+
+    effect: {
+      type: "revive",
+      mode: "full",
+    },
+  },
+
+  "rare-candy": {
+    id: "rare-candy",
+    name: "Rare Candy",
+    category: "medicine",
+
+    battleUsable: false,
+    overworldUsable: false,
+    battleTarget: null,
+
+    effect: {
+      type: "level-up",
+      levels: 1,
     },
   },
 

@@ -19,7 +19,7 @@ export class PokemonOverworldItemPersistenceConflictError extends Error {
   }
 }
 
-export interface ApplyPokemonOverworldHealingInput {
+export interface ApplyPokemonOverworldHpItemInput {
   readonly trainerId: PokemonTrainerId;
   readonly itemId: PokemonItemId;
   readonly targetPokemonInstanceId: string;
@@ -30,8 +30,8 @@ export interface ApplyPokemonOverworldHealingInput {
 export class PokemonOverworldItemRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  public async applyHealing(
-    input: ApplyPokemonOverworldHealingInput,
+  public async applyHpItemUse(
+    input: ApplyPokemonOverworldHpItemInput,
   ): Promise<void> {
     const { trainerId, itemId, targetPokemonInstanceId, currentHp } = input;
 
@@ -71,7 +71,7 @@ export class PokemonOverworldItemRepository {
        * - existir;
        * - estar actualmente en Party.
        */
-      const healed = await tx.pokemonInstance.updateMany({
+      const updated = await tx.pokemonInstance.updateMany({
         where: {
           id: targetPokemonInstanceId,
           trainerId,
@@ -84,7 +84,7 @@ export class PokemonOverworldItemRepository {
         },
       });
 
-      if (healed.count !== 1) {
+      if (updated.count !== 1) {
         /* Throw dentro de $transaction: también revierte el decrement anterior del item */
         throw new PokemonOverworldItemPersistenceConflictError(
           'INVALID_TARGET',

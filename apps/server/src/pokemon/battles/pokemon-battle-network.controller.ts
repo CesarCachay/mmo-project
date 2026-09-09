@@ -98,6 +98,19 @@ export class PokemonBattleNetworkController {
       return;
     }
 
+    /* A normal Battle command must never bypass a server-authoritative forced replacement */
+    const preCommandOutcome = resolveWildBattleContinuationOutcome(
+      session.battle,
+    );
+
+    if (
+      preCommandOutcome.type === 'trainer-replacement-required' ||
+      preCommandOutcome.type === 'trainer-defeated' ||
+      preCommandOutcome.type === 'wild-defeated'
+    ) {
+      return;
+    }
+
     try {
       if (payload.action.type === 'use-item') {
         if (payload.action.target.type === 'wild-active') {

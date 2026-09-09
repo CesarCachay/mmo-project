@@ -58,7 +58,7 @@ export class BattleOverlay {
     onPokemonBack: () => void,
     onItemBack: () => void,
     onRunSelected: () => void,
-    onCompletionContinue: () => void
+    onCompletionContinue: () => void,
   ) {
     this.scene = scene;
 
@@ -68,7 +68,10 @@ export class BattleOverlay {
 
     this.captureLayer = new ModernBattleCaptureLayer(this.modernRoot.element);
 
-    this.trainerHud = new ModernBattlePokemonHud(this.modernRoot.element, "trainer");
+    this.trainerHud = new ModernBattlePokemonHud(
+      this.modernRoot.element,
+      "trainer",
+    );
     this.wildHud = new ModernBattlePokemonHud(this.modernRoot.element, "wild");
     this.actionMenu = new ModernBattleActionMenu(this.modernRoot.element, {
       onFightSelected,
@@ -80,14 +83,20 @@ export class BattleOverlay {
       onMoveSelected,
       onBack: onMoveBack,
     });
-    this.replacementPanel = new ModernBattleReplacementPanel(this.modernRoot.element, {
-      onPartyPokemonSelected,
-      onBack: onPokemonBack,
-    });
+    this.replacementPanel = new ModernBattleReplacementPanel(
+      this.modernRoot.element,
+      {
+        onPartyPokemonSelected,
+        onBack: onPokemonBack,
+      },
+    );
     this.messagePanel = new ModernBattleMessagePanel(this.modernRoot.element);
-    this.completionPanel = new ModernBattleCompletionPanel(this.modernRoot.element, {
-      onContinue: onCompletionContinue,
-    });
+    this.completionPanel = new ModernBattleCompletionPanel(
+      this.modernRoot.element,
+      {
+        onContinue: onCompletionContinue,
+      },
+    );
     this.bagPanel = new ModernBattleBagPanel(this.modernRoot.element, {
       onItemSelected: onBagItemSelected,
       onBack: onItemBack,
@@ -123,11 +132,11 @@ export class BattleOverlay {
 
   public renderBattle(battle: BattleInstance): void {
     const trainerParticipant = battle.participants.find(
-      (participant) => participant.type === "trainer"
+      (participant) => participant.type === "trainer",
     );
 
     const wildParticipant = battle.participants.find(
-      (participant) => participant.type === "wild"
+      (participant) => participant.type === "wild",
     );
 
     if (!trainerParticipant || !wildParticipant) {
@@ -140,7 +149,8 @@ export class BattleOverlay {
 
     const trainerPokemon =
       trainerParticipant.pokemon[trainerParticipant.activePokemonIndex];
-    const wildPokemon = wildParticipant.pokemon[wildParticipant.activePokemonIndex];
+    const wildPokemon =
+      wildParticipant.pokemon[wildParticipant.activePokemonIndex];
 
     if (!trainerPokemon || !wildPokemon) {
       console.warn("[BattleOverlay] active Pokémon missing", {
@@ -338,13 +348,15 @@ export class BattleOverlay {
 
   public setReplacementOptions(
     battle: BattleInstance,
-    replacementPokemonIndexes: readonly number[]
+    replacementPokemonIndexes: readonly number[],
   ): void {
     this.replacementPanel.setMode("forced");
     this.replacementPanel.render(battle, replacementPokemonIndexes);
   }
 
-  public showCompletion(outcome: PokemonBattleCompletedPayload["outcome"]): void {
+  public showCompletion(
+    outcome: PokemonBattleCompletedPayload["outcome"],
+  ): void {
     this.actionMenu.setVisible(false);
     this.movePanel.setVisible(false);
     this.replacementPanel.setVisible(false);
@@ -354,7 +366,7 @@ export class BattleOverlay {
 
   public setVoluntaryPokemonOptions(battle: BattleInstance): void {
     const trainerParticipant = battle.participants.find(
-      (participant) => participant.type === "trainer"
+      (participant) => participant.type === "trainer",
     );
 
     if (!trainerParticipant) {
@@ -369,7 +381,7 @@ export class BattleOverlay {
       .filter(
         ({ pokemonState, pokemonIndex }) =>
           pokemonIndex !== trainerParticipant.activePokemonIndex &&
-          pokemonState.currentHp > 0
+          pokemonState.currentHp > 0,
       )
       .map(({ pokemonIndex }) => pokemonIndex);
 
@@ -378,37 +390,69 @@ export class BattleOverlay {
   }
 
   public presentMessage(message: string, durationMs?: number): Promise<void> {
+    /* Durante la narración no dejamos ningún menú debajo */
+    this.hideCommandPanelsForPresentation();
     return this.messagePanel.present(message, durationMs);
   }
 
-  public animatePokemonHp(
+  public async animatePokemonHp(
     battle: BattleInstance,
     participantId: string,
     pokemonInstanceId: string,
     previousHp: number,
-    currentHp: number
+    currentHp: number,
   ): Promise<void> {
     const participant = battle.participants.find(
-      (candidate) => candidate.id === participantId
+      (candidate) => candidate.id === participantId,
     );
 
     if (!participant) {
-      return Promise.resolve();
+      return;
     }
 
     const hud = participant.type === "trainer" ? this.trainerHud : this.wildHud;
 
-    if (!hud.isDisplayingPokemon(pokemonInstanceId)) {
-      return Promise.resolve();
+    /* Limpiamos cualquier mensaje antes de empezar la parte puramente visual del evento */
+    this.messagePanel.clear();
+
+    this.hideCommandPanelsForPresentation();
+
+    /* Pokémon actualmente en el battlefield */
+    if (hud.isDisplayingPokemon(pokemonInstanceId)) {
+      /* HP aumentando: Potion / Revive / future healing effects. */
+      if (currentHp > previousHp) {
+        const isRevive = previousHp === 0 && currentHp > 0;
+        await Promise.all([
+          hud.animateHp(pokemonInstanceId, previousHp, currentHp, 720),
+          hud.animateHpRestoreEffect(pokemonInstanceId, isRevive, 760),
+        ]);
+        return;
+      }
+
+      /* Damage conserva la animación normal */
+      await hud.animateHp(pokemonInstanceId, previousHp, currentHp);
+      return;
     }
 
-    return hud.animateHp(pokemonInstanceId, previousHp, currentHp);
+    if (participant.type === "trainer") {
+      this.replacementPanel.setVisible(true);
+
+      try {
+        await this.replacementPanel.animatePokemonHp(
+          pokemonInstanceId,
+          previousHp,
+          currentHp,
+        );
+      } finally {
+        this.replacementPanel.setVisible(false);
+      }
+    }
   }
 
   public animatePokemonHit(
     battle: BattleInstance,
     participantId: string,
-    pokemonInstanceId: string
+    pokemonInstanceId: string,
   ): Promise<void> {
     const hud = this.getParticipantHud(battle, participantId);
 
@@ -426,7 +470,7 @@ export class BattleOverlay {
   public animatePokemonSwitchOut(
     battle: BattleInstance,
     participantId: string,
-    pokemonInstanceId: string
+    pokemonInstanceId: string,
   ): Promise<void> {
     const hud = this.getParticipantHud(battle, participantId);
 
@@ -440,10 +484,10 @@ export class BattleOverlay {
   public animatePokemonSwitchIn(
     battle: BattleInstance,
     participantId: string,
-    pokemonInstanceId: string
+    pokemonInstanceId: string,
   ): Promise<void> {
     const participant = battle.participants.find(
-      (candidate) => candidate.id === participantId
+      (candidate) => candidate.id === participantId,
     );
 
     if (!participant) {
@@ -451,7 +495,7 @@ export class BattleOverlay {
     }
 
     const pokemonState = participant.pokemon.find(
-      (candidate) => candidate.pokemon.instanceId === pokemonInstanceId
+      (candidate) => candidate.pokemon.instanceId === pokemonInstanceId,
     );
 
     if (!pokemonState) {
@@ -471,7 +515,7 @@ export class BattleOverlay {
   public animatePokemonFaint(
     battle: BattleInstance,
     participantId: string,
-    pokemonInstanceId: string
+    pokemonInstanceId: string,
   ): Promise<void> {
     const hud = this.getParticipantHud(battle, participantId);
 
@@ -484,10 +528,10 @@ export class BattleOverlay {
 
   private getParticipantHud(
     battle: BattleInstance,
-    participantId: string
+    participantId: string,
   ): ModernBattlePokemonHud | undefined {
     const participant = battle.participants.find(
-      (candidate) => candidate.id === participantId
+      (candidate) => candidate.id === participantId,
     );
 
     if (!participant) {
@@ -507,7 +551,7 @@ export class BattleOverlay {
 
   public setItemTargetOptions(
     battle: BattleInstance,
-    selectablePokemonIndexes: readonly number[]
+    selectablePokemonIndexes: readonly number[],
   ): void {
     this.replacementPanel.setMode("item-target");
     this.replacementPanel.render(battle, selectablePokemonIndexes);
@@ -519,10 +563,10 @@ export class BattleOverlay {
     wildParticipantId: string,
     pokemonInstanceId: string,
     shakeCount: number,
-    captured: boolean
+    captured: boolean,
   ): Promise<void> {
     const participant = battle.participants.find(
-      (candidate) => candidate.id === wildParticipantId
+      (candidate) => candidate.id === wildParticipantId,
     );
 
     if (!participant || participant.type !== "wild") {
@@ -589,5 +633,12 @@ export class BattleOverlay {
         ? undefined
         : () => this.wildHud.animateCaptureBreakFree(pokemonInstanceId),
     });
+  }
+
+  private hideCommandPanelsForPresentation(): void {
+    this.actionMenu.setVisible(false);
+    this.movePanel.setVisible(false);
+    this.replacementPanel.setVisible(false);
+    this.bagPanel.setVisible(false);
   }
 }

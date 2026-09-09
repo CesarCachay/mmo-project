@@ -29,26 +29,28 @@ export function planBattleHealingItemUse(
   battle: BattleInstance,
   participantId: BattleParticipantId,
   action: BattleUseItemAction,
-  inventory: PokemonInventory
+  inventory: PokemonInventory,
 ): BattleHealingItemPlan {
   if (!isBattleActive(battle)) {
     throw new Error(
-      `Cannot use item in battle "${battle.battleId}" because it is not active`
+      `Cannot use item in battle "${battle.battleId}" because it is not active`,
     );
   }
 
   const participant = battle.participants.find(
-    (candidate) => candidate.id === participantId
+    (candidate) => candidate.id === participantId,
   );
 
   if (!participant) {
     throw new Error(
-      `Battle participant "${participantId}" not found in battle "${battle.battleId}"`
+      `Battle participant "${participantId}" not found in battle "${battle.battleId}"`,
     );
   }
 
   if (participant.type !== "trainer") {
-    throw new Error(`Battle participant "${participantId}" cannot use Trainer items`);
+    throw new Error(
+      `Battle participant "${participantId}" cannot use Trainer items`,
+    );
   }
 
   const item = getPokemonItem(action.itemId);
@@ -59,27 +61,32 @@ export function planBattleHealingItemUse(
 
   if (item.battleTarget !== "trainer-pokemon") {
     throw new Error(
-      `Pokémon item "${action.itemId}" does not support Trainer Pokémon targets`
+      `Pokémon item "${action.itemId}" does not support Trainer Pokémon targets`,
     );
   }
 
   if (getPokemonInventoryItemQuantity(inventory, action.itemId) <= 0) {
-    throw new Error(`Trainer does not have Pokémon item "${action.itemId}" available`);
+    throw new Error(
+      `Trainer does not have Pokémon item "${action.itemId}" available`,
+    );
   }
 
   if (action.target.type !== "trainer-pokemon") {
-    throw new Error(`Healing item "${action.itemId}" requires a Trainer Pokémon target`);
+    throw new Error(
+      `Pokémon item "${action.itemId}" requires a Trainer Pokémon target`,
+    );
   }
 
   const targetPokemonInstanceId = action.target.pokemonInstanceId;
 
   const target = participant.pokemon.find(
-    (pokemonState) => pokemonState.pokemon.instanceId === targetPokemonInstanceId
+    (pokemonState) =>
+      pokemonState.pokemon.instanceId === targetPokemonInstanceId,
   );
 
   if (!target) {
     throw new Error(
-      `Pokémon "${targetPokemonInstanceId}" does not belong to Trainer participant "${participant.id}" in battle "${battle.battleId}"`
+      `Pokémon "${targetPokemonInstanceId}" does not belong to Trainer participant "${participant.id}" in battle "${battle.battleId}"`,
     );
   }
 
@@ -90,31 +97,64 @@ function createHealingPlan(
   participantId: BattleParticipantId,
   action: BattleUseItemAction,
   target: BattlePokemonState,
-  effect: ReturnType<typeof getPokemonItem>["effect"]
+  effect: ReturnType<typeof getPokemonItem>["effect"],
 ): BattleHealingItemPlan {
-  if (!effect || effect.type !== "heal-hp") {
+  if (!effect) {
     throw new Error(
-      `Pokémon item "${action.itemId}" does not provide an HP healing effect`
-    );
-  }
-
-  if (target.currentHp <= 0) {
-    throw new Error(
-      `Fainted Pokémon "${target.pokemon.instanceId}" cannot be healed with "${action.itemId}"`
+      `Pokémon item "${action.itemId}" does not provide a supported HP effect`,
     );
   }
 
   const maxHp = calculatePokemonMaxHp(target.pokemon);
-
   const previousHp = target.currentHp;
 
-  if (previousHp >= maxHp) {
-    throw new Error(`Pokémon "${target.pokemon.instanceId}" already has full HP`);
+  let currentHp: number;
+  let requestedHealing: number;
+
+  switch (effect.type) {
+    case "heal-hp": {
+      /* Potion / Super Potion / Hyper Potion / Max Potion cannot revive a fainted Pokémon */
+      if (previousHp <= 0) {
+        throw new Error(
+          `Fainted Pokémon "${target.pokemon.instanceId}" cannot be healed with "${action.itemId}"`,
+        );
+      }
+
+      if (previousHp >= maxHp) {
+        throw new Error(
+          `Pokémon "${target.pokemon.instanceId}" already has full HP`,
+        );
+      }
+
+      requestedHealing =
+        effect.mode === "full" ? maxHp - previousHp : effect.amount;
+
+      currentHp = Math.min(maxHp, previousHp + requestedHealing);
+
+      break;
+    }
+
+    case "revive": {
+      /* Revive / Max Revive are only valid when the Pokémon is actually fainted. */
+      if (previousHp > 0) {
+        throw new Error(
+          `Pokémon "${target.pokemon.instanceId}" is not fainted and cannot use "${action.itemId}"`,
+        );
+      }
+
+      currentHp =
+        effect.mode === "full" ? maxHp : Math.max(1, Math.floor(maxHp / 2));
+
+      requestedHealing = currentHp - previousHp;
+
+      break;
+    }
+
+    default:
+      throw new Error(
+        `Pokémon item "${action.itemId}" does not provide a supported Battle HP effect`,
+      );
   }
-
-  const requestedHealing = effect.mode === "full" ? maxHp - previousHp : effect.amount;
-
-  const currentHp = Math.min(maxHp, previousHp + requestedHealing);
 
   const appliedHealing = currentHp - previousHp;
 

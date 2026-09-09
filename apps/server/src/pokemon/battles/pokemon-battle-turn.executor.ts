@@ -199,8 +199,24 @@ export class PokemonBattleTurnExecutor {
           trainerService: this.trainerService,
         });
 
+        const itemUsedEvent: BattlePresentationEvent = {
+          type: 'item-used',
+          participantId: result.participantId,
+          itemId: result.itemId,
+          targetPokemonInstanceId: result.targetPokemonInstanceId,
+        };
+
+        const hpRestoredEvent: BattlePresentationEvent = {
+          type: 'hp-restored',
+          participantId: result.participantId,
+          pokemonInstanceId: result.targetPokemonInstanceId,
+          previousHp: result.previousHp,
+          currentHp: result.currentHp,
+          appliedHealing: result.appliedHealing,
+        };
+
         return {
-          events: [],
+          events: [itemUsedEvent, hpRestoredEvent],
           terminalOutcome: null,
           trainerStateUpdate: result.trainerState,
         };

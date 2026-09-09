@@ -9,18 +9,20 @@ import { getPokemonDisplayName } from "../../pokemon/pokemon-presentation.utils"
 
 export function formatBattlePresentationMessage(
   battle: BattleInstance,
-  event: BattlePresentationEvent
+  event: BattlePresentationEvent,
 ): string | null {
   switch (event.type) {
     case "move-used": {
       const pokemonName = getBattlePokemonDisplayName(
         battle,
         event.participantId,
-        event.pokemonInstanceId
+        event.pokemonInstanceId,
       );
 
       const move = getPokemonMove(event.moveId);
-      const moveName = move ? formatMoveName(move.name) : `Move ${event.moveId}`;
+      const moveName = move
+        ? formatMoveName(move.name)
+        : `Move ${event.moveId}`;
       return `${pokemonName} used ${moveName}!`;
     }
 
@@ -48,7 +50,7 @@ export function formatBattlePresentationMessage(
       const pokemonName = getBattlePokemonDisplayName(
         battle,
         event.participantId,
-        event.pokemonInstanceId
+        event.pokemonInstanceId,
       );
 
       return `${pokemonName} fainted!`;
@@ -58,11 +60,11 @@ export function formatBattlePresentationMessage(
       const pokemonName = getBattlePokemonDisplayName(
         battle,
         event.participantId,
-        event.currentPokemonInstanceId
+        event.currentPokemonInstanceId,
       );
 
       const participant = battle.participants.find(
-        (candidate) => candidate.id === event.participantId
+        (candidate) => candidate.id === event.participantId,
       );
 
       if (participant?.type === "trainer") {
@@ -97,7 +99,7 @@ export function formatBattlePresentationMessage(
       const pokemonName = getBattlePokemonDisplayName(
         battle,
         event.wildParticipantId,
-        event.pokemonInstanceId
+        event.pokemonInstanceId,
       );
 
       return `Gotcha! ${pokemonName} was caught!`;
@@ -108,14 +110,14 @@ export function formatBattlePresentationMessage(
 function getBattlePokemonDisplayName(
   battle: BattleInstance,
   participantId: string,
-  pokemonInstanceId: string
+  pokemonInstanceId: string,
 ): string {
   const participant = battle.participants.find(
-    (candidate) => candidate.id === participantId
+    (candidate) => candidate.id === participantId,
   );
 
   const pokemonState = participant?.pokemon.find(
-    (candidate) => candidate.pokemon.instanceId === pokemonInstanceId
+    (candidate) => candidate.pokemon.instanceId === pokemonInstanceId,
   );
 
   if (!pokemonState) {

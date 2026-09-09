@@ -299,6 +299,9 @@ export class TrainerPanelController {
       case "TARGET_FAINTED":
         return "No puedes usar ese objeto sobre un Pokémon debilitado.";
 
+      case "TARGET_NOT_FAINTED":
+        return "Ese Pokémon no está debilitado.";
+
       case "TARGET_FULL_HP":
         return "Ese Pokémon ya tiene todos sus PS.";
 

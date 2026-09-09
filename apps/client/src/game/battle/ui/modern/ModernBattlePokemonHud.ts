@@ -31,17 +31,16 @@ export interface ModernBattlePokemonHudViewport {
 
 export class ModernBattlePokemonHud {
   private readonly side: ModernBattlePokemonHudSide;
-
   private readonly root: HTMLDivElement;
-
   private readonly sprite: HTMLImageElement;
-
   private readonly card: HTMLDivElement;
 
   private readonly hitSprite: HTMLImageElement;
+  private readonly healFx: HTMLDivElement;
+  private healFxTimer?: number;
+  private healFxResolve?: () => void;
 
   private readonly name: HTMLDivElement;
-
   private readonly level: HTMLDivElement;
 
   private readonly hpText: HTMLSpanElement;
@@ -60,7 +59,10 @@ export class ModernBattlePokemonHud {
 
     this.root = document.createElement("div");
 
-    this.root.className = ["battle-modern-hud", `battle-modern-hud--${side}`].join(" ");
+    this.root.className = [
+      "battle-modern-hud",
+      `battle-modern-hud--${side}`,
+    ].join(" ");
 
     this.sprite = document.createElement("img");
     this.sprite.className = "battle-modern-hud__sprite";
@@ -71,10 +73,21 @@ export class ModernBattlePokemonHud {
     this.hitSprite.alt = "";
     this.hitSprite.ariaHidden = "true";
 
+    this.healFx = document.createElement("div");
+    this.healFx.className = "battle-modern-hud__heal-fx";
+    this.healFx.ariaHidden = "true";
+
+    for (let index = 0; index < 7; index += 1) {
+      const particle = document.createElement("span");
+      particle.className = "battle-modern-hud__heal-particle";
+      this.healFx.appendChild(particle);
+    }
+
     this.card = document.createElement("div");
-    this.card.className = ["battle-modern-hud__card", "battle-ui-modern__surface"].join(
-      " "
-    );
+    this.card.className = [
+      "battle-modern-hud__card",
+      "battle-ui-modern__surface",
+    ].join(" ");
 
     const header = document.createElement("div");
 
@@ -108,7 +121,7 @@ export class ModernBattlePokemonHud {
 
     this.card.append(header, hpHeader, hpTrack);
 
-    this.root.append(this.sprite, this.hitSprite, this.card);
+    this.root.append(this.sprite, this.hitSprite, this.healFx, this.card);
 
     parent.appendChild(this.root);
 
@@ -117,7 +130,7 @@ export class ModernBattlePokemonHud {
 
   public setBounds(
     bounds: ModernBattlePokemonHudBounds,
-    viewport: ModernBattlePokemonHudViewport
+    viewport: ModernBattlePokemonHudViewport,
   ): void {
     if (viewport.width <= 0 || viewport.height <= 0) {
       return;
@@ -144,7 +157,7 @@ export class ModernBattlePokemonHud {
     this.sprite.classList.remove(
       "battle-modern-hud__sprite--switched-out",
       "battle-modern-hud__sprite--fainted",
-      "battle-modern-hud__sprite--captured-hidden"
+      "battle-modern-hud__sprite--captured-hidden",
     );
 
     this.pokemonState = state;
@@ -155,14 +168,17 @@ export class ModernBattlePokemonHud {
 
     const currentHp = Math.max(0, Math.min(maxHp, state.currentHp));
 
-    const fallbackAsset = getPokemonSpriteAsset(pokemon.speciesId, pokemon.formId);
+    const fallbackAsset = getPokemonSpriteAsset(
+      pokemon.speciesId,
+      pokemon.formId,
+    );
 
     const battleSpriteSide = this.side === "trainer" ? "back" : "front";
 
     const battleAsset = getPokemonBattleSpriteAsset(
       pokemon.speciesId,
       pokemon.formId,
-      battleSpriteSide
+      battleSpriteSide,
     );
 
     this.sprite.onerror = () => {
@@ -198,6 +214,7 @@ export class ModernBattlePokemonHud {
     this.finishPendingHpAnimation();
     this.finishPendingHitAnimation();
     this.finishPendingSpriteAnimation();
+    this.finishPendingHealEffect();
 
     this.pokemonState = undefined;
 
@@ -213,7 +230,7 @@ export class ModernBattlePokemonHud {
       "battle-modern-hud__hp-fill--healthy",
       "battle-modern-hud__hp-fill--warning",
       "battle-modern-hud__hp-fill--danger",
-      "battle-modern-hud__hp-fill--animating"
+      "battle-modern-hud__hp-fill--animating",
     );
 
     this.sprite.classList.remove(
@@ -225,7 +242,7 @@ export class ModernBattlePokemonHud {
 
       "battle-modern-hud__sprite--capture-absorbing",
       "battle-modern-hud__sprite--capture-breaking-free",
-      "battle-modern-hud__sprite--captured-hidden"
+      "battle-modern-hud__sprite--captured-hidden",
     );
 
     this.sprite.removeAttribute("src");
@@ -244,7 +261,10 @@ export class ModernBattlePokemonHud {
   private renderHp(currentHp: number, maxHp: number): void {
     const safeMaxHp = Math.max(0, maxHp);
 
-    const safeCurrentHp = Math.max(0, Math.min(safeMaxHp, Math.round(currentHp)));
+    const safeCurrentHp = Math.max(
+      0,
+      Math.min(safeMaxHp, Math.round(currentHp)),
+    );
 
     const hpRatio =
       safeMaxHp > 0 ? Math.max(0, Math.min(1, safeCurrentHp / safeMaxHp)) : 0;
@@ -256,7 +276,7 @@ export class ModernBattlePokemonHud {
     this.hpFill.classList.remove(
       "battle-modern-hud__hp-fill--healthy",
       "battle-modern-hud__hp-fill--warning",
-      "battle-modern-hud__hp-fill--danger"
+      "battle-modern-hud__hp-fill--danger",
     );
 
     if (hpRatio > 0.5) {
@@ -276,7 +296,7 @@ export class ModernBattlePokemonHud {
     pokemonInstanceId: string,
     previousHp: number,
     currentHp: number,
-    durationMs = 520
+    durationMs = 520,
   ): Promise<void> {
     const state = this.pokemonState;
 
@@ -329,6 +349,78 @@ export class ModernBattlePokemonHud {
     });
   }
 
+  public animateHpRestoreEffect(
+    pokemonInstanceId: string,
+    isRevive: boolean,
+    durationMs = 760,
+  ): Promise<void> {
+    if (!this.isDisplayingPokemon(pokemonInstanceId)) {
+      return Promise.resolve();
+    }
+
+    this.finishPendingHealEffect();
+
+    const prefersReducedMotion =
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+
+    const safeDuration = prefersReducedMotion ? 0 : Math.max(0, durationMs);
+
+    if (safeDuration === 0) {
+      return Promise.resolve();
+    }
+
+    this.syncHealEffectLayout();
+
+    /* Reiniciamos la animación aunque se utilicen varios items consecutivamente */
+    this.healFx.classList.remove(
+      "battle-modern-hud__heal-fx--active",
+      "battle-modern-hud__heal-fx--heal",
+      "battle-modern-hud__heal-fx--revive",
+    );
+
+    this.sprite.classList.remove(
+      "battle-modern-hud__sprite--healing",
+      "battle-modern-hud__sprite--reviving",
+    );
+
+    void this.healFx.offsetWidth;
+
+    this.healFx.classList.add(
+      "battle-modern-hud__heal-fx--active",
+      isRevive
+        ? "battle-modern-hud__heal-fx--revive"
+        : "battle-modern-hud__heal-fx--heal",
+    );
+
+    this.sprite.classList.add("battle-modern-hud__sprite--healing");
+
+    if (isRevive) {
+      this.sprite.classList.add("battle-modern-hud__sprite--reviving");
+    }
+
+    return new Promise<void>((resolve) => {
+      this.healFxResolve = resolve;
+
+      this.healFxTimer = window.setTimeout(() => {
+        this.healFxTimer = undefined;
+        this.healFxResolve = undefined;
+
+        this.healFx.classList.remove(
+          "battle-modern-hud__heal-fx--active",
+          "battle-modern-hud__heal-fx--heal",
+          "battle-modern-hud__heal-fx--revive",
+        );
+
+        this.sprite.classList.remove(
+          "battle-modern-hud__sprite--healing",
+          "battle-modern-hud__sprite--reviving",
+        );
+
+        resolve();
+      }, safeDuration);
+    });
+  }
+
   private finishPendingHpAnimation(): void {
     if (this.hpAnimationFrame !== undefined) {
       window.cancelAnimationFrame(this.hpAnimationFrame);
@@ -348,7 +440,7 @@ export class ModernBattlePokemonHud {
 
     await this.playSpriteAnimation(
       "battle-modern-hud__sprite--switching-out",
-      SWITCH_OUT_DURATION_MS
+      SWITCH_OUT_DURATION_MS,
     );
 
     if (!this.isDisplayingPokemon(pokemonInstanceId)) {
@@ -367,7 +459,7 @@ export class ModernBattlePokemonHud {
 
     await this.playSpriteAnimation(
       "battle-modern-hud__sprite--switching-in",
-      SWITCH_IN_DURATION_MS
+      SWITCH_IN_DURATION_MS,
     );
   }
 
@@ -401,7 +493,7 @@ export class ModernBattlePokemonHud {
 
     await this.playSpriteAnimation(
       "battle-modern-hud__sprite--fainting",
-      FAINT_DURATION_MS
+      FAINT_DURATION_MS,
     );
 
     if (!this.isDisplayingPokemon(pokemonInstanceId)) {
@@ -417,7 +509,7 @@ export class ModernBattlePokemonHud {
     }
     await this.playSpriteAnimation(
       "battle-modern-hud__sprite--capture-absorbing",
-      CAPTURE_ABSORB_DURATION_MS
+      CAPTURE_ABSORB_DURATION_MS,
     );
     if (!this.isDisplayingPokemon(pokemonInstanceId)) {
       return;
@@ -425,18 +517,23 @@ export class ModernBattlePokemonHud {
     this.sprite.classList.add("battle-modern-hud__sprite--captured-hidden");
   }
 
-  public async animateCaptureBreakFree(pokemonInstanceId: string): Promise<void> {
+  public async animateCaptureBreakFree(
+    pokemonInstanceId: string,
+  ): Promise<void> {
     if (!this.isDisplayingPokemon(pokemonInstanceId)) {
       return;
     }
     this.sprite.classList.remove("battle-modern-hud__sprite--captured-hidden");
     await this.playSpriteAnimation(
       "battle-modern-hud__sprite--capture-breaking-free",
-      CAPTURE_BREAK_FREE_DURATION_MS
+      CAPTURE_BREAK_FREE_DURATION_MS,
     );
   }
 
-  private playSpriteAnimation(className: string, durationMs: number): Promise<void> {
+  private playSpriteAnimation(
+    className: string,
+    durationMs: number,
+  ): Promise<void> {
     this.finishPendingSpriteAnimation();
 
     const prefersReducedMotion =
@@ -450,7 +547,7 @@ export class ModernBattlePokemonHud {
 
     this.sprite.style.setProperty(
       "--battle-sprite-animation-duration",
-      `${safeDuration}ms`
+      `${safeDuration}ms`,
     );
 
     void this.sprite.offsetWidth;
@@ -486,7 +583,7 @@ export class ModernBattlePokemonHud {
       "battle-modern-hud__sprite--fainting",
 
       "battle-modern-hud__sprite--capture-absorbing",
-      "battle-modern-hud__sprite--capture-breaking-free"
+      "battle-modern-hud__sprite--capture-breaking-free",
     );
 
     this.sprite.style.removeProperty("--battle-sprite-animation-duration");
@@ -522,7 +619,9 @@ export class ModernBattlePokemonHud {
     this.hitSprite.style.transformOrigin = computedStyle.transformOrigin;
   }
 
-  public getCaptureThrowOrigin(container: HTMLElement): { x: number; y: number } | null {
+  public getCaptureThrowOrigin(
+    container: HTMLElement,
+  ): { x: number; y: number } | null {
     const spriteRect = this.sprite.getBoundingClientRect();
     const containerRect = container.getBoundingClientRect();
 
@@ -537,7 +636,9 @@ export class ModernBattlePokemonHud {
     };
   }
 
-  public getCaptureTargetPoint(container: HTMLElement): { x: number; y: number } | null {
+  public getCaptureTargetPoint(
+    container: HTMLElement,
+  ): { x: number; y: number } | null {
     const spriteRect = this.sprite.getBoundingClientRect();
     const containerRect = container.getBoundingClientRect();
 
@@ -551,7 +652,9 @@ export class ModernBattlePokemonHud {
     };
   }
 
-  public getCaptureGroundPoint(container: HTMLElement): { x: number; y: number } | null {
+  public getCaptureGroundPoint(
+    container: HTMLElement,
+  ): { x: number; y: number } | null {
     const spriteRect = this.sprite.getBoundingClientRect();
     const containerRect = container.getBoundingClientRect();
 
@@ -563,5 +666,41 @@ export class ModernBattlePokemonHud {
       x: spriteRect.left - containerRect.left + spriteRect.width * 0.5,
       y: spriteRect.bottom - containerRect.top - 6,
     };
+  }
+
+  private syncHealEffectLayout(): void {
+    const paddingX = Math.max(14, this.sprite.offsetWidth * 0.08);
+
+    const paddingY = Math.max(12, this.sprite.offsetHeight * 0.06);
+
+    this.healFx.style.left = `${this.sprite.offsetLeft - paddingX}px`;
+
+    this.healFx.style.top = `${this.sprite.offsetTop - paddingY}px`;
+
+    this.healFx.style.width = `${this.sprite.offsetWidth + paddingX * 2}px`;
+
+    this.healFx.style.height = `${this.sprite.offsetHeight + paddingY * 2}px`;
+  }
+
+  private finishPendingHealEffect(): void {
+    if (this.healFxTimer !== undefined) {
+      window.clearTimeout(this.healFxTimer);
+      this.healFxTimer = undefined;
+    }
+
+    this.healFx.classList.remove(
+      "battle-modern-hud__heal-fx--active",
+      "battle-modern-hud__heal-fx--heal",
+      "battle-modern-hud__heal-fx--revive",
+    );
+
+    this.sprite.classList.remove(
+      "battle-modern-hud__sprite--healing",
+      "battle-modern-hud__sprite--reviving",
+    );
+
+    const resolve = this.healFxResolve;
+    this.healFxResolve = undefined;
+    resolve?.();
   }
 }

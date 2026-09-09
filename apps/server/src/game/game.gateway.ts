@@ -260,6 +260,7 @@ export class GameGateway
 
     for (const [, player] of this.playerWorldRuntimeStore.entries()) {
       const trainerId = this.getTrainerId(player.id);
+      console.log('trainerId', trainerId);
 
       if (!trainerId) {
         console.warn(
@@ -409,7 +410,6 @@ export class GameGateway
     const mapRoom = this.getMapRoom(newPlayer.mapId);
     await client.join(mapRoom);
 
-    console.log(`Player connected: ${client.id}`);
     client.emit(
       'currentPlayers',
       this.playerWorldRuntimeStore.getPlayersInMap(newPlayer.mapId),
@@ -486,7 +486,6 @@ export class GameGateway
   handleDialogueStart(
     @ConnectedSocket()
     client: Socket,
-
     @MessageBody()
     payload: unknown,
   ): void {
@@ -710,6 +709,7 @@ export class GameGateway
     };
 
     const trainerId = this.getTrainerId(client.id);
+    console.log('trainerId', trainerId);
 
     if (!trainerId) {
       console.warn('[MapTransition] trainer identity missing', {

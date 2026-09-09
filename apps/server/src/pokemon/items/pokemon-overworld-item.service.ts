@@ -95,11 +95,14 @@ export class PokemonOverworldItemService {
       );
     }
 
-    /* C4 V1 sólo implementa healing items */
-    if (!item.effect || item.effect.type !== 'heal-hp') {
+    /* Overworld HP items soportados actualmente: heal-hp */
+    if (
+      !item.effect ||
+      (item.effect.type !== 'heal-hp' && item.effect.type !== 'revive')
+    ) {
       throw new PokemonOverworldItemUseError(
         'ITEM_NOT_USABLE',
-        `Pokémon item "${itemId}" is not an overworld healing item`,
+        `Pokémon item "${itemId}" is not a supported overworld HP item`,
       );
     }
 
@@ -131,31 +134,47 @@ export class PokemonOverworldItemService {
       );
     }
 
-    /* 5. Healing eligibility */
-    if (target.currentHp <= 0) {
-      throw new PokemonOverworldItemUseError(
-        'TARGET_FAINTED',
-        `Pokémon "${targetPokemonInstanceId}" is fainted`,
-      );
-    }
-
+    /* 5. Resolve authoritative HP mutation */
     const maxHp = calculatePokemonMaxHp(target);
-
-    if (target.currentHp >= maxHp) {
-      throw new PokemonOverworldItemUseError(
-        'TARGET_FULL_HP',
-        `Pokémon "${targetPokemonInstanceId}" already has full HP`,
-      );
-    }
-
     const previousHp = target.currentHp;
 
     let currentHp: number;
 
-    if (item.effect.mode === 'full') {
-      currentHp = maxHp;
+    if (item.effect.type === 'heal-hp') {
+      /* Potion / Super Potion / Hyper Potion / Max Potion nunca pueden revivir */
+      if (previousHp <= 0) {
+        throw new PokemonOverworldItemUseError(
+          'TARGET_FAINTED',
+          `Pokémon "${targetPokemonInstanceId}" is fainted`,
+        );
+      }
+
+      if (previousHp >= maxHp) {
+        throw new PokemonOverworldItemUseError(
+          'TARGET_FULL_HP',
+          `Pokémon "${targetPokemonInstanceId}" already has full HP`,
+        );
+      }
+
+      if (item.effect.mode === 'full') {
+        currentHp = maxHp;
+      } else {
+        currentHp = Math.min(maxHp, previousHp + item.effect.amount);
+      }
     } else {
-      currentHp = Math.min(maxHp, previousHp + item.effect.amount);
+      /* Revive / Max Revive solamente pueden utilizarse sobre un Pokémon debilitado. */
+      if (previousHp > 0) {
+        throw new PokemonOverworldItemUseError(
+          'TARGET_NOT_FAINTED',
+          `Pokémon "${targetPokemonInstanceId}" is not fainted`,
+        );
+      }
+
+      if (item.effect.mode === 'full') {
+        currentHp = maxHp;
+      } else {
+        currentHp = Math.max(1, Math.floor(maxHp / 2));
+      }
     }
 
     const appliedHealing = currentHp - previousHp;
@@ -180,7 +199,7 @@ export class PokemonOverworldItemService {
 
     /* 7. PostgreSQL FIRST. Item dec + HP mutation belong to one transaction */
     try {
-      await this.repository.applyHealing({
+      await this.repository.applyHpItemUse({
         trainerId,
         itemId,
         targetPokemonInstanceId,
