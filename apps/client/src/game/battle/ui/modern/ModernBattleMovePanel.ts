@@ -41,9 +41,10 @@ export class ModernBattleMovePanel {
   constructor(parent: HTMLElement, options: ModernBattleMovePanelOptions) {
     this.onMoveSelected = options.onMoveSelected;
     this.root = document.createElement("div");
-    this.root.className = ["battle-modern-moves", "battle-ui-modern__interactive"].join(
-      " "
-    );
+    this.root.className = [
+      "battle-modern-moves",
+      "battle-ui-modern__interactive",
+    ].join(" ");
 
     this.backButton = document.createElement("button");
     this.backButton.type = "button";
@@ -80,7 +81,7 @@ export class ModernBattleMovePanel {
 
   public setBounds(
     bounds: ModernBattleMovePanelBounds,
-    viewport: ModernBattleMovePanelViewport
+    viewport: ModernBattleMovePanelViewport,
   ): void {
     if (viewport.width <= 0 || viewport.height <= 0) {
       return;
@@ -176,31 +177,38 @@ export class ModernBattleMovePanel {
       top.append(name, typeBadge);
 
       const bottom = document.createElement("div");
-
       bottom.className = "battle-modern-move-card__bottom";
 
       const ppLabel = document.createElement("span");
-
       ppLabel.className = "battle-modern-move-card__pp-label";
-
       ppLabel.textContent = "PP";
 
       const pp = document.createElement("span");
-
       pp.className = "battle-modern-move-card__pp";
 
       const maxPp = move.pp ?? 0;
-
       pp.textContent = `${instanceMove.currentPp} / ${maxPp}`;
+      const ppRatio =
+        maxPp > 0
+          ? Math.max(0, Math.min(1, instanceMove.currentPp / maxPp))
+          : 0;
+
+      if (instanceMove.currentPp <= 0 || ppRatio <= 0.25) {
+        button.classList.add("battle-modern-move-card--pp-danger");
+      } else if (ppRatio <= 0.5) {
+        button.classList.add("battle-modern-move-card--pp-warning");
+      }
 
       bottom.append(ppLabel, pp);
-
       button.append(top, bottom);
 
       const moveId = instanceMove.moveId;
 
       button.addEventListener("click", () => {
-        if (this.interactionState !== "move-selection" || instanceMove.currentPp <= 0) {
+        if (
+          this.interactionState !== "move-selection" ||
+          instanceMove.currentPp <= 0
+        ) {
           return;
         }
 

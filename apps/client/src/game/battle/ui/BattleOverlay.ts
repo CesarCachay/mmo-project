@@ -672,15 +672,19 @@ export class BattleOverlay {
     this.movePanel.setVisible(false);
     this.replacementPanel.setVisible(false);
     this.bagPanel.setVisible(false);
+    this.moveLearningPanel.setVisible(false);
   }
 
   public requestMoveLearningDecision(
     prompt: MoveLearningPrompt,
   ): Promise<PokemonMoveLearningDecision> {
+    this.messagePanel.clear();
+
     this.actionMenu.setVisible(false);
     this.movePanel.setVisible(false);
     this.replacementPanel.setVisible(false);
     this.bagPanel.setVisible(false);
+
     return this.moveLearningPanel.prompt(prompt);
   }
 

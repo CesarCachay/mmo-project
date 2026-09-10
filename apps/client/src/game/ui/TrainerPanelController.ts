@@ -163,6 +163,7 @@ export class TrainerPanelController {
   ): Promise<void> {
     const item = POKEMON_ITEM_REGISTRY[payload.itemId];
     const pending = this.pendingOverworldItemPresentation;
+
     const matchesPendingRequest =
       pending?.itemId === payload.itemId &&
       pending.targetPokemonInstanceId === payload.targetPokemonInstanceId;
@@ -179,7 +180,7 @@ export class TrainerPanelController {
     /* El mensaje ocurre ANTES del efecto, igual que en Battle. */
     this.showFeedback(`Used a ${item.name}!`);
 
-    /* Nos aseguramos de que la Party permanezca como superficie principal durante el FX */
+    /* Party permanece como superficie principal mientras ocurre toda la presentación del healing item. */
     this.partyPanel.show();
 
     try {
@@ -190,6 +191,8 @@ export class TrainerPanelController {
         isRevive,
         760,
       );
+
+      await this.wait(600);
     } catch (error: unknown) {
       /* Un error puramente visual jamás debe impedir aplicar el TrainerState autoritativo */
       console.error(
@@ -197,7 +200,12 @@ export class TrainerPanelController {
         error,
       );
     } finally {
+      /* Primero aplicamos cualquier Party autoritativa diferida y liberamos el presentation lock */
       this.finishOverworldItemPresentation();
+
+      /* Después restauramos la superficie desde la cual comenzó originalmente el flujo */
+      this.partyPanel.hide();
+      this.inventoryPanel.show();
     }
   }
 
@@ -504,6 +512,12 @@ export class TrainerPanelController {
       case "PERSISTENCE_FAILED":
         return "No se pudo guardar el nuevo orden.";
     }
+  }
+
+  private wait(durationMs: number): Promise<void> {
+    return new Promise((resolve) => {
+      this.scene.time.delayedCall(durationMs, resolve);
+    });
   }
 
   private finishOverworldItemPresentation(): void {

@@ -412,6 +412,20 @@
 }
 
 /* ============================
+     PP STATES
+     ============================ */
+
+.battle-modern-move-card--pp-warning .battle-modern-move-card__pp-label,
+.battle-modern-move-card--pp-warning .battle-modern-move-card__pp {
+  color: var(--battle-hp-warning);
+}
+
+.battle-modern-move-card--pp-danger .battle-modern-move-card__pp-label,
+.battle-modern-move-card--pp-danger .battle-modern-move-card__pp {
+  color: var(--battle-hp-danger);
+}
+
+/* ============================
      MOVE TYPE BADGES
      ============================ */
 
@@ -503,6 +517,299 @@
      pero bloqueadas. */
 .battle-modern-moves--waiting .battle-modern-move-card {
   opacity: 0.58;
+}
+
+/* =========================================================
+   MOVE LEARNING
+   ========================================================= */
+
+.battle-modern-move-learning {
+  position: absolute;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 10px 18px 12px;
+  pointer-events: auto;
+}
+
+.battle-modern-move-learning[hidden] {
+  display: none;
+}
+
+/* ============================
+   HEADER
+   ============================ */
+
+.battle-modern-move-learning__header {
+  flex: 0 0 auto;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.battle-modern-move-learning__title {
+  color: var(--battle-text-primary);
+  font-size: clamp(14px, 1.2vw, 17px);
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+
+.battle-modern-move-learning__subtitle {
+  margin-top: 4px;
+  color: var(--battle-text-muted);
+  font-size: clamp(9px, 0.82vw, 11px);
+  font-weight: 600;
+}
+
+/* ============================
+   CANDIDATE MOVE
+   ============================ */
+
+.battle-modern-move-learning__candidate {
+  width: min(420px, 78%);
+  margin: 0 auto 9px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  box-sizing: border-box;
+  border: 1px solid rgba(96, 165, 250, 0.26);
+  border-radius: 12px;
+  background: linear-gradient(
+    145deg,
+    rgba(30, 41, 59, 0.92),
+    rgba(15, 23, 42, 0.96)
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.045),
+    0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+.battle-modern-move-learning__candidate[hidden] {
+  display: none;
+}
+
+.battle-modern-move-learning__candidate-info {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.battle-modern-move-learning__candidate-name {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--battle-text-primary);
+  font-size: clamp(11px, 1vw, 14px);
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.battle-modern-move-learning__candidate-pp {
+  flex: 0 0 auto;
+  color: var(--battle-text-secondary);
+  font-size: clamp(9px, 0.78vw, 11px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================
+   INITIAL DECISION
+   ============================ */
+
+.battle-modern-move-learning__actions {
+  flex: 1;
+  width: min(520px, 90%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 10px;
+  min-height: 0;
+}
+
+.battle-modern-move-learning__actions[hidden] {
+  display: none;
+}
+
+.battle-modern-move-learning__action {
+  min-width: 0;
+  border-radius: 14px;
+  font: inherit;
+  font-size: clamp(10px, 0.92vw, 13px);
+  font-weight: 850;
+  letter-spacing: 0.035em;
+  cursor: pointer;
+  transition:
+    transform 150ms ease,
+    border-color 150ms ease,
+    background 150ms ease,
+    box-shadow 150ms ease,
+    opacity 150ms ease;
+}
+
+.battle-modern-move-learning__action:not(:disabled):hover {
+  transform: translateY(-2px);
+}
+
+.battle-modern-move-learning__action:not(:disabled):active {
+  transform: translateY(0);
+}
+
+.battle-modern-move-learning__action:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+/* LEARN MOVE */
+
+.battle-modern-move-learning__action--learn {
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  background: linear-gradient(
+    145deg,
+    rgba(21, 128, 61, 0.34),
+    rgba(20, 83, 45, 0.38)
+  );
+  color: #bbf7d0;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.battle-modern-move-learning__action--learn:not(:disabled):hover {
+  border-color: rgba(74, 222, 128, 0.7);
+  background: linear-gradient(
+    145deg,
+    rgba(22, 163, 74, 0.4),
+    rgba(21, 128, 61, 0.44)
+  );
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.2),
+    0 0 18px rgba(34, 197, 94, 0.08);
+}
+
+/* DON'T LEARN */
+
+.battle-modern-move-learning__action--cancel {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: linear-gradient(
+    145deg,
+    rgba(30, 41, 59, 0.82),
+    rgba(15, 23, 42, 0.9)
+  );
+  color: var(--battle-text-secondary);
+}
+
+.battle-modern-move-learning__action--cancel:not(:disabled):hover {
+  border-color: rgba(248, 113, 113, 0.42);
+  background: linear-gradient(
+    145deg,
+    rgba(69, 28, 36, 0.78),
+    rgba(42, 21, 29, 0.88)
+  );
+  color: #fecaca;
+}
+
+/* ============================
+   MOVE REPLACEMENT GRID
+   ============================ */
+
+.battle-modern-move-learning__moves {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.battle-modern-move-learning__moves[hidden] {
+  display: none;
+}
+
+/*
+ * Importante:
+ * un move con 0 PP sigue siendo completamente
+ * seleccionable para ser olvidado.
+ */
+.battle-modern-move-learning__moves .battle-modern-move-card {
+  opacity: 1;
+}
+
+/* ============================
+   BACK
+   ============================ */
+
+.battle-move-learning__back {
+  flex: 0 0 auto;
+  align-self: flex-start;
+  margin-top: 7px;
+  padding: 5px 10px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 9px;
+  background: rgba(15, 23, 42, 0.7);
+  color: var(--battle-text-muted);
+  font: inherit;
+  font-size: clamp(8px, 0.72vw, 10px);
+  font-weight: 750;
+  cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    color 150ms ease,
+    background 150ms ease;
+}
+
+.battle-move-learning__back[hidden] {
+  display: none;
+}
+
+.battle-move-learning__back:not(:disabled):hover {
+  border-color: rgba(96, 165, 250, 0.42);
+  background: rgba(30, 41, 59, 0.9);
+  color: var(--battle-text-primary);
+}
+
+.battle-move-learning__back:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+/* ============================
+   WAITING FOR SERVER
+   ============================ */
+
+.battle-modern-move-learning--waiting {
+  cursor: progress;
+}
+
+.battle-modern-move-learning--waiting button {
+  pointer-events: none;
+}
+
+/* ============================
+   RESPONSIVE
+   ============================ */
+
+@media (max-width: 720px) {
+  .battle-modern-move-learning {
+    padding: 8px 12px 10px;
+  }
+
+  .battle-modern-move-learning__candidate {
+    width: min(440px, 92%);
+  }
+
+  .battle-modern-move-learning__actions {
+    width: 94%;
+    gap: 7px;
+  }
+
+  .battle-modern-move-learning__moves {
+    gap: 6px;
+  }
 }
 
 @media (max-width: 720px) {
