@@ -19,7 +19,15 @@ export const BATTLE_PRESENTATION_TIMING = {
   captureMessageMs: 1200,
   experienceGainedMessageMs: 700,
   levelUpMessageMs: 900,
+  moveLearnedMessageMs: 900,
   moveLearningMessageMs: 900,
+
+  /*
+   * Small breathing room after the defeated Pokémon
+   * finishes its faint presentation and before Party EXP
+   * starts animating.
+   */
+  experienceRewardLeadInMs: 500,
 } as const;
 
 export function getBattlePresentationMessageDuration(
@@ -60,6 +68,9 @@ export function getBattlePresentationMessageDuration(
 
     case "pokemon-leveled-up":
       return BATTLE_PRESENTATION_TIMING.levelUpMessageMs;
+
+    case "move-learned":
+      return BATTLE_PRESENTATION_TIMING.moveLearnedMessageMs;
 
     case "pokemon-leveled-up":
       return BATTLE_PRESENTATION_TIMING.levelUpMessageMs;

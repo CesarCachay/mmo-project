@@ -61,6 +61,25 @@ export interface BattleRunSucceededEvent {
   readonly participantId: BattleParticipantId;
 }
 
+// Capture
+export interface BattleCaptureFailedPresentationEvent {
+  readonly type: "capture-failed";
+  readonly participantId: BattleParticipantId;
+  readonly wildParticipantId: BattleParticipantId;
+  readonly pokemonInstanceId: string;
+  readonly itemId: PokemonItemId;
+  readonly shakeCount: number;
+}
+
+export interface BattleCaptureSucceededPresentationEvent {
+  readonly type: "capture-succeeded";
+  readonly participantId: BattleParticipantId;
+  readonly wildParticipantId: BattleParticipantId;
+  readonly pokemonInstanceId: string;
+  readonly itemId: PokemonItemId;
+  readonly shakeCount: number;
+}
+
 // items
 export interface BattleItemUsedEvent {
   readonly type: "item-used";
@@ -77,6 +96,60 @@ export interface BattleHpRestoredEvent {
   readonly currentHp: number;
   readonly appliedHealing: number;
 }
+
+// progression
+export interface BattleExperienceGainedEvent {
+  readonly type: "experience-gained";
+  readonly participantId: BattleParticipantId;
+  readonly pokemonInstanceId: string;
+  readonly gainedExperience: number;
+  readonly previousExperience: number;
+  readonly currentExperience: number;
+  readonly previousLevel: number;
+  readonly currentLevel: number;
+}
+
+export interface BattlePokemonLeveledUpEvent {
+  readonly type: "pokemon-leveled-up";
+  readonly participantId: BattleParticipantId;
+  readonly pokemonInstanceId: string;
+  readonly previousLevel: number;
+  readonly currentLevel: number;
+}
+
+export interface BattleMoveLearningRequiredEvent {
+  readonly type: "move-learning-required";
+  readonly participantId: BattleParticipantId;
+  readonly pokemonInstanceId: string;
+  readonly candidateMoveId: number;
+  readonly candidateLearnedAtLevel: number;
+  readonly revision: number;
+  readonly currentMoves: readonly PokemonInstanceMove[];
+}
+
+export interface BattleMoveLearnedEvent {
+  readonly type: "move-learned";
+  readonly participantId: BattleParticipantId;
+  readonly pokemonInstanceId: string;
+  readonly moveId: number;
+}
+
+export type BattlePresentationEvent =
+  | BattleMoveUsedEvent
+  | BattleMoveMissedEvent
+  | BattleDamageAppliedEvent
+  | BattlePokemonFaintedEvent
+  | BattlePokemonSwitchedEvent
+  | BattleRunFailedEvent
+  | BattleRunSucceededEvent
+  | BattleItemUsedEvent
+  | BattleHpRestoredEvent
+  | BattleCaptureFailedPresentationEvent
+  | BattleCaptureSucceededPresentationEvent
+  | BattleExperienceGainedEvent
+  | BattlePokemonLeveledUpEvent
+  | BattleMoveLearningRequiredEvent
+  | BattleMoveLearnedEvent;
 
 function isMoveEvent(value: Record<string, unknown>): boolean {
   return (
@@ -169,25 +242,6 @@ function isHpRestoredEvent(value: Record<string, unknown>): boolean {
   return value.appliedHealing === value.currentHp - value.previousHp;
 }
 
-// Capture
-export interface BattleCaptureFailedPresentationEvent {
-  readonly type: "capture-failed";
-  readonly participantId: BattleParticipantId;
-  readonly wildParticipantId: BattleParticipantId;
-  readonly pokemonInstanceId: string;
-  readonly itemId: PokemonItemId;
-  readonly shakeCount: number;
-}
-
-export interface BattleCaptureSucceededPresentationEvent {
-  readonly type: "capture-succeeded";
-  readonly participantId: BattleParticipantId;
-  readonly wildParticipantId: BattleParticipantId;
-  readonly pokemonInstanceId: string;
-  readonly itemId: PokemonItemId;
-  readonly shakeCount: number;
-}
-
 function isCaptureFailedEvent(value: Record<string, unknown>): boolean {
   return (
     isNonEmptyString(value.participantId) &&
@@ -209,22 +263,6 @@ function isCaptureSucceededEvent(value: Record<string, unknown>): boolean {
     value.shakeCount === 4
   );
 }
-
-export type BattlePresentationEvent =
-  | BattleMoveUsedEvent
-  | BattleMoveMissedEvent
-  | BattleDamageAppliedEvent
-  | BattlePokemonFaintedEvent
-  | BattlePokemonSwitchedEvent
-  | BattleRunFailedEvent
-  | BattleRunSucceededEvent
-  | BattleItemUsedEvent
-  | BattleHpRestoredEvent
-  | BattleCaptureFailedPresentationEvent
-  | BattleCaptureSucceededPresentationEvent
-  | BattleExperienceGainedEvent
-  | BattlePokemonLeveledUpEvent
-  | BattleMoveLearningRequiredEvent;
 
 export function isBattlePresentationEvent(
   value: unknown,
@@ -274,32 +312,15 @@ export function isBattlePresentationEvent(
     case "pokemon-leveled-up":
       return isPokemonLeveledUpEvent(value);
 
+    case "move-learned":
+      return isMoveLearnedEvent(value);
+
     case "move-learning-required":
       return isMoveLearningRequiredEvent(value);
 
     default:
       return false;
   }
-}
-
-// progression
-export interface BattleExperienceGainedEvent {
-  readonly type: "experience-gained";
-  readonly participantId: BattleParticipantId;
-  readonly pokemonInstanceId: string;
-  readonly gainedExperience: number;
-  readonly previousExperience: number;
-  readonly currentExperience: number;
-  readonly previousLevel: number;
-  readonly currentLevel: number;
-}
-
-export interface BattlePokemonLeveledUpEvent {
-  readonly type: "pokemon-leveled-up";
-  readonly participantId: BattleParticipantId;
-  readonly pokemonInstanceId: string;
-  readonly previousLevel: number;
-  readonly currentLevel: number;
 }
 
 function isExperienceGainedEvent(value: Record<string, unknown>): boolean {
@@ -354,14 +375,12 @@ function isPokemonLeveledUpEvent(value: Record<string, unknown>): boolean {
   return (value.currentLevel as number) > (value.previousLevel as number);
 }
 
-export interface BattleMoveLearningRequiredEvent {
-  readonly type: "move-learning-required";
-  readonly participantId: BattleParticipantId;
-  readonly pokemonInstanceId: string;
-  readonly candidateMoveId: number;
-  readonly candidateLearnedAtLevel: number;
-  readonly revision: number;
-  readonly currentMoves: readonly PokemonInstanceMove[];
+function isMoveLearnedEvent(value: Record<string, unknown>): boolean {
+  return (
+    isNonEmptyString(value.participantId) &&
+    isNonEmptyString(value.pokemonInstanceId) &&
+    isPositiveInteger(value.moveId)
+  );
 }
 
 function isMoveLearningRequiredEvent(value: Record<string, unknown>): boolean {

@@ -163,6 +163,13 @@ export class ModernBattlePartyExperiencePanel {
   }
 
   public show(): void {
+    if (
+      !this.root.hidden &&
+      this.root.classList.contains("battle-party-experience--visible")
+    ) {
+      return;
+    }
+
     this.root.hidden = false;
 
     this.root.classList.remove("battle-party-experience--visible");

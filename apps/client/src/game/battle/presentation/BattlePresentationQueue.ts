@@ -3,6 +3,11 @@ import type {
   PokemonBattleTurnResolvedPayload,
 } from "@cesar-mmo/shared";
 
+type BattleExperienceGainedPresentationEvent = Extract<
+  BattlePresentationEvent,
+  { readonly type: "experience-gained" }
+>;
+
 export interface BattlePresentationEventContext {
   readonly battleId: string;
   readonly turnNumber: number;
@@ -11,14 +16,28 @@ export interface BattlePresentationEventContext {
   readonly eventCount: number;
 }
 
+export interface BattlePresentationEventBatchContext {
+  readonly battleId: string;
+  readonly turnNumber: number;
+
+  readonly startEventIndex: number;
+  readonly endEventIndex: number;
+  readonly eventCount: number;
+}
+
 export interface BattlePresentationQueueOptions {
   readonly presentEvent: (
     event: BattlePresentationEvent,
-    context: BattlePresentationEventContext
+    context: BattlePresentationEventContext,
+  ) => void | Promise<void>;
+
+  readonly presentExperienceBatch?: (
+    events: readonly BattleExperienceGainedPresentationEvent[],
+    context: BattlePresentationEventBatchContext,
   ) => void | Promise<void>;
 
   readonly onTurnCompleted?: (
-    payload: PokemonBattleTurnResolvedPayload
+    payload: PokemonBattleTurnResolvedPayload,
   ) => void | Promise<void>;
 
   readonly onIdle?: () => void | Promise<void>;
@@ -26,11 +45,8 @@ export interface BattlePresentationQueueOptions {
 
 export class BattlePresentationQueue {
   private readonly pendingTurns: PokemonBattleTurnResolvedPayload[] = [];
-
   private readonly options: BattlePresentationQueueOptions;
-
   private processing = false;
-
   private generation = 0;
 
   constructor(options: BattlePresentationQueueOptions) {
@@ -42,12 +58,6 @@ export class BattlePresentationQueue {
   }
 
   public enqueue(payload: PokemonBattleTurnResolvedPayload): void {
-    /*
-     * Copy the events array.
-     *
-     * Shared contracts are readonly, but this also
-     * prevents accidental external array mutation.
-     */
     this.pendingTurns.push({
       battleId: payload.battleId,
       turnNumber: payload.turnNumber,
@@ -59,13 +69,6 @@ export class BattlePresentationQueue {
 
   public clear(): void {
     this.pendingTurns.length = 0;
-
-    /*
-     * An event that is already awaiting cannot be
-     * forcibly cancelled yet, but once it finishes
-     * this generation check prevents the remaining
-     * stale events from being presented.
-     */
     this.generation += 1;
   }
 
@@ -100,11 +103,14 @@ export class BattlePresentationQueue {
           try {
             await this.options.onTurnCompleted(payload);
           } catch (error) {
-            console.error("[BattlePresentationQueue] turn completion callback failed", {
-              battleId: payload.battleId,
-              turnNumber: payload.turnNumber,
-              error,
-            });
+            console.error(
+              "[BattlePresentationQueue] turn completion callback failed",
+              {
+                battleId: payload.battleId,
+                turnNumber: payload.turnNumber,
+                error,
+              },
+            );
           }
         }
       }
@@ -112,18 +118,13 @@ export class BattlePresentationQueue {
       this.processing = false;
     }
 
-    /*
-     * A new generation could have been enqueued
-     * while the previous one was being cancelled.
-     */
+    /* A new generation could have been enqueued while the previous one was being cancelled */
     if (this.pendingTurns.length > 0) {
       void this.drain();
       return;
     }
 
-    /*
-     * Never report idle for a stale generation.
-     */
+    /* Never report idle for a stale generation */
     if (generation !== this.generation) {
       return;
     }
@@ -139,11 +140,13 @@ export class BattlePresentationQueue {
 
   private async presentTurn(
     payload: PokemonBattleTurnResolvedPayload,
-    generation: number
+    generation: number,
   ): Promise<void> {
     const eventCount = payload.events.length;
 
-    for (let eventIndex = 0; eventIndex < eventCount; eventIndex += 1) {
+    let eventIndex = 0;
+
+    while (eventIndex < eventCount) {
       if (generation !== this.generation) {
         return;
       }
@@ -151,8 +154,80 @@ export class BattlePresentationQueue {
       const event = payload.events[eventIndex];
 
       if (!event) {
+        eventIndex += 1;
         continue;
       }
+
+      /*
+       * ------------------------------------------------------
+       * EXP BATCH
+       * ------------------------------------------------------
+       *
+       * Consecutive experience-gained events belong to the
+       * same authoritative Turn and may be PRESENTED
+       * concurrently.
+       *
+       * Gameplay is NOT being resolved here.
+       */
+      if (
+        event.type === "experience-gained" &&
+        this.options.presentExperienceBatch
+      ) {
+        const experienceEvents: BattleExperienceGainedPresentationEvent[] = [];
+
+        let batchEndIndex = eventIndex;
+
+        while (batchEndIndex < eventCount) {
+          const candidate = payload.events[batchEndIndex];
+
+          if (!candidate || candidate.type !== "experience-gained") {
+            break;
+          }
+
+          experienceEvents.push(candidate);
+          batchEndIndex += 1;
+        }
+
+        if (experienceEvents.length > 1) {
+          const batchContext: BattlePresentationEventBatchContext = {
+            battleId: payload.battleId,
+            turnNumber: payload.turnNumber,
+            startEventIndex: eventIndex,
+            endEventIndex: batchEndIndex - 1,
+            eventCount,
+          };
+
+          try {
+            await this.options.presentExperienceBatch(
+              experienceEvents,
+              batchContext,
+            );
+          } catch (error) {
+            /* Presentation failures must never deadlock authoritative Battle state */
+            console.error(
+              "[BattlePresentationQueue] EXP batch presentation failed",
+              {
+                ...batchContext,
+
+                events: experienceEvents,
+
+                error,
+              },
+            );
+          }
+
+          /* Skip every EXP event already consumed by the batch */
+          eventIndex = batchEndIndex;
+
+          continue;
+        }
+      }
+
+      /*
+       * ------------------------------------------------------
+       * NORMAL SEQUENTIAL EVENT
+       * ------------------------------------------------------
+       */
 
       const context: BattlePresentationEventContext = {
         battleId: payload.battleId,
@@ -164,16 +239,14 @@ export class BattlePresentationQueue {
       try {
         await this.options.presentEvent(event, context);
       } catch (error) {
-        /*
-         * Presentation failures must not deadlock the Battle.
-         * Gameplay has already been resolved authoritatively by the server.
-         */
         console.error("[BattlePresentationQueue] event presentation failed", {
           ...context,
           event,
           error,
         });
       }
+
+      eventIndex += 1;
     }
   }
 }

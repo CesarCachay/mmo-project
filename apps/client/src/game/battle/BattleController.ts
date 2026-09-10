@@ -33,6 +33,7 @@ import type { BattleClientInteractionState } from "./battle-client.types";
 import {
   BattlePresentationQueue,
   type BattlePresentationEventContext,
+  type BattlePresentationEventBatchContext,
 } from "./presentation/BattlePresentationQueue";
 
 import { formatBattlePresentationMessage } from "./presentation/battle-presentation-message";
@@ -41,6 +42,11 @@ import {
   getBattlePresentationMessageDuration,
 } from "./presentation/battle-presentation-timing";
 import { getPokemonDisplayName } from "../pokemon/pokemon-presentation.utils";
+
+type BattleExperienceGainedPresentationEvent = Extract<
+  BattlePresentationEvent,
+  { readonly type: "experience-gained" }
+>;
 
 export class BattleController {
   private activeBattlePayload?: PokemonBattleStartedPayload;
@@ -133,6 +139,8 @@ export class BattleController {
 
     this.presentationQueue = new BattlePresentationQueue({
       presentEvent: (event, context) => this.presentBattleEvent(event, context),
+      presentExperienceBatch: (events, context) =>
+        this.presentBattleExperienceBatch(events, context),
       onTurnCompleted: async (payload) => {
         await this.handlePresentationTurnCompleted(payload);
       },
@@ -714,6 +722,38 @@ export class BattleController {
     this.presentationQueue.enqueue(payload);
   }
 
+  private async presentBattleExperienceBatch(
+    events: readonly BattleExperienceGainedPresentationEvent[],
+    context: BattlePresentationEventBatchContext,
+  ): Promise<void> {
+    const activeBattle = this.activeBattlePayload?.battle;
+
+    if (!activeBattle) {
+      return;
+    }
+
+    if (activeBattle.battleId !== context.battleId) {
+      console.warn("[BattleController] EXP batch battle mismatch", {
+        activeBattleId: activeBattle.battleId,
+        receivedBattleId: context.battleId,
+        turnNumber: context.turnNumber,
+      });
+      return;
+    }
+
+    await this.waitForPresentationDelay(
+      BATTLE_PRESENTATION_TIMING.experienceRewardLeadInMs,
+    );
+
+    await Promise.all([
+      this.overlay.animatePartyExperienceGainBatch(activeBattle, events),
+      this.overlay.presentMessage(
+        "Your party gained EXP!",
+        BATTLE_PRESENTATION_TIMING.experienceGainedMessageMs,
+      ),
+    ]);
+  }
+
   private async presentBattleEvent(
     event: BattlePresentationEvent,
     context: BattlePresentationEventContext,
@@ -839,6 +879,10 @@ export class BattleController {
 
     if (event.type === "experience-gained") {
       const message = formatBattlePresentationMessage(activeBattle, event);
+
+      await this.waitForPresentationDelay(
+        BATTLE_PRESENTATION_TIMING.experienceRewardLeadInMs,
+      );
 
       await Promise.all([
         this.overlay.animatePokemonExperienceGain(
@@ -1394,6 +1438,16 @@ export class BattleController {
         resolve,
         reject,
       };
+    });
+  }
+
+  private waitForPresentationDelay(durationMs: number): Promise<void> {
+    if (durationMs <= 0) {
+      return Promise.resolve();
+    }
+
+    return new Promise<void>((resolve) => {
+      window.setTimeout(resolve, durationMs);
     });
   }
 }

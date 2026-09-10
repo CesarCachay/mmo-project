@@ -6,6 +6,7 @@ import type {
   PokemonInventory,
   PokemonItemId,
   PokemonMoveLearningDecision,
+  BattlePresentationEvent,
 } from "@cesar-mmo/shared";
 
 import { BattleDomRoot } from "./modern/BattleDomRoot";
@@ -34,6 +35,11 @@ import { getPokemonItemSpriteAsset } from "../../pokemon/pokemon-item-sprite.reg
 import type { BattleClientInteractionState } from "../battle-client.types";
 
 const CAPTURE_TARGET_HEAD_OFFSET_PX = 44;
+
+type BattleExperienceGainedPresentationEvent = Extract<
+  BattlePresentationEvent,
+  { readonly type: "experience-gained" }
+>;
 
 export class BattleOverlay {
   private readonly scene: Phaser.Scene;
@@ -684,6 +690,33 @@ export class BattleOverlay {
 
   public hideMoveLearning(): void {
     this.moveLearningPanel.setVisible(false);
+  }
+
+  public animatePartyExperienceGainBatch(
+    battle: BattleInstance,
+    events: readonly BattleExperienceGainedPresentationEvent[],
+  ): Promise<void> {
+    if (events.length === 0) {
+      return Promise.resolve();
+    }
+
+    this.hideCommandPanelsForPresentation();
+
+    /* Critical difference from the old flow: map() invokes every animation immediately */
+    return Promise.all(
+      events.map((event) =>
+        this.animatePokemonExperienceGain(
+          battle,
+          event.participantId,
+          event.pokemonInstanceId,
+          event.gainedExperience,
+          event.previousExperience,
+          event.currentExperience,
+          event.previousLevel,
+          event.currentLevel,
+        ),
+      ),
+    ).then(() => undefined);
   }
 
   public animatePokemonExperienceGain(

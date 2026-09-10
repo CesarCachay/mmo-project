@@ -17,6 +17,16 @@ export function createPokemonWildBattleProgressionPresentationEvents(
 
   const events: BattlePresentationEvent[] = [];
 
+  /*
+   * ==========================================================
+   * PHASE 1 — PARTY EXP
+   * ==========================================================
+   *
+   * IMPORTANT:
+   * Keep every experience-gained event consecutive so the
+   * client presentation queue can animate Party EXP as one
+   * simultaneous batch.
+   */
   for (const reward of result.rewards) {
     /* Fainted / Lv100 entries have zero EXP */
     if (reward.gainedExperience <= 0) {
@@ -33,7 +43,17 @@ export function createPokemonWildBattleProgressionPresentationEvents(
       previousLevel: reward.previousLevel,
       currentLevel: reward.currentLevel,
     });
+  }
 
+  /*
+   * ==========================================================
+   * PHASE 2 — LEVEL UP + AUTOMATIC MOVE LEARNING
+   * ==========================================================
+   *
+   * These events run only after the full Party EXP batch
+   * has completed.
+   */
+  for (const reward of result.rewards) {
     if (reward.leveledUp) {
       events.push({
         type: 'pokemon-leveled-up',
@@ -43,8 +63,25 @@ export function createPokemonWildBattleProgressionPresentationEvents(
         currentLevel: reward.currentLevel,
       });
     }
+
+    for (const moveId of reward.automaticallyLearnedMoveIds) {
+      events.push({
+        type: 'move-learned',
+        participantId,
+        pokemonInstanceId: reward.pokemonInstanceId,
+        moveId,
+      });
+    }
   }
 
+  /*
+   * ==========================================================
+   * PHASE 3 — INTERACTIVE MOVE LEARNING
+   * ==========================================================
+   *
+   * Interactive decisions always happen after all automatic
+   * progression presentation has finished.
+   */
   for (const reward of result.rewards) {
     const pending = reward.pendingMoveLearning;
 

@@ -125,6 +125,22 @@ export function formatBattlePresentationMessage(
       return `${pokemonName} grew to Lv. ${event.currentLevel}!`;
     }
 
+    case "move-learned": {
+      const pokemonName = getBattlePokemonDisplayName(
+        battle,
+        event.participantId,
+        event.pokemonInstanceId,
+      );
+
+      const move = getPokemonMove(event.moveId);
+
+      const moveName = move
+        ? formatMoveName(move.name)
+        : `Move ${event.moveId}`;
+
+      return `${pokemonName} learned ${moveName}!`;
+    }
+
     case "move-learning-required": {
       return null;
     }

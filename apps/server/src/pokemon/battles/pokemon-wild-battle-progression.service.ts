@@ -26,6 +26,7 @@ export interface PokemonWildBattleAppliedExperience {
   readonly previousLevel: number;
   readonly currentLevel: number;
   readonly leveledUp: boolean;
+  readonly automaticallyLearnedMoveIds: readonly number[];
   readonly requiresMoveLearningDecision: boolean;
   readonly pendingMoveLearning: {
     readonly candidateMoveId: number;
@@ -136,18 +137,28 @@ export class PokemonWildBattleProgressionService {
             currentLevel: currentPokemon.level,
             leveledUp:
               currentPokemon.level > previousPokemonState.pokemon.level,
+            automaticallyLearnedMoveIds: [],
             requiresMoveLearningDecision: false,
             pendingMoveLearning: null,
           };
         }
 
         const progression = appliedProgression.progression;
+
         const pendingCandidate =
           progression.moveLearning.status === 'pending-decision'
             ? toPendingMoveLearningCandidate(
                 progression.moveLearning.pendingDecision.candidate,
               )
             : null;
+
+        const previousMoveIds = new Set(
+          previousPokemonState.pokemon.moves.map((move) => move.moveId),
+        );
+
+        const automaticallyLearnedMoveIds = currentPokemon.moves
+          .map((move) => move.moveId)
+          .filter((moveId) => !previousMoveIds.has(moveId));
 
         return {
           pokemonInstanceId: reward.pokemonInstanceId,
@@ -161,6 +172,7 @@ export class PokemonWildBattleProgressionService {
           leveledUp:
             progression.experience.currentLevel >
             progression.experience.previousLevel,
+          automaticallyLearnedMoveIds,
           requiresMoveLearningDecision: pendingCandidate !== null,
           pendingMoveLearning: pendingCandidate
             ? {
