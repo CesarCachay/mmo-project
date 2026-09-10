@@ -17,10 +17,13 @@ export const BATTLE_PRESENTATION_TIMING = {
   itemUsedMessageMs: 650,
   hpRestoredMessageMs: 500,
   captureMessageMs: 1200,
+  experienceGainedMessageMs: 700,
+  levelUpMessageMs: 900,
+  moveLearningMessageMs: 900,
 } as const;
 
 export function getBattlePresentationMessageDuration(
-  event: BattlePresentationEvent
+  event: BattlePresentationEvent,
 ): number {
   switch (event.type) {
     case "move-used":
@@ -51,5 +54,17 @@ export function getBattlePresentationMessageDuration(
     case "capture-failed":
     case "capture-succeeded":
       return BATTLE_PRESENTATION_TIMING.captureMessageMs;
+
+    case "experience-gained":
+      return BATTLE_PRESENTATION_TIMING.experienceGainedMessageMs;
+
+    case "pokemon-leveled-up":
+      return BATTLE_PRESENTATION_TIMING.levelUpMessageMs;
+
+    case "pokemon-leveled-up":
+      return BATTLE_PRESENTATION_TIMING.levelUpMessageMs;
+
+    case "move-learning-required":
+      return BATTLE_PRESENTATION_TIMING.moveLearningMessageMs;
   }
 }

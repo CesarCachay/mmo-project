@@ -11,5 +11,6 @@
 export type * from './models/PokemonTrainer.js'
 export type * from './models/PokemonInstance.js'
 export type * from './models/PokemonInstanceMove.js'
+export type * from './models/PokemonPendingMoveLearning.js'
 export type * from './models/PokemonTrainerInventoryItem.js'
 export type * from './commonInputTypes.js'

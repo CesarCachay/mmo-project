@@ -2,10 +2,14 @@ import type { BattleInstance, BattleParticipantId } from '@cesar-mmo/shared';
 
 import type { PokemonTrainerId } from '../pokemon-trainer-identity';
 
-export interface PokemonBattleTrainerBinding {
+export interface PokemonBattleTrainerBindingInput {
   readonly participantId: BattleParticipantId;
   readonly trainerId: PokemonTrainerId;
   readonly playerId: string;
+}
+
+export interface PokemonBattleTrainerBinding extends PokemonBattleTrainerBindingInput {
+  readonly participatingPokemonInstanceIds: Set<string>;
 }
 
 export interface PokemonBattleSession {
@@ -15,7 +19,7 @@ export interface PokemonBattleSession {
 
 export interface CreatePokemonBattleSessionInput {
   readonly battle: BattleInstance;
-  readonly trainerBindings: readonly PokemonBattleTrainerBinding[];
+  readonly trainerBindings: readonly PokemonBattleTrainerBindingInput[];
 }
 
 export function createPokemonBattleSession(
@@ -36,6 +40,7 @@ export function createPokemonBattleSession(
   const participantIds = new Set<BattleParticipantId>();
   const trainerIds = new Set<PokemonTrainerId>();
   const playerIds = new Set<string>();
+  const normalizedBindings: PokemonBattleTrainerBinding[] = [];
 
   for (const binding of trainerBindings) {
     if (binding.playerId.trim().length === 0) {
@@ -76,16 +81,84 @@ export function createPokemonBattleSession(
       );
     }
 
+    const activePokemon = participant.pokemon[participant.activePokemonIndex];
+
+    if (!activePokemon) {
+      throw new Error(
+        `Trainer participant "${participant.id}" has no active Pokémon in battle "${battle.battleId}"`,
+      );
+    }
+
     participantIds.add(binding.participantId);
     trainerIds.add(binding.trainerId);
     playerIds.add(binding.playerId);
+    normalizedBindings.push({
+      ...binding,
+      participatingPokemonInstanceIds: new Set([
+        activePokemon.pokemon.instanceId,
+      ]),
+    });
   }
 
   return {
     battle,
-
-    trainerBindings: trainerBindings.map((binding) => ({
-      ...binding,
-    })),
+    trainerBindings: normalizedBindings,
   };
+}
+
+/* Mark a Pokémon as having participated in this Battle */
+export function markPokemonBattleParticipation(
+  session: PokemonBattleSession,
+  participantId: BattleParticipantId,
+  pokemonInstanceId: string,
+): void {
+  const binding = session.trainerBindings.find(
+    (candidate) => candidate.participantId === participantId,
+  );
+
+  if (!binding) {
+    throw new Error(
+      `Trainer participant "${participantId}" is not bound to battle "${session.battle.battleId}"`,
+    );
+  }
+
+  const participant = session.battle.participants.find(
+    (candidate) => candidate.id === participantId,
+  );
+
+  if (!participant || participant.type !== 'trainer') {
+    throw new Error(
+      `Trainer participant "${participantId}" not found in battle "${session.battle.battleId}"`,
+    );
+  }
+
+  const belongsToParticipant = participant.pokemon.some(
+    (pokemonState) => pokemonState.pokemon.instanceId === pokemonInstanceId,
+  );
+
+  if (!belongsToParticipant) {
+    throw new Error(
+      `Pokémon "${pokemonInstanceId}" does not belong to Trainer participant "${participantId}"`,
+    );
+  }
+
+  binding.participatingPokemonInstanceIds.add(pokemonInstanceId);
+}
+
+export function getPokemonBattleParticipatingPokemonInstanceIds(
+  session: PokemonBattleSession,
+
+  participantId: BattleParticipantId,
+): readonly string[] {
+  const binding = session.trainerBindings.find(
+    (candidate) => candidate.participantId === participantId,
+  );
+
+  if (!binding) {
+    throw new Error(
+      `Trainer participant "${participantId}" is not bound to battle "${session.battle.battleId}"`,
+    );
+  }
+
+  return [...binding.participatingPokemonInstanceIds];
 }

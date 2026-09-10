@@ -1,6 +1,7 @@
 import type { BattleParticipantId } from "./pokemon-battle.types.js";
 import { isPokemonItemId } from "../inventory/pokemon-inventory.js";
 import type { PokemonItemId } from "../inventory/pokemon-inventory.js";
+import type { PokemonInstanceMove } from "../pokemon.types.js";
 
 // moves
 export interface BattleMoveUsedEvent {
@@ -220,10 +221,13 @@ export type BattlePresentationEvent =
   | BattleItemUsedEvent
   | BattleHpRestoredEvent
   | BattleCaptureFailedPresentationEvent
-  | BattleCaptureSucceededPresentationEvent;
+  | BattleCaptureSucceededPresentationEvent
+  | BattleExperienceGainedEvent
+  | BattlePokemonLeveledUpEvent
+  | BattleMoveLearningRequiredEvent;
 
 export function isBattlePresentationEvent(
-  value: unknown
+  value: unknown,
 ): value is BattlePresentationEvent {
   if (!isRecord(value)) {
     return false;
@@ -241,7 +245,8 @@ export function isBattlePresentationEvent(
 
     case "pokemon-fainted":
       return (
-        isNonEmptyString(value.participantId) && isNonEmptyString(value.pokemonInstanceId)
+        isNonEmptyString(value.participantId) &&
+        isNonEmptyString(value.pokemonInstanceId)
       );
 
     case "pokemon-switched":
@@ -263,7 +268,110 @@ export function isBattlePresentationEvent(
     case "capture-succeeded":
       return isCaptureSucceededEvent(value);
 
+    case "experience-gained":
+      return isExperienceGainedEvent(value);
+
+    case "pokemon-leveled-up":
+      return isPokemonLeveledUpEvent(value);
+
+    case "move-learning-required":
+      return isMoveLearningRequiredEvent(value);
+
     default:
       return false;
   }
+}
+
+// progression
+export interface BattleExperienceGainedEvent {
+  readonly type: "experience-gained";
+  readonly participantId: BattleParticipantId;
+  readonly pokemonInstanceId: string;
+  readonly gainedExperience: number;
+  readonly previousExperience: number;
+  readonly currentExperience: number;
+  readonly previousLevel: number;
+  readonly currentLevel: number;
+}
+
+export interface BattlePokemonLeveledUpEvent {
+  readonly type: "pokemon-leveled-up";
+  readonly participantId: BattleParticipantId;
+  readonly pokemonInstanceId: string;
+  readonly previousLevel: number;
+  readonly currentLevel: number;
+}
+
+function isExperienceGainedEvent(value: Record<string, unknown>): boolean {
+  if (
+    !isNonEmptyString(value.participantId) ||
+    !isNonEmptyString(value.pokemonInstanceId) ||
+    !isPositiveInteger(value.gainedExperience) ||
+    !isNonNegativeInteger(value.previousExperience) ||
+    !isNonNegativeInteger(value.currentExperience) ||
+    !isPositiveInteger(value.previousLevel) ||
+    !isPositiveInteger(value.currentLevel)
+  ) {
+    return false;
+  }
+
+  const previousLevel = value.previousLevel as number;
+
+  const currentLevel = value.currentLevel as number;
+
+  const previousExperience = value.previousExperience as number;
+
+  const currentExperience = value.currentExperience as number;
+
+  if (previousLevel > 100 || currentLevel > 100) {
+    return false;
+  }
+
+  if (currentLevel < previousLevel) {
+    return false;
+  }
+
+  return currentExperience >= previousExperience;
+}
+
+function isPokemonLeveledUpEvent(value: Record<string, unknown>): boolean {
+  if (
+    !isNonEmptyString(value.participantId) ||
+    !isNonEmptyString(value.pokemonInstanceId) ||
+    !isPositiveInteger(value.previousLevel) ||
+    !isPositiveInteger(value.currentLevel)
+  ) {
+    return false;
+  }
+
+  if (
+    (value.previousLevel as number) > 100 ||
+    (value.currentLevel as number) > 100
+  ) {
+    return false;
+  }
+
+  return (value.currentLevel as number) > (value.previousLevel as number);
+}
+
+export interface BattleMoveLearningRequiredEvent {
+  readonly type: "move-learning-required";
+  readonly participantId: BattleParticipantId;
+  readonly pokemonInstanceId: string;
+  readonly candidateMoveId: number;
+  readonly candidateLearnedAtLevel: number;
+  readonly revision: number;
+  readonly currentMoves: readonly PokemonInstanceMove[];
+}
+
+function isMoveLearningRequiredEvent(value: Record<string, unknown>): boolean {
+  return (
+    isNonEmptyString(value.participantId) &&
+    isNonEmptyString(value.pokemonInstanceId) &&
+    isPositiveInteger(value.candidateMoveId) &&
+    isPositiveInteger(value.candidateLearnedAtLevel) &&
+    isNonNegativeInteger(value.revision) &&
+    Array.isArray(value.currentMoves) &&
+    value.currentMoves.length === 4
+  );
 }

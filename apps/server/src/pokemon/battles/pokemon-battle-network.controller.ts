@@ -27,6 +27,8 @@ import { PokemonTrainerStateStore } from '../pokemon-trainer-state.store';
 
 import { PokemonTrainerService } from '../pokemon-trainer.service';
 
+import { PokemonWildBattleProgressionService } from './pokemon-wild-battle-progression.service';
+
 import { PokemonBattleSessionStore } from './pokemon-battle-session.store';
 
 import { PokemonBattleTurnStore } from './pokemon-battle-turn.store';
@@ -49,12 +51,15 @@ import { PokemonTrainerStateNetworkPresenter } from '../network/PokemonTrainerSt
 
 import { PokemonBattleTurnExecutor } from './pokemon-battle-turn.executor';
 
+import { createPokemonWildBattleProgressionPresentationEvents } from './pokemon-wild-battle-progression.presentation';
+
 export interface PokemonBattleNetworkControllerOptions {
   readonly trainerStateStore: PokemonTrainerStateStore;
   readonly trainerService: PokemonTrainerService;
   readonly battleSessionStore: PokemonBattleSessionStore;
   readonly battleTurnStore: PokemonBattleTurnStore;
   readonly turnExecutor: PokemonBattleTurnExecutor;
+  readonly wildBattleProgressionService: PokemonWildBattleProgressionService;
   readonly trainerStatePresenter: PokemonTrainerStateNetworkPresenter;
 }
 
@@ -64,6 +69,7 @@ export class PokemonBattleNetworkController {
   private readonly battleSessionStore: PokemonBattleSessionStore;
   private readonly battleTurnStore: PokemonBattleTurnStore;
   private readonly turnExecutor: PokemonBattleTurnExecutor;
+  private readonly wildBattleProgressionService: PokemonWildBattleProgressionService;
   private readonly trainerStatePresenter: PokemonTrainerStateNetworkPresenter;
 
   constructor(options: PokemonBattleNetworkControllerOptions) {
@@ -72,6 +78,7 @@ export class PokemonBattleNetworkController {
     this.battleSessionStore = options.battleSessionStore;
     this.battleTurnStore = options.battleTurnStore;
     this.turnExecutor = options.turnExecutor;
+    this.wildBattleProgressionService = options.wildBattleProgressionService;
     this.trainerStatePresenter = options.trainerStatePresenter;
   }
 
@@ -200,13 +207,16 @@ export class PokemonBattleNetworkController {
         }
       }
 
-      client.emit(POKEMON_EVENTS.BATTLE_TURN_RESOLVED, {
-        battleId: session.battle.battleId,
-        turnNumber: turn.number,
-        events: presentationEvents,
-      } satisfies PokemonBattleTurnResolvedPayload);
+      const emitTurnResolved = (): void => {
+        client.emit(POKEMON_EVENTS.BATTLE_TURN_RESOLVED, {
+          battleId: session.battle.battleId,
+          turnNumber: turn.number,
+          events: [...presentationEvents],
+        } satisfies PokemonBattleTurnResolvedPayload);
+      };
 
       if (terminalOutcome === 'trainer-escaped') {
+        emitTurnResolved();
         const updatedTrainerState = await this.syncBattleResultToTrainer(
           session,
           trainerBinding.trainerId,
@@ -233,6 +243,7 @@ export class PokemonBattleNetworkController {
       }
 
       if (terminalOutcome === 'wild-captured') {
+        emitTurnResolved();
         if (!trainerStateUpdate) {
           throw new Error(
             `Trainer state missing after successful capture in battle "${session.battle.battleId}"`,
@@ -267,17 +278,55 @@ export class PokemonBattleNetworkController {
         this.trainerStatePresenter.emitTrainerState(client, trainerStateUpdate);
       }
 
-      const battleIsTerminal =
-        continuationOutcome.type === 'trainer-defeated' ||
-        continuationOutcome.type === 'wild-defeated';
+      let updatedTrainerState: PokemonTrainerState | null = null;
 
-      const updatedTrainerState = battleIsTerminal
-        ? await this.syncBattleResultToTrainer(
+      /*
+       * ==========================================================
+       * TRAINER DEFEATED
+       * ==========================================================
+       */
+      if (continuationOutcome.type === 'trainer-defeated') {
+        updatedTrainerState = await this.syncBattleResultToTrainer(
+          session,
+          trainerBinding.trainerId,
+          trainerBinding.participantId,
+        );
+      }
+
+      /*
+       * ==========================================================
+       * WILD DEFEATED
+       * ==========================================================
+       */
+      if (continuationOutcome.type === 'wild-defeated') {
+        /* 1. Persist authoritative Battle consequences first */
+        await this.syncBattleResultToTrainer(
+          session,
+          trainerBinding.trainerId,
+          trainerBinding.participantId,
+        );
+
+        /* 2. Apply EXP to the Party atomically */
+        const progressionResult =
+          await this.wildBattleProgressionService.applyVictoryExperience(
             session,
-            trainerBinding.trainerId,
-            trainerBinding.participantId,
-          )
-        : null;
+          );
+
+        updatedTrainerState = progressionResult.trainerState;
+
+        presentationEvents.push(
+          ...createPokemonWildBattleProgressionPresentationEvents({
+            participantId: trainerBinding.participantId,
+            result: progressionResult,
+          }),
+        );
+      }
+
+      /*
+       * Battle lifecycle is applied only AFTER all
+       * persistence/progression has completed successfully.
+       */
+      emitTurnResolved();
 
       const outcomeRuntime = applyPokemonWildBattleOutcome({
         battleId: session.battle.battleId,

@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import { createPokemonParty, createPokemonInventory } from '@cesar-mmo/shared';
 
 import type { PokemonTrainerId } from './pokemon-trainer-identity';
@@ -7,6 +8,7 @@ import type {
   PokemonInventory,
 } from '@cesar-mmo/shared';
 
+@Injectable()
 export class PokemonTrainerStateStore {
   private readonly trainerStates = new Map<
     PokemonTrainerId,

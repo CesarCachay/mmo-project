@@ -104,6 +104,30 @@ export function formatBattlePresentationMessage(
 
       return `Gotcha! ${pokemonName} was caught!`;
     }
+
+    case "experience-gained": {
+      const pokemonName = getBattlePokemonDisplayName(
+        battle,
+        event.participantId,
+        event.pokemonInstanceId,
+      );
+
+      return `${pokemonName} gained ${event.gainedExperience} EXP!`;
+    }
+
+    case "pokemon-leveled-up": {
+      const pokemonName = getBattlePokemonDisplayName(
+        battle,
+        event.participantId,
+        event.pokemonInstanceId,
+      );
+
+      return `${pokemonName} grew to Lv. ${event.currentLevel}!`;
+    }
+
+    case "move-learning-required": {
+      return null;
+    }
   }
 }
 

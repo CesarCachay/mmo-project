@@ -295,6 +295,9 @@ export class GameScene extends Phaser.Scene {
       (input) => {
         this.network.sendBattleReplacement(input);
       },
+      (input) => {
+        this.network.sendPokemonMoveLearningDecision(input);
+      },
     );
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -663,6 +666,14 @@ export class GameScene extends Phaser.Scene {
 
     this.network.onBattleReplacementResolved((payload) => {
       void this.battleController.applyReplacement(payload);
+    });
+
+    this.network.onPokemonMoveLearningResolved((payload) => {
+      this.battleController.applyMoveLearningResolved(payload);
+    });
+
+    this.network.onPokemonMoveLearningError((payload) => {
+      this.battleController.applyMoveLearningError(payload);
     });
 
     this.network.onBattleCompleted((payload) => {

@@ -3,16 +3,21 @@ import { getPokemonFormsBySpecies } from "./pokemon-form.registry.js";
 import { getPokemonAbilitySet } from "./pokemon-ability-set.registry.js";
 import { getPokemonLearnset } from "./pokemon-learnset.registry.js";
 import { getPokemonMove } from "./pokemon-move.registry.js";
-
+import {
+  getExperienceForLevel,
+  MAX_POKEMON_LEVEL,
+} from "./progression/pokemon-experience.js";
+import { MAX_POKEMON_MOVE_SLOTS } from "./pokemon.types.js";
 import type { PokemonInstance, PokemonInstanceMove } from "./pokemon.types.js";
-
-const MAX_INSTANCE_MOVES = 4;
 
 function getInitialHp(baseHp: number, level: number): number {
   return Math.floor((2 * baseHp * level) / 100) + level + 10;
 }
 
-function getInitialMoves(speciesId: number, level: number): PokemonInstanceMove[] {
+function getInitialMoves(
+  speciesId: number,
+  level: number,
+): PokemonInstanceMove[] {
   const learnset = getPokemonLearnset(speciesId);
 
   if (!learnset) {
@@ -35,7 +40,7 @@ function getInitialMoves(speciesId: number, level: number): PokemonInstanceMove[
     moveIds.push(entry.moveId);
   }
 
-  return moveIds.slice(-MAX_INSTANCE_MOVES).map((moveId) => {
+  return moveIds.slice(-MAX_POKEMON_MOVE_SLOTS).map((moveId) => {
     const move = getPokemonMove(moveId);
 
     if (!move) {
@@ -49,15 +54,20 @@ function getInitialMoves(speciesId: number, level: number): PokemonInstanceMove[
   });
 }
 
-export function createPokemonInstance(speciesId: number, level: number): PokemonInstance {
+export function createPokemonInstance(
+  speciesId: number,
+  level: number,
+): PokemonInstance {
   if (!Number.isInteger(speciesId) || speciesId <= 0) {
     throw new Error(
-      `Pokémon speciesId must be a positive integer. Received: ${speciesId}`
+      `Pokémon speciesId must be a positive integer. Received: ${speciesId}`,
     );
   }
 
-  if (!Number.isInteger(level) || level < 1) {
-    throw new Error(`Pokémon level must be a positive integer. Received: ${level}`);
+  if (!Number.isInteger(level) || level < 1 || level > MAX_POKEMON_LEVEL) {
+    throw new Error(
+      `Pokémon level must be an integer between 1 and ${MAX_POKEMON_LEVEL}. Received: ${level}`,
+    );
   }
 
   const species = getPokemonSpecies(speciesId);
@@ -85,19 +95,23 @@ export function createPokemonInstance(speciesId: number, level: number): Pokemon
     .find((entry) => !entry.isHidden);
 
   if (!ability) {
-    throw new Error(`No standard Pokémon ability found for species ${speciesId}`);
+    throw new Error(
+      `No standard Pokémon ability found for species ${speciesId}`,
+    );
   }
 
   const moves = getInitialMoves(speciesId, level);
 
   const currentHp = getInitialHp(defaultForm.baseStats.hp, level);
 
+  const experience = getExperienceForLevel(species.growthRate, level);
+
   return {
     instanceId: globalThis.crypto.randomUUID(),
     speciesId,
     formId: defaultForm.formId,
     level,
-    experience: 0,
+    experience,
     currentHp,
     abilityId: ability.abilityId,
     moves,

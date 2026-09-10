@@ -5,6 +5,7 @@ import type {
   PokemonBattleCompletedPayload,
   PokemonInventory,
   PokemonItemId,
+  PokemonMoveLearningDecision,
 } from "@cesar-mmo/shared";
 
 import { BattleDomRoot } from "./modern/BattleDomRoot";
@@ -17,6 +18,12 @@ import { ModernBattleCompletionPanel } from "./modern/ModernBattleCompletionPane
 import { ModernBattleActionMenu } from "./modern/ModernBattleActionMenu";
 import { ModernBattleBagPanel } from "./modern/ModernBattleBagPanel";
 import { ModernBattleCaptureLayer } from "./modern/ModernBattleCaptureLayer";
+import { ModernBattlePartyExperiencePanel } from "./modern/ModernBattlePartyExperiencePanel";
+
+import {
+  ModernBattleMoveLearningPanel,
+  type MoveLearningPrompt,
+} from "./modern/ModernBattleMoveLearningPanel";
 
 // presentation
 import { ModernBattleMessagePanel } from "./modern/ModernBattleMessagePanel";
@@ -45,6 +52,10 @@ export class BattleOverlay {
   private readonly bagPanel: ModernBattleBagPanel;
 
   private readonly captureLayer: ModernBattleCaptureLayer;
+
+  private readonly moveLearningPanel: ModernBattleMoveLearningPanel;
+
+  private readonly partyExperiencePanel: ModernBattlePartyExperiencePanel;
 
   constructor(
     scene: Phaser.Scene,
@@ -101,6 +112,12 @@ export class BattleOverlay {
       onItemSelected: onBagItemSelected,
       onBack: onItemBack,
     });
+    this.moveLearningPanel = new ModernBattleMoveLearningPanel(
+      this.modernRoot.element,
+    );
+    this.partyExperiencePanel = new ModernBattlePartyExperiencePanel(
+      this.modernRoot.element,
+    );
 
     this.layout();
 
@@ -128,6 +145,8 @@ export class BattleOverlay {
     this.movePanel.clear();
     this.replacementPanel.clear();
     this.bagPanel.clear();
+    this.moveLearningPanel.clear();
+    this.partyExperiencePanel.clear();
   }
 
   public renderBattle(battle: BattleInstance): void {
@@ -164,6 +183,7 @@ export class BattleOverlay {
     this.wildHud.setPokemon(wildPokemon);
     this.actionMenu.setPokemon(trainerPokemon);
     this.movePanel.setPokemon(trainerPokemon);
+    this.partyExperiencePanel.renderParty(trainerParticipant.pokemon);
   }
 
   public destroy(): void {
@@ -175,6 +195,7 @@ export class BattleOverlay {
     this.actionMenu.destroy();
     this.movePanel.destroy();
     this.replacementPanel.destroy();
+    this.moveLearningPanel.destroy();
 
     this.captureLayer.clear();
 
@@ -183,6 +204,8 @@ export class BattleOverlay {
     this.messagePanel.destroy();
 
     this.completionPanel.destroy();
+
+    this.partyExperiencePanel.destroy();
 
     this.stage.destroy();
 
@@ -217,6 +240,7 @@ export class BattleOverlay {
     this.replacementPanel.setBounds(commandBounds, viewport);
     this.messagePanel.setBounds(commandBounds, viewport);
     this.bagPanel.setBounds(commandBounds, viewport);
+    this.moveLearningPanel.setBounds(commandBounds, viewport);
 
     /*
      * Conservamos exactamente la distribución
@@ -361,7 +385,9 @@ export class BattleOverlay {
     this.movePanel.setVisible(false);
     this.replacementPanel.setVisible(false);
     this.bagPanel.setVisible(false);
+    this.partyExperiencePanel.hide();
     this.completionPanel.show(outcome);
+    this.moveLearningPanel.setVisible(false);
   }
 
   public setVoluntaryPokemonOptions(battle: BattleInstance): void {
@@ -640,5 +666,100 @@ export class BattleOverlay {
     this.movePanel.setVisible(false);
     this.replacementPanel.setVisible(false);
     this.bagPanel.setVisible(false);
+  }
+
+  public requestMoveLearningDecision(
+    prompt: MoveLearningPrompt,
+  ): Promise<PokemonMoveLearningDecision> {
+    this.actionMenu.setVisible(false);
+    this.movePanel.setVisible(false);
+    this.replacementPanel.setVisible(false);
+    this.bagPanel.setVisible(false);
+    return this.moveLearningPanel.prompt(prompt);
+  }
+
+  public setMoveLearningWaiting(waiting: boolean): void {
+    this.moveLearningPanel.setWaiting(waiting);
+  }
+
+  public hideMoveLearning(): void {
+    this.moveLearningPanel.setVisible(false);
+  }
+
+  public animatePokemonExperienceGain(
+    battle: BattleInstance,
+    participantId: string,
+    pokemonInstanceId: string,
+    gainedExperience: number,
+    previousExperience: number,
+    currentExperience: number,
+    previousLevel: number,
+    currentLevel: number,
+  ): Promise<void> {
+    const participant = battle.participants.find(
+      (candidate) => candidate.id === participantId,
+    );
+
+    if (!participant || participant.type !== "trainer") {
+      return Promise.resolve();
+    }
+
+    this.hideCommandPanelsForPresentation();
+
+    const animations: Promise<void>[] = [
+      this.partyExperiencePanel.animateExperienceGain(
+        pokemonInstanceId,
+        gainedExperience,
+        previousExperience,
+        currentExperience,
+        previousLevel,
+        currentLevel,
+      ),
+    ];
+
+    /* El Pokémon activo conserva además su HUD grande de EXP */
+    if (this.trainerHud.isDisplayingPokemon(pokemonInstanceId)) {
+      animations.push(
+        this.trainerHud.animateExperienceGain(
+          pokemonInstanceId,
+          gainedExperience,
+          previousExperience,
+          currentExperience,
+          previousLevel,
+          currentLevel,
+        ),
+      );
+    }
+
+    return Promise.all(animations).then(() => undefined);
+  }
+
+  public animatePokemonLevelUp(
+    battle: BattleInstance,
+    participantId: string,
+    pokemonInstanceId: string,
+    currentLevel: number,
+  ): Promise<void> {
+    const participant = battle.participants.find(
+      (candidate) => candidate.id === participantId,
+    );
+
+    if (!participant || participant.type !== "trainer") {
+      return Promise.resolve();
+    }
+
+    this.hideCommandPanelsForPresentation();
+
+    const animations: Promise<void>[] = [
+      this.partyExperiencePanel.animateLevelUp(pokemonInstanceId, currentLevel),
+    ];
+
+    if (this.trainerHud.isDisplayingPokemon(pokemonInstanceId)) {
+      animations.push(
+        this.trainerHud.animateLevelUp(pokemonInstanceId, currentLevel),
+      );
+    }
+
+    return Promise.all(animations).then(() => undefined);
   }
 }

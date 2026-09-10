@@ -80,7 +80,10 @@ export type {
   PokemonTrainerState,
   PokemonFollowerPublicState,
 } from "./pokemon/pokemon.types.js";
-export { MAX_POKEMON_PARTY_SIZE } from "./pokemon/pokemon.types.js";
+export {
+  MAX_POKEMON_PARTY_SIZE,
+  MAX_POKEMON_MOVE_SLOTS,
+} from "./pokemon/pokemon.types.js";
 
 export { getPokemonSpecies } from "./pokemon/pokemon.registry.js";
 export {
@@ -298,6 +301,9 @@ export type {
   BattleHpRestoredEvent,
   BattleCaptureFailedPresentationEvent,
   BattleCaptureSucceededPresentationEvent,
+  BattleExperienceGainedEvent,
+  BattlePokemonLeveledUpEvent,
+  BattleMoveLearningRequiredEvent,
 } from "./pokemon/battles/pokemon-battle-presentation.js";
 export { isPokemonBattleTurnResolvedPayload } from "./pokemon/battles/pokemon-battle-presentation-network.js";
 export type { PokemonBattleTurnResolvedPayload } from "./pokemon/battles/pokemon-battle-presentation-network.js";
@@ -334,7 +340,13 @@ export type {
   PokemonItemEffect,
   PokemonItemDefinition,
 } from "./pokemon/items/pokemon-item.registry.js";
-export { calculatePokemonMaxHp } from "./pokemon/pokemon-stat.js";
+export {
+  calculatePokemonMaxHp,
+  calculatePokemonNonHpStat,
+  calculatePokemonDerivedStats,
+} from "./pokemon/pokemon-stat.js";
+
+export type { PokemonDerivedStats } from "./pokemon/pokemon-stat.js";
 export { planBattleHealingItemUse } from "./pokemon/inventory/pokemon-battle-healing-item.js";
 export type { BattleHealingItemPlan } from "./pokemon/inventory/pokemon-battle-healing-item.js";
 export {
@@ -390,3 +402,89 @@ export type {
   PokemonPartyReorderErrorCode,
   PokemonPartyReorderErrorPayload,
 } from "./pokemon/pokemon-party-reorder-network.js";
+
+// PROGRESSION
+export {
+  POKEMON_GROWTH_RATES,
+  isPokemonGrowthRate,
+} from "./pokemon/progression/pokemon-growth-rate.js";
+export type { PokemonGrowthRate } from "./pokemon/progression/pokemon-growth-rate.js";
+export {
+  MIN_POKEMON_LEVEL,
+  MAX_POKEMON_LEVEL,
+  getExperienceForLevel,
+  getLevelFromExperience,
+  getExperienceToNextLevel,
+} from "./pokemon/progression/pokemon-experience.js";
+export {
+  getPokemonLevelExperienceRange,
+  isPokemonExperienceCompatibleWithLevel,
+  assertPokemonExperienceCompatibleWithLevel,
+} from "./pokemon/progression/pokemon-progression-invariant.js";
+export type { PokemonLevelExperienceRange } from "./pokemon/progression/pokemon-progression-invariant.js";
+export { planPokemonExperienceGain } from "./pokemon/progression/pokemon-progression-plan.js";
+export type {
+  PlanPokemonExperienceGainInput,
+  PokemonExperienceProgressionPlan,
+} from "./pokemon/progression/pokemon-progression-plan.js";
+export { planPokemonLevelStatTransition } from "./pokemon/progression/pokemon-level-stat-transition.js";
+export type {
+  PlanPokemonLevelStatTransitionInput,
+  PokemonLevelStatTransition,
+} from "./pokemon/progression/pokemon-level-stat-transition.js";
+export { resolvePokemonLevelUpMoves } from "./pokemon/progression/pokemon-level-up-moves.js";
+export type {
+  PokemonLevelUpMoveCandidate,
+  ResolvePokemonLevelUpMovesInput,
+} from "./pokemon/progression/pokemon-level-up-moves.js";
+export { resolvePokemonMoveLearningCandidate } from "./pokemon/progression/pokemon-move-learning.js";
+export type {
+  PokemonMoveLearningSkipReason,
+  PokemonMoveLearningResolution,
+  ResolvePokemonMoveLearningCandidateInput,
+} from "./pokemon/progression/pokemon-move-learning.js";
+export { resolvePokemonMoveLearningDecision } from "./pokemon/progression/pokemon-move-learning-decision.js";
+export type {
+  PokemonPendingMoveLearningResolution,
+  PokemonMoveLearningDecision,
+  PokemonMoveLearningDecisionResult,
+  ResolvePokemonMoveLearningDecisionInput,
+} from "./pokemon/progression/pokemon-move-learning-decision.js";
+export { planPokemonMoveLearningSequence } from "./pokemon/progression/pokemon-move-learning-sequence.js";
+export type {
+  PlanPokemonMoveLearningSequenceInput,
+  PokemonMoveLearningSequenceResult,
+} from "./pokemon/progression/pokemon-move-learning-sequence.js";
+export { planPokemonProgression } from "./pokemon/progression/pokemon-progression.js";
+export type {
+  PlanPokemonProgressionInput,
+  PokemonProgressionPlan,
+} from "./pokemon/progression/pokemon-progression.js";
+// Pokémon Battle Experience
+export { calculateWildBattleExperienceReward } from "./pokemon/progression/pokemon-experience-reward.js";
+export type {
+  CalculateWildBattleExperienceRewardInput,
+  PokemonWildBattleExperienceReward,
+} from "./pokemon/progression/pokemon-experience-reward.js";
+export {
+  POKEMON_SHARED_EXPERIENCE_RATIO,
+  distributePokemonPartyExperience,
+} from "./pokemon/progression/pokemon-party-experience.js";
+export type {
+  PokemonPartyExperienceSnapshot,
+  PokemonPartyExperienceRewardReason,
+  PokemonPartyExperienceReward,
+  DistributePokemonPartyExperienceInput,
+  PokemonPartyExperienceDistribution,
+} from "./pokemon/progression/pokemon-party-experience.js";
+export {
+  isPokemonMoveLearningDecisionInput,
+  isPokemonMoveLearningResolvedPayload,
+  isPokemonMoveLearningErrorPayload,
+} from "./pokemon/progression/pokemon-progression-network.js";
+export type {
+  PokemonPendingMoveLearningNetworkState,
+  PokemonMoveLearningDecisionInput,
+  PokemonMoveLearningResolvedPayload,
+  PokemonMoveLearningErrorPayload,
+} from "./pokemon/progression/pokemon-progression-network.js";

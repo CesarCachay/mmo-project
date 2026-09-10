@@ -1,3 +1,9 @@
+import {
+  getExperienceForLevel,
+  getPokemonSpecies,
+  MAX_POKEMON_LEVEL,
+} from "@cesar-mmo/shared";
+
 import type { BattlePokemonState } from "@cesar-mmo/shared";
 
 import {
@@ -46,9 +52,16 @@ export class ModernBattlePokemonHud {
   private readonly hpText: HTMLSpanElement;
   private readonly hpFill: HTMLDivElement;
 
+  private readonly progression: HTMLDivElement;
+  private readonly experienceText: HTMLSpanElement;
+  private readonly experienceTrack: HTMLDivElement;
+  private readonly experienceFill: HTMLDivElement;
+
   private pokemonState?: BattlePokemonState;
   private hpAnimationFrame?: number;
   private hpAnimationResolve?: () => void;
+  private experienceAnimationTimer?: number;
+  private experienceAnimationResolve?: () => void;
 
   private spriteAnimationTimer?: number;
   private spriteAnimationResolve?: () => void;
@@ -119,7 +132,29 @@ export class ModernBattlePokemonHud {
     this.hpFill.className = "battle-modern-hud__hp-fill";
     hpTrack.appendChild(this.hpFill);
 
-    this.card.append(header, hpHeader, hpTrack);
+    this.progression = document.createElement("div");
+
+    this.progression.className = "battle-progression";
+
+    this.experienceText = document.createElement("span");
+
+    this.experienceText.className = "battle-progression__exp-text";
+
+    this.experienceText.textContent = "EXP";
+
+    this.experienceTrack = document.createElement("div");
+
+    this.experienceTrack.className = "battle-progression__track";
+
+    this.experienceFill = document.createElement("div");
+
+    this.experienceFill.className = "battle-progression__fill";
+
+    this.experienceTrack.appendChild(this.experienceFill);
+
+    this.progression.append(this.experienceText, this.experienceTrack);
+
+    this.card.append(header, hpHeader, hpTrack, this.progression);
 
     this.root.append(this.sprite, this.hitSprite, this.healFx, this.card);
 
@@ -153,6 +188,7 @@ export class ModernBattlePokemonHud {
     this.finishPendingHpAnimation();
     this.finishPendingHitAnimation();
     this.finishPendingSpriteAnimation();
+    this.finishPendingExperienceAnimation();
 
     this.sprite.classList.remove(
       "battle-modern-hud__sprite--switched-out",
@@ -196,10 +232,9 @@ export class ModernBattlePokemonHud {
     this.hitSprite.src = battleAsset.path;
 
     this.name.textContent = getPokemonDisplayName(pokemon);
-
     this.level.textContent = `Lv. ${pokemon.level}`;
-
     this.renderHp(currentHp, maxHp);
+    this.renderExperience(pokemon.speciesId, pokemon.experience, pokemon.level);
 
     if (currentHp === 0) {
       this.sprite.classList.add("battle-modern-hud__sprite--fainted");
@@ -215,6 +250,7 @@ export class ModernBattlePokemonHud {
     this.finishPendingHitAnimation();
     this.finishPendingSpriteAnimation();
     this.finishPendingHealEffect();
+    this.finishPendingExperienceAnimation();
 
     this.pokemonState = undefined;
 
@@ -245,6 +281,22 @@ export class ModernBattlePokemonHud {
       "battle-modern-hud__sprite--captured-hidden",
     );
 
+    this.progression.hidden = true;
+
+    this.experienceText.textContent = "EXP";
+
+    this.experienceFill.classList.remove("battle-progression__fill--gaining");
+
+    this.experienceFill.style.width = "0%";
+
+    this.level.classList.remove("battle-progression__level--up");
+
+    this.card.classList.remove("battle-progression__card--level-up");
+
+    this.progression.classList.remove("battle-progression--visible");
+
+    this.experienceFill.style.removeProperty("--battle-exp-duration");
+
     this.sprite.removeAttribute("src");
 
     this.hitSprite.removeAttribute("src");
@@ -260,7 +312,6 @@ export class ModernBattlePokemonHud {
 
   private renderHp(currentHp: number, maxHp: number): void {
     const safeMaxHp = Math.max(0, maxHp);
-
     const safeCurrentHp = Math.max(
       0,
       Math.min(safeMaxHp, Math.round(currentHp)),
@@ -268,11 +319,8 @@ export class ModernBattlePokemonHud {
 
     const hpRatio =
       safeMaxHp > 0 ? Math.max(0, Math.min(1, safeCurrentHp / safeMaxHp)) : 0;
-
     this.hpText.textContent = `${safeCurrentHp} / ${safeMaxHp}`;
-
     this.hpFill.style.width = `${hpRatio * 100}%`;
-
     this.hpFill.classList.remove(
       "battle-modern-hud__hp-fill--healthy",
       "battle-modern-hud__hp-fill--warning",
@@ -286,6 +334,25 @@ export class ModernBattlePokemonHud {
     } else {
       this.hpFill.classList.add("battle-modern-hud__hp-fill--danger");
     }
+  }
+
+  private renderExperience(
+    speciesId: number,
+    experience: number,
+    level: number,
+  ): void {
+    /* Wild Pokémon never need an EXP bar */
+    if (this.side !== "trainer") {
+      this.progression.hidden = true;
+      return;
+    }
+
+    this.progression.hidden = false;
+    this.progression.classList.add("battle-progression--visible");
+    this.experienceText.textContent = "EXP";
+    this.setExperienceRatio(
+      this.getExperienceLevelRatio(speciesId, experience, level),
+    );
   }
 
   public isDisplayingPokemon(pokemonInstanceId: string): boolean {
@@ -346,6 +413,269 @@ export class ModernBattlePokemonHud {
         this.hpAnimationFrame = window.requestAnimationFrame(tick);
       };
       this.hpAnimationFrame = window.requestAnimationFrame(tick);
+    });
+  }
+
+  public async animateExperienceGain(
+    pokemonInstanceId: string,
+    gainedExperience: number,
+    previousExperience: number,
+    currentExperience: number,
+    previousLevel: number,
+    currentLevel: number,
+    durationMs = 900,
+  ): Promise<void> {
+    const state = this.pokemonState;
+
+    if (!state || state.pokemon.instanceId !== pokemonInstanceId) {
+      return;
+    }
+
+    if (!Number.isInteger(gainedExperience) || gainedExperience <= 0) {
+      return;
+    }
+
+    if (
+      !Number.isInteger(previousExperience) ||
+      !Number.isInteger(currentExperience) ||
+      previousExperience < 0 ||
+      currentExperience < previousExperience
+    ) {
+      return;
+    }
+
+    if (
+      !Number.isInteger(previousLevel) ||
+      !Number.isInteger(currentLevel) ||
+      previousLevel < 1 ||
+      currentLevel < previousLevel ||
+      currentLevel > MAX_POKEMON_LEVEL
+    ) {
+      return;
+    }
+
+    const pokemon = state.pokemon;
+
+    const species = getPokemonSpecies(pokemon.speciesId);
+
+    if (!species) {
+      console.warn("[BattleProgression] species missing while animating EXP", {
+        speciesId: pokemon.speciesId,
+        pokemonInstanceId,
+      });
+
+      return;
+    }
+
+    this.finishPendingExperienceAnimation();
+    this.progression.hidden = false;
+    this.progression.classList.add("battle-progression--visible");
+    this.experienceText.textContent = `EXP +${gainedExperience}`;
+    const prefersReducedMotion =
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+    const safeDuration = prefersReducedMotion ? 0 : Math.max(0, durationMs);
+    const finalRatio = this.getExperienceLevelRatio(
+      pokemon.speciesId,
+      currentExperience,
+      currentLevel,
+    );
+
+    if (safeDuration === 0) {
+      this.level.textContent = `Lv. ${currentLevel}`;
+      this.setExperienceRatio(finalRatio);
+      this.experienceText.textContent = "EXP";
+      return;
+    }
+
+    let displayedLevel = previousLevel;
+
+    let fromRatio = this.getExperienceLevelRatio(
+      pokemon.speciesId,
+      previousExperience,
+      previousLevel,
+    );
+
+    this.level.textContent = `Lv. ${displayedLevel}`;
+    this.setExperienceRatio(fromRatio);
+
+    while (displayedLevel < currentLevel) {
+      await this.animateExperienceRatio(fromRatio, 1, safeDuration);
+
+      if (!this.isDisplayingPokemon(pokemonInstanceId)) {
+        return;
+      }
+
+      displayedLevel += 1;
+
+      this.level.textContent = `Lv. ${displayedLevel}`;
+
+      /* Lv100 has no next level, so we present a full bar */
+      if (displayedLevel >= MAX_POKEMON_LEVEL) {
+        this.setExperienceRatio(1);
+
+        fromRatio = 1;
+        break;
+      }
+
+      /* Level threshold crossed. New level starts at 0% */
+      this.setExperienceRatio(0);
+      fromRatio = 0;
+    }
+
+    /* Animate whatever EXP remains inside the final level */
+    if (currentLevel < MAX_POKEMON_LEVEL && finalRatio > fromRatio) {
+      await this.animateExperienceRatio(fromRatio, finalRatio, safeDuration);
+    } else {
+      this.setExperienceRatio(finalRatio);
+    }
+
+    if (!this.isDisplayingPokemon(pokemonInstanceId)) {
+      return;
+    }
+
+    this.level.textContent = `Lv. ${currentLevel}`;
+    this.setExperienceRatio(finalRatio);
+    this.experienceText.textContent = "EXP";
+  }
+
+  private getExperienceLevelRatio(
+    speciesId: number,
+    totalExperience: number,
+    level: number,
+  ): number {
+    if (level >= MAX_POKEMON_LEVEL) {
+      return 1;
+    }
+
+    const species = getPokemonSpecies(speciesId);
+
+    if (!species) {
+      return 0;
+    }
+
+    const levelFloor = getExperienceForLevel(species.growthRate, level);
+    const nextLevelFloor = getExperienceForLevel(species.growthRate, level + 1);
+    const levelSpan = nextLevelFloor - levelFloor;
+
+    if (levelSpan <= 0) {
+      return 0;
+    }
+
+    return Math.max(0, Math.min(1, (totalExperience - levelFloor) / levelSpan));
+  }
+
+  private setExperienceRatio(ratio: number): void {
+    const safeRatio = Math.max(0, Math.min(1, ratio));
+    this.experienceFill.style.width = `${safeRatio * 100}%`;
+  }
+
+  private animateExperienceRatio(
+    fromRatio: number,
+    toRatio: number,
+    fullBarDurationMs: number,
+  ): Promise<void> {
+    this.finishPendingExperienceAnimation();
+
+    const safeFrom = Math.max(0, Math.min(1, fromRatio));
+
+    const safeTo = Math.max(0, Math.min(1, toRatio));
+
+    const distance = Math.abs(safeTo - safeFrom);
+
+    const durationMs = Math.max(
+      180,
+      Math.min(
+        fullBarDurationMs,
+        Math.round(fullBarDurationMs * Math.max(0.25, distance)),
+      ),
+    );
+
+    this.experienceFill.classList.remove("battle-progression__fill--gaining");
+
+    this.setExperienceRatio(safeFrom);
+
+    this.experienceFill.style.setProperty(
+      "--battle-exp-duration",
+      `${durationMs}ms`,
+    );
+
+    void this.experienceFill.offsetWidth;
+
+    this.experienceFill.classList.add("battle-progression__fill--gaining");
+
+    this.setExperienceRatio(safeTo);
+
+    return new Promise<void>((resolve) => {
+      this.experienceAnimationResolve = resolve;
+      this.experienceAnimationTimer = window.setTimeout(() => {
+        this.experienceAnimationTimer = undefined;
+        this.experienceAnimationResolve = undefined;
+        this.experienceFill.classList.remove(
+          "battle-progression__fill--gaining",
+        );
+        resolve();
+      }, durationMs);
+    });
+  }
+
+  private finishPendingExperienceAnimation(): void {
+    if (this.experienceAnimationTimer !== undefined) {
+      window.clearTimeout(this.experienceAnimationTimer);
+      this.experienceAnimationTimer = undefined;
+    }
+
+    this.experienceFill.classList.remove("battle-progression__fill--gaining");
+    this.experienceFill.style.removeProperty("--battle-exp-duration");
+    const resolve = this.experienceAnimationResolve;
+    this.experienceAnimationResolve = undefined;
+    resolve?.();
+  }
+
+  public animateLevelUp(
+    pokemonInstanceId: string,
+    currentLevel: number,
+    durationMs = 900,
+  ): Promise<void> {
+    if (!this.isDisplayingPokemon(pokemonInstanceId)) {
+      return Promise.resolve();
+    }
+
+    if (
+      !Number.isInteger(currentLevel) ||
+      currentLevel < 1 ||
+      currentLevel > 100
+    ) {
+      return Promise.resolve();
+    }
+
+    /* El Level viene del evento autoritativo enviado por el servidor */
+    this.level.textContent = `Lv. ${currentLevel}`;
+
+    const prefersReducedMotion =
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+
+    const safeDuration = prefersReducedMotion ? 0 : Math.max(0, durationMs);
+
+    this.level.classList.remove("battle-progression__level--up");
+    this.card.classList.remove("battle-progression__card--level-up");
+
+    /* Restart animation */
+    void this.level.offsetWidth;
+    this.level.classList.add("battle-progression__level--up");
+    this.card.classList.add("battle-progression__card--level-up");
+
+    if (safeDuration === 0) {
+      this.level.classList.remove("battle-progression__level--up");
+      this.card.classList.remove("battle-progression__card--level-up");
+      return Promise.resolve();
+    }
+
+    return new Promise<void>((resolve) => {
+      window.setTimeout(() => {
+        this.level.classList.remove("battle-progression__level--up");
+        this.card.classList.remove("battle-progression__card--level-up");
+        resolve();
+      }, safeDuration);
     });
   }
 
@@ -559,13 +889,9 @@ export class ModernBattlePokemonHud {
 
       this.spriteAnimationTimer = window.setTimeout(() => {
         this.spriteAnimationTimer = undefined;
-
         this.spriteAnimationResolve = undefined;
-
         this.sprite.classList.remove(className);
-
         this.sprite.style.removeProperty("--battle-sprite-animation-duration");
-
         resolve();
       }, safeDuration);
     });
@@ -670,15 +996,11 @@ export class ModernBattlePokemonHud {
 
   private syncHealEffectLayout(): void {
     const paddingX = Math.max(14, this.sprite.offsetWidth * 0.08);
-
     const paddingY = Math.max(12, this.sprite.offsetHeight * 0.06);
 
     this.healFx.style.left = `${this.sprite.offsetLeft - paddingX}px`;
-
     this.healFx.style.top = `${this.sprite.offsetTop - paddingY}px`;
-
     this.healFx.style.width = `${this.sprite.offsetWidth + paddingX * 2}px`;
-
     this.healFx.style.height = `${this.sprite.offsetHeight + paddingY * 2}px`;
   }
 

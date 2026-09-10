@@ -298,6 +298,7 @@ export type PokemonInstanceWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"PokemonInstance"> | Date | string
   trainer?: Prisma.XOR<Prisma.PokemonTrainerScalarRelationFilter, Prisma.PokemonTrainerWhereInput>
   moves?: Prisma.PokemonInstanceMoveListRelationFilter
+  pendingMoveLearning?: Prisma.XOR<Prisma.PokemonPendingMoveLearningNullableScalarRelationFilter, Prisma.PokemonPendingMoveLearningWhereInput> | null
 }
 
 export type PokemonInstanceOrderByWithRelationInput = {
@@ -315,6 +316,7 @@ export type PokemonInstanceOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   trainer?: Prisma.PokemonTrainerOrderByWithRelationInput
   moves?: Prisma.PokemonInstanceMoveOrderByRelationAggregateInput
+  pendingMoveLearning?: Prisma.PokemonPendingMoveLearningOrderByWithRelationInput
 }
 
 export type PokemonInstanceWhereUniqueInput = Prisma.AtLeast<{
@@ -336,6 +338,7 @@ export type PokemonInstanceWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"PokemonInstance"> | Date | string
   trainer?: Prisma.XOR<Prisma.PokemonTrainerScalarRelationFilter, Prisma.PokemonTrainerWhereInput>
   moves?: Prisma.PokemonInstanceMoveListRelationFilter
+  pendingMoveLearning?: Prisma.XOR<Prisma.PokemonPendingMoveLearningNullableScalarRelationFilter, Prisma.PokemonPendingMoveLearningWhereInput> | null
 }, "id" | "trainerId_partyPosition">
 
 export type PokemonInstanceOrderByWithAggregationInput = {
@@ -390,6 +393,7 @@ export type PokemonInstanceCreateInput = {
   updatedAt?: Date | string
   trainer: Prisma.PokemonTrainerCreateNestedOneWithoutPokemonInstancesInput
   moves?: Prisma.PokemonInstanceMoveCreateNestedManyWithoutPokemonInput
+  pendingMoveLearning?: Prisma.PokemonPendingMoveLearningCreateNestedOneWithoutPokemonInput
 }
 
 export type PokemonInstanceUncheckedCreateInput = {
@@ -406,6 +410,7 @@ export type PokemonInstanceUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   moves?: Prisma.PokemonInstanceMoveUncheckedCreateNestedManyWithoutPokemonInput
+  pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUncheckedCreateNestedOneWithoutPokemonInput
 }
 
 export type PokemonInstanceUpdateInput = {
@@ -422,6 +427,7 @@ export type PokemonInstanceUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   trainer?: Prisma.PokemonTrainerUpdateOneRequiredWithoutPokemonInstancesNestedInput
   moves?: Prisma.PokemonInstanceMoveUpdateManyWithoutPokemonNestedInput
+  pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUpdateOneWithoutPokemonNestedInput
 }
 
 export type PokemonInstanceUncheckedUpdateInput = {
@@ -438,6 +444,7 @@ export type PokemonInstanceUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   moves?: Prisma.PokemonInstanceMoveUncheckedUpdateManyWithoutPokemonNestedInput
+  pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUncheckedUpdateOneWithoutPokemonNestedInput
 }
 
 export type PokemonInstanceCreateManyInput = {
@@ -641,6 +648,20 @@ export type PokemonInstanceUpdateOneRequiredWithoutMovesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PokemonInstanceUpdateToOneWithWhereWithoutMovesInput, Prisma.PokemonInstanceUpdateWithoutMovesInput>, Prisma.PokemonInstanceUncheckedUpdateWithoutMovesInput>
 }
 
+export type PokemonInstanceCreateNestedOneWithoutPendingMoveLearningInput = {
+  create?: Prisma.XOR<Prisma.PokemonInstanceCreateWithoutPendingMoveLearningInput, Prisma.PokemonInstanceUncheckedCreateWithoutPendingMoveLearningInput>
+  connectOrCreate?: Prisma.PokemonInstanceCreateOrConnectWithoutPendingMoveLearningInput
+  connect?: Prisma.PokemonInstanceWhereUniqueInput
+}
+
+export type PokemonInstanceUpdateOneRequiredWithoutPendingMoveLearningNestedInput = {
+  create?: Prisma.XOR<Prisma.PokemonInstanceCreateWithoutPendingMoveLearningInput, Prisma.PokemonInstanceUncheckedCreateWithoutPendingMoveLearningInput>
+  connectOrCreate?: Prisma.PokemonInstanceCreateOrConnectWithoutPendingMoveLearningInput
+  upsert?: Prisma.PokemonInstanceUpsertWithoutPendingMoveLearningInput
+  connect?: Prisma.PokemonInstanceWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PokemonInstanceUpdateToOneWithWhereWithoutPendingMoveLearningInput, Prisma.PokemonInstanceUpdateWithoutPendingMoveLearningInput>, Prisma.PokemonInstanceUncheckedUpdateWithoutPendingMoveLearningInput>
+}
+
 export type PokemonInstanceCreateWithoutTrainerInput = {
   id: string
   speciesId: number
@@ -654,6 +675,7 @@ export type PokemonInstanceCreateWithoutTrainerInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   moves?: Prisma.PokemonInstanceMoveCreateNestedManyWithoutPokemonInput
+  pendingMoveLearning?: Prisma.PokemonPendingMoveLearningCreateNestedOneWithoutPokemonInput
 }
 
 export type PokemonInstanceUncheckedCreateWithoutTrainerInput = {
@@ -669,6 +691,7 @@ export type PokemonInstanceUncheckedCreateWithoutTrainerInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   moves?: Prisma.PokemonInstanceMoveUncheckedCreateNestedManyWithoutPokemonInput
+  pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUncheckedCreateNestedOneWithoutPokemonInput
 }
 
 export type PokemonInstanceCreateOrConnectWithoutTrainerInput = {
@@ -728,6 +751,7 @@ export type PokemonInstanceCreateWithoutMovesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   trainer: Prisma.PokemonTrainerCreateNestedOneWithoutPokemonInstancesInput
+  pendingMoveLearning?: Prisma.PokemonPendingMoveLearningCreateNestedOneWithoutPokemonInput
 }
 
 export type PokemonInstanceUncheckedCreateWithoutMovesInput = {
@@ -743,6 +767,7 @@ export type PokemonInstanceUncheckedCreateWithoutMovesInput = {
   partyPosition?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUncheckedCreateNestedOneWithoutPokemonInput
 }
 
 export type PokemonInstanceCreateOrConnectWithoutMovesInput = {
@@ -774,6 +799,7 @@ export type PokemonInstanceUpdateWithoutMovesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   trainer?: Prisma.PokemonTrainerUpdateOneRequiredWithoutPokemonInstancesNestedInput
+  pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUpdateOneWithoutPokemonNestedInput
 }
 
 export type PokemonInstanceUncheckedUpdateWithoutMovesInput = {
@@ -789,6 +815,87 @@ export type PokemonInstanceUncheckedUpdateWithoutMovesInput = {
   partyPosition?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUncheckedUpdateOneWithoutPokemonNestedInput
+}
+
+export type PokemonInstanceCreateWithoutPendingMoveLearningInput = {
+  id: string
+  speciesId: number
+  formId: number
+  nickname?: string | null
+  level: number
+  experience: number
+  currentHp: number
+  abilityId: number
+  partyPosition?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  trainer: Prisma.PokemonTrainerCreateNestedOneWithoutPokemonInstancesInput
+  moves?: Prisma.PokemonInstanceMoveCreateNestedManyWithoutPokemonInput
+}
+
+export type PokemonInstanceUncheckedCreateWithoutPendingMoveLearningInput = {
+  id: string
+  trainerId: string
+  speciesId: number
+  formId: number
+  nickname?: string | null
+  level: number
+  experience: number
+  currentHp: number
+  abilityId: number
+  partyPosition?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  moves?: Prisma.PokemonInstanceMoveUncheckedCreateNestedManyWithoutPokemonInput
+}
+
+export type PokemonInstanceCreateOrConnectWithoutPendingMoveLearningInput = {
+  where: Prisma.PokemonInstanceWhereUniqueInput
+  create: Prisma.XOR<Prisma.PokemonInstanceCreateWithoutPendingMoveLearningInput, Prisma.PokemonInstanceUncheckedCreateWithoutPendingMoveLearningInput>
+}
+
+export type PokemonInstanceUpsertWithoutPendingMoveLearningInput = {
+  update: Prisma.XOR<Prisma.PokemonInstanceUpdateWithoutPendingMoveLearningInput, Prisma.PokemonInstanceUncheckedUpdateWithoutPendingMoveLearningInput>
+  create: Prisma.XOR<Prisma.PokemonInstanceCreateWithoutPendingMoveLearningInput, Prisma.PokemonInstanceUncheckedCreateWithoutPendingMoveLearningInput>
+  where?: Prisma.PokemonInstanceWhereInput
+}
+
+export type PokemonInstanceUpdateToOneWithWhereWithoutPendingMoveLearningInput = {
+  where?: Prisma.PokemonInstanceWhereInput
+  data: Prisma.XOR<Prisma.PokemonInstanceUpdateWithoutPendingMoveLearningInput, Prisma.PokemonInstanceUncheckedUpdateWithoutPendingMoveLearningInput>
+}
+
+export type PokemonInstanceUpdateWithoutPendingMoveLearningInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  speciesId?: Prisma.IntFieldUpdateOperationsInput | number
+  formId?: Prisma.IntFieldUpdateOperationsInput | number
+  nickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.IntFieldUpdateOperationsInput | number
+  experience?: Prisma.IntFieldUpdateOperationsInput | number
+  currentHp?: Prisma.IntFieldUpdateOperationsInput | number
+  abilityId?: Prisma.IntFieldUpdateOperationsInput | number
+  partyPosition?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  trainer?: Prisma.PokemonTrainerUpdateOneRequiredWithoutPokemonInstancesNestedInput
+  moves?: Prisma.PokemonInstanceMoveUpdateManyWithoutPokemonNestedInput
+}
+
+export type PokemonInstanceUncheckedUpdateWithoutPendingMoveLearningInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  trainerId?: Prisma.StringFieldUpdateOperationsInput | string
+  speciesId?: Prisma.IntFieldUpdateOperationsInput | number
+  formId?: Prisma.IntFieldUpdateOperationsInput | number
+  nickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.IntFieldUpdateOperationsInput | number
+  experience?: Prisma.IntFieldUpdateOperationsInput | number
+  currentHp?: Prisma.IntFieldUpdateOperationsInput | number
+  abilityId?: Prisma.IntFieldUpdateOperationsInput | number
+  partyPosition?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  moves?: Prisma.PokemonInstanceMoveUncheckedUpdateManyWithoutPokemonNestedInput
 }
 
 export type PokemonInstanceCreateManyTrainerInput = {
@@ -818,6 +925,7 @@ export type PokemonInstanceUpdateWithoutTrainerInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   moves?: Prisma.PokemonInstanceMoveUpdateManyWithoutPokemonNestedInput
+  pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUpdateOneWithoutPokemonNestedInput
 }
 
 export type PokemonInstanceUncheckedUpdateWithoutTrainerInput = {
@@ -833,6 +941,7 @@ export type PokemonInstanceUncheckedUpdateWithoutTrainerInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   moves?: Prisma.PokemonInstanceMoveUncheckedUpdateManyWithoutPokemonNestedInput
+  pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUncheckedUpdateOneWithoutPokemonNestedInput
 }
 
 export type PokemonInstanceUncheckedUpdateManyWithoutTrainerInput = {
@@ -895,6 +1004,7 @@ export type PokemonInstanceSelect<ExtArgs extends runtime.Types.Extensions.Inter
   updatedAt?: boolean
   trainer?: boolean | Prisma.PokemonTrainerDefaultArgs<ExtArgs>
   moves?: boolean | Prisma.PokemonInstance$movesArgs<ExtArgs>
+  pendingMoveLearning?: boolean | Prisma.PokemonInstance$pendingMoveLearningArgs<ExtArgs>
   _count?: boolean | Prisma.PokemonInstanceCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["pokemonInstance"]>
 
@@ -949,6 +1059,7 @@ export type PokemonInstanceOmit<ExtArgs extends runtime.Types.Extensions.Interna
 export type PokemonInstanceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   trainer?: boolean | Prisma.PokemonTrainerDefaultArgs<ExtArgs>
   moves?: boolean | Prisma.PokemonInstance$movesArgs<ExtArgs>
+  pendingMoveLearning?: boolean | Prisma.PokemonInstance$pendingMoveLearningArgs<ExtArgs>
   _count?: boolean | Prisma.PokemonInstanceCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PokemonInstanceIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -963,6 +1074,7 @@ export type $PokemonInstancePayload<ExtArgs extends runtime.Types.Extensions.Int
   objects: {
     trainer: Prisma.$PokemonTrainerPayload<ExtArgs>
     moves: Prisma.$PokemonInstanceMovePayload<ExtArgs>[]
+    pendingMoveLearning: Prisma.$PokemonPendingMoveLearningPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1373,6 +1485,7 @@ export interface Prisma__PokemonInstanceClient<T, Null = never, ExtArgs extends 
   readonly [Symbol.toStringTag]: "PrismaPromise"
   trainer<T extends Prisma.PokemonTrainerDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PokemonTrainerDefaultArgs<ExtArgs>>): Prisma.Prisma__PokemonTrainerClient<runtime.Types.Result.GetResult<Prisma.$PokemonTrainerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   moves<T extends Prisma.PokemonInstance$movesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PokemonInstance$movesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PokemonInstanceMovePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  pendingMoveLearning<T extends Prisma.PokemonInstance$pendingMoveLearningArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PokemonInstance$pendingMoveLearningArgs<ExtArgs>>): Prisma.Prisma__PokemonPendingMoveLearningClient<runtime.Types.Result.GetResult<Prisma.$PokemonPendingMoveLearningPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1836,6 +1949,25 @@ export type PokemonInstance$movesArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.PokemonInstanceMoveScalarFieldEnum | Prisma.PokemonInstanceMoveScalarFieldEnum[]
+}
+
+/**
+ * PokemonInstance.pendingMoveLearning
+ */
+export type PokemonInstance$pendingMoveLearningArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PokemonPendingMoveLearning
+   */
+  select?: Prisma.PokemonPendingMoveLearningSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PokemonPendingMoveLearning
+   */
+  omit?: Prisma.PokemonPendingMoveLearningOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PokemonPendingMoveLearningInclude<ExtArgs> | null
+  where?: Prisma.PokemonPendingMoveLearningWhereInput
 }
 
 /**

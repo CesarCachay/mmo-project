@@ -1,4 +1,5 @@
 import { PokemonInventory } from "./inventory/pokemon-inventory.js";
+import type { PokemonGrowthRate } from "./progression/pokemon-growth-rate.js";
 
 export type PokemonType =
   | "normal"
@@ -37,6 +38,9 @@ export interface PokemonSpecies {
   height: number;
   weight: number;
   baseExperience: number | null;
+
+  growthRate: PokemonGrowthRate;
+
   captureRate: number;
   generation: number;
   evolutionChainId: number | null;
@@ -113,6 +117,8 @@ export interface PokemonForm {
 }
 
 export type PokemonTypeEffectiveness = 0 | 0.5 | 1 | 2;
+
+export const MAX_POKEMON_MOVE_SLOTS = 4;
 
 export interface PokemonInstanceMove {
   moveId: number;

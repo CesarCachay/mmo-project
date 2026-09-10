@@ -22,6 +22,8 @@ model PokemonTrainer {
   pokemonInstances PokemonInstance[]
   inventoryItems   PokemonTrainerInventoryItem[]
 
+  pendingMoveLearning PokemonPendingMoveLearning[]
+
   @@map("pokemon_trainers")
 }
 
@@ -45,6 +47,8 @@ model PokemonInstance {
 
   moves PokemonInstanceMove[]
 
+  pendingMoveLearning PokemonPendingMoveLearning?
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -64,6 +68,30 @@ model PokemonInstanceMove {
 
   @@id([pokemonInstanceId, slot])
   @@map("pokemon_instance_moves")
+}
+
+model PokemonPendingMoveLearning {
+  id String @id @default(uuid()) @db.Uuid
+
+  trainerId         String @map("trainer_id") @db.Uuid
+  pokemonInstanceId String @unique @map("pokemon_instance_id") @db.Uuid
+
+  candidateMoveId         Int @map("candidate_move_id")
+  candidateLearnedAtLevel Int @map("candidate_learned_at_level")
+
+  remainingCandidates Json @map("remaining_candidates") @db.JsonB
+
+  revision Int @default(0)
+
+  trainer PokemonTrainer @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+
+  pokemon PokemonInstance @relation(fields: [pokemonInstanceId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([trainerId])
+  @@map("pokemon_pending_move_learning")
 }
 
 model PokemonTrainerInventoryItem {

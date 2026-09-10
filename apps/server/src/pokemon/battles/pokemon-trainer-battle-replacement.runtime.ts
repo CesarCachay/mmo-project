@@ -5,7 +5,10 @@ import {
 
 import type { BattleParticipant } from '@cesar-mmo/shared';
 
-import type { PokemonBattleSession } from './pokemon-battle-session.js';
+import {
+  markPokemonBattleParticipation,
+  type PokemonBattleSession,
+} from './pokemon-battle-session.js';
 
 import type { PokemonBattleTurnStore } from './pokemon-battle-turn.store.js';
 
@@ -88,6 +91,12 @@ export function applyPokemonTrainerBattleReplacement(
   const replacementResult = replaceFaintedTrainerBattlePokemon(
     trainerParticipant,
     replacementPokemonIndex,
+  );
+
+  markPokemonBattleParticipation(
+    session,
+    trainerParticipant.id,
+    replacementResult.activePokemon.pokemon.instanceId,
   );
 
   // 6. Replacement must return Battle

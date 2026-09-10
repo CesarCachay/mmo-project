@@ -400,6 +400,7 @@ export const ModelName = {
   PokemonTrainer: 'PokemonTrainer',
   PokemonInstance: 'PokemonInstance',
   PokemonInstanceMove: 'PokemonInstanceMove',
+  PokemonPendingMoveLearning: 'PokemonPendingMoveLearning',
   PokemonTrainerInventoryItem: 'PokemonTrainerInventoryItem'
 } as const
 
@@ -416,7 +417,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "pokemonTrainer" | "pokemonInstance" | "pokemonInstanceMove" | "pokemonTrainerInventoryItem"
+    modelProps: "pokemonTrainer" | "pokemonInstance" | "pokemonInstanceMove" | "pokemonPendingMoveLearning" | "pokemonTrainerInventoryItem"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -642,6 +643,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PokemonPendingMoveLearning: {
+      payload: Prisma.$PokemonPendingMoveLearningPayload<ExtArgs>
+      fields: Prisma.PokemonPendingMoveLearningFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PokemonPendingMoveLearningFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonPendingMoveLearningPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PokemonPendingMoveLearningFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonPendingMoveLearningPayload>
+        }
+        findFirst: {
+          args: Prisma.PokemonPendingMoveLearningFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonPendingMoveLearningPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PokemonPendingMoveLearningFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonPendingMoveLearningPayload>
+        }
+        findMany: {
+          args: Prisma.PokemonPendingMoveLearningFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonPendingMoveLearningPayload>[]
+        }
+        create: {
+          args: Prisma.PokemonPendingMoveLearningCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonPendingMoveLearningPayload>
+        }
+        createMany: {
+          args: Prisma.PokemonPendingMoveLearningCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PokemonPendingMoveLearningCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonPendingMoveLearningPayload>[]
+        }
+        delete: {
+          args: Prisma.PokemonPendingMoveLearningDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonPendingMoveLearningPayload>
+        }
+        update: {
+          args: Prisma.PokemonPendingMoveLearningUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonPendingMoveLearningPayload>
+        }
+        deleteMany: {
+          args: Prisma.PokemonPendingMoveLearningDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PokemonPendingMoveLearningUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PokemonPendingMoveLearningUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonPendingMoveLearningPayload>[]
+        }
+        upsert: {
+          args: Prisma.PokemonPendingMoveLearningUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonPendingMoveLearningPayload>
+        }
+        aggregate: {
+          args: Prisma.PokemonPendingMoveLearningAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePokemonPendingMoveLearning>
+        }
+        groupBy: {
+          args: Prisma.PokemonPendingMoveLearningGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PokemonPendingMoveLearningGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PokemonPendingMoveLearningCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PokemonPendingMoveLearningCountAggregateOutputType> | number
+        }
+      }
+    }
     PokemonTrainerInventoryItem: {
       payload: Prisma.$PokemonTrainerInventoryItemPayload<ExtArgs>
       fields: Prisma.PokemonTrainerInventoryItemFieldRefs
@@ -797,6 +872,21 @@ export const PokemonInstanceMoveScalarFieldEnum = {
 export type PokemonInstanceMoveScalarFieldEnum = (typeof PokemonInstanceMoveScalarFieldEnum)[keyof typeof PokemonInstanceMoveScalarFieldEnum]
 
 
+export const PokemonPendingMoveLearningScalarFieldEnum = {
+  id: 'id',
+  trainerId: 'trainerId',
+  pokemonInstanceId: 'pokemonInstanceId',
+  candidateMoveId: 'candidateMoveId',
+  candidateLearnedAtLevel: 'candidateLearnedAtLevel',
+  remainingCandidates: 'remainingCandidates',
+  revision: 'revision',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PokemonPendingMoveLearningScalarFieldEnum = (typeof PokemonPendingMoveLearningScalarFieldEnum)[keyof typeof PokemonPendingMoveLearningScalarFieldEnum]
+
+
 export const PokemonTrainerInventoryItemScalarFieldEnum = {
   trainerId: 'trainerId',
   itemId: 'itemId',
@@ -814,6 +904,13 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
 export const QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -828,6 +925,15 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
 
@@ -889,6 +995,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 /**
@@ -1045,6 +1165,7 @@ export type GlobalOmitConfig = {
   pokemonTrainer?: Prisma.PokemonTrainerOmit
   pokemonInstance?: Prisma.PokemonInstanceOmit
   pokemonInstanceMove?: Prisma.PokemonInstanceMoveOmit
+  pokemonPendingMoveLearning?: Prisma.PokemonPendingMoveLearningOmit
   pokemonTrainerInventoryItem?: Prisma.PokemonTrainerInventoryItemOmit
 }
 

@@ -29,6 +29,10 @@ export const POKEMON_EVENTS = {
   BATTLE_STATE_UPDATED: "pokemon:battle-state-updated",
   BATTLE_TURN_RESOLVED: "battleTurnResolved",
 
+  MOVE_LEARNING_DECISION: "pokemon:move-learning-decision",
+  MOVE_LEARNING_RESOLVED: "pokemon:move-learning-resolved",
+  MOVE_LEARNING_ERROR: "pokemon:move-learning-error",
+
   STORAGE_OPEN: "pokemon:storage-open",
   STORAGE_CLOSE: "pokemon:storage-close",
   STORAGE_STATE: "pokemon:storage-state",
@@ -59,7 +63,9 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
-function isPokemonEncounterTableId(value: unknown): value is PokemonEncounterTableId {
+function isPokemonEncounterTableId(
+  value: unknown,
+): value is PokemonEncounterTableId {
   return (
     typeof value === "string" &&
     Object.prototype.hasOwnProperty.call(POKEMON_ENCOUNTER_TABLES, value)
@@ -128,7 +134,7 @@ function isPokemonInstance(value: unknown): value is PokemonInstance {
 }
 
 export function isPokemonWildEncounterStartedPayload(
-  value: unknown
+  value: unknown,
 ): value is PokemonWildEncounterStartedPayload {
   if (!isRecord(value)) {
     return false;
@@ -160,7 +166,7 @@ export interface PokemonBattleReplacementResolvedPayload {
 }
 
 export function isPokemonBattleReplacementInput(
-  value: unknown
+  value: unknown,
 ): value is PokemonBattleReplacementInput {
   if (typeof value !== "object" || value === null) {
     return false;
@@ -168,7 +174,10 @@ export function isPokemonBattleReplacementInput(
 
   const candidate = value as Record<string, unknown>;
 
-  if (typeof candidate.battleId !== "string" || candidate.battleId.trim().length === 0) {
+  if (
+    typeof candidate.battleId !== "string" ||
+    candidate.battleId.trim().length === 0
+  ) {
     return false;
   }
 
@@ -184,7 +193,7 @@ export function isPokemonBattleReplacementInput(
 }
 
 export function isPokemonBattleReplacementResolvedPayload(
-  value: unknown
+  value: unknown,
 ): value is PokemonBattleReplacementResolvedPayload {
   if (typeof value !== "object" || value === null) {
     return false;
@@ -214,7 +223,7 @@ export interface PokemonBattleCompletedPayload {
 }
 
 export function isPokemonBattleCompletedPayload(
-  value: unknown
+  value: unknown,
 ): value is PokemonBattleCompletedPayload {
   if (typeof value !== "object" || value === null) {
     return false;
@@ -222,7 +231,10 @@ export function isPokemonBattleCompletedPayload(
 
   const candidate = value as Record<string, unknown>;
 
-  if (typeof candidate.battleId !== "string" || candidate.battleId.trim().length === 0) {
+  if (
+    typeof candidate.battleId !== "string" ||
+    candidate.battleId.trim().length === 0
+  ) {
     return false;
   }
 
@@ -238,7 +250,8 @@ export function isPokemonBattleCompletedPayload(
   return true;
 }
 
-export type PokemonBattleInteractionState = "selecting-action" | "replacement-required";
+export type PokemonBattleInteractionState =
+  "selecting-action" | "replacement-required";
 
 export interface PokemonBattleStateUpdatedPayload {
   readonly battle: BattleInstance;
@@ -249,7 +262,7 @@ export interface PokemonBattleStateUpdatedPayload {
 }
 
 export function isPokemonBattleStateUpdatedPayload(
-  value: unknown
+  value: unknown,
 ): value is PokemonBattleStateUpdatedPayload {
   if (typeof value !== "object" || value === null) {
     return false;
@@ -285,7 +298,7 @@ export function isPokemonBattleStateUpdatedPayload(
   if (
     !Array.isArray(candidate.replacementPokemonIndexes) ||
     !candidate.replacementPokemonIndexes.every(
-      (index) => Number.isInteger(index) && index >= 0
+      (index) => Number.isInteger(index) && index >= 0,
     )
   ) {
     return false;

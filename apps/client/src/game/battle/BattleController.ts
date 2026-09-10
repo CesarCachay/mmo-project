@@ -12,12 +12,18 @@ import type {
   PokemonBattleTurnResolvedPayload,
   PokemonTrainerState,
   PokemonItemId,
+  PokemonMoveLearningDecisionInput,
+  PokemonMoveLearningResolvedPayload,
+  PokemonMoveLearningErrorPayload,
+  BattleMoveLearningRequiredEvent,
+  PokemonPendingMoveLearningNetworkState,
 } from "@cesar-mmo/shared";
 
 import {
   calculatePokemonMaxHp,
   getPokemonInventoryItemQuantity,
   getPokemonItem,
+  getPokemonMove,
 } from "@cesar-mmo/shared";
 
 import { PokemonSpriteLoader } from "../pokemon/PokemonSpriteLoader";
@@ -62,15 +68,21 @@ export class BattleController {
 
   private selectedItemId?: PokemonItemId;
 
+  private readonly sendMoveLearningDecision: (
+    input: PokemonMoveLearningDecisionInput,
+  ) => void;
+
   constructor(
     scene: Phaser.Scene,
     pokemonSpriteLoader: PokemonSpriteLoader,
     sendBattleCommand: (input: PokemonBattleCommandInput) => void,
     sendBattleReplacement: (input: PokemonBattleReplacementInput) => void,
+    sendMoveLearningDecision: (input: PokemonMoveLearningDecisionInput) => void,
   ) {
     this.pokemonSpriteLoader = pokemonSpriteLoader;
     this.sendBattleCommand = sendBattleCommand;
     this.sendBattleReplacement = sendBattleReplacement;
+    this.sendMoveLearningDecision = sendMoveLearningDecision;
     this.overlay = new BattleOverlay(
       scene,
       // FIGHT
@@ -706,12 +718,6 @@ export class BattleController {
     event: BattlePresentationEvent,
     context: BattlePresentationEventContext,
   ): Promise<void> {
-    console.log("[BattlePresentation] event", {
-      type: event.type,
-      event,
-      turnNumber: context.turnNumber,
-      eventIndex: context.eventIndex,
-    });
     const activeBattle = this.activeBattlePayload?.battle;
 
     if (!activeBattle) {
@@ -829,6 +835,55 @@ export class BattleController {
           event.currentHp,
         ),
       ]);
+    }
+
+    if (event.type === "experience-gained") {
+      const message = formatBattlePresentationMessage(activeBattle, event);
+
+      await Promise.all([
+        this.overlay.animatePokemonExperienceGain(
+          activeBattle,
+          event.participantId,
+          event.pokemonInstanceId,
+          event.gainedExperience,
+          event.previousExperience,
+          event.currentExperience,
+          event.previousLevel,
+          event.currentLevel,
+        ),
+        message
+          ? this.overlay.presentMessage(
+              message,
+              getBattlePresentationMessageDuration(event),
+            )
+          : Promise.resolve(),
+      ]);
+      return;
+    }
+
+    if (event.type === "pokemon-leveled-up") {
+      const message = formatBattlePresentationMessage(activeBattle, event);
+
+      await Promise.all([
+        this.overlay.animatePokemonLevelUp(
+          activeBattle,
+          event.participantId,
+          event.pokemonInstanceId,
+          event.currentLevel,
+        ),
+        message
+          ? this.overlay.presentMessage(
+              message,
+              getBattlePresentationMessageDuration(event),
+            )
+          : Promise.resolve(),
+      ]);
+      return;
+    }
+
+    if (event.type === "move-learning-required") {
+      await this.presentMoveLearningWorkflow(activeBattle, event);
+      return;
     }
 
     const message = formatBattlePresentationMessage(activeBattle, event);
@@ -1178,5 +1233,167 @@ export class BattleController {
       this.setInteractionState("item-target-selection");
       console.error("[BattleController] failed to submit item", error);
     }
+  }
+
+  private pendingMoveLearningResponse?: {
+    readonly pokemonInstanceId: string;
+    readonly revision: number;
+    readonly resolve: (payload: PokemonMoveLearningResolvedPayload) => void;
+    readonly reject: (error: Error) => void;
+  };
+
+  public applyMoveLearningResolved(
+    payload: PokemonMoveLearningResolvedPayload,
+  ): void {
+    const pending = this.pendingMoveLearningResponse;
+
+    if (!pending) {
+      return;
+    }
+
+    if (
+      pending.pokemonInstanceId !== payload.pokemonInstanceId ||
+      pending.revision !== payload.resolvedRevision
+    ) {
+      return;
+    }
+
+    this.pendingMoveLearningResponse = undefined;
+
+    pending.resolve(payload);
+  }
+
+  public applyMoveLearningError(
+    payload: PokemonMoveLearningErrorPayload,
+  ): void {
+    const pending = this.pendingMoveLearningResponse;
+
+    if (!pending) {
+      return;
+    }
+
+    if (
+      payload.pokemonInstanceId !== null &&
+      payload.pokemonInstanceId !== pending.pokemonInstanceId
+    ) {
+      return;
+    }
+
+    this.pendingMoveLearningResponse = undefined;
+
+    pending.reject(new Error(payload.message));
+  }
+
+  private async presentMoveLearningWorkflow(
+    battle: BattleInstance,
+    event: BattleMoveLearningRequiredEvent,
+  ): Promise<void> {
+    const participant = battle.participants.find(
+      (candidate) => candidate.id === event.participantId,
+    );
+
+    const pokemonState = participant?.pokemon.find(
+      (candidate) => candidate.pokemon.instanceId === event.pokemonInstanceId,
+    );
+
+    const pokemonName = pokemonState
+      ? getPokemonDisplayName(pokemonState.pokemon)
+      : "Pokémon";
+
+    let pending: PokemonPendingMoveLearningNetworkState | null = {
+      pokemonInstanceId: event.pokemonInstanceId,
+      candidateMoveId: event.candidateMoveId,
+      candidateLearnedAtLevel: event.candidateLearnedAtLevel,
+      revision: event.revision,
+      currentMoves: event.currentMoves,
+    };
+
+    while (pending) {
+      const candidate = getPokemonMove(pending.candidateMoveId);
+
+      const candidateName = candidate
+        ? candidate.name
+            .split("-")
+            .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+            .join(" ")
+        : `Move ${pending.candidateMoveId}`;
+
+      await this.overlay.presentMessage(
+        `${pokemonName} wants to learn ${candidateName}!`,
+        900,
+      );
+
+      const decision = await this.overlay.requestMoveLearningDecision({
+        pokemonName,
+        candidateMoveId: pending.candidateMoveId,
+        currentMoves: pending.currentMoves,
+      });
+
+      const responsePromise = this.waitForMoveLearningResponse(
+        pending.pokemonInstanceId,
+        pending.revision,
+      );
+
+      try {
+        this.sendMoveLearningDecision({
+          pokemonInstanceId: pending.pokemonInstanceId,
+          candidateMoveId: pending.candidateMoveId,
+          revision: pending.revision,
+          decision,
+        });
+      } catch (error) {
+        this.pendingMoveLearningResponse = undefined;
+        throw error;
+      }
+
+      const response = await responsePromise;
+
+      this.overlay.hideMoveLearning();
+
+      if (decision.type === "forget") {
+        const forgotten = getPokemonMove(decision.moveId);
+
+        const forgottenName = forgotten
+          ? forgotten.name
+              .split("-")
+              .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+              .join(" ")
+          : `Move ${decision.moveId}`;
+
+        await this.overlay.presentMessage(
+          `${pokemonName} forgot ${forgottenName} and learned ${candidateName}!`,
+          950,
+        );
+      } else {
+        await this.overlay.presentMessage(
+          `${pokemonName} did not learn ${candidateName}.`,
+          850,
+        );
+      }
+
+      pending = response.nextPending;
+    }
+
+    this.overlay.hideMoveLearning();
+  }
+
+  private waitForMoveLearningResponse(
+    pokemonInstanceId: string,
+    revision: number,
+  ): Promise<PokemonMoveLearningResolvedPayload> {
+    if (this.pendingMoveLearningResponse) {
+      throw new Error(
+        "Another move-learning network request is already pending",
+      );
+    }
+
+    return new Promise((resolve, reject) => {
+      this.pendingMoveLearningResponse = {
+        pokemonInstanceId,
+        revision,
+        resolve,
+        reject,
+      };
+    });
   }
 }

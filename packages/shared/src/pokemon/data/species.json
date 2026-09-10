@@ -17,6 +17,7 @@
     "height": 7,
     "weight": 69,
     "baseExperience": 64,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 1
@@ -39,6 +40,7 @@
     "height": 10,
     "weight": 130,
     "baseExperience": 142,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 1
@@ -61,6 +63,7 @@
     "height": 20,
     "weight": 1000,
     "baseExperience": 236,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 1
@@ -82,6 +85,7 @@
     "height": 6,
     "weight": 85,
     "baseExperience": 62,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 2
@@ -103,6 +107,7 @@
     "height": 11,
     "weight": 190,
     "baseExperience": 142,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 2
@@ -125,6 +130,7 @@
     "height": 17,
     "weight": 905,
     "baseExperience": 240,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 2
@@ -146,6 +152,7 @@
     "height": 5,
     "weight": 90,
     "baseExperience": 63,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 3
@@ -167,6 +174,7 @@
     "height": 10,
     "weight": 225,
     "baseExperience": 142,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 3
@@ -188,6 +196,7 @@
     "height": 16,
     "weight": 855,
     "baseExperience": 239,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 3
@@ -209,6 +218,7 @@
     "height": 3,
     "weight": 29,
     "baseExperience": 39,
+    "growthRate": "medium",
     "captureRate": 255,
     "generation": 1,
     "evolutionChainId": 4
@@ -230,6 +240,7 @@
     "height": 7,
     "weight": 99,
     "baseExperience": 72,
+    "growthRate": "medium",
     "captureRate": 120,
     "generation": 1,
     "evolutionChainId": 4
@@ -252,6 +263,7 @@
     "height": 11,
     "weight": 320,
     "baseExperience": 178,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 4
@@ -274,6 +286,7 @@
     "height": 3,
     "weight": 32,
     "baseExperience": 39,
+    "growthRate": "medium",
     "captureRate": 255,
     "generation": 1,
     "evolutionChainId": 5
@@ -296,6 +309,7 @@
     "height": 6,
     "weight": 100,
     "baseExperience": 72,
+    "growthRate": "medium",
     "captureRate": 120,
     "generation": 1,
     "evolutionChainId": 5
@@ -318,6 +332,7 @@
     "height": 10,
     "weight": 295,
     "baseExperience": 178,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 5
@@ -340,6 +355,7 @@
     "height": 3,
     "weight": 18,
     "baseExperience": 50,
+    "growthRate": "medium-slow",
     "captureRate": 255,
     "generation": 1,
     "evolutionChainId": 6
@@ -362,6 +378,7 @@
     "height": 11,
     "weight": 300,
     "baseExperience": 122,
+    "growthRate": "medium-slow",
     "captureRate": 120,
     "generation": 1,
     "evolutionChainId": 6
@@ -384,6 +401,7 @@
     "height": 15,
     "weight": 395,
     "baseExperience": 216,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 6
@@ -405,6 +423,7 @@
     "height": 3,
     "weight": 35,
     "baseExperience": 51,
+    "growthRate": "medium",
     "captureRate": 255,
     "generation": 1,
     "evolutionChainId": 7
@@ -426,6 +445,7 @@
     "height": 7,
     "weight": 185,
     "baseExperience": 145,
+    "growthRate": "medium",
     "captureRate": 127,
     "generation": 1,
     "evolutionChainId": 7
@@ -448,6 +468,7 @@
     "height": 3,
     "weight": 20,
     "baseExperience": 52,
+    "growthRate": "medium",
     "captureRate": 255,
     "generation": 1,
     "evolutionChainId": 8
@@ -470,6 +491,7 @@
     "height": 12,
     "weight": 380,
     "baseExperience": 155,
+    "growthRate": "medium",
     "captureRate": 90,
     "generation": 1,
     "evolutionChainId": 8
@@ -491,6 +513,7 @@
     "height": 20,
     "weight": 69,
     "baseExperience": 58,
+    "growthRate": "medium",
     "captureRate": 255,
     "generation": 1,
     "evolutionChainId": 9
@@ -512,6 +535,7 @@
     "height": 35,
     "weight": 650,
     "baseExperience": 157,
+    "growthRate": "medium",
     "captureRate": 90,
     "generation": 1,
     "evolutionChainId": 9
@@ -533,6 +557,7 @@
     "height": 4,
     "weight": 60,
     "baseExperience": 112,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 1,
     "evolutionChainId": 10
@@ -554,6 +579,7 @@
     "height": 8,
     "weight": 300,
     "baseExperience": 218,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 1,
     "evolutionChainId": 10
@@ -575,6 +601,7 @@
     "height": 6,
     "weight": 120,
     "baseExperience": 60,
+    "growthRate": "medium",
     "captureRate": 255,
     "generation": 1,
     "evolutionChainId": 11
@@ -596,6 +623,7 @@
     "height": 10,
     "weight": 295,
     "baseExperience": 158,
+    "growthRate": "medium",
     "captureRate": 90,
     "generation": 1,
     "evolutionChainId": 11
@@ -617,6 +645,7 @@
     "height": 4,
     "weight": 70,
     "baseExperience": 55,
+    "growthRate": "medium-slow",
     "captureRate": 235,
     "generation": 1,
     "evolutionChainId": 12
@@ -638,6 +667,7 @@
     "height": 8,
     "weight": 200,
     "baseExperience": 128,
+    "growthRate": "medium-slow",
     "captureRate": 120,
     "generation": 1,
     "evolutionChainId": 12
@@ -660,6 +690,7 @@
     "height": 13,
     "weight": 600,
     "baseExperience": 227,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 12
@@ -681,6 +712,7 @@
     "height": 5,
     "weight": 90,
     "baseExperience": 55,
+    "growthRate": "medium-slow",
     "captureRate": 235,
     "generation": 1,
     "evolutionChainId": 13
@@ -702,6 +734,7 @@
     "height": 9,
     "weight": 195,
     "baseExperience": 128,
+    "growthRate": "medium-slow",
     "captureRate": 120,
     "generation": 1,
     "evolutionChainId": 13
@@ -724,6 +757,7 @@
     "height": 14,
     "weight": 620,
     "baseExperience": 227,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 13
@@ -745,6 +779,7 @@
     "height": 6,
     "weight": 75,
     "baseExperience": 113,
+    "growthRate": "fast",
     "captureRate": 150,
     "generation": 1,
     "evolutionChainId": 14
@@ -766,6 +801,7 @@
     "height": 13,
     "weight": 400,
     "baseExperience": 217,
+    "growthRate": "fast",
     "captureRate": 25,
     "generation": 1,
     "evolutionChainId": 14
@@ -787,6 +823,7 @@
     "height": 6,
     "weight": 99,
     "baseExperience": 60,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 1,
     "evolutionChainId": 15
@@ -808,6 +845,7 @@
     "height": 11,
     "weight": 199,
     "baseExperience": 177,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 1,
     "evolutionChainId": 15
@@ -830,6 +868,7 @@
     "height": 5,
     "weight": 55,
     "baseExperience": 95,
+    "growthRate": "fast",
     "captureRate": 170,
     "generation": 1,
     "evolutionChainId": 16
@@ -852,6 +891,7 @@
     "height": 10,
     "weight": 120,
     "baseExperience": 196,
+    "growthRate": "fast",
     "captureRate": 50,
     "generation": 1,
     "evolutionChainId": 16
@@ -874,6 +914,7 @@
     "height": 8,
     "weight": 75,
     "baseExperience": 49,
+    "growthRate": "medium",
     "captureRate": 255,
     "generation": 1,
     "evolutionChainId": 17
@@ -896,6 +937,7 @@
     "height": 16,
     "weight": 550,
     "baseExperience": 159,
+    "growthRate": "medium",
     "captureRate": 90,
     "generation": 1,
     "evolutionChainId": 17
@@ -918,6 +960,7 @@
     "height": 5,
     "weight": 54,
     "baseExperience": 64,
+    "growthRate": "medium-slow",
     "captureRate": 255,
     "generation": 1,
     "evolutionChainId": 18
@@ -940,6 +983,7 @@
     "height": 8,
     "weight": 86,
     "baseExperience": 138,
+    "growthRate": "medium-slow",
     "captureRate": 120,
     "generation": 1,
     "evolutionChainId": 18
@@ -962,6 +1006,7 @@
     "height": 12,
     "weight": 186,
     "baseExperience": 221,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 18
@@ -984,6 +1029,7 @@
     "height": 3,
     "weight": 54,
     "baseExperience": 57,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 1,
     "evolutionChainId": 19
@@ -1006,6 +1052,7 @@
     "height": 10,
     "weight": 295,
     "baseExperience": 142,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 1,
     "evolutionChainId": 19
@@ -1028,6 +1075,7 @@
     "height": 10,
     "weight": 300,
     "baseExperience": 61,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 1,
     "evolutionChainId": 20
@@ -1050,6 +1098,7 @@
     "height": 15,
     "weight": 125,
     "baseExperience": 158,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 1,
     "evolutionChainId": 20
@@ -1071,6 +1120,7 @@
     "height": 2,
     "weight": 8,
     "baseExperience": 53,
+    "growthRate": "medium",
     "captureRate": 255,
     "generation": 1,
     "evolutionChainId": 21
@@ -1092,6 +1142,7 @@
     "height": 7,
     "weight": 333,
     "baseExperience": 149,
+    "growthRate": "medium",
     "captureRate": 50,
     "generation": 1,
     "evolutionChainId": 21
@@ -1113,6 +1164,7 @@
     "height": 4,
     "weight": 42,
     "baseExperience": 58,
+    "growthRate": "medium",
     "captureRate": 255,
     "generation": 1,
     "evolutionChainId": 22
@@ -1134,6 +1186,7 @@
     "height": 10,
     "weight": 320,
     "baseExperience": 154,
+    "growthRate": "medium",
     "captureRate": 90,
     "generation": 1,
     "evolutionChainId": 22
@@ -1155,6 +1208,7 @@
     "height": 8,
     "weight": 196,
     "baseExperience": 64,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 1,
     "evolutionChainId": 23
@@ -1176,6 +1230,7 @@
     "height": 17,
     "weight": 766,
     "baseExperience": 175,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 1,
     "evolutionChainId": 23
@@ -1197,6 +1252,7 @@
     "height": 5,
     "weight": 280,
     "baseExperience": 61,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 1,
     "evolutionChainId": 24
@@ -1218,6 +1274,7 @@
     "height": 10,
     "weight": 320,
     "baseExperience": 159,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 1,
     "evolutionChainId": 24
@@ -1239,6 +1296,7 @@
     "height": 7,
     "weight": 190,
     "baseExperience": 70,
+    "growthRate": "slow",
     "captureRate": 190,
     "generation": 1,
     "evolutionChainId": 25
@@ -1260,6 +1318,7 @@
     "height": 19,
     "weight": 1550,
     "baseExperience": 194,
+    "growthRate": "slow",
     "captureRate": 75,
     "generation": 1,
     "evolutionChainId": 25
@@ -1281,6 +1340,7 @@
     "height": 6,
     "weight": 124,
     "baseExperience": 60,
+    "growthRate": "medium-slow",
     "captureRate": 255,
     "generation": 1,
     "evolutionChainId": 26
@@ -1302,6 +1362,7 @@
     "height": 10,
     "weight": 200,
     "baseExperience": 135,
+    "growthRate": "medium-slow",
     "captureRate": 120,
     "generation": 1,
     "evolutionChainId": 26
@@ -1324,6 +1385,7 @@
     "height": 13,
     "weight": 540,
     "baseExperience": 230,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 26
@@ -1345,6 +1407,7 @@
     "height": 9,
     "weight": 195,
     "baseExperience": 62,
+    "growthRate": "medium-slow",
     "captureRate": 200,
     "generation": 1,
     "evolutionChainId": 27
@@ -1366,6 +1429,7 @@
     "height": 13,
     "weight": 565,
     "baseExperience": 140,
+    "growthRate": "medium-slow",
     "captureRate": 100,
     "generation": 1,
     "evolutionChainId": 27
@@ -1387,6 +1451,7 @@
     "height": 15,
     "weight": 480,
     "baseExperience": 225,
+    "growthRate": "medium-slow",
     "captureRate": 50,
     "generation": 1,
     "evolutionChainId": 27
@@ -1408,6 +1473,7 @@
     "height": 8,
     "weight": 195,
     "baseExperience": 61,
+    "growthRate": "medium-slow",
     "captureRate": 180,
     "generation": 1,
     "evolutionChainId": 28
@@ -1429,6 +1495,7 @@
     "height": 15,
     "weight": 705,
     "baseExperience": 142,
+    "growthRate": "medium-slow",
     "captureRate": 90,
     "generation": 1,
     "evolutionChainId": 28
@@ -1450,6 +1517,7 @@
     "height": 16,
     "weight": 1300,
     "baseExperience": 227,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 28
@@ -1472,6 +1540,7 @@
     "height": 7,
     "weight": 40,
     "baseExperience": 60,
+    "growthRate": "medium-slow",
     "captureRate": 255,
     "generation": 1,
     "evolutionChainId": 29
@@ -1494,6 +1563,7 @@
     "height": 10,
     "weight": 64,
     "baseExperience": 137,
+    "growthRate": "medium-slow",
     "captureRate": 120,
     "generation": 1,
     "evolutionChainId": 29
@@ -1516,6 +1586,7 @@
     "height": 17,
     "weight": 155,
     "baseExperience": 221,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 29
@@ -1538,6 +1609,7 @@
     "height": 9,
     "weight": 455,
     "baseExperience": 67,
+    "growthRate": "slow",
     "captureRate": 190,
     "generation": 1,
     "evolutionChainId": 30
@@ -1560,6 +1632,7 @@
     "height": 16,
     "weight": 550,
     "baseExperience": 180,
+    "growthRate": "slow",
     "captureRate": 60,
     "generation": 1,
     "evolutionChainId": 30
@@ -1582,6 +1655,7 @@
     "height": 4,
     "weight": 200,
     "baseExperience": 60,
+    "growthRate": "medium-slow",
     "captureRate": 255,
     "generation": 1,
     "evolutionChainId": 31
@@ -1604,6 +1678,7 @@
     "height": 10,
     "weight": 1050,
     "baseExperience": 137,
+    "growthRate": "medium-slow",
     "captureRate": 120,
     "generation": 1,
     "evolutionChainId": 31
@@ -1626,6 +1701,7 @@
     "height": 14,
     "weight": 3000,
     "baseExperience": 223,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 31
@@ -1647,6 +1723,7 @@
     "height": 10,
     "weight": 300,
     "baseExperience": 82,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 1,
     "evolutionChainId": 32
@@ -1668,6 +1745,7 @@
     "height": 17,
     "weight": 950,
     "baseExperience": 175,
+    "growthRate": "medium",
     "captureRate": 60,
     "generation": 1,
     "evolutionChainId": 32
@@ -1690,6 +1768,7 @@
     "height": 12,
     "weight": 360,
     "baseExperience": 63,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 1,
     "evolutionChainId": 33
@@ -1712,6 +1791,7 @@
     "height": 16,
     "weight": 785,
     "baseExperience": 172,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 1,
     "evolutionChainId": 33
@@ -1734,6 +1814,7 @@
     "height": 3,
     "weight": 60,
     "baseExperience": 65,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 1,
     "evolutionChainId": 34
@@ -1756,6 +1837,7 @@
     "height": 10,
     "weight": 600,
     "baseExperience": 163,
+    "growthRate": "medium",
     "captureRate": 60,
     "generation": 1,
     "evolutionChainId": 34
@@ -1778,6 +1860,7 @@
     "height": 8,
     "weight": 150,
     "baseExperience": 132,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 35
@@ -1800,6 +1883,7 @@
     "height": 14,
     "weight": 392,
     "baseExperience": 62,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 1,
     "evolutionChainId": 36
@@ -1822,6 +1906,7 @@
     "height": 18,
     "weight": 852,
     "baseExperience": 165,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 36
@@ -1843,6 +1928,7 @@
     "height": 11,
     "weight": 900,
     "baseExperience": 65,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 1,
     "evolutionChainId": 37
@@ -1865,6 +1951,7 @@
     "height": 17,
     "weight": 1200,
     "baseExperience": 166,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 1,
     "evolutionChainId": 37
@@ -1886,6 +1973,7 @@
     "height": 9,
     "weight": 300,
     "baseExperience": 65,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 1,
     "evolutionChainId": 38
@@ -1907,6 +1995,7 @@
     "height": 12,
     "weight": 300,
     "baseExperience": 175,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 1,
     "evolutionChainId": 38
@@ -1928,6 +2017,7 @@
     "height": 3,
     "weight": 40,
     "baseExperience": 61,
+    "growthRate": "slow",
     "captureRate": 190,
     "generation": 1,
     "evolutionChainId": 39
@@ -1950,6 +2040,7 @@
     "height": 15,
     "weight": 1325,
     "baseExperience": 184,
+    "growthRate": "slow",
     "captureRate": 60,
     "generation": 1,
     "evolutionChainId": 39
@@ -1972,6 +2063,7 @@
     "height": 13,
     "weight": 1,
     "baseExperience": 62,
+    "growthRate": "medium-slow",
     "captureRate": 190,
     "generation": 1,
     "evolutionChainId": 40
@@ -1994,6 +2086,7 @@
     "height": 16,
     "weight": 1,
     "baseExperience": 142,
+    "growthRate": "medium-slow",
     "captureRate": 90,
     "generation": 1,
     "evolutionChainId": 40
@@ -2016,6 +2109,7 @@
     "height": 15,
     "weight": 405,
     "baseExperience": 225,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 40
@@ -2038,6 +2132,7 @@
     "height": 88,
     "weight": 2100,
     "baseExperience": 77,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 41
@@ -2059,6 +2154,7 @@
     "height": 10,
     "weight": 324,
     "baseExperience": 66,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 1,
     "evolutionChainId": 42
@@ -2080,6 +2176,7 @@
     "height": 16,
     "weight": 756,
     "baseExperience": 169,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 1,
     "evolutionChainId": 42
@@ -2101,6 +2198,7 @@
     "height": 4,
     "weight": 65,
     "baseExperience": 65,
+    "growthRate": "medium",
     "captureRate": 225,
     "generation": 1,
     "evolutionChainId": 43
@@ -2122,6 +2220,7 @@
     "height": 13,
     "weight": 600,
     "baseExperience": 166,
+    "growthRate": "medium",
     "captureRate": 60,
     "generation": 1,
     "evolutionChainId": 43
@@ -2143,6 +2242,7 @@
     "height": 5,
     "weight": 104,
     "baseExperience": 66,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 1,
     "evolutionChainId": 44
@@ -2164,6 +2264,7 @@
     "height": 12,
     "weight": 666,
     "baseExperience": 172,
+    "growthRate": "medium",
     "captureRate": 60,
     "generation": 1,
     "evolutionChainId": 44
@@ -2186,6 +2287,7 @@
     "height": 4,
     "weight": 25,
     "baseExperience": 65,
+    "growthRate": "slow",
     "captureRate": 90,
     "generation": 1,
     "evolutionChainId": 45
@@ -2208,6 +2310,7 @@
     "height": 20,
     "weight": 1200,
     "baseExperience": 186,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 45
@@ -2229,6 +2332,7 @@
     "height": 4,
     "weight": 65,
     "baseExperience": 64,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 1,
     "evolutionChainId": 46
@@ -2250,6 +2354,7 @@
     "height": 10,
     "weight": 450,
     "baseExperience": 149,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 1,
     "evolutionChainId": 46
@@ -2271,6 +2376,7 @@
     "height": 15,
     "weight": 498,
     "baseExperience": 159,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 47
@@ -2292,6 +2398,7 @@
     "height": 14,
     "weight": 502,
     "baseExperience": 159,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 47
@@ -2313,6 +2420,7 @@
     "height": 12,
     "weight": 655,
     "baseExperience": 77,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 48
@@ -2334,6 +2442,7 @@
     "height": 6,
     "weight": 10,
     "baseExperience": 68,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 1,
     "evolutionChainId": 49
@@ -2355,6 +2464,7 @@
     "height": 12,
     "weight": 95,
     "baseExperience": 172,
+    "growthRate": "medium",
     "captureRate": 60,
     "generation": 1,
     "evolutionChainId": 49
@@ -2377,6 +2487,7 @@
     "height": 10,
     "weight": 1150,
     "baseExperience": 69,
+    "growthRate": "slow",
     "captureRate": 120,
     "generation": 1,
     "evolutionChainId": 50
@@ -2399,6 +2510,7 @@
     "height": 19,
     "weight": 1200,
     "baseExperience": 170,
+    "growthRate": "slow",
     "captureRate": 60,
     "generation": 1,
     "evolutionChainId": 50
@@ -2420,6 +2532,7 @@
     "height": 11,
     "weight": 346,
     "baseExperience": 395,
+    "growthRate": "fast",
     "captureRate": 30,
     "generation": 1,
     "evolutionChainId": 51
@@ -2441,6 +2554,7 @@
     "height": 10,
     "weight": 350,
     "baseExperience": 87,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 52
@@ -2462,6 +2576,7 @@
     "height": 22,
     "weight": 800,
     "baseExperience": 172,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 53
@@ -2483,6 +2598,7 @@
     "height": 4,
     "weight": 80,
     "baseExperience": 59,
+    "growthRate": "medium",
     "captureRate": 225,
     "generation": 1,
     "evolutionChainId": 54
@@ -2504,6 +2620,7 @@
     "height": 12,
     "weight": 250,
     "baseExperience": 154,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 1,
     "evolutionChainId": 54
@@ -2525,6 +2642,7 @@
     "height": 6,
     "weight": 150,
     "baseExperience": 64,
+    "growthRate": "medium",
     "captureRate": 225,
     "generation": 1,
     "evolutionChainId": 55
@@ -2546,6 +2664,7 @@
     "height": 13,
     "weight": 390,
     "baseExperience": 158,
+    "growthRate": "medium",
     "captureRate": 60,
     "generation": 1,
     "evolutionChainId": 55
@@ -2567,6 +2686,7 @@
     "height": 8,
     "weight": 345,
     "baseExperience": 68,
+    "growthRate": "slow",
     "captureRate": 225,
     "generation": 1,
     "evolutionChainId": 56
@@ -2589,6 +2709,7 @@
     "height": 11,
     "weight": 800,
     "baseExperience": 182,
+    "growthRate": "slow",
     "captureRate": 60,
     "generation": 1,
     "evolutionChainId": 56
@@ -2611,6 +2732,7 @@
     "height": 13,
     "weight": 545,
     "baseExperience": 161,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 57
@@ -2633,6 +2755,7 @@
     "height": 15,
     "weight": 560,
     "baseExperience": 100,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 58
@@ -2655,6 +2778,7 @@
     "height": 14,
     "weight": 406,
     "baseExperience": 159,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 59
@@ -2676,6 +2800,7 @@
     "height": 11,
     "weight": 300,
     "baseExperience": 172,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 60
@@ -2697,6 +2822,7 @@
     "height": 13,
     "weight": 445,
     "baseExperience": 173,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 61
@@ -2718,6 +2844,7 @@
     "height": 15,
     "weight": 550,
     "baseExperience": 175,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 62
@@ -2739,6 +2866,7 @@
     "height": 14,
     "weight": 884,
     "baseExperience": 172,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 63
@@ -2760,6 +2888,7 @@
     "height": 9,
     "weight": 100,
     "baseExperience": 40,
+    "growthRate": "slow",
     "captureRate": 255,
     "generation": 1,
     "evolutionChainId": 64
@@ -2782,6 +2911,7 @@
     "height": 65,
     "weight": 2350,
     "baseExperience": 189,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 64
@@ -2804,6 +2934,7 @@
     "height": 25,
     "weight": 2200,
     "baseExperience": 187,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 65
@@ -2825,6 +2956,7 @@
     "height": 3,
     "weight": 40,
     "baseExperience": 101,
+    "growthRate": "medium",
     "captureRate": 35,
     "generation": 1,
     "evolutionChainId": 66
@@ -2846,6 +2978,7 @@
     "height": 3,
     "weight": 65,
     "baseExperience": 65,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 67
@@ -2867,6 +3000,7 @@
     "height": 10,
     "weight": 290,
     "baseExperience": 184,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 67
@@ -2888,6 +3022,7 @@
     "height": 8,
     "weight": 245,
     "baseExperience": 184,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 67
@@ -2909,6 +3044,7 @@
     "height": 9,
     "weight": 250,
     "baseExperience": 184,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 67
@@ -2930,6 +3066,7 @@
     "height": 8,
     "weight": 365,
     "baseExperience": 79,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 68
@@ -2952,6 +3089,7 @@
     "height": 4,
     "weight": 75,
     "baseExperience": 71,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 69
@@ -2974,6 +3112,7 @@
     "height": 10,
     "weight": 350,
     "baseExperience": 173,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 69
@@ -2996,6 +3135,7 @@
     "height": 5,
     "weight": 115,
     "baseExperience": 71,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 70
@@ -3018,6 +3158,7 @@
     "height": 13,
     "weight": 405,
     "baseExperience": 173,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 70
@@ -3040,6 +3181,7 @@
     "height": 18,
     "weight": 590,
     "baseExperience": 180,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 71
@@ -3061,6 +3203,7 @@
     "height": 21,
     "weight": 4600,
     "baseExperience": 189,
+    "growthRate": "slow",
     "captureRate": 25,
     "generation": 1,
     "evolutionChainId": 72
@@ -3083,6 +3226,7 @@
     "height": 17,
     "weight": 554,
     "baseExperience": 261,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 1,
     "evolutionChainId": 73
@@ -3105,6 +3249,7 @@
     "height": 16,
     "weight": 526,
     "baseExperience": 261,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 1,
     "evolutionChainId": 74
@@ -3127,6 +3272,7 @@
     "height": 20,
     "weight": 600,
     "baseExperience": 261,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 1,
     "evolutionChainId": 75
@@ -3148,6 +3294,7 @@
     "height": 18,
     "weight": 33,
     "baseExperience": 60,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 76
@@ -3169,6 +3316,7 @@
     "height": 40,
     "weight": 165,
     "baseExperience": 147,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 76
@@ -3191,6 +3339,7 @@
     "height": 22,
     "weight": 2100,
     "baseExperience": 270,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 76
@@ -3212,6 +3361,7 @@
     "height": 20,
     "weight": 1220,
     "baseExperience": 306,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 1,
     "evolutionChainId": 77
@@ -3233,6 +3383,7 @@
     "height": 4,
     "weight": 40,
     "baseExperience": 270,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 1,
     "evolutionChainId": 78
@@ -3254,6 +3405,7 @@
     "height": 9,
     "weight": 64,
     "baseExperience": 64,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 79
@@ -3275,6 +3427,7 @@
     "height": 12,
     "weight": 158,
     "baseExperience": 142,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 79
@@ -3296,6 +3449,7 @@
     "height": 18,
     "weight": 1005,
     "baseExperience": 236,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 79
@@ -3317,6 +3471,7 @@
     "height": 5,
     "weight": 79,
     "baseExperience": 62,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 80
@@ -3338,6 +3493,7 @@
     "height": 9,
     "weight": 190,
     "baseExperience": 142,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 80
@@ -3359,6 +3515,7 @@
     "height": 17,
     "weight": 795,
     "baseExperience": 240,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 80
@@ -3380,6 +3537,7 @@
     "height": 6,
     "weight": 95,
     "baseExperience": 63,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 81
@@ -3401,6 +3559,7 @@
     "height": 11,
     "weight": 250,
     "baseExperience": 142,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 81
@@ -3422,6 +3581,7 @@
     "height": 23,
     "weight": 888,
     "baseExperience": 239,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 81
@@ -3443,6 +3603,7 @@
     "height": 8,
     "weight": 60,
     "baseExperience": 43,
+    "growthRate": "medium",
     "captureRate": 255,
     "generation": 2,
     "evolutionChainId": 82
@@ -3464,6 +3625,7 @@
     "height": 18,
     "weight": 325,
     "baseExperience": 145,
+    "growthRate": "medium",
     "captureRate": 90,
     "generation": 2,
     "evolutionChainId": 82
@@ -3486,6 +3648,7 @@
     "height": 7,
     "weight": 212,
     "baseExperience": 52,
+    "growthRate": "medium",
     "captureRate": 255,
     "generation": 2,
     "evolutionChainId": 83
@@ -3508,6 +3671,7 @@
     "height": 16,
     "weight": 408,
     "baseExperience": 158,
+    "growthRate": "medium",
     "captureRate": 90,
     "generation": 2,
     "evolutionChainId": 83
@@ -3530,6 +3694,7 @@
     "height": 10,
     "weight": 108,
     "baseExperience": 53,
+    "growthRate": "fast",
     "captureRate": 255,
     "generation": 2,
     "evolutionChainId": 84
@@ -3552,6 +3717,7 @@
     "height": 14,
     "weight": 356,
     "baseExperience": 137,
+    "growthRate": "fast",
     "captureRate": 90,
     "generation": 2,
     "evolutionChainId": 84
@@ -3574,6 +3740,7 @@
     "height": 5,
     "weight": 85,
     "baseExperience": 50,
+    "growthRate": "fast",
     "captureRate": 255,
     "generation": 2,
     "evolutionChainId": 85
@@ -3596,6 +3763,7 @@
     "height": 11,
     "weight": 335,
     "baseExperience": 140,
+    "growthRate": "fast",
     "captureRate": 90,
     "generation": 2,
     "evolutionChainId": 85
@@ -3618,6 +3786,7 @@
     "height": 18,
     "weight": 750,
     "baseExperience": 241,
+    "growthRate": "medium",
     "captureRate": 90,
     "generation": 2,
     "evolutionChainId": 17
@@ -3640,6 +3809,7 @@
     "height": 5,
     "weight": 120,
     "baseExperience": 66,
+    "growthRate": "slow",
     "captureRate": 190,
     "generation": 2,
     "evolutionChainId": 86
@@ -3662,6 +3832,7 @@
     "height": 12,
     "weight": 225,
     "baseExperience": 161,
+    "growthRate": "slow",
     "captureRate": 75,
     "generation": 2,
     "evolutionChainId": 86
@@ -3683,6 +3854,7 @@
     "height": 3,
     "weight": 20,
     "baseExperience": 41,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 2,
     "evolutionChainId": 10
@@ -3704,6 +3876,7 @@
     "height": 3,
     "weight": 30,
     "baseExperience": 44,
+    "growthRate": "fast",
     "captureRate": 150,
     "generation": 2,
     "evolutionChainId": 14
@@ -3726,6 +3899,7 @@
     "height": 3,
     "weight": 10,
     "baseExperience": 42,
+    "growthRate": "fast",
     "captureRate": 170,
     "generation": 2,
     "evolutionChainId": 16
@@ -3747,6 +3921,7 @@
     "height": 3,
     "weight": 15,
     "baseExperience": 49,
+    "growthRate": "fast",
     "captureRate": 190,
     "generation": 2,
     "evolutionChainId": 87
@@ -3769,6 +3944,7 @@
     "height": 6,
     "weight": 32,
     "baseExperience": 142,
+    "growthRate": "fast",
     "captureRate": 75,
     "generation": 2,
     "evolutionChainId": 87
@@ -3791,6 +3967,7 @@
     "height": 2,
     "weight": 20,
     "baseExperience": 64,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 2,
     "evolutionChainId": 88
@@ -3813,6 +3990,7 @@
     "height": 15,
     "weight": 150,
     "baseExperience": 165,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 2,
     "evolutionChainId": 88
@@ -3834,6 +4012,7 @@
     "height": 6,
     "weight": 78,
     "baseExperience": 56,
+    "growthRate": "medium-slow",
     "captureRate": 235,
     "generation": 2,
     "evolutionChainId": 89
@@ -3855,6 +4034,7 @@
     "height": 8,
     "weight": 133,
     "baseExperience": 128,
+    "growthRate": "medium-slow",
     "captureRate": 120,
     "generation": 2,
     "evolutionChainId": 89
@@ -3876,6 +4056,7 @@
     "height": 14,
     "weight": 615,
     "baseExperience": 230,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 89
@@ -3897,6 +4078,7 @@
     "height": 4,
     "weight": 58,
     "baseExperience": 221,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 18
@@ -3919,6 +4101,7 @@
     "height": 4,
     "weight": 85,
     "baseExperience": 88,
+    "growthRate": "fast",
     "captureRate": 190,
     "generation": 2,
     "evolutionChainId": 90
@@ -3941,6 +4124,7 @@
     "height": 8,
     "weight": 285,
     "baseExperience": 189,
+    "growthRate": "fast",
     "captureRate": 75,
     "generation": 2,
     "evolutionChainId": 90
@@ -3962,6 +4146,7 @@
     "height": 12,
     "weight": 380,
     "baseExperience": 144,
+    "growthRate": "medium",
     "captureRate": 65,
     "generation": 2,
     "evolutionChainId": 91
@@ -3983,6 +4168,7 @@
     "height": 11,
     "weight": 339,
     "baseExperience": 225,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 26
@@ -4005,6 +4191,7 @@
     "height": 4,
     "weight": 5,
     "baseExperience": 50,
+    "growthRate": "medium-slow",
     "captureRate": 255,
     "generation": 2,
     "evolutionChainId": 92
@@ -4027,6 +4214,7 @@
     "height": 6,
     "weight": 10,
     "baseExperience": 119,
+    "growthRate": "medium-slow",
     "captureRate": 120,
     "generation": 2,
     "evolutionChainId": 92
@@ -4049,6 +4237,7 @@
     "height": 8,
     "weight": 30,
     "baseExperience": 207,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 92
@@ -4070,6 +4259,7 @@
     "height": 8,
     "weight": 115,
     "baseExperience": 72,
+    "growthRate": "fast",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 93
@@ -4091,6 +4281,7 @@
     "height": 3,
     "weight": 18,
     "baseExperience": 36,
+    "growthRate": "medium-slow",
     "captureRate": 235,
     "generation": 2,
     "evolutionChainId": 94
@@ -4112,6 +4303,7 @@
     "height": 8,
     "weight": 85,
     "baseExperience": 149,
+    "growthRate": "medium-slow",
     "captureRate": 120,
     "generation": 2,
     "evolutionChainId": 94
@@ -4134,6 +4326,7 @@
     "height": 12,
     "weight": 380,
     "baseExperience": 78,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 2,
     "evolutionChainId": 95
@@ -4156,6 +4349,7 @@
     "height": 4,
     "weight": 85,
     "baseExperience": 42,
+    "growthRate": "medium",
     "captureRate": 255,
     "generation": 2,
     "evolutionChainId": 96
@@ -4178,6 +4372,7 @@
     "height": 14,
     "weight": 750,
     "baseExperience": 151,
+    "growthRate": "medium",
     "captureRate": 90,
     "generation": 2,
     "evolutionChainId": 96
@@ -4199,6 +4394,7 @@
     "height": 9,
     "weight": 265,
     "baseExperience": 184,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 67
@@ -4220,6 +4416,7 @@
     "height": 10,
     "weight": 270,
     "baseExperience": 184,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 67
@@ -4242,6 +4439,7 @@
     "height": 5,
     "weight": 21,
     "baseExperience": 81,
+    "growthRate": "medium-slow",
     "captureRate": 30,
     "generation": 2,
     "evolutionChainId": 97
@@ -4264,6 +4462,7 @@
     "height": 20,
     "weight": 795,
     "baseExperience": 172,
+    "growthRate": "medium",
     "captureRate": 70,
     "generation": 2,
     "evolutionChainId": 33
@@ -4285,6 +4484,7 @@
     "height": 7,
     "weight": 10,
     "baseExperience": 87,
+    "growthRate": "fast",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 98
@@ -4306,6 +4506,7 @@
     "height": 5,
     "weight": 50,
     "baseExperience": 118,
+    "growthRate": "medium",
     "captureRate": 225,
     "generation": 2,
     "evolutionChainId": 99
@@ -4327,6 +4528,7 @@
     "height": 13,
     "weight": 285,
     "baseExperience": 142,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 100
@@ -4349,6 +4551,7 @@
     "height": 15,
     "weight": 415,
     "baseExperience": 159,
+    "growthRate": "medium",
     "captureRate": 60,
     "generation": 2,
     "evolutionChainId": 101
@@ -4370,6 +4573,7 @@
     "height": 6,
     "weight": 72,
     "baseExperience": 58,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 2,
     "evolutionChainId": 102
@@ -4392,6 +4596,7 @@
     "height": 12,
     "weight": 1258,
     "baseExperience": 163,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 2,
     "evolutionChainId": 102
@@ -4413,6 +4618,7 @@
     "height": 15,
     "weight": 140,
     "baseExperience": 145,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 2,
     "evolutionChainId": 103
@@ -4435,6 +4641,7 @@
     "height": 11,
     "weight": 648,
     "baseExperience": 86,
+    "growthRate": "medium-slow",
     "captureRate": 60,
     "generation": 2,
     "evolutionChainId": 104
@@ -4457,6 +4664,7 @@
     "height": 92,
     "weight": 4000,
     "baseExperience": 179,
+    "growthRate": "medium",
     "captureRate": 25,
     "generation": 2,
     "evolutionChainId": 41
@@ -4478,6 +4686,7 @@
     "height": 6,
     "weight": 78,
     "baseExperience": 60,
+    "growthRate": "fast",
     "captureRate": 190,
     "generation": 2,
     "evolutionChainId": 105
@@ -4499,6 +4708,7 @@
     "height": 14,
     "weight": 487,
     "baseExperience": 158,
+    "growthRate": "fast",
     "captureRate": 75,
     "generation": 2,
     "evolutionChainId": 105
@@ -4521,6 +4731,7 @@
     "height": 5,
     "weight": 39,
     "baseExperience": 88,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 106
@@ -4543,6 +4754,7 @@
     "height": 18,
     "weight": 1180,
     "baseExperience": 175,
+    "growthRate": "medium",
     "captureRate": 25,
     "generation": 2,
     "evolutionChainId": 58
@@ -4565,6 +4777,7 @@
     "height": 6,
     "weight": 205,
     "baseExperience": 177,
+    "growthRate": "medium-slow",
     "captureRate": 190,
     "generation": 2,
     "evolutionChainId": 107
@@ -4587,6 +4800,7 @@
     "height": 15,
     "weight": 540,
     "baseExperience": 175,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 108
@@ -4609,6 +4823,7 @@
     "height": 9,
     "weight": 280,
     "baseExperience": 86,
+    "growthRate": "medium-slow",
     "captureRate": 60,
     "generation": 2,
     "evolutionChainId": 109
@@ -4630,6 +4845,7 @@
     "height": 6,
     "weight": 88,
     "baseExperience": 66,
+    "growthRate": "medium",
     "captureRate": 120,
     "generation": 2,
     "evolutionChainId": 110
@@ -4651,6 +4867,7 @@
     "height": 18,
     "weight": 1258,
     "baseExperience": 175,
+    "growthRate": "medium",
     "captureRate": 60,
     "generation": 2,
     "evolutionChainId": 110
@@ -4672,6 +4889,7 @@
     "height": 7,
     "weight": 350,
     "baseExperience": 50,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 2,
     "evolutionChainId": 111
@@ -4694,6 +4912,7 @@
     "height": 8,
     "weight": 550,
     "baseExperience": 151,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 2,
     "evolutionChainId": 111
@@ -4716,6 +4935,7 @@
     "height": 4,
     "weight": 65,
     "baseExperience": 50,
+    "growthRate": "slow",
     "captureRate": 225,
     "generation": 2,
     "evolutionChainId": 112
@@ -4738,6 +4958,7 @@
     "height": 11,
     "weight": 558,
     "baseExperience": 158,
+    "growthRate": "slow",
     "captureRate": 75,
     "generation": 2,
     "evolutionChainId": 112
@@ -4760,6 +4981,7 @@
     "height": 6,
     "weight": 50,
     "baseExperience": 144,
+    "growthRate": "fast",
     "captureRate": 60,
     "generation": 2,
     "evolutionChainId": 113
@@ -4781,6 +5003,7 @@
     "height": 6,
     "weight": 120,
     "baseExperience": 60,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 2,
     "evolutionChainId": 114
@@ -4802,6 +5025,7 @@
     "height": 9,
     "weight": 285,
     "baseExperience": 168,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 2,
     "evolutionChainId": 114
@@ -4824,6 +5048,7 @@
     "height": 9,
     "weight": 160,
     "baseExperience": 116,
+    "growthRate": "fast",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 115
@@ -4846,6 +5071,7 @@
     "height": 21,
     "weight": 2200,
     "baseExperience": 170,
+    "growthRate": "slow",
     "captureRate": 25,
     "generation": 2,
     "evolutionChainId": 116
@@ -4868,6 +5094,7 @@
     "height": 17,
     "weight": 505,
     "baseExperience": 163,
+    "growthRate": "slow",
     "captureRate": 25,
     "generation": 2,
     "evolutionChainId": 117
@@ -4890,6 +5117,7 @@
     "height": 6,
     "weight": 108,
     "baseExperience": 66,
+    "growthRate": "slow",
     "captureRate": 120,
     "generation": 2,
     "evolutionChainId": 118
@@ -4912,6 +5140,7 @@
     "height": 14,
     "weight": 350,
     "baseExperience": 175,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 118
@@ -4934,6 +5163,7 @@
     "height": 18,
     "weight": 1520,
     "baseExperience": 243,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 54
@@ -4955,6 +5185,7 @@
     "height": 5,
     "weight": 335,
     "baseExperience": 66,
+    "growthRate": "medium",
     "captureRate": 120,
     "generation": 2,
     "evolutionChainId": 119
@@ -4976,6 +5207,7 @@
     "height": 11,
     "weight": 1200,
     "baseExperience": 175,
+    "growthRate": "medium",
     "captureRate": 60,
     "generation": 2,
     "evolutionChainId": 119
@@ -4997,6 +5229,7 @@
     "height": 6,
     "weight": 325,
     "baseExperience": 180,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 68
@@ -5018,6 +5251,7 @@
     "height": 14,
     "weight": 712,
     "baseExperience": 163,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 120
@@ -5039,6 +5273,7 @@
     "height": 12,
     "weight": 580,
     "baseExperience": 88,
+    "growthRate": "fast",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 121
@@ -5060,6 +5295,7 @@
     "height": 7,
     "weight": 210,
     "baseExperience": 42,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 2,
     "evolutionChainId": 47
@@ -5081,6 +5317,7 @@
     "height": 14,
     "weight": 480,
     "baseExperience": 159,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 47
@@ -5103,6 +5340,7 @@
     "height": 4,
     "weight": 60,
     "baseExperience": 61,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 59
@@ -5124,6 +5362,7 @@
     "height": 6,
     "weight": 235,
     "baseExperience": 72,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 60
@@ -5145,6 +5384,7 @@
     "height": 7,
     "weight": 214,
     "baseExperience": 73,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 61
@@ -5166,6 +5406,7 @@
     "height": 12,
     "weight": 755,
     "baseExperience": 172,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 122
@@ -5187,6 +5428,7 @@
     "height": 15,
     "weight": 468,
     "baseExperience": 608,
+    "growthRate": "fast",
     "captureRate": 30,
     "generation": 2,
     "evolutionChainId": 51
@@ -5208,6 +5450,7 @@
     "height": 19,
     "weight": 1780,
     "baseExperience": 261,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 2,
     "evolutionChainId": 123
@@ -5229,6 +5472,7 @@
     "height": 21,
     "weight": 1980,
     "baseExperience": 261,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 2,
     "evolutionChainId": 124
@@ -5250,6 +5494,7 @@
     "height": 20,
     "weight": 1870,
     "baseExperience": 261,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 2,
     "evolutionChainId": 125
@@ -5272,6 +5517,7 @@
     "height": 6,
     "weight": 720,
     "baseExperience": 60,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 126
@@ -5294,6 +5540,7 @@
     "height": 12,
     "weight": 1520,
     "baseExperience": 144,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 126
@@ -5316,6 +5563,7 @@
     "height": 20,
     "weight": 2020,
     "baseExperience": 270,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 126
@@ -5338,6 +5586,7 @@
     "height": 52,
     "weight": 2160,
     "baseExperience": 306,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 2,
     "evolutionChainId": 127
@@ -5360,6 +5609,7 @@
     "height": 38,
     "weight": 1990,
     "baseExperience": 306,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 2,
     "evolutionChainId": 128
@@ -5382,6 +5632,7 @@
     "height": 6,
     "weight": 50,
     "baseExperience": 270,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 2,
     "evolutionChainId": 129
@@ -5403,6 +5654,7 @@
     "height": 5,
     "weight": 50,
     "baseExperience": 62,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 130
@@ -5424,6 +5676,7 @@
     "height": 9,
     "weight": 216,
     "baseExperience": 142,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 130
@@ -5445,6 +5698,7 @@
     "height": 17,
     "weight": 522,
     "baseExperience": 239,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 130
@@ -5466,6 +5720,7 @@
     "height": 4,
     "weight": 25,
     "baseExperience": 62,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 131
@@ -5488,6 +5743,7 @@
     "height": 9,
     "weight": 195,
     "baseExperience": 142,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 131
@@ -5510,6 +5766,7 @@
     "height": 19,
     "weight": 520,
     "baseExperience": 239,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 131
@@ -5531,6 +5788,7 @@
     "height": 4,
     "weight": 76,
     "baseExperience": 62,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 132
@@ -5553,6 +5811,7 @@
     "height": 7,
     "weight": 280,
     "baseExperience": 142,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 132
@@ -5575,6 +5834,7 @@
     "height": 15,
     "weight": 819,
     "baseExperience": 241,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 132
@@ -5596,6 +5856,7 @@
     "height": 5,
     "weight": 136,
     "baseExperience": 56,
+    "growthRate": "medium",
     "captureRate": 255,
     "generation": 3,
     "evolutionChainId": 133
@@ -5617,6 +5878,7 @@
     "height": 10,
     "weight": 370,
     "baseExperience": 147,
+    "growthRate": "medium",
     "captureRate": 127,
     "generation": 3,
     "evolutionChainId": 133
@@ -5638,6 +5900,7 @@
     "height": 4,
     "weight": 175,
     "baseExperience": 56,
+    "growthRate": "medium",
     "captureRate": 255,
     "generation": 3,
     "evolutionChainId": 134
@@ -5659,6 +5922,7 @@
     "height": 5,
     "weight": 325,
     "baseExperience": 147,
+    "growthRate": "medium",
     "captureRate": 90,
     "generation": 3,
     "evolutionChainId": 134
@@ -5680,6 +5944,7 @@
     "height": 3,
     "weight": 36,
     "baseExperience": 56,
+    "growthRate": "medium",
     "captureRate": 255,
     "generation": 3,
     "evolutionChainId": 135
@@ -5701,6 +5966,7 @@
     "height": 6,
     "weight": 100,
     "baseExperience": 72,
+    "growthRate": "medium",
     "captureRate": 120,
     "generation": 3,
     "evolutionChainId": 135
@@ -5723,6 +5989,7 @@
     "height": 10,
     "weight": 284,
     "baseExperience": 178,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 135
@@ -5744,6 +6011,7 @@
     "height": 7,
     "weight": 115,
     "baseExperience": 72,
+    "growthRate": "medium",
     "captureRate": 120,
     "generation": 3,
     "evolutionChainId": 135
@@ -5766,6 +6034,7 @@
     "height": 12,
     "weight": 316,
     "baseExperience": 173,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 135
@@ -5788,6 +6057,7 @@
     "height": 5,
     "weight": 26,
     "baseExperience": 44,
+    "growthRate": "medium-slow",
     "captureRate": 255,
     "generation": 3,
     "evolutionChainId": 136
@@ -5810,6 +6080,7 @@
     "height": 12,
     "weight": 325,
     "baseExperience": 119,
+    "growthRate": "medium-slow",
     "captureRate": 120,
     "generation": 3,
     "evolutionChainId": 136
@@ -5832,6 +6103,7 @@
     "height": 15,
     "weight": 550,
     "baseExperience": 216,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 136
@@ -5853,6 +6125,7 @@
     "height": 5,
     "weight": 40,
     "baseExperience": 44,
+    "growthRate": "medium-slow",
     "captureRate": 255,
     "generation": 3,
     "evolutionChainId": 137
@@ -5875,6 +6148,7 @@
     "height": 10,
     "weight": 280,
     "baseExperience": 119,
+    "growthRate": "medium-slow",
     "captureRate": 120,
     "generation": 3,
     "evolutionChainId": 137
@@ -5897,6 +6171,7 @@
     "height": 13,
     "weight": 596,
     "baseExperience": 216,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 137
@@ -5919,6 +6194,7 @@
     "height": 3,
     "weight": 23,
     "baseExperience": 54,
+    "growthRate": "medium-slow",
     "captureRate": 200,
     "generation": 3,
     "evolutionChainId": 138
@@ -5941,6 +6217,7 @@
     "height": 7,
     "weight": 198,
     "baseExperience": 159,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 138
@@ -5963,6 +6240,7 @@
     "height": 6,
     "weight": 95,
     "baseExperience": 54,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 3,
     "evolutionChainId": 139
@@ -5985,6 +6263,7 @@
     "height": 12,
     "weight": 280,
     "baseExperience": 154,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 139
@@ -6007,6 +6286,7 @@
     "height": 4,
     "weight": 66,
     "baseExperience": 40,
+    "growthRate": "slow",
     "captureRate": 235,
     "generation": 3,
     "evolutionChainId": 140
@@ -6029,6 +6309,7 @@
     "height": 8,
     "weight": 202,
     "baseExperience": 97,
+    "growthRate": "slow",
     "captureRate": 120,
     "generation": 3,
     "evolutionChainId": 140
@@ -6051,6 +6332,7 @@
     "height": 16,
     "weight": 484,
     "baseExperience": 233,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 140
@@ -6073,6 +6355,7 @@
     "height": 5,
     "weight": 17,
     "baseExperience": 54,
+    "growthRate": "medium",
     "captureRate": 200,
     "generation": 3,
     "evolutionChainId": 141
@@ -6095,6 +6378,7 @@
     "height": 8,
     "weight": 36,
     "baseExperience": 159,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 3,
     "evolutionChainId": 141
@@ -6116,6 +6400,7 @@
     "height": 4,
     "weight": 45,
     "baseExperience": 59,
+    "growthRate": "fluctuating",
     "captureRate": 255,
     "generation": 3,
     "evolutionChainId": 142
@@ -6138,6 +6423,7 @@
     "height": 12,
     "weight": 392,
     "baseExperience": 161,
+    "growthRate": "fluctuating",
     "captureRate": 90,
     "generation": 3,
     "evolutionChainId": 142
@@ -6159,6 +6445,7 @@
     "height": 8,
     "weight": 240,
     "baseExperience": 56,
+    "growthRate": "slow",
     "captureRate": 255,
     "generation": 3,
     "evolutionChainId": 143
@@ -6180,6 +6467,7 @@
     "height": 14,
     "weight": 465,
     "baseExperience": 154,
+    "growthRate": "slow",
     "captureRate": 120,
     "generation": 3,
     "evolutionChainId": 143
@@ -6201,6 +6489,7 @@
     "height": 20,
     "weight": 1305,
     "baseExperience": 252,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 143
@@ -6223,6 +6512,7 @@
     "height": 5,
     "weight": 55,
     "baseExperience": 53,
+    "growthRate": "erratic",
     "captureRate": 255,
     "generation": 3,
     "evolutionChainId": 144
@@ -6245,6 +6535,7 @@
     "height": 8,
     "weight": 120,
     "baseExperience": 160,
+    "growthRate": "erratic",
     "captureRate": 120,
     "generation": 3,
     "evolutionChainId": 144
@@ -6267,6 +6558,7 @@
     "height": 8,
     "weight": 12,
     "baseExperience": 83,
+    "growthRate": "erratic",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 144
@@ -6288,6 +6580,7 @@
     "height": 6,
     "weight": 163,
     "baseExperience": 48,
+    "growthRate": "medium-slow",
     "captureRate": 190,
     "generation": 3,
     "evolutionChainId": 145
@@ -6309,6 +6602,7 @@
     "height": 10,
     "weight": 405,
     "baseExperience": 126,
+    "growthRate": "medium-slow",
     "captureRate": 120,
     "generation": 3,
     "evolutionChainId": 145
@@ -6330,6 +6624,7 @@
     "height": 15,
     "weight": 840,
     "baseExperience": 221,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 145
@@ -6351,6 +6646,7 @@
     "height": 10,
     "weight": 864,
     "baseExperience": 47,
+    "growthRate": "fluctuating",
     "captureRate": 180,
     "generation": 3,
     "evolutionChainId": 146
@@ -6372,6 +6668,7 @@
     "height": 23,
     "weight": 2538,
     "baseExperience": 166,
+    "growthRate": "fluctuating",
     "captureRate": 200,
     "generation": 3,
     "evolutionChainId": 146
@@ -6394,6 +6691,7 @@
     "height": 2,
     "weight": 20,
     "baseExperience": 38,
+    "growthRate": "fast",
     "captureRate": 150,
     "generation": 3,
     "evolutionChainId": 90
@@ -6415,6 +6713,7 @@
     "height": 10,
     "weight": 970,
     "baseExperience": 75,
+    "growthRate": "medium",
     "captureRate": 255,
     "generation": 3,
     "evolutionChainId": 147
@@ -6436,6 +6735,7 @@
     "height": 6,
     "weight": 110,
     "baseExperience": 52,
+    "growthRate": "fast",
     "captureRate": 255,
     "generation": 3,
     "evolutionChainId": 148
@@ -6457,6 +6757,7 @@
     "height": 11,
     "weight": 326,
     "baseExperience": 140,
+    "growthRate": "fast",
     "captureRate": 60,
     "generation": 3,
     "evolutionChainId": 148
@@ -6479,6 +6780,7 @@
     "height": 5,
     "weight": 110,
     "baseExperience": 133,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 149
@@ -6501,6 +6803,7 @@
     "height": 6,
     "weight": 115,
     "baseExperience": 133,
+    "growthRate": "fast",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 150
@@ -6523,6 +6826,7 @@
     "height": 4,
     "weight": 600,
     "baseExperience": 66,
+    "growthRate": "slow",
     "captureRate": 180,
     "generation": 3,
     "evolutionChainId": 151
@@ -6545,6 +6849,7 @@
     "height": 9,
     "weight": 1200,
     "baseExperience": 151,
+    "growthRate": "slow",
     "captureRate": 90,
     "generation": 3,
     "evolutionChainId": 151
@@ -6567,6 +6872,7 @@
     "height": 21,
     "weight": 3600,
     "baseExperience": 239,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 151
@@ -6589,6 +6895,7 @@
     "height": 6,
     "weight": 112,
     "baseExperience": 56,
+    "growthRate": "medium",
     "captureRate": 180,
     "generation": 3,
     "evolutionChainId": 152
@@ -6611,6 +6918,7 @@
     "height": 13,
     "weight": 315,
     "baseExperience": 144,
+    "growthRate": "medium",
     "captureRate": 90,
     "generation": 3,
     "evolutionChainId": 152
@@ -6632,6 +6940,7 @@
     "height": 6,
     "weight": 152,
     "baseExperience": 59,
+    "growthRate": "slow",
     "captureRate": 120,
     "generation": 3,
     "evolutionChainId": 153
@@ -6653,6 +6962,7 @@
     "height": 15,
     "weight": 402,
     "baseExperience": 166,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 153
@@ -6674,6 +6984,7 @@
     "height": 4,
     "weight": 42,
     "baseExperience": 142,
+    "growthRate": "medium",
     "captureRate": 200,
     "generation": 3,
     "evolutionChainId": 154
@@ -6695,6 +7006,7 @@
     "height": 4,
     "weight": 42,
     "baseExperience": 142,
+    "growthRate": "medium",
     "captureRate": 200,
     "generation": 3,
     "evolutionChainId": 155
@@ -6716,6 +7028,7 @@
     "height": 7,
     "weight": 177,
     "baseExperience": 151,
+    "growthRate": "erratic",
     "captureRate": 150,
     "generation": 3,
     "evolutionChainId": 156
@@ -6737,6 +7050,7 @@
     "height": 6,
     "weight": 177,
     "baseExperience": 151,
+    "growthRate": "fluctuating",
     "captureRate": 150,
     "generation": 3,
     "evolutionChainId": 157
@@ -6759,6 +7073,7 @@
     "height": 3,
     "weight": 20,
     "baseExperience": 140,
+    "growthRate": "medium-slow",
     "captureRate": 150,
     "generation": 3,
     "evolutionChainId": 158
@@ -6780,6 +7095,7 @@
     "height": 4,
     "weight": 103,
     "baseExperience": 60,
+    "growthRate": "fluctuating",
     "captureRate": 225,
     "generation": 3,
     "evolutionChainId": 159
@@ -6801,6 +7117,7 @@
     "height": 17,
     "weight": 800,
     "baseExperience": 163,
+    "growthRate": "fluctuating",
     "captureRate": 75,
     "generation": 3,
     "evolutionChainId": 159
@@ -6823,6 +7140,7 @@
     "height": 8,
     "weight": 208,
     "baseExperience": 61,
+    "growthRate": "slow",
     "captureRate": 225,
     "generation": 3,
     "evolutionChainId": 160
@@ -6845,6 +7163,7 @@
     "height": 18,
     "weight": 888,
     "baseExperience": 161,
+    "growthRate": "slow",
     "captureRate": 60,
     "generation": 3,
     "evolutionChainId": 160
@@ -6866,6 +7185,7 @@
     "height": 20,
     "weight": 1300,
     "baseExperience": 80,
+    "growthRate": "fluctuating",
     "captureRate": 125,
     "generation": 3,
     "evolutionChainId": 161
@@ -6887,6 +7207,7 @@
     "height": 145,
     "weight": 3980,
     "baseExperience": 175,
+    "growthRate": "fluctuating",
     "captureRate": 60,
     "generation": 3,
     "evolutionChainId": 161
@@ -6909,6 +7230,7 @@
     "height": 7,
     "weight": 240,
     "baseExperience": 61,
+    "growthRate": "medium",
     "captureRate": 255,
     "generation": 3,
     "evolutionChainId": 162
@@ -6931,6 +7253,7 @@
     "height": 19,
     "weight": 2200,
     "baseExperience": 161,
+    "growthRate": "medium",
     "captureRate": 150,
     "generation": 3,
     "evolutionChainId": 162
@@ -6952,6 +7275,7 @@
     "height": 5,
     "weight": 804,
     "baseExperience": 165,
+    "growthRate": "medium",
     "captureRate": 90,
     "generation": 3,
     "evolutionChainId": 163
@@ -6973,6 +7297,7 @@
     "height": 7,
     "weight": 306,
     "baseExperience": 66,
+    "growthRate": "fast",
     "captureRate": 255,
     "generation": 3,
     "evolutionChainId": 164
@@ -6994,6 +7319,7 @@
     "height": 9,
     "weight": 715,
     "baseExperience": 165,
+    "growthRate": "fast",
     "captureRate": 60,
     "generation": 3,
     "evolutionChainId": 164
@@ -7015,6 +7341,7 @@
     "height": 11,
     "weight": 50,
     "baseExperience": 126,
+    "growthRate": "fast",
     "captureRate": 255,
     "generation": 3,
     "evolutionChainId": 165
@@ -7036,6 +7363,7 @@
     "height": 7,
     "weight": 150,
     "baseExperience": 58,
+    "growthRate": "medium-slow",
     "captureRate": 255,
     "generation": 3,
     "evolutionChainId": 166
@@ -7058,6 +7386,7 @@
     "height": 11,
     "weight": 153,
     "baseExperience": 119,
+    "growthRate": "medium-slow",
     "captureRate": 120,
     "generation": 3,
     "evolutionChainId": 166
@@ -7080,6 +7409,7 @@
     "height": 20,
     "weight": 820,
     "baseExperience": 234,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 166
@@ -7101,6 +7431,7 @@
     "height": 4,
     "weight": 513,
     "baseExperience": 67,
+    "growthRate": "medium-slow",
     "captureRate": 190,
     "generation": 3,
     "evolutionChainId": 167
@@ -7123,6 +7454,7 @@
     "height": 13,
     "weight": 774,
     "baseExperience": 166,
+    "growthRate": "medium-slow",
     "captureRate": 60,
     "generation": 3,
     "evolutionChainId": 167
@@ -7145,6 +7477,7 @@
     "height": 4,
     "weight": 12,
     "baseExperience": 62,
+    "growthRate": "erratic",
     "captureRate": 255,
     "generation": 3,
     "evolutionChainId": 168
@@ -7167,6 +7500,7 @@
     "height": 11,
     "weight": 206,
     "baseExperience": 172,
+    "growthRate": "erratic",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 168
@@ -7188,6 +7522,7 @@
     "height": 13,
     "weight": 403,
     "baseExperience": 160,
+    "growthRate": "erratic",
     "captureRate": 90,
     "generation": 3,
     "evolutionChainId": 169
@@ -7209,6 +7544,7 @@
     "height": 27,
     "weight": 525,
     "baseExperience": 160,
+    "growthRate": "fluctuating",
     "captureRate": 90,
     "generation": 3,
     "evolutionChainId": 170
@@ -7231,6 +7567,7 @@
     "height": 10,
     "weight": 1680,
     "baseExperience": 161,
+    "growthRate": "fast",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 171
@@ -7253,6 +7590,7 @@
     "height": 12,
     "weight": 1540,
     "baseExperience": 161,
+    "growthRate": "fast",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 172
@@ -7275,6 +7613,7 @@
     "height": 4,
     "weight": 19,
     "baseExperience": 58,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 3,
     "evolutionChainId": 173
@@ -7297,6 +7636,7 @@
     "height": 9,
     "weight": 236,
     "baseExperience": 164,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 3,
     "evolutionChainId": 173
@@ -7318,6 +7658,7 @@
     "height": 6,
     "weight": 115,
     "baseExperience": 62,
+    "growthRate": "fluctuating",
     "captureRate": 205,
     "generation": 3,
     "evolutionChainId": 174
@@ -7340,6 +7681,7 @@
     "height": 11,
     "weight": 328,
     "baseExperience": 164,
+    "growthRate": "fluctuating",
     "captureRate": 155,
     "generation": 3,
     "evolutionChainId": 174
@@ -7362,6 +7704,7 @@
     "height": 5,
     "weight": 215,
     "baseExperience": 60,
+    "growthRate": "medium",
     "captureRate": 255,
     "generation": 3,
     "evolutionChainId": 175
@@ -7384,6 +7727,7 @@
     "height": 15,
     "weight": 1080,
     "baseExperience": 175,
+    "growthRate": "medium",
     "captureRate": 90,
     "generation": 3,
     "evolutionChainId": 175
@@ -7406,6 +7750,7 @@
     "height": 10,
     "weight": 238,
     "baseExperience": 71,
+    "growthRate": "erratic",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 176
@@ -7428,6 +7773,7 @@
     "height": 15,
     "weight": 604,
     "baseExperience": 173,
+    "growthRate": "erratic",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 176
@@ -7450,6 +7796,7 @@
     "height": 7,
     "weight": 125,
     "baseExperience": 71,
+    "growthRate": "erratic",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 177
@@ -7472,6 +7819,7 @@
     "height": 15,
     "weight": 682,
     "baseExperience": 173,
+    "growthRate": "erratic",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 177
@@ -7493,6 +7841,7 @@
     "height": 6,
     "weight": 74,
     "baseExperience": 40,
+    "growthRate": "erratic",
     "captureRate": 255,
     "generation": 3,
     "evolutionChainId": 178
@@ -7514,6 +7863,7 @@
     "height": 62,
     "weight": 1620,
     "baseExperience": 189,
+    "growthRate": "erratic",
     "captureRate": 60,
     "generation": 3,
     "evolutionChainId": 178
@@ -7535,6 +7885,7 @@
     "height": 3,
     "weight": 8,
     "baseExperience": 147,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 179
@@ -7556,6 +7907,7 @@
     "height": 10,
     "weight": 220,
     "baseExperience": 154,
+    "growthRate": "medium-slow",
     "captureRate": 200,
     "generation": 3,
     "evolutionChainId": 180
@@ -7577,6 +7929,7 @@
     "height": 6,
     "weight": 23,
     "baseExperience": 59,
+    "growthRate": "fast",
     "captureRate": 225,
     "generation": 3,
     "evolutionChainId": 181
@@ -7598,6 +7951,7 @@
     "height": 11,
     "weight": 125,
     "baseExperience": 159,
+    "growthRate": "fast",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 181
@@ -7619,6 +7973,7 @@
     "height": 8,
     "weight": 150,
     "baseExperience": 59,
+    "growthRate": "fast",
     "captureRate": 190,
     "generation": 3,
     "evolutionChainId": 182
@@ -7640,6 +7995,7 @@
     "height": 16,
     "weight": 306,
     "baseExperience": 159,
+    "growthRate": "fast",
     "captureRate": 90,
     "generation": 3,
     "evolutionChainId": 182
@@ -7662,6 +8018,7 @@
     "height": 20,
     "weight": 1000,
     "baseExperience": 161,
+    "growthRate": "slow",
     "captureRate": 200,
     "generation": 3,
     "evolutionChainId": 183
@@ -7683,6 +8040,7 @@
     "height": 6,
     "weight": 10,
     "baseExperience": 159,
+    "growthRate": "fast",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 184
@@ -7704,6 +8062,7 @@
     "height": 12,
     "weight": 470,
     "baseExperience": 163,
+    "growthRate": "medium-slow",
     "captureRate": 30,
     "generation": 3,
     "evolutionChainId": 185
@@ -7725,6 +8084,7 @@
     "height": 6,
     "weight": 140,
     "baseExperience": 52,
+    "growthRate": "medium",
     "captureRate": 125,
     "generation": 3,
     "evolutionChainId": 100
@@ -7746,6 +8106,7 @@
     "height": 7,
     "weight": 168,
     "baseExperience": 60,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 3,
     "evolutionChainId": 186
@@ -7767,6 +8128,7 @@
     "height": 15,
     "weight": 2565,
     "baseExperience": 168,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 3,
     "evolutionChainId": 186
@@ -7789,6 +8151,7 @@
     "height": 8,
     "weight": 395,
     "baseExperience": 58,
+    "growthRate": "medium-slow",
     "captureRate": 255,
     "generation": 3,
     "evolutionChainId": 187
@@ -7811,6 +8174,7 @@
     "height": 11,
     "weight": 876,
     "baseExperience": 144,
+    "growthRate": "medium-slow",
     "captureRate": 120,
     "generation": 3,
     "evolutionChainId": 187
@@ -7833,6 +8197,7 @@
     "height": 14,
     "weight": 1506,
     "baseExperience": 239,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 187
@@ -7854,6 +8219,7 @@
     "height": 4,
     "weight": 525,
     "baseExperience": 69,
+    "growthRate": "erratic",
     "captureRate": 255,
     "generation": 3,
     "evolutionChainId": 188
@@ -7875,6 +8241,7 @@
     "height": 17,
     "weight": 270,
     "baseExperience": 170,
+    "growthRate": "erratic",
     "captureRate": 60,
     "generation": 3,
     "evolutionChainId": 188
@@ -7896,6 +8263,7 @@
     "height": 18,
     "weight": 226,
     "baseExperience": 170,
+    "growthRate": "erratic",
     "captureRate": 60,
     "generation": 3,
     "evolutionChainId": 188
@@ -7918,6 +8286,7 @@
     "height": 10,
     "weight": 234,
     "baseExperience": 170,
+    "growthRate": "slow",
     "captureRate": 25,
     "generation": 3,
     "evolutionChainId": 189
@@ -7939,6 +8308,7 @@
     "height": 6,
     "weight": 87,
     "baseExperience": 116,
+    "growthRate": "fast",
     "captureRate": 225,
     "generation": 3,
     "evolutionChainId": 190
@@ -7960,6 +8330,7 @@
     "height": 6,
     "weight": 421,
     "baseExperience": 60,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 191
@@ -7981,6 +8352,7 @@
     "height": 11,
     "weight": 1105,
     "baseExperience": 147,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 191
@@ -8003,6 +8375,7 @@
     "height": 15,
     "weight": 1026,
     "baseExperience": 270,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 191
@@ -8025,6 +8398,7 @@
     "height": 6,
     "weight": 952,
     "baseExperience": 60,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 3,
     "evolutionChainId": 192
@@ -8047,6 +8421,7 @@
     "height": 12,
     "weight": 2025,
     "baseExperience": 147,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 3,
     "evolutionChainId": 192
@@ -8069,6 +8444,7 @@
     "height": 16,
     "weight": 5500,
     "baseExperience": 270,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 3,
     "evolutionChainId": 192
@@ -8090,6 +8466,7 @@
     "height": 17,
     "weight": 2300,
     "baseExperience": 261,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 3,
     "evolutionChainId": 193
@@ -8111,6 +8488,7 @@
     "height": 18,
     "weight": 1750,
     "baseExperience": 261,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 3,
     "evolutionChainId": 194
@@ -8132,6 +8510,7 @@
     "height": 19,
     "weight": 2050,
     "baseExperience": 261,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 3,
     "evolutionChainId": 195
@@ -8154,6 +8533,7 @@
     "height": 14,
     "weight": 400,
     "baseExperience": 270,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 3,
     "evolutionChainId": 196
@@ -8176,6 +8556,7 @@
     "height": 20,
     "weight": 600,
     "baseExperience": 270,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 3,
     "evolutionChainId": 197
@@ -8197,6 +8578,7 @@
     "height": 45,
     "weight": 3520,
     "baseExperience": 302,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 3,
     "evolutionChainId": 198
@@ -8218,6 +8600,7 @@
     "height": 35,
     "weight": 9500,
     "baseExperience": 302,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 3,
     "evolutionChainId": 199
@@ -8240,6 +8623,7 @@
     "height": 70,
     "weight": 2065,
     "baseExperience": 306,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 3,
     "evolutionChainId": 200
@@ -8262,6 +8646,7 @@
     "height": 3,
     "weight": 11,
     "baseExperience": 270,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 3,
     "evolutionChainId": 201
@@ -8283,6 +8668,7 @@
     "height": 17,
     "weight": 608,
     "baseExperience": 270,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 3,
     "evolutionChainId": 202
@@ -8304,6 +8690,7 @@
     "height": 4,
     "weight": 102,
     "baseExperience": 64,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 203
@@ -8325,6 +8712,7 @@
     "height": 11,
     "weight": 970,
     "baseExperience": 142,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 203
@@ -8347,6 +8735,7 @@
     "height": 22,
     "weight": 3100,
     "baseExperience": 236,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 203
@@ -8368,6 +8757,7 @@
     "height": 5,
     "weight": 62,
     "baseExperience": 62,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 204
@@ -8390,6 +8780,7 @@
     "height": 9,
     "weight": 220,
     "baseExperience": 142,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 204
@@ -8412,6 +8803,7 @@
     "height": 12,
     "weight": 550,
     "baseExperience": 240,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 204
@@ -8433,6 +8825,7 @@
     "height": 4,
     "weight": 52,
     "baseExperience": 63,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 205
@@ -8454,6 +8847,7 @@
     "height": 8,
     "weight": 230,
     "baseExperience": 142,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 205
@@ -8476,6 +8870,7 @@
     "height": 17,
     "weight": 845,
     "baseExperience": 239,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 205
@@ -8498,6 +8893,7 @@
     "height": 3,
     "weight": 20,
     "baseExperience": 49,
+    "growthRate": "medium-slow",
     "captureRate": 255,
     "generation": 4,
     "evolutionChainId": 206
@@ -8520,6 +8916,7 @@
     "height": 6,
     "weight": 155,
     "baseExperience": 119,
+    "growthRate": "medium-slow",
     "captureRate": 120,
     "generation": 4,
     "evolutionChainId": 206
@@ -8542,6 +8939,7 @@
     "height": 12,
     "weight": 249,
     "baseExperience": 218,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 206
@@ -8563,6 +8961,7 @@
     "height": 5,
     "weight": 200,
     "baseExperience": 50,
+    "growthRate": "medium",
     "captureRate": 255,
     "generation": 4,
     "evolutionChainId": 207
@@ -8585,6 +8984,7 @@
     "height": 10,
     "weight": 315,
     "baseExperience": 144,
+    "growthRate": "medium",
     "captureRate": 127,
     "generation": 4,
     "evolutionChainId": 207
@@ -8606,6 +9006,7 @@
     "height": 3,
     "weight": 22,
     "baseExperience": 39,
+    "growthRate": "medium-slow",
     "captureRate": 255,
     "generation": 4,
     "evolutionChainId": 208
@@ -8627,6 +9028,7 @@
     "height": 10,
     "weight": 255,
     "baseExperience": 134,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 208
@@ -8648,6 +9050,7 @@
     "height": 5,
     "weight": 95,
     "baseExperience": 53,
+    "growthRate": "medium-slow",
     "captureRate": 235,
     "generation": 4,
     "evolutionChainId": 209
@@ -8669,6 +9072,7 @@
     "height": 9,
     "weight": 305,
     "baseExperience": 127,
+    "growthRate": "medium-slow",
     "captureRate": 120,
     "generation": 4,
     "evolutionChainId": 209
@@ -8690,6 +9094,7 @@
     "height": 14,
     "weight": 420,
     "baseExperience": 235,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 209
@@ -8712,6 +9117,7 @@
     "height": 2,
     "weight": 12,
     "baseExperience": 56,
+    "growthRate": "medium-slow",
     "captureRate": 255,
     "generation": 4,
     "evolutionChainId": 158
@@ -8734,6 +9140,7 @@
     "height": 9,
     "weight": 145,
     "baseExperience": 232,
+    "growthRate": "medium-slow",
     "captureRate": 75,
     "generation": 4,
     "evolutionChainId": 158
@@ -8755,6 +9162,7 @@
     "height": 9,
     "weight": 315,
     "baseExperience": 70,
+    "growthRate": "erratic",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 211
@@ -8776,6 +9184,7 @@
     "height": 16,
     "weight": 1025,
     "baseExperience": 173,
+    "growthRate": "erratic",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 211
@@ -8798,6 +9207,7 @@
     "height": 5,
     "weight": 570,
     "baseExperience": 70,
+    "growthRate": "erratic",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 212
@@ -8820,6 +9230,7 @@
     "height": 13,
     "weight": 1495,
     "baseExperience": 173,
+    "growthRate": "erratic",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 212
@@ -8841,6 +9252,7 @@
     "height": 2,
     "weight": 34,
     "baseExperience": 45,
+    "growthRate": "medium",
     "captureRate": 120,
     "generation": 4,
     "evolutionChainId": 213
@@ -8863,6 +9275,7 @@
     "height": 5,
     "weight": 65,
     "baseExperience": 148,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 213
@@ -8885,6 +9298,7 @@
     "height": 9,
     "weight": 233,
     "baseExperience": 148,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 213
@@ -8907,6 +9321,7 @@
     "height": 3,
     "weight": 55,
     "baseExperience": 49,
+    "growthRate": "medium-slow",
     "captureRate": 120,
     "generation": 4,
     "evolutionChainId": 214
@@ -8929,6 +9344,7 @@
     "height": 12,
     "weight": 385,
     "baseExperience": 166,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 214
@@ -8950,6 +9366,7 @@
     "height": 4,
     "weight": 39,
     "baseExperience": 142,
+    "growthRate": "medium",
     "captureRate": 200,
     "generation": 4,
     "evolutionChainId": 215
@@ -8971,6 +9388,7 @@
     "height": 7,
     "weight": 295,
     "baseExperience": 66,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 4,
     "evolutionChainId": 216
@@ -8992,6 +9410,7 @@
     "height": 11,
     "weight": 335,
     "baseExperience": 173,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 4,
     "evolutionChainId": 216
@@ -9013,6 +9432,7 @@
     "height": 4,
     "weight": 33,
     "baseExperience": 55,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 4,
     "evolutionChainId": 217
@@ -9034,6 +9454,7 @@
     "height": 5,
     "weight": 93,
     "baseExperience": 158,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 4,
     "evolutionChainId": 217
@@ -9055,6 +9476,7 @@
     "height": 3,
     "weight": 63,
     "baseExperience": 65,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 4,
     "evolutionChainId": 218
@@ -9077,6 +9499,7 @@
     "height": 9,
     "weight": 299,
     "baseExperience": 166,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 4,
     "evolutionChainId": 218
@@ -9098,6 +9521,7 @@
     "height": 12,
     "weight": 203,
     "baseExperience": 169,
+    "growthRate": "fast",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 93
@@ -9120,6 +9544,7 @@
     "height": 4,
     "weight": 12,
     "baseExperience": 70,
+    "growthRate": "fluctuating",
     "captureRate": 125,
     "generation": 4,
     "evolutionChainId": 219
@@ -9142,6 +9567,7 @@
     "height": 12,
     "weight": 150,
     "baseExperience": 174,
+    "growthRate": "fluctuating",
     "captureRate": 60,
     "generation": 4,
     "evolutionChainId": 219
@@ -9163,6 +9589,7 @@
     "height": 4,
     "weight": 55,
     "baseExperience": 70,
+    "growthRate": "medium",
     "captureRate": 190,
     "generation": 4,
     "evolutionChainId": 220
@@ -9184,6 +9611,7 @@
     "height": 12,
     "weight": 333,
     "baseExperience": 168,
+    "growthRate": "medium",
     "captureRate": 60,
     "generation": 4,
     "evolutionChainId": 220
@@ -9205,6 +9633,7 @@
     "height": 9,
     "weight": 44,
     "baseExperience": 173,
+    "growthRate": "fast",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 98
@@ -9227,6 +9656,7 @@
     "height": 9,
     "weight": 273,
     "baseExperience": 177,
+    "growthRate": "medium-slow",
     "captureRate": 30,
     "generation": 4,
     "evolutionChainId": 97
@@ -9248,6 +9678,7 @@
     "height": 5,
     "weight": 39,
     "baseExperience": 62,
+    "growthRate": "fast",
     "captureRate": 190,
     "generation": 4,
     "evolutionChainId": 221
@@ -9269,6 +9700,7 @@
     "height": 10,
     "weight": 438,
     "baseExperience": 158,
+    "growthRate": "fast",
     "captureRate": 75,
     "generation": 4,
     "evolutionChainId": 221
@@ -9290,6 +9722,7 @@
     "height": 2,
     "weight": 6,
     "baseExperience": 57,
+    "growthRate": "fast",
     "captureRate": 120,
     "generation": 4,
     "evolutionChainId": 184
@@ -9312,6 +9745,7 @@
     "height": 4,
     "weight": 192,
     "baseExperience": 66,
+    "growthRate": "medium",
     "captureRate": 225,
     "generation": 4,
     "evolutionChainId": 223
@@ -9334,6 +9768,7 @@
     "height": 10,
     "weight": 380,
     "baseExperience": 168,
+    "growthRate": "medium",
     "captureRate": 60,
     "generation": 4,
     "evolutionChainId": 223
@@ -9356,6 +9791,7 @@
     "height": 5,
     "weight": 605,
     "baseExperience": 60,
+    "growthRate": "medium",
     "captureRate": 255,
     "generation": 4,
     "evolutionChainId": 224
@@ -9378,6 +9814,7 @@
     "height": 13,
     "weight": 1870,
     "baseExperience": 175,
+    "growthRate": "medium",
     "captureRate": 90,
     "generation": 4,
     "evolutionChainId": 224
@@ -9399,6 +9836,7 @@
     "height": 5,
     "weight": 150,
     "baseExperience": 58,
+    "growthRate": "medium",
     "captureRate": 255,
     "generation": 4,
     "evolutionChainId": 91
@@ -9421,6 +9859,7 @@
     "height": 6,
     "weight": 130,
     "baseExperience": 62,
+    "growthRate": "medium",
     "captureRate": 145,
     "generation": 4,
     "evolutionChainId": 57
@@ -9442,6 +9881,7 @@
     "height": 6,
     "weight": 244,
     "baseExperience": 110,
+    "growthRate": "fast",
     "captureRate": 130,
     "generation": 4,
     "evolutionChainId": 51
@@ -9464,6 +9904,7 @@
     "height": 5,
     "weight": 19,
     "baseExperience": 144,
+    "growthRate": "medium-slow",
     "captureRate": 30,
     "generation": 4,
     "evolutionChainId": 228
@@ -9486,6 +9927,7 @@
     "height": 10,
     "weight": 1080,
     "baseExperience": 170,
+    "growthRate": "medium",
     "captureRate": 100,
     "generation": 4,
     "evolutionChainId": 229
@@ -9508,6 +9950,7 @@
     "height": 7,
     "weight": 205,
     "baseExperience": 60,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 230
@@ -9530,6 +9973,7 @@
     "height": 14,
     "weight": 560,
     "baseExperience": 144,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 230
@@ -9552,6 +9996,7 @@
     "height": 19,
     "weight": 950,
     "baseExperience": 270,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 230
@@ -9573,6 +10018,7 @@
     "height": 6,
     "weight": 1050,
     "baseExperience": 78,
+    "growthRate": "slow",
     "captureRate": 50,
     "generation": 4,
     "evolutionChainId": 72
@@ -9594,6 +10040,7 @@
     "height": 7,
     "weight": 202,
     "baseExperience": 57,
+    "growthRate": "medium-slow",
     "captureRate": 75,
     "generation": 4,
     "evolutionChainId": 232
@@ -9616,6 +10063,7 @@
     "height": 12,
     "weight": 540,
     "baseExperience": 184,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 232
@@ -9637,6 +10085,7 @@
     "height": 8,
     "weight": 495,
     "baseExperience": 66,
+    "growthRate": "slow",
     "captureRate": 140,
     "generation": 4,
     "evolutionChainId": 233
@@ -9658,6 +10107,7 @@
     "height": 20,
     "weight": 3000,
     "baseExperience": 184,
+    "growthRate": "slow",
     "captureRate": 60,
     "generation": 4,
     "evolutionChainId": 233
@@ -9680,6 +10130,7 @@
     "height": 8,
     "weight": 120,
     "baseExperience": 66,
+    "growthRate": "slow",
     "captureRate": 120,
     "generation": 4,
     "evolutionChainId": 234
@@ -9702,6 +10153,7 @@
     "height": 13,
     "weight": 615,
     "baseExperience": 175,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 234
@@ -9724,6 +10176,7 @@
     "height": 7,
     "weight": 230,
     "baseExperience": 60,
+    "growthRate": "medium",
     "captureRate": 140,
     "generation": 4,
     "evolutionChainId": 235
@@ -9746,6 +10199,7 @@
     "height": 13,
     "weight": 444,
     "baseExperience": 172,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 4,
     "evolutionChainId": 235
@@ -9767,6 +10221,7 @@
     "height": 14,
     "weight": 270,
     "baseExperience": 159,
+    "growthRate": "slow",
     "captureRate": 200,
     "generation": 4,
     "evolutionChainId": 236
@@ -9788,6 +10243,7 @@
     "height": 4,
     "weight": 70,
     "baseExperience": 66,
+    "growthRate": "erratic",
     "captureRate": 190,
     "generation": 4,
     "evolutionChainId": 237
@@ -9809,6 +10265,7 @@
     "height": 12,
     "weight": 240,
     "baseExperience": 161,
+    "growthRate": "erratic",
     "captureRate": 75,
     "generation": 4,
     "evolutionChainId": 237
@@ -9831,6 +10288,7 @@
     "height": 10,
     "weight": 650,
     "baseExperience": 69,
+    "growthRate": "slow",
     "captureRate": 25,
     "generation": 4,
     "evolutionChainId": 116
@@ -9853,6 +10311,7 @@
     "height": 10,
     "weight": 505,
     "baseExperience": 67,
+    "growthRate": "slow",
     "captureRate": 120,
     "generation": 4,
     "evolutionChainId": 239
@@ -9875,6 +10334,7 @@
     "height": 22,
     "weight": 1355,
     "baseExperience": 173,
+    "growthRate": "slow",
     "captureRate": 60,
     "generation": 4,
     "evolutionChainId": 239
@@ -9897,6 +10357,7 @@
     "height": 11,
     "weight": 340,
     "baseExperience": 179,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 109
@@ -9919,6 +10380,7 @@
     "height": 12,
     "weight": 1800,
     "baseExperience": 241,
+    "growthRate": "medium",
     "captureRate": 30,
     "generation": 4,
     "evolutionChainId": 34
@@ -9940,6 +10402,7 @@
     "height": 17,
     "weight": 1400,
     "baseExperience": 180,
+    "growthRate": "medium",
     "captureRate": 30,
     "generation": 4,
     "evolutionChainId": 48
@@ -9962,6 +10425,7 @@
     "height": 24,
     "weight": 2828,
     "baseExperience": 241,
+    "growthRate": "slow",
     "captureRate": 30,
     "generation": 4,
     "evolutionChainId": 50
@@ -9983,6 +10447,7 @@
     "height": 20,
     "weight": 1286,
     "baseExperience": 187,
+    "growthRate": "medium",
     "captureRate": 30,
     "generation": 4,
     "evolutionChainId": 52
@@ -10004,6 +10469,7 @@
     "height": 18,
     "weight": 1386,
     "baseExperience": 243,
+    "growthRate": "medium",
     "captureRate": 30,
     "generation": 4,
     "evolutionChainId": 60
@@ -10025,6 +10491,7 @@
     "height": 16,
     "weight": 680,
     "baseExperience": 243,
+    "growthRate": "medium",
     "captureRate": 30,
     "generation": 4,
     "evolutionChainId": 61
@@ -10047,6 +10514,7 @@
     "height": 15,
     "weight": 380,
     "baseExperience": 245,
+    "growthRate": "fast",
     "captureRate": 30,
     "generation": 4,
     "evolutionChainId": 87
@@ -10069,6 +10537,7 @@
     "height": 19,
     "weight": 515,
     "baseExperience": 180,
+    "growthRate": "medium",
     "captureRate": 30,
     "generation": 4,
     "evolutionChainId": 95
@@ -10090,6 +10559,7 @@
     "height": 10,
     "weight": 255,
     "baseExperience": 184,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 67
@@ -10111,6 +10581,7 @@
     "height": 8,
     "weight": 259,
     "baseExperience": 184,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 67
@@ -10133,6 +10604,7 @@
     "height": 20,
     "weight": 425,
     "baseExperience": 179,
+    "growthRate": "medium-slow",
     "captureRate": 30,
     "generation": 4,
     "evolutionChainId": 104
@@ -10155,6 +10627,7 @@
     "height": 25,
     "weight": 2910,
     "baseExperience": 239,
+    "growthRate": "slow",
     "captureRate": 50,
     "generation": 4,
     "evolutionChainId": 112
@@ -10176,6 +10649,7 @@
     "height": 9,
     "weight": 340,
     "baseExperience": 241,
+    "growthRate": "medium",
     "captureRate": 30,
     "generation": 4,
     "evolutionChainId": 68
@@ -10198,6 +10672,7 @@
     "height": 16,
     "weight": 520,
     "baseExperience": 233,
+    "growthRate": "slow",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 140
@@ -10220,6 +10695,7 @@
     "height": 14,
     "weight": 3400,
     "baseExperience": 184,
+    "growthRate": "medium",
     "captureRate": 60,
     "generation": 4,
     "evolutionChainId": 147
@@ -10241,6 +10717,7 @@
     "height": 22,
     "weight": 1066,
     "baseExperience": 236,
+    "growthRate": "fast",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 182
@@ -10263,6 +10740,7 @@
     "height": 13,
     "weight": 266,
     "baseExperience": 168,
+    "growthRate": "medium",
     "captureRate": 75,
     "generation": 4,
     "evolutionChainId": 186
@@ -10285,6 +10763,7 @@
     "height": 3,
     "weight": 3,
     "baseExperience": 154,
+    "growthRate": "medium",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 240
@@ -10306,6 +10785,7 @@
     "height": 3,
     "weight": 3,
     "baseExperience": 261,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 4,
     "evolutionChainId": 241
@@ -10327,6 +10807,7 @@
     "height": 3,
     "weight": 3,
     "baseExperience": 261,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 4,
     "evolutionChainId": 242
@@ -10348,6 +10829,7 @@
     "height": 3,
     "weight": 3,
     "baseExperience": 261,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 4,
     "evolutionChainId": 243
@@ -10370,6 +10852,7 @@
     "height": 54,
     "weight": 6830,
     "baseExperience": 306,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 4,
     "evolutionChainId": 244
@@ -10392,6 +10875,7 @@
     "height": 42,
     "weight": 3360,
     "baseExperience": 306,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 4,
     "evolutionChainId": 245
@@ -10414,6 +10898,7 @@
     "height": 17,
     "weight": 4300,
     "baseExperience": 270,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 4,
     "evolutionChainId": 246
@@ -10435,6 +10920,7 @@
     "height": 37,
     "weight": 4200,
     "baseExperience": 302,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 4,
     "evolutionChainId": 247
@@ -10457,6 +10943,7 @@
     "height": 45,
     "weight": 7500,
     "baseExperience": 306,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 4,
     "evolutionChainId": 248
@@ -10478,6 +10965,7 @@
     "height": 15,
     "weight": 856,
     "baseExperience": 270,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 4,
     "evolutionChainId": 249
@@ -10499,6 +10987,7 @@
     "height": 4,
     "weight": 31,
     "baseExperience": 216,
+    "growthRate": "slow",
     "captureRate": 30,
     "generation": 4,
     "evolutionChainId": 250
@@ -10520,6 +11009,7 @@
     "height": 3,
     "weight": 14,
     "baseExperience": 270,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 4,
     "evolutionChainId": 250
@@ -10541,6 +11031,7 @@
     "height": 15,
     "weight": 505,
     "baseExperience": 270,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 4,
     "evolutionChainId": 252
@@ -10562,6 +11053,7 @@
     "height": 2,
     "weight": 21,
     "baseExperience": 270,
+    "growthRate": "medium-slow",
     "captureRate": 45,
     "generation": 4,
     "evolutionChainId": 253
@@ -10583,6 +11075,7 @@
     "height": 32,
     "weight": 3200,
     "baseExperience": 324,
+    "growthRate": "slow",
     "captureRate": 3,
     "generation": 4,
     "evolutionChainId": 254

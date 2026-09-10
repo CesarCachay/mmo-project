@@ -1,6 +1,8 @@
 import speciesData from "./data/species.json" with { type: "json" };
 import type { PokemonSpecies, PokemonType } from "./pokemon.types.js";
 
+import type { PokemonGrowthRate } from "./progression/pokemon-growth-rate.js";
+
 const POKEMON_SPECIES = new Map<number, PokemonSpecies>(
   speciesData.map((pokemon) => [
     pokemon.id,
@@ -21,14 +23,16 @@ const POKEMON_SPECIES = new Map<number, PokemonSpecies>(
 
       height: pokemon.height,
       weight: pokemon.weight,
+
       baseExperience: pokemon.baseExperience,
+      growthRate: pokemon.growthRate as PokemonGrowthRate,
 
       captureRate: pokemon.captureRate,
 
       generation: pokemon.generation,
       evolutionChainId: pokemon.evolutionChainId,
     },
-  ])
+  ]),
 );
 
 export function getPokemonSpecies(id: number): PokemonSpecies | undefined {

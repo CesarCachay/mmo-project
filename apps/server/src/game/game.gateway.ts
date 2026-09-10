@@ -79,6 +79,7 @@ import { isPokemonTrainerSessionToken } from 'src/pokemon/pokemon-trainer-identi
 import { PokemonWildEncounterTriggerService } from 'src/pokemon/encounters/pokemon-wild-encounter-trigger.service';
 import { PokemonWildEncounterSessionStore } from 'src/pokemon/encounters/pokemon-wild-encounter-session.store';
 import { PokemonBattleSessionStore } from '../pokemon/battles/pokemon-battle-session.store';
+import { PokemonWildBattleProgressionService } from 'src/pokemon/battles/pokemon-wild-battle-progression.service';
 
 import { PokemonCaptureService } from 'src/pokemon/battles/capture/pokemon-capture.service';
 import { PlayerWorldStateService } from './world/player-world-state.service';
@@ -91,6 +92,7 @@ import { PokemonTrainerStateNetworkPresenter } from 'src/pokemon/network/Pokemon
 import { PokemonBattleTurnExecutor } from 'src/pokemon/battles/pokemon-battle-turn.executor';
 import { PokemonBattleNetworkController } from 'src/pokemon/battles/pokemon-battle-network.controller';
 import { PokemonWildBattleStarter } from 'src/pokemon/battles/pokemon-wild-battle.starter';
+import { PokemonProgressionNetworkController } from 'src/pokemon/progression/pokemon-progression-network.controller';
 
 // stores
 import { PlayerWorldRuntimeStore } from './world/player-world-runtime.store';
@@ -101,6 +103,9 @@ import { PokemonBattleTurnStore } from 'src/pokemon/battles/pokemon-battle-turn.
 import { PokemonTrainerIdentityStore } from 'src/pokemon/pokemon-trainer-identity.store';
 import { PokemonTrainerStateStore } from 'src/pokemon/pokemon-trainer-state.store';
 import { DialogueSessionStore } from 'src/dialogue/dialogue-session.store';
+
+// manager
+import { PokemonProgressionManager } from 'src/pokemon/progression/pokemon-progression.manager';
 
 @WebSocketGateway({
   cors: {
@@ -121,7 +126,6 @@ export class GameGateway
 
   private readonly pokemonTrainerIdentityStore =
     new PokemonTrainerIdentityStore();
-  private readonly pokemonTrainerStateStore = new PokemonTrainerStateStore();
   private readonly pokemonTrainerService: PokemonTrainerService;
 
   private readonly dialogueSessionStore = new DialogueSessionStore();
@@ -152,11 +156,14 @@ export class GameGateway
 
   private readonly pokemonWildBattleStarter: PokemonWildBattleStarter;
 
+  private readonly pokemonProgressionNetworkController: PokemonProgressionNetworkController;
+
   private nextColorIndex = 0;
   private gameLoop?: ReturnType<typeof setInterval>;
 
   constructor(
     private readonly chatService: ChatService,
+    private readonly pokemonTrainerStateStore: PokemonTrainerStateStore,
     private readonly pokemonTrainerRepository: PokemonTrainerRepository,
     private readonly pokemonPartyRepository: PokemonPartyRepository,
     private readonly pokemonInventoryRepository: PokemonInventoryRepository,
@@ -165,6 +172,8 @@ export class GameGateway
     private readonly playerWorldRuntimeStore: PlayerWorldRuntimeStore,
     private readonly playerWorldStateService: PlayerWorldStateService,
     private readonly pokemonOverworldItemRepository: PokemonOverworldItemRepository,
+    private readonly wildBattleProgressionService: PokemonWildBattleProgressionService,
+    private readonly pokemonProgressionManager: PokemonProgressionManager,
   ) {
     this.pokemonTrainerService = new PokemonTrainerService(
       this.pokemonTrainerStateStore,
@@ -187,6 +196,13 @@ export class GameGateway
     this.pokemonTrainerStateNetworkPresenter =
       new PokemonTrainerStateNetworkPresenter(this.playerWorldRuntimeStore);
 
+    this.pokemonProgressionNetworkController =
+      new PokemonProgressionNetworkController({
+        progressionManager: this.pokemonProgressionManager,
+        trainerStatePresenter: this.pokemonTrainerStateNetworkPresenter,
+        resolveTrainerId: (playerId) => this.getTrainerId(playerId),
+      });
+
     this.pokemonBattleTurnExecutor = new PokemonBattleTurnExecutor({
       trainerStateStore: this.pokemonTrainerStateStore,
       trainerService: this.pokemonTrainerService,
@@ -198,6 +214,7 @@ export class GameGateway
       battleSessionStore: this.pokemonBattleSessionStore,
       battleTurnStore: this.pokemonBattleTurnStore,
       turnExecutor: this.pokemonBattleTurnExecutor,
+      wildBattleProgressionService: this.wildBattleProgressionService,
       trainerStatePresenter: this.pokemonTrainerStateNetworkPresenter,
     });
 
@@ -583,6 +600,20 @@ export class GameGateway
         error,
       );
     }
+  }
+
+  @SubscribeMessage(POKEMON_EVENTS.MOVE_LEARNING_DECISION)
+  handlePokemonMoveLearningDecision(
+    @ConnectedSocket()
+    client: Socket,
+
+    @MessageBody()
+    payload: unknown,
+  ): Promise<void> {
+    return this.pokemonProgressionNetworkController.handleMoveLearningDecision(
+      client,
+      payload,
+    );
   }
 
   @SubscribeMessage(POKEMON_EVENTS.CHOOSE_STARTER)

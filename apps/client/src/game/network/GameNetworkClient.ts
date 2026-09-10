@@ -17,6 +17,8 @@ import {
   POKEMON_PARTY_REORDER_EVENTS,
   isPokemonPartyReorderedPayload,
   isPokemonPartyReorderErrorPayload,
+  isPokemonMoveLearningResolvedPayload,
+  isPokemonMoveLearningErrorPayload,
 } from "@cesar-mmo/shared";
 
 import type {
@@ -53,6 +55,9 @@ import type {
   PokemonPartyReorderInput,
   PokemonPartyReorderedPayload,
   PokemonPartyReorderErrorPayload,
+  PokemonMoveLearningDecisionInput,
+  PokemonMoveLearningResolvedPayload,
+  PokemonMoveLearningErrorPayload,
 } from "@cesar-mmo/shared";
 
 type ConnectionRejectedError = {
@@ -163,6 +168,40 @@ export class GameNetworkClient {
         callback(payload);
       },
     );
+  }
+
+  // progression
+  public sendPokemonMoveLearningDecision(
+    input: PokemonMoveLearningDecisionInput,
+  ): void {
+    this.socket.emit(POKEMON_EVENTS.MOVE_LEARNING_DECISION, input);
+  }
+
+  public onPokemonMoveLearningResolved(
+    callback: (payload: PokemonMoveLearningResolvedPayload) => void,
+  ): void {
+    this.socket.on(
+      POKEMON_EVENTS.MOVE_LEARNING_RESOLVED,
+      (payload: unknown) => {
+        if (!isPokemonMoveLearningResolvedPayload(payload)) {
+          console.warn("[MoveLearning] invalid RESOLVED payload", payload);
+          return;
+        }
+        callback(payload);
+      },
+    );
+  }
+
+  public onPokemonMoveLearningError(
+    callback: (payload: PokemonMoveLearningErrorPayload) => void,
+  ): void {
+    this.socket.on(POKEMON_EVENTS.MOVE_LEARNING_ERROR, (payload: unknown) => {
+      if (!isPokemonMoveLearningErrorPayload(payload)) {
+        console.warn("[MoveLearning] invalid ERROR payload", payload);
+        return;
+      }
+      callback(payload);
+    });
   }
 
   public onCurrentPlayers(

@@ -3,8 +3,10 @@ import {
   type BattleTurnResolutionEntry,
 } from '@cesar-mmo/shared';
 
-import type { PokemonBattleSession } from './pokemon-battle-session.js';
-
+import {
+  markPokemonBattleParticipation,
+  type PokemonBattleSession,
+} from './pokemon-battle-session.js';
 export interface ApplyPokemonTrainerBattleSwitchInput {
   readonly session: PokemonBattleSession;
   readonly entry: BattleTurnResolutionEntry;
@@ -149,6 +151,12 @@ export function applyPokemonTrainerBattleSwitch(
    * This is Battle runtime state only.
    */
   trainerParticipant.activePokemonIndex = pokemonIndex;
+
+  markPokemonBattleParticipation(
+    session,
+    trainerParticipant.id,
+    nextPokemon.pokemon.instanceId,
+  );
 
   return {
     battleId: battle.battleId,

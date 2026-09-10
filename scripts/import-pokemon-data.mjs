@@ -9,31 +9,31 @@ const MAX_POKEMON_ID = 493;
 
 const OUTPUT_PATH = resolve(
   __dirname,
-  "../packages/shared/src/pokemon/data/species.json"
+  "../packages/shared/src/pokemon/data/species.json",
 );
 const EVOLUTION_CHAINS_OUTPUT_PATH = resolve(
   __dirname,
-  "../packages/shared/src/pokemon/data/evolution-chains.json"
+  "../packages/shared/src/pokemon/data/evolution-chains.json",
 );
 const MOVES_OUTPUT_PATH = resolve(
   __dirname,
-  "../packages/shared/src/pokemon/data/moves.json"
+  "../packages/shared/src/pokemon/data/moves.json",
 );
 const LEARNSETS_OUTPUT_PATH = resolve(
   __dirname,
-  "../packages/shared/src/pokemon/data/learnsets.json"
+  "../packages/shared/src/pokemon/data/learnsets.json",
 );
 const ABILITIES_OUTPUT_PATH = resolve(
   __dirname,
-  "../packages/shared/src/pokemon/data/abilities.json"
+  "../packages/shared/src/pokemon/data/abilities.json",
 );
 const POKEMON_ABILITIES_OUTPUT_PATH = resolve(
   __dirname,
-  "../packages/shared/src/pokemon/data/pokemon-abilities.json"
+  "../packages/shared/src/pokemon/data/pokemon-abilities.json",
 );
 const FORMS_OUTPUT_PATH = resolve(
   __dirname,
-  "../packages/shared/src/pokemon/data/forms.json"
+  "../packages/shared/src/pokemon/data/forms.json",
 );
 
 const LEARNSET_VERSION_GROUP = "heartgold-soulsilver";
@@ -60,7 +60,7 @@ async function fetchPokemon(id) {
   const response = await fetch(`${POKE_API_BASE_URL}/pokemon/${id}`);
   if (!response.ok) {
     throw new Error(
-      `Failed to fetch Pokémon ${id}: ${response.status} ${response.statusText}`
+      `Failed to fetch Pokémon ${id}: ${response.status} ${response.statusText}`,
     );
   }
   return response.json();
@@ -78,7 +78,7 @@ async function fetchPokemonSpecies(id) {
   const response = await fetch(`${POKE_API_BASE_URL}/pokemon-species/${id}`);
   if (!response.ok) {
     throw new Error(
-      `Failed to fetch Pokémon species ${id}: ${response.status} ${response.statusText}`
+      `Failed to fetch Pokémon species ${id}: ${response.status} ${response.statusText}`,
     );
   }
   return response.json();
@@ -88,7 +88,9 @@ function normalizePokemon(pokemon, species) {
   return {
     id: pokemon.id,
     name: pokemon.name,
-    types: pokemon.types.sort((a, b) => a.slot - b.slot).map((entry) => entry.type.name),
+    types: pokemon.types
+      .sort((a, b) => a.slot - b.slot)
+      .map((entry) => entry.type.name),
     baseStats: {
       hp: getStat(pokemon, "hp"),
       attack: getStat(pokemon, "attack"),
@@ -102,6 +104,8 @@ function normalizePokemon(pokemon, species) {
     weight: pokemon.weight,
     baseExperience: pokemon.base_experience,
 
+    growthRate: normalizeGrowthRate(species.growth_rate.name),
+
     captureRate: species.capture_rate,
 
     generation: getIdFromUrl(species.generation.url),
@@ -114,7 +118,7 @@ async function fetchEvolutionChain(id) {
   const response = await fetch(`${POKE_API_BASE_URL}/evolution-chain/${id}`);
   if (!response.ok) {
     throw new Error(
-      `Failed to fetch evolution chain ${id}: ${response.status} ${response.statusText}`
+      `Failed to fetch evolution chain ${id}: ${response.status} ${response.statusText}`,
     );
   }
   return response.json();
@@ -143,7 +147,7 @@ async function fetchMove(id) {
   const response = await fetch(`${POKE_API_BASE_URL}/move/${id}`);
   if (!response.ok) {
     throw new Error(
-      `Failed to fetch move ${id}: ${response.status} ${response.statusText}`
+      `Failed to fetch move ${id}: ${response.status} ${response.statusText}`,
     );
   }
   return response.json();
@@ -166,7 +170,7 @@ async function fetchMoveList() {
   const response = await fetch(`${POKE_API_BASE_URL}/move?limit=10000`);
   if (!response.ok) {
     throw new Error(
-      `Failed to fetch move list: ${response.status} ${response.statusText}`
+      `Failed to fetch move list: ${response.status} ${response.statusText}`,
     );
   }
   return response.json();
@@ -224,12 +228,38 @@ function normalizePokemonAbilities(pokemon) {
   };
 }
 
+// progression helpers (growth rate)
+function normalizeGrowthRate(growthRateName) {
+  switch (growthRateName) {
+    case "slow":
+      return "slow";
+
+    case "medium-slow":
+      return "medium-slow";
+
+    case "medium":
+      return "medium";
+
+    case "fast":
+      return "fast";
+
+    case "slow-then-very-fast":
+      return "erratic";
+
+    case "fast-then-very-slow":
+      return "fluctuating";
+
+    default:
+      throw new Error(`Unsupported Pokémon growth rate "${growthRateName}"`);
+  }
+}
+
 async function fetchAbility(id) {
   const response = await fetch(`${POKE_API_BASE_URL}/ability/${id}`);
 
   if (!response.ok) {
     throw new Error(
-      `Failed to fetch ability ${id}: ${response.status} ${response.statusText}`
+      `Failed to fetch ability ${id}: ${response.status} ${response.statusText}`,
     );
   }
 
@@ -249,7 +279,7 @@ async function fetchPokemonByUrl(url) {
 
   if (!response.ok) {
     throw new Error(
-      `Failed to fetch Pokémon variety: ${response.status} ${response.statusText}`
+      `Failed to fetch Pokémon variety: ${response.status} ${response.statusText}`,
     );
   }
 
@@ -261,7 +291,7 @@ async function fetchPokemonFormByUrl(url) {
 
   if (!response.ok) {
     throw new Error(
-      `Failed to fetch Pokémon form: ${response.status} ${response.statusText}`
+      `Failed to fetch Pokémon form: ${response.status} ${response.statusText}`,
     );
   }
 
@@ -281,7 +311,9 @@ function normalizePokemonForm(speciesId, pokemon, form, isDefault) {
     isMega: form.is_mega,
     isBattleOnly: form.is_battle_only,
 
-    types: pokemon.types.sort((a, b) => a.slot - b.slot).map((entry) => entry.type.name),
+    types: pokemon.types
+      .sort((a, b) => a.slot - b.slot)
+      .map((entry) => entry.type.name),
 
     baseStats: {
       hp: getStat(pokemon, "hp"),
@@ -304,7 +336,9 @@ async function importPokemonForms(speciesId, pokemonSpecies) {
     const pokemon = await fetchPokemonByUrl(variety.pokemon.url);
     for (const formEntry of pokemon.forms) {
       const form = await fetchPokemonFormByUrl(formEntry.url);
-      forms.push(normalizePokemonForm(speciesId, pokemon, form, variety.is_default));
+      forms.push(
+        normalizePokemonForm(speciesId, pokemon, form, variety.is_default),
+      );
     }
   }
 
@@ -334,7 +368,9 @@ async function main() {
       forms.push(...pokemonForms);
     }
 
-    console.log(`[${String(id).padStart(3, "0")}/${MAX_POKEMON_ID}] ${pokemon.name}`);
+    console.log(
+      `[${String(id).padStart(3, "0")}/${MAX_POKEMON_ID}] ${pokemon.name}`,
+    );
   }
 
   if (IMPORT_SPECIES_ONLY) {
@@ -342,7 +378,11 @@ async function main() {
       recursive: true,
     });
 
-    await writeFile(OUTPUT_PATH, `${JSON.stringify(species, null, 2)}\n`, "utf8");
+    await writeFile(
+      OUTPUT_PATH,
+      `${JSON.stringify(species, null, 2)}\n`,
+      "utf8",
+    );
 
     console.log("");
     console.log(`Imported ${species.length} Pokémon species.`);
@@ -353,15 +393,17 @@ async function main() {
 
   const evolutionChainIds = [
     ...new Set(
-      species.map((pokemon) => pokemon.evolutionChainId).filter((id) => id !== null)
+      species
+        .map((pokemon) => pokemon.evolutionChainId)
+        .filter((id) => id !== null),
     ),
   ];
 
   const abilityIds = [
     ...new Set(
       pokemonAbilities.flatMap((entry) =>
-        entry.abilities.map((ability) => ability.abilityId)
-      )
+        entry.abilities.map((ability) => ability.abilityId),
+      ),
     ),
   ];
 
@@ -421,33 +463,41 @@ async function main() {
   await writeFile(
     EVOLUTION_CHAINS_OUTPUT_PATH,
     `${JSON.stringify(evolutionChains, null, 2)}\n`,
-    "utf8"
+    "utf8",
   );
 
   // write moves file
-  await writeFile(MOVES_OUTPUT_PATH, `${JSON.stringify(moves, null, 2)}\n`, "utf8");
+  await writeFile(
+    MOVES_OUTPUT_PATH,
+    `${JSON.stringify(moves, null, 2)}\n`,
+    "utf8",
+  );
 
   // write learn sets file
   await writeFile(
     LEARNSETS_OUTPUT_PATH,
     `${JSON.stringify(learnsets, null, 2)}\n`,
-    "utf8"
+    "utf8",
   );
 
   // write abilities file
   await writeFile(
     ABILITIES_OUTPUT_PATH,
     `${JSON.stringify(abilities, null, 2)}\n`,
-    "utf8"
+    "utf8",
   );
   await writeFile(
     POKEMON_ABILITIES_OUTPUT_PATH,
     `${JSON.stringify(pokemonAbilities, null, 2)}\n`,
-    "utf8"
+    "utf8",
   );
 
   // write mega forms file
-  await writeFile(FORMS_OUTPUT_PATH, `${JSON.stringify(forms, null, 2)}\n`, "utf8");
+  await writeFile(
+    FORMS_OUTPUT_PATH,
+    `${JSON.stringify(forms, null, 2)}\n`,
+    "utf8",
+  );
 
   console.log("");
   console.log(`Imported ${species.length} Pokémon.`);
