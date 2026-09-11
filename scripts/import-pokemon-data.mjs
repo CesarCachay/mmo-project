@@ -124,9 +124,40 @@ async function fetchEvolutionChain(id) {
   return response.json();
 }
 
+function normalizeEvolutionDetail(detail) {
+  return {
+    trigger: detail.trigger?.name ?? "",
+    itemId: getIdFromUrl(detail.item?.url),
+    minLevel: detail.min_level ?? null,
+    gender: detail.gender ?? null,
+    heldItemId: getIdFromUrl(detail.held_item?.url),
+    knownMoveId: getIdFromUrl(detail.known_move?.url),
+    knownMoveTypeId: getIdFromUrl(detail.known_move_type?.url),
+    locationId: getIdFromUrl(detail.location?.url),
+    minHappiness: detail.min_happiness ?? null,
+    minBeauty: detail.min_beauty ?? null,
+    minAffection: detail.min_affection ?? null,
+    nearSpecialRock: detail.near_special_rock === true,
+    needsOverworldRain: detail.needs_overworld_rain === true,
+    partySpeciesId: getIdFromUrl(detail.party_species?.url),
+    partyTypeId: getIdFromUrl(detail.party_type?.url),
+    relativePhysicalStats: detail.relative_physical_stats ?? null,
+    timeOfDay: detail.time_of_day ?? "",
+    tradeSpeciesId: getIdFromUrl(detail.trade_species?.url),
+    turnUpsideDown: detail.turn_upside_down === true,
+  };
+}
+
 function normalizeEvolutionNode(chainNode) {
+  const evolutionDetails = Array.isArray(chainNode.evolution_details)
+    ? chainNode.evolution_details.map((detail) =>
+        normalizeEvolutionDetail(detail),
+      )
+    : [];
+
   return {
     speciesId: getIdFromUrl(chainNode.species.url),
+    evolutionDetails,
     evolvesTo: chainNode.evolves_to
       .filter((node) => {
         const speciesId = getIdFromUrl(node.species.url);
@@ -135,6 +166,7 @@ function normalizeEvolutionNode(chainNode) {
       .map((node) => normalizeEvolutionNode(node)),
   };
 }
+
 function normalizeEvolutionChain(chain) {
   return {
     id: chain.id,

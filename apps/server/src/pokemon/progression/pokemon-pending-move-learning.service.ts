@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common';
 
 import {
+  evaluatePokemonLevelEvolution,
   getPokemonMove,
+  planPokemonEvolution,
   planPokemonMoveLearningSequence,
   resolvePokemonMoveLearningDecision,
 } from '@cesar-mmo/shared';
 
 import type {
+  PokemonEvolutionPlan,
+  PokemonInstance,
   PokemonLevelUpMoveCandidate,
   PokemonMoveLearningDecision,
   PokemonMoveLearningDecisionResult,
@@ -62,6 +66,7 @@ export interface ResolvePendingMoveLearningResult {
   readonly decision: PokemonMoveLearningDecisionResult;
   readonly continuation: PokemonMoveLearningSequenceResult;
   readonly hasNextPendingDecision: boolean;
+  readonly evolution: PokemonEvolutionPlan | null;
 }
 
 @Injectable()
@@ -179,15 +184,58 @@ export class PokemonPendingMoveLearningService {
           }
         : null;
 
+    /*
+     * --------------------------------------------------
+     * Evolution continuation
+     * --------------------------------------------------
+     *
+     * Evolution may only happen once ALL move-learning
+     * decisions from this progression have been resolved.
+     */
+    const pokemonAfterMoveLearning: PokemonInstance = {
+      ...pokemon,
+
+      moves: continuation.currentMoves.map((move) => ({
+        ...move,
+      })),
+    };
+
+    let evolution: PokemonEvolutionPlan | null = null;
+
+    if (nextPending === null) {
+      const evaluation = evaluatePokemonLevelEvolution({
+        speciesId: pokemonAfterMoveLearning.speciesId,
+        level: pokemonAfterMoveLearning.level,
+      });
+
+      if (evaluation.status === 'eligible') {
+        evolution = planPokemonEvolution({
+          pokemon: pokemonAfterMoveLearning,
+          candidate: evaluation.candidate,
+        });
+      }
+    }
+
+    const finalPokemonState =
+      evolution?.evolvedPokemonState ?? pokemonAfterMoveLearning;
+
     /* PostgreSQL FIRST */
     try {
       await this.repository.applyDecision({
         trainerId,
         pokemonInstanceId,
+        expectedSpeciesId: pokemon.speciesId,
+        expectedFormId: pokemon.formId,
+        expectedAbilityId: pokemon.abilityId,
+        expectedCurrentHp: pokemon.currentHp,
         expectedLevel: pokemon.level,
         expectedExperience: pokemon.experience,
         expectedRevision: pending.revision,
-        moves: continuation.currentMoves,
+        speciesId: finalPokemonState.speciesId,
+        formId: finalPokemonState.formId,
+        abilityId: finalPokemonState.abilityId,
+        currentHp: finalPokemonState.currentHp,
+        moves: finalPokemonState.moves,
         nextPending,
       });
     } catch (error: unknown) {
@@ -215,14 +263,7 @@ export class PokemonPendingMoveLearningService {
     /* RAM SECOND */
     const updatedParty = {
       pokemon: trainerState.party.pokemon.map((entry) =>
-        entry.instanceId === pokemonInstanceId
-          ? {
-              ...entry,
-              moves: continuation.currentMoves.map((move) => ({
-                ...move,
-              })),
-            }
-          : entry,
+        entry.instanceId === pokemonInstanceId ? finalPokemonState : entry,
       ),
     };
 
@@ -249,6 +290,7 @@ export class PokemonPendingMoveLearningService {
       decision: decisionResult,
       continuation,
       hasNextPendingDecision: nextPending !== null,
+      evolution,
     };
   }
 }

@@ -141,6 +141,10 @@ export function formatBattlePresentationMessage(
       return `${pokemonName} learned ${moveName}!`;
     }
 
+    case "pokemon-evolved": {
+      return null;
+    }
+
     case "move-learning-required": {
       return null;
     }

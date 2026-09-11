@@ -19,9 +19,18 @@ export interface ApplyPokemonProgressionInput {
   readonly trainerId: PokemonTrainerId;
   readonly pokemonInstanceId: string;
   /* Optimistic concurrency guards */
+  readonly expectedSpeciesId: number;
+  readonly expectedFormId: number;
+  readonly expectedAbilityId: number;
+
   readonly expectedLevel: number;
   readonly expectedExperience: number;
+
   /* New authoritative state */
+  readonly speciesId: number;
+  readonly formId: number;
+  readonly abilityId: number;
+
   readonly level: number;
   readonly experience: number;
   readonly currentHp: number;
@@ -29,6 +38,13 @@ export interface ApplyPokemonProgressionInput {
   readonly pendingMoveLearning: {
     readonly candidate: PokemonPendingMoveLearningCandidate;
     readonly remainingCandidates: readonly PokemonPendingMoveLearningCandidate[];
+  } | null;
+  readonly pendingEvolution: {
+    readonly sourceSpeciesId: number;
+    readonly sourceFormId: number;
+    readonly targetSpeciesId: number;
+    readonly targetFormId: number;
+    readonly triggerLevel: number;
   } | null;
 }
 
@@ -42,8 +58,14 @@ export class PokemonProgressionRepository {
     const {
       trainerId,
       pokemonInstanceId,
+      expectedSpeciesId,
+      expectedFormId,
+      expectedAbilityId,
       expectedLevel,
       expectedExperience,
+      speciesId,
+      formId,
+      abilityId,
       level,
       experience,
       currentHp,
@@ -71,13 +93,23 @@ export class PokemonProgressionRepository {
         where: {
           id: pokemonInstanceId,
           trainerId,
+
           partyPosition: {
             not: null,
           },
+
+          speciesId: expectedSpeciesId,
+          formId: expectedFormId,
+          abilityId: expectedAbilityId,
+
           level: expectedLevel,
           experience: expectedExperience,
         },
         data: {
+          speciesId,
+          formId,
+          abilityId,
+
           level,
           experience,
           currentHp,
@@ -110,6 +142,43 @@ export class PokemonProgressionRepository {
             moveId: move.moveId,
             currentPp: move.currentPp,
           })),
+        });
+      }
+
+      const existingEvolution = await tx.pokemonPendingEvolution.findUnique({
+        where: {
+          pokemonInstanceId,
+        },
+
+        select: {
+          id: true,
+        },
+      });
+
+      if (existingEvolution) {
+        throw new PokemonProgressionPersistenceConflictError(
+          `Pokémon "${pokemonInstanceId}" already has a pending evolution`,
+        );
+      }
+
+      if (input.pendingMoveLearning && input.pendingEvolution) {
+        throw new Error(
+          'Pokémon progression cannot create move-learning and evolution pending workflows simultaneously',
+        );
+      }
+
+      if (input.pendingEvolution) {
+        await tx.pokemonPendingEvolution.create({
+          data: {
+            trainerId,
+            pokemonInstanceId,
+            sourceSpeciesId: input.pendingEvolution.sourceSpeciesId,
+            sourceFormId: input.pendingEvolution.sourceFormId,
+            targetSpeciesId: input.pendingEvolution.targetSpeciesId,
+            targetFormId: input.pendingEvolution.targetFormId,
+            triggerLevel: input.pendingEvolution.triggerLevel,
+            revision: 0,
+          },
         });
       }
 

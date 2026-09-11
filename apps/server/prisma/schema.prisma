@@ -24,6 +24,8 @@ model PokemonTrainer {
 
   pendingMoveLearning PokemonPendingMoveLearning[]
 
+  pendingEvolutions PokemonPendingEvolution[]
+
   @@map("pokemon_trainers")
 }
 
@@ -48,6 +50,8 @@ model PokemonInstance {
   moves PokemonInstanceMove[]
 
   pendingMoveLearning PokemonPendingMoveLearning?
+
+  pendingEvolution PokemonPendingEvolution?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -103,4 +107,31 @@ model PokemonTrainerInventoryItem {
 
   @@id([trainerId, itemId])
   @@map("pokemon_trainer_inventory_items")
+}
+
+model PokemonPendingEvolution {
+  id String @id @default(uuid()) @db.Uuid
+
+  trainerId         String @map("trainer_id") @db.Uuid
+  pokemonInstanceId String @unique @map("pokemon_instance_id") @db.Uuid
+
+  sourceSpeciesId Int @map("source_species_id")
+  sourceFormId    Int @map("source_form_id")
+
+  targetSpeciesId Int @map("target_species_id")
+  targetFormId    Int @map("target_form_id")
+
+  triggerLevel Int @map("trigger_level")
+
+  revision Int @default(0)
+
+  trainer PokemonTrainer @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+
+  pokemon PokemonInstance @relation(fields: [pokemonInstanceId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([trainerId])
+  @@map("pokemon_pending_evolutions")
 }

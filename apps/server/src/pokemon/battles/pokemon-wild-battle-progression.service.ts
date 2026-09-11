@@ -34,6 +34,14 @@ export interface PokemonWildBattleAppliedExperience {
     readonly revision: number;
     readonly currentMoves: readonly PokemonInstanceMove[];
   } | null;
+  readonly pendingEvolution: {
+    readonly sourceSpeciesId: number;
+    readonly sourceFormId: number;
+    readonly targetSpeciesId: number;
+    readonly targetFormId: number;
+    readonly triggerLevel: number;
+    readonly revision: number;
+  } | null;
 }
 
 export interface ApplyPokemonWildBattleProgressionResult {
@@ -140,6 +148,7 @@ export class PokemonWildBattleProgressionService {
             automaticallyLearnedMoveIds: [],
             requiresMoveLearningDecision: false,
             pendingMoveLearning: null,
+            pendingEvolution: null,
           };
         }
 
@@ -184,6 +193,18 @@ export class PokemonWildBattleProgressionService {
                     ...move,
                   }),
                 ),
+              }
+            : null,
+          pendingEvolution: appliedProgression.pendingEvolution
+            ? {
+                sourceSpeciesId:
+                  appliedProgression.pendingEvolution.sourceSpeciesId,
+                sourceFormId: appliedProgression.pendingEvolution.sourceFormId,
+                targetSpeciesId:
+                  appliedProgression.pendingEvolution.targetSpeciesId,
+                targetFormId: appliedProgression.pendingEvolution.targetFormId,
+                triggerLevel: appliedProgression.pendingEvolution.triggerLevel,
+                revision: appliedProgression.pendingEvolution.revision,
               }
             : null,
         };

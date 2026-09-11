@@ -26,6 +26,12 @@ import {
   PokemonPartyProgressionRepository,
 } from './pokemon-party-progression.repository';
 
+import { PokemonPendingEvolutionRepository } from '../evolution/pokemon-pending-evolution.repository';
+
+import { PokemonPendingEvolutionStore } from '../evolution/pokemon-pending-evolution.store';
+
+import type { PokemonPendingEvolutionState } from '../evolution/pokemon-pending-evolution.types';
+
 export interface PokemonPartyExperienceApplication {
   readonly pokemonInstanceId: string;
   readonly gainedExperience: number;
@@ -40,6 +46,7 @@ export interface PokemonAppliedPartyProgression {
   readonly pokemonInstanceId: string;
   readonly gainedExperience: number;
   readonly progression: PokemonProgressionPlan;
+  readonly pendingEvolution: PokemonPendingEvolutionState | null;
 }
 
 export interface ApplyPokemonPartyExperienceResult {
@@ -55,6 +62,8 @@ export class PokemonPartyProgressionService {
     private readonly operationQueue: PokemonProgressionOperationQueue,
     private readonly pendingRepository: PokemonPendingMoveLearningRepository,
     private readonly pendingStore: PokemonPendingMoveLearningStore,
+    private readonly pendingEvolutionRepository: PokemonPendingEvolutionRepository,
+    private readonly pendingEvolutionStore: PokemonPendingEvolutionStore,
   ) {}
 
   public applyPartyExperience(
@@ -177,6 +186,34 @@ export class PokemonPartyProgressionService {
           ].join(' '),
         );
       }
+
+      let pendingEvolution = this.pendingEvolutionStore.getByPokemonInstanceId(
+        pokemon.instanceId,
+      );
+
+      if (!pendingEvolution) {
+        pendingEvolution =
+          await this.pendingEvolutionRepository.findByPokemonInstanceId(
+            trainerId,
+            pokemon.instanceId,
+          );
+
+        if (pendingEvolution) {
+          this.pendingEvolutionStore.set(pendingEvolution);
+        }
+      }
+
+      if (pendingEvolution) {
+        throw new PokemonProgressionError(
+          'PENDING_EVOLUTION',
+
+          [
+            `Pokémon "${pokemon.instanceId}"`,
+            'must resolve its pending evolution',
+            'before receiving Battle EXP',
+          ].join(' '),
+        );
+      }
     }
 
     /*
@@ -228,12 +265,36 @@ export class PokemonPartyProgressionService {
             }
           : null;
 
+      const evolutionPlan = progression.evolution.plan;
+
+      const pendingEvolution =
+        pendingMoveLearning === null && evolutionPlan !== null
+          ? {
+              sourceSpeciesId: evolutionPlan.sourceSpeciesId,
+              sourceFormId: evolutionPlan.sourceFormId,
+              targetSpeciesId: evolutionPlan.targetSpeciesId,
+              targetFormId: evolutionPlan.targetFormId,
+              triggerLevel: automaticPokemon.level,
+            }
+          : null;
+
+      if (pendingMoveLearning && pendingEvolution) {
+        throw new Error(
+          [
+            `Pokémon "${pokemon.instanceId}"`,
+            'cannot create pending Move Learning',
+            'and pending Evolution simultaneously',
+          ].join(' '),
+        );
+      }
+
       return {
         reward,
         pokemon,
         progression,
         automaticPokemon,
         pendingMoveLearning,
+        pendingEvolution,
       };
     });
 
@@ -248,13 +309,20 @@ export class PokemonPartyProgressionService {
         trainerId,
         entries: planned.map((entry) => ({
           pokemonInstanceId: entry.pokemon.instanceId,
+          expectedSpeciesId: entry.pokemon.speciesId,
+          expectedFormId: entry.pokemon.formId,
+          expectedAbilityId: entry.pokemon.abilityId,
           expectedLevel: entry.pokemon.level,
           expectedExperience: entry.pokemon.experience,
+          speciesId: entry.automaticPokemon.speciesId,
+          formId: entry.automaticPokemon.formId,
+          abilityId: entry.automaticPokemon.abilityId,
           level: entry.automaticPokemon.level,
           experience: entry.automaticPokemon.experience,
           currentHp: entry.automaticPokemon.currentHp,
           moves: entry.automaticPokemon.moves,
           pendingMoveLearning: entry.pendingMoveLearning,
+          pendingEvolution: entry.pendingEvolution,
         })),
       });
     } catch (error: unknown) {
@@ -308,17 +376,28 @@ export class PokemonPartyProgressionService {
      */
 
     for (const entry of planned) {
-      if (!entry.pendingMoveLearning) {
-        continue;
+      if (entry.pendingMoveLearning) {
+        this.pendingStore.set({
+          trainerId,
+          pokemonInstanceId: entry.pokemon.instanceId,
+          candidate: entry.pendingMoveLearning.candidate,
+          remainingCandidates: entry.pendingMoveLearning.remainingCandidates,
+          revision: 0,
+        });
       }
 
-      this.pendingStore.set({
-        trainerId,
-        pokemonInstanceId: entry.pokemon.instanceId,
-        candidate: entry.pendingMoveLearning.candidate,
-        remainingCandidates: entry.pendingMoveLearning.remainingCandidates,
-        revision: 0,
-      });
+      if (entry.pendingEvolution) {
+        this.pendingEvolutionStore.set({
+          trainerId,
+          pokemonInstanceId: entry.pokemon.instanceId,
+          sourceSpeciesId: entry.pendingEvolution.sourceSpeciesId,
+          sourceFormId: entry.pendingEvolution.sourceFormId,
+          targetSpeciesId: entry.pendingEvolution.targetSpeciesId,
+          targetFormId: entry.pendingEvolution.targetFormId,
+          triggerLevel: entry.pendingEvolution.triggerLevel,
+          revision: 0,
+        });
+      }
     }
 
     return {
@@ -327,6 +406,14 @@ export class PokemonPartyProgressionService {
         pokemonInstanceId: entry.pokemon.instanceId,
         gainedExperience: entry.reward.gainedExperience,
         progression: entry.progression,
+        pendingEvolution: entry.pendingEvolution
+          ? {
+              trainerId,
+              pokemonInstanceId: entry.pokemon.instanceId,
+              ...entry.pendingEvolution,
+              revision: 0,
+            }
+          : null,
       })),
     };
   }

@@ -79,6 +79,7 @@ export type {
   PokemonParty,
   PokemonTrainerState,
   PokemonFollowerPublicState,
+  PokemonEvolutionDetail,
 } from "./pokemon/pokemon.types.js";
 export {
   MAX_POKEMON_PARTY_SIZE,
@@ -93,6 +94,8 @@ export {
 export {
   getPokemonEvolutionChain,
   getPokemonEvolutionChainCount,
+  getPokemonEvolutionNode,
+  getPokemonDirectEvolutions,
 } from "./pokemon/pokemon-evolution.registry.js";
 export {
   getPokemonForm,
@@ -481,10 +484,34 @@ export {
   isPokemonMoveLearningDecisionInput,
   isPokemonMoveLearningResolvedPayload,
   isPokemonMoveLearningErrorPayload,
+  isPokemonEvolutionResolvedPayload,
 } from "./pokemon/progression/pokemon-progression-network.js";
 export type {
   PokemonPendingMoveLearningNetworkState,
   PokemonMoveLearningDecisionInput,
   PokemonMoveLearningResolvedPayload,
   PokemonMoveLearningErrorPayload,
+  PokemonEvolutionResolvedPayload,
 } from "./pokemon/progression/pokemon-progression-network.js";
+
+// EVOLUTION
+export {
+  evaluatePokemonLevelEvolution,
+  isPokemonPureLevelEvolutionDetail,
+} from "./pokemon/evolution/pokemon-evolution-eligibility.js";
+export type {
+  EvaluatePokemonLevelEvolutionInput,
+  PokemonLevelEvolutionCandidate,
+  PokemonLevelEvolutionIneligibilityReason,
+  PokemonLevelEvolutionEvaluation,
+} from "./pokemon/evolution/pokemon-evolution-eligibility.js";
+export { planPokemonEvolution } from "./pokemon/evolution/pokemon-evolution-plan.js";
+export type {
+  PlanPokemonEvolutionInput,
+  PokemonEvolutionAbilityTransition,
+  PokemonEvolutionHpTransition,
+  PokemonEvolutionPlan,
+} from "./pokemon/evolution/pokemon-evolution-plan.js";
+export { isPokemonEvolutionPresentation } from "./pokemon/evolution/pokemon-evolution-presentation.js";
+export type { PokemonEvolutionPresentation } from "./pokemon/evolution/pokemon-evolution-presentation.js";
+export type { PokemonEvolutionDecision } from "./pokemon/evolution/pokemon-evolution-decision.js";

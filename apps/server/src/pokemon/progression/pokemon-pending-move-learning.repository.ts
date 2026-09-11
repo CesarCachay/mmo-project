@@ -21,12 +21,40 @@ export class PokemonPendingMoveLearningPersistenceConflictError extends Error {
 export interface ApplyPokemonMoveLearningDecisionPersistenceInput {
   readonly trainerId: PokemonTrainerId;
   readonly pokemonInstanceId: string;
+
+  /*
+   * Optimistic Pokémon-state guards
+   */
+  readonly expectedSpeciesId: number;
+  readonly expectedFormId: number;
+  readonly expectedAbilityId: number;
+  readonly expectedCurrentHp: number;
+
   readonly expectedLevel: number;
   readonly expectedExperience: number;
+
+  /*
+   * Pending workflow concurrency guard
+   */
   readonly expectedRevision: number;
+
+  /*
+   * Final authoritative Pokémon state.
+   *
+   * These values remain unchanged while another
+   * move decision exists, and become the evolved
+   * values after the final decision when eligible.
+   */
+  readonly speciesId: number;
+  readonly formId: number;
+  readonly abilityId: number;
+  readonly currentHp: number;
+
   readonly moves: readonly PokemonInstanceMove[];
+
   readonly nextPending: {
     readonly candidate: PokemonPendingMoveLearningCandidate;
+
     readonly remainingCandidates: readonly PokemonPendingMoveLearningCandidate[];
   } | null;
 }
@@ -91,27 +119,40 @@ export class PokemonPendingMoveLearningRepository {
         );
       }
 
-      /* 2. Validate that the Pokémon itself has not changed unexpectedly */
-      const pokemon = await tx.pokemonInstance.findFirst({
+      /*
+       * --------------------------------------------------
+       * 2. Apply the final Pokémon state atomically
+       * --------------------------------------------------
+       */
+      const updatedPokemon = await tx.pokemonInstance.updateMany({
         where: {
           id: input.pokemonInstanceId,
           trainerId: input.trainerId,
           partyPosition: {
             not: null,
           },
+          speciesId: input.expectedSpeciesId,
+          formId: input.expectedFormId,
+          abilityId: input.expectedAbilityId,
+          currentHp: input.expectedCurrentHp,
           level: input.expectedLevel,
           experience: input.expectedExperience,
         },
-        select: {
-          id: true,
+
+        data: {
+          speciesId: input.speciesId,
+          formId: input.formId,
+          abilityId: input.abilityId,
+          currentHp: input.currentHp,
         },
       });
 
-      if (!pokemon) {
+      if (updatedPokemon.count !== 1) {
         throw new PokemonPendingMoveLearningPersistenceConflictError(
           [
             `Pokémon "${input.pokemonInstanceId}" changed`,
-            'before the pending move-learning decision could be persisted',
+            'before the pending move-learning decision',
+            'and deferred evolution could be persisted',
           ].join(' '),
         );
       }

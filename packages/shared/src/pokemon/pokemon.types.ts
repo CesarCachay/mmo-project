@@ -46,16 +46,6 @@ export interface PokemonSpecies {
   evolutionChainId: number | null;
 }
 
-export interface PokemonEvolutionNode {
-  speciesId: number;
-  evolvesTo: PokemonEvolutionNode[];
-}
-
-export interface PokemonEvolutionChain {
-  id: number;
-  root: PokemonEvolutionNode;
-}
-
 export type PokemonDamageClass = "physical" | "special" | "status";
 
 export interface PokemonMove {
@@ -153,4 +143,38 @@ export interface PokemonTrainerState {
 export interface PokemonFollowerPublicState {
   speciesId: number;
   formId: number;
+}
+
+// Evolution
+export interface PokemonEvolutionDetail {
+  trigger: string;
+  itemId: number | null;
+  minLevel: number | null;
+  gender: number | null;
+  heldItemId: number | null;
+  knownMoveId: number | null;
+  knownMoveTypeId: number | null;
+  locationId: number | null;
+  minHappiness: number | null;
+  minBeauty: number | null;
+  minAffection: number | null;
+  nearSpecialRock: boolean;
+  needsOverworldRain: boolean;
+  partySpeciesId: number | null;
+  partyTypeId: number | null;
+  relativePhysicalStats: number | null;
+  timeOfDay: string;
+  tradeSpeciesId: number | null;
+  turnUpsideDown: boolean;
+}
+
+export interface PokemonEvolutionNode {
+  speciesId: number;
+  evolutionDetails: PokemonEvolutionDetail[];
+  evolvesTo: PokemonEvolutionNode[];
+}
+
+export interface PokemonEvolutionChain {
+  id: number;
+  root: PokemonEvolutionNode;
 }

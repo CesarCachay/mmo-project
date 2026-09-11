@@ -77,5 +77,8 @@ export function getBattlePresentationMessageDuration(
 
     case "move-learning-required":
       return BATTLE_PRESENTATION_TIMING.moveLearningMessageMs;
+
+    case "pokemon-evolved":
+      return 0;
   }
 }

@@ -16,15 +16,39 @@ export interface PokemonPartyProgressionPendingMoveLearning {
   readonly remainingCandidates: readonly PokemonPartyProgressionPendingCandidate[];
 }
 
+export interface PokemonPartyProgressionPendingEvolution {
+  readonly sourceSpeciesId: number;
+  readonly sourceFormId: number;
+
+  readonly targetSpeciesId: number;
+  readonly targetFormId: number;
+
+  readonly triggerLevel: number;
+}
+
 export interface ApplyPokemonPartyProgressionEntry {
   readonly pokemonInstanceId: string;
+
+  readonly expectedSpeciesId: number;
+  readonly expectedFormId: number;
+  readonly expectedAbilityId: number;
+
   readonly expectedLevel: number;
   readonly expectedExperience: number;
+
+  readonly speciesId: number;
+  readonly formId: number;
+  readonly abilityId: number;
+
   readonly level: number;
   readonly experience: number;
   readonly currentHp: number;
+
   readonly moves: readonly PokemonInstanceMove[];
+
   readonly pendingMoveLearning: PokemonPartyProgressionPendingMoveLearning | null;
+
+  readonly pendingEvolution: PokemonPartyProgressionPendingEvolution | null;
 }
 
 export interface ApplyPokemonPartyProgressionInput {
@@ -101,11 +125,17 @@ export class PokemonPartyProgressionRepository {
             partyPosition: {
               not: null,
             },
+            speciesId: entry.expectedSpeciesId,
+            formId: entry.expectedFormId,
+            abilityId: entry.expectedAbilityId,
             level: entry.expectedLevel,
             experience: entry.expectedExperience,
           },
 
           data: {
+            speciesId: entry.speciesId,
+            formId: entry.formId,
+            abilityId: entry.abilityId,
             level: entry.level,
             experience: entry.experience,
             currentHp: entry.currentHp,
@@ -140,6 +170,16 @@ export class PokemonPartyProgressionRepository {
           });
         }
 
+        if (entry.pendingMoveLearning && entry.pendingEvolution) {
+          throw new Error(
+            [
+              `Pokémon "${entry.pokemonInstanceId}"`,
+              'cannot create pending Move Learning',
+              'and pending Evolution simultaneously',
+            ].join(' '),
+          );
+        }
+
         /*
          * A Pokémon may independently require
          * move-learning after receiving Battle EXP.
@@ -165,6 +205,27 @@ export class PokemonPartyProgressionRepository {
               revision: 0,
             },
           });
+        }
+
+        const existingEvolution = await tx.pokemonPendingEvolution.findFirst({
+          where: {
+            trainerId,
+            pokemonInstanceId: {
+              in: instanceIds,
+            },
+          },
+          select: {
+            pokemonInstanceId: true,
+          },
+        });
+
+        if (existingEvolution) {
+          throw new PokemonPartyProgressionPersistenceConflictError(
+            [
+              `Pokémon "${existingEvolution.pokemonInstanceId}"`,
+              'already has pending evolution',
+            ].join(' '),
+          );
         }
       }
     });

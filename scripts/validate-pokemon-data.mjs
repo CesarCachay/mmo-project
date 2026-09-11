@@ -40,6 +40,126 @@ function assertUniqueIds(items, getId, label) {
   }
 }
 
+function isNullablePositiveInteger(value) {
+  return value === null || (Number.isInteger(value) && value > 0);
+}
+
+function isNullableNonNegativeInteger(value) {
+  return value === null || (Number.isInteger(value) && value >= 0);
+}
+
+function validateEvolutionDetail(detail, chainId, speciesId, moveIds) {
+  assert(
+    typeof detail === "object" && detail !== null && !Array.isArray(detail),
+    `Evolution chain ${chainId}, species ${speciesId} contains an invalid evolution detail`,
+  );
+
+  assert(
+    typeof detail.trigger === "string" && detail.trigger.trim().length > 0,
+    `Evolution chain ${chainId}, species ${speciesId} has an invalid trigger`,
+  );
+
+  assert(
+    isNullablePositiveInteger(detail.itemId),
+    `Evolution chain ${chainId}, species ${speciesId} has invalid itemId`,
+  );
+
+  assert(
+    isNullablePositiveInteger(detail.minLevel),
+    `Evolution chain ${chainId}, species ${speciesId} has invalid minLevel`,
+  );
+
+  assert(
+    isNullablePositiveInteger(detail.gender),
+    `Evolution chain ${chainId}, species ${speciesId} has invalid gender`,
+  );
+
+  assert(
+    isNullablePositiveInteger(detail.heldItemId),
+    `Evolution chain ${chainId}, species ${speciesId} has invalid heldItemId`,
+  );
+
+  assert(
+    isNullablePositiveInteger(detail.knownMoveId),
+    `Evolution chain ${chainId}, species ${speciesId} has invalid knownMoveId`,
+  );
+
+  if (detail.knownMoveId !== null) {
+    assert(
+      moveIds.has(detail.knownMoveId),
+      `Evolution chain ${chainId}, species ${speciesId} references unknown knownMoveId ${detail.knownMoveId}`,
+    );
+  }
+
+  assert(
+    isNullablePositiveInteger(detail.knownMoveTypeId),
+    `Evolution chain ${chainId}, species ${speciesId} has invalid knownMoveTypeId`,
+  );
+
+  assert(
+    isNullablePositiveInteger(detail.locationId),
+    `Evolution chain ${chainId}, species ${speciesId} has invalid locationId`,
+  );
+
+  assert(
+    isNullableNonNegativeInteger(detail.minHappiness),
+    `Evolution chain ${chainId}, species ${speciesId} has invalid minHappiness`,
+  );
+
+  assert(
+    isNullableNonNegativeInteger(detail.minBeauty),
+    `Evolution chain ${chainId}, species ${speciesId} has invalid minBeauty`,
+  );
+
+  assert(
+    isNullableNonNegativeInteger(detail.minAffection),
+    `Evolution chain ${chainId}, species ${speciesId} has invalid minAffection`,
+  );
+
+  assert(
+    typeof detail.nearSpecialRock === "boolean",
+    `Evolution chain ${chainId}, species ${speciesId} has invalid nearSpecialRock`,
+  );
+
+  assert(
+    typeof detail.needsOverworldRain === "boolean",
+    `Evolution chain ${chainId}, species ${speciesId} has invalid needsOverworldRain`,
+  );
+
+  assert(
+    isNullablePositiveInteger(detail.partySpeciesId),
+    `Evolution chain ${chainId}, species ${speciesId} has invalid partySpeciesId`,
+  );
+
+  assert(
+    isNullablePositiveInteger(detail.partyTypeId),
+    `Evolution chain ${chainId}, species ${speciesId} has invalid partyTypeId`,
+  );
+
+  assert(
+    detail.relativePhysicalStats === null ||
+      detail.relativePhysicalStats === -1 ||
+      detail.relativePhysicalStats === 0 ||
+      detail.relativePhysicalStats === 1,
+    `Evolution chain ${chainId}, species ${speciesId} has invalid relativePhysicalStats`,
+  );
+
+  assert(
+    typeof detail.timeOfDay === "string",
+    `Evolution chain ${chainId}, species ${speciesId} has invalid timeOfDay`,
+  );
+
+  assert(
+    isNullablePositiveInteger(detail.tradeSpeciesId),
+    `Evolution chain ${chainId}, species ${speciesId} has invalid tradeSpeciesId`,
+  );
+
+  assert(
+    typeof detail.turnUpsideDown === "boolean",
+    `Evolution chain ${chainId}, species ${speciesId} has invalid turnUpsideDown`,
+  );
+}
+
 async function main() {
   console.log("Validating Pokémon data...");
 
@@ -219,13 +339,23 @@ async function main() {
       `Evolution chain ${chainId} references unknown speciesId ${node.speciesId}`,
     );
 
+    assert(
+      Array.isArray(node.evolutionDetails),
+      `Evolution chain ${chainId}, species ${node.speciesId} must contain evolutionDetails[]`,
+    );
+
+    assert(
+      Array.isArray(node.evolvesTo),
+      `Evolution chain ${chainId}, species ${node.speciesId} must contain evolvesTo[]`,
+    );
+
+    for (const detail of node.evolutionDetails) {
+      validateEvolutionDetail(detail, chainId, node.speciesId, moveIds);
+    }
+
     for (const child of node.evolvesTo) {
       validateEvolutionNode(child, chainId);
     }
-  }
-
-  for (const chain of evolutionChains) {
-    validateEvolutionNode(chain.root, chain.id);
   }
 
   // --------------------------------------------------

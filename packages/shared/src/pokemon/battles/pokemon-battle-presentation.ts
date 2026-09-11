@@ -2,6 +2,10 @@ import type { BattleParticipantId } from "./pokemon-battle.types.js";
 import { isPokemonItemId } from "../inventory/pokemon-inventory.js";
 import type { PokemonItemId } from "../inventory/pokemon-inventory.js";
 import type { PokemonInstanceMove } from "../pokemon.types.js";
+import {
+  isPokemonEvolutionPresentation,
+  type PokemonEvolutionPresentation,
+} from "../evolution/pokemon-evolution-presentation.js";
 
 // moves
 export interface BattleMoveUsedEvent {
@@ -134,6 +138,11 @@ export interface BattleMoveLearnedEvent {
   readonly moveId: number;
 }
 
+export interface BattlePokemonEvolvedEvent extends PokemonEvolutionPresentation {
+  readonly type: "pokemon-evolved";
+  readonly participantId: BattleParticipantId;
+}
+
 export type BattlePresentationEvent =
   | BattleMoveUsedEvent
   | BattleMoveMissedEvent
@@ -149,7 +158,8 @@ export type BattlePresentationEvent =
   | BattleExperienceGainedEvent
   | BattlePokemonLeveledUpEvent
   | BattleMoveLearningRequiredEvent
-  | BattleMoveLearnedEvent;
+  | BattleMoveLearnedEvent
+  | BattlePokemonEvolvedEvent;
 
 function isMoveEvent(value: Record<string, unknown>): boolean {
   return (
@@ -318,6 +328,9 @@ export function isBattlePresentationEvent(
     case "move-learning-required":
       return isMoveLearningRequiredEvent(value);
 
+    case "pokemon-evolved":
+      return isPokemonEvolvedEvent(value);
+
     default:
       return false;
   }
@@ -392,5 +405,12 @@ function isMoveLearningRequiredEvent(value: Record<string, unknown>): boolean {
     isNonNegativeInteger(value.revision) &&
     Array.isArray(value.currentMoves) &&
     value.currentMoves.length === 4
+  );
+}
+
+function isPokemonEvolvedEvent(value: Record<string, unknown>): boolean {
+  return (
+    isNonEmptyString(value.participantId) &&
+    isPokemonEvolutionPresentation(value)
   );
 }

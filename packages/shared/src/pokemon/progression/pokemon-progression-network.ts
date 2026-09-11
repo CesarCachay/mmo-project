@@ -2,6 +2,11 @@ import type { PokemonInstanceMove } from "../pokemon.types.js";
 
 import type { PokemonMoveLearningDecision } from "./pokemon-move-learning-decision.js";
 
+import {
+  isPokemonEvolutionPresentation,
+  type PokemonEvolutionPresentation,
+} from "../evolution/pokemon-evolution-presentation.js";
+
 export interface PokemonPendingMoveLearningNetworkState {
   readonly pokemonInstanceId: string;
   readonly candidateMoveId: number;
@@ -32,6 +37,8 @@ export interface PokemonMoveLearningErrorPayload {
   readonly code: string;
   readonly message: string;
 }
+
+export interface PokemonEvolutionResolvedPayload extends PokemonEvolutionPresentation {}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -138,4 +145,10 @@ export function isPokemonMoveLearningErrorPayload(
     typeof value.code === "string" &&
     typeof value.message === "string"
   );
+}
+
+export function isPokemonEvolutionResolvedPayload(
+  value: unknown,
+): value is PokemonEvolutionResolvedPayload {
+  return isPokemonEvolutionPresentation(value);
 }

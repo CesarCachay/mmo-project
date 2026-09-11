@@ -401,7 +401,8 @@ export const ModelName = {
   PokemonInstance: 'PokemonInstance',
   PokemonInstanceMove: 'PokemonInstanceMove',
   PokemonPendingMoveLearning: 'PokemonPendingMoveLearning',
-  PokemonTrainerInventoryItem: 'PokemonTrainerInventoryItem'
+  PokemonTrainerInventoryItem: 'PokemonTrainerInventoryItem',
+  PokemonPendingEvolution: 'PokemonPendingEvolution'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -417,7 +418,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "pokemonTrainer" | "pokemonInstance" | "pokemonInstanceMove" | "pokemonPendingMoveLearning" | "pokemonTrainerInventoryItem"
+    modelProps: "pokemonTrainer" | "pokemonInstance" | "pokemonInstanceMove" | "pokemonPendingMoveLearning" | "pokemonTrainerInventoryItem" | "pokemonPendingEvolution"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -791,6 +792,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PokemonPendingEvolution: {
+      payload: Prisma.$PokemonPendingEvolutionPayload<ExtArgs>
+      fields: Prisma.PokemonPendingEvolutionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PokemonPendingEvolutionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonPendingEvolutionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PokemonPendingEvolutionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonPendingEvolutionPayload>
+        }
+        findFirst: {
+          args: Prisma.PokemonPendingEvolutionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonPendingEvolutionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PokemonPendingEvolutionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonPendingEvolutionPayload>
+        }
+        findMany: {
+          args: Prisma.PokemonPendingEvolutionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonPendingEvolutionPayload>[]
+        }
+        create: {
+          args: Prisma.PokemonPendingEvolutionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonPendingEvolutionPayload>
+        }
+        createMany: {
+          args: Prisma.PokemonPendingEvolutionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PokemonPendingEvolutionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonPendingEvolutionPayload>[]
+        }
+        delete: {
+          args: Prisma.PokemonPendingEvolutionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonPendingEvolutionPayload>
+        }
+        update: {
+          args: Prisma.PokemonPendingEvolutionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonPendingEvolutionPayload>
+        }
+        deleteMany: {
+          args: Prisma.PokemonPendingEvolutionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PokemonPendingEvolutionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PokemonPendingEvolutionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonPendingEvolutionPayload>[]
+        }
+        upsert: {
+          args: Prisma.PokemonPendingEvolutionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonPendingEvolutionPayload>
+        }
+        aggregate: {
+          args: Prisma.PokemonPendingEvolutionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePokemonPendingEvolution>
+        }
+        groupBy: {
+          args: Prisma.PokemonPendingEvolutionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PokemonPendingEvolutionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PokemonPendingEvolutionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PokemonPendingEvolutionCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -894,6 +969,23 @@ export const PokemonTrainerInventoryItemScalarFieldEnum = {
 } as const
 
 export type PokemonTrainerInventoryItemScalarFieldEnum = (typeof PokemonTrainerInventoryItemScalarFieldEnum)[keyof typeof PokemonTrainerInventoryItemScalarFieldEnum]
+
+
+export const PokemonPendingEvolutionScalarFieldEnum = {
+  id: 'id',
+  trainerId: 'trainerId',
+  pokemonInstanceId: 'pokemonInstanceId',
+  sourceSpeciesId: 'sourceSpeciesId',
+  sourceFormId: 'sourceFormId',
+  targetSpeciesId: 'targetSpeciesId',
+  targetFormId: 'targetFormId',
+  triggerLevel: 'triggerLevel',
+  revision: 'revision',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PokemonPendingEvolutionScalarFieldEnum = (typeof PokemonPendingEvolutionScalarFieldEnum)[keyof typeof PokemonPendingEvolutionScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1167,6 +1259,7 @@ export type GlobalOmitConfig = {
   pokemonInstanceMove?: Prisma.PokemonInstanceMoveOmit
   pokemonPendingMoveLearning?: Prisma.PokemonPendingMoveLearningOmit
   pokemonTrainerInventoryItem?: Prisma.PokemonTrainerInventoryItemOmit
+  pokemonPendingEvolution?: Prisma.PokemonPendingEvolutionOmit
 }
 
 /* Types for Logging */

@@ -8,6 +8,7 @@ import {
 import type {
   PokemonMoveLearningErrorPayload,
   PokemonMoveLearningResolvedPayload,
+  PokemonEvolutionResolvedPayload,
 } from '@cesar-mmo/shared';
 
 import type { PokemonTrainerId } from '../pokemon-trainer-identity';
@@ -62,11 +63,21 @@ export class PokemonProgressionNetworkController {
     try {
       const result = await this.progressionManager.resolveMoveLearningDecision({
         trainerId,
-
         pokemonInstanceId: payload.pokemonInstanceId,
         decision: payload.decision,
         expectedRevision: payload.revision,
       });
+
+      const evolutionPayload: PokemonEvolutionResolvedPayload | null =
+        result.evolution
+          ? {
+              pokemonInstanceId: result.evolution.pokemonInstanceId,
+              previousSpeciesId: result.evolution.sourceSpeciesId,
+              previousFormId: result.evolution.sourceFormId,
+              currentSpeciesId: result.evolution.targetSpeciesId,
+              currentFormId: result.evolution.targetFormId,
+            }
+          : null;
 
       const updatedPokemon = result.trainerState.party.pokemon.find(
         (pokemon) => pokemon.instanceId === payload.pokemonInstanceId,
@@ -98,6 +109,10 @@ export class PokemonProgressionNetworkController {
       }
 
       this.trainerStatePresenter.emitTrainerState(client, result.trainerState);
+
+      if (evolutionPayload) {
+        client.emit(POKEMON_EVENTS.EVOLUTION_RESOLVED, evolutionPayload);
+      }
 
       client.emit(POKEMON_EVENTS.MOVE_LEARNING_RESOLVED, {
         pokemonInstanceId: payload.pokemonInstanceId,

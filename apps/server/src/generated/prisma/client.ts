@@ -64,3 +64,8 @@ export type PokemonPendingMoveLearning = Prisma.PokemonPendingMoveLearningModel
  * 
  */
 export type PokemonTrainerInventoryItem = Prisma.PokemonTrainerInventoryItemModel
+/**
+ * Model PokemonPendingEvolution
+ * 
+ */
+export type PokemonPendingEvolution = Prisma.PokemonPendingEvolutionModel

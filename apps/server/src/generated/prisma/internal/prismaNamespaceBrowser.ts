@@ -55,7 +55,8 @@ export const ModelName = {
   PokemonInstance: 'PokemonInstance',
   PokemonInstanceMove: 'PokemonInstanceMove',
   PokemonPendingMoveLearning: 'PokemonPendingMoveLearning',
-  PokemonTrainerInventoryItem: 'PokemonTrainerInventoryItem'
+  PokemonTrainerInventoryItem: 'PokemonTrainerInventoryItem',
+  PokemonPendingEvolution: 'PokemonPendingEvolution'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -138,6 +139,23 @@ export const PokemonTrainerInventoryItemScalarFieldEnum = {
 } as const
 
 export type PokemonTrainerInventoryItemScalarFieldEnum = (typeof PokemonTrainerInventoryItemScalarFieldEnum)[keyof typeof PokemonTrainerInventoryItemScalarFieldEnum]
+
+
+export const PokemonPendingEvolutionScalarFieldEnum = {
+  id: 'id',
+  trainerId: 'trainerId',
+  pokemonInstanceId: 'pokemonInstanceId',
+  sourceSpeciesId: 'sourceSpeciesId',
+  sourceFormId: 'sourceFormId',
+  targetSpeciesId: 'targetSpeciesId',
+  targetFormId: 'targetFormId',
+  triggerLevel: 'triggerLevel',
+  revision: 'revision',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PokemonPendingEvolutionScalarFieldEnum = (typeof PokemonPendingEvolutionScalarFieldEnum)[keyof typeof PokemonPendingEvolutionScalarFieldEnum]
 
 
 export const SortOrder = {
