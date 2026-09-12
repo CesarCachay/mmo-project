@@ -8,6 +8,13 @@ type BattleExperienceGainedPresentationEvent = Extract<
   { readonly type: "experience-gained" }
 >;
 
+function isAuthoritativeDecisionEvent(event: BattlePresentationEvent): boolean {
+  return (
+    event.type === "move-learning-required" ||
+    event.type === "evolution-required"
+  );
+}
+
 export interface BattlePresentationEventContext {
   readonly battleId: string;
   readonly turnNumber: number;
@@ -46,7 +53,9 @@ export interface BattlePresentationQueueOptions {
 export class BattlePresentationQueue {
   private readonly pendingTurns: PokemonBattleTurnResolvedPayload[] = [];
   private readonly options: BattlePresentationQueueOptions;
+
   private processing = false;
+  private blocked = false;
   private generation = 0;
 
   constructor(options: BattlePresentationQueueOptions) {
@@ -54,7 +63,11 @@ export class BattlePresentationQueue {
   }
 
   public get isBusy(): boolean {
-    return this.processing || this.pendingTurns.length > 0;
+    return this.blocked || this.processing || this.pendingTurns.length > 0;
+  }
+
+  public get isBlocked(): boolean {
+    return this.blocked;
   }
 
   public enqueue(payload: PokemonBattleTurnResolvedPayload): void {
@@ -69,11 +82,15 @@ export class BattlePresentationQueue {
 
   public clear(): void {
     this.pendingTurns.length = 0;
+
+    /* Battle lifecycle reset explicitly releases a previously blocked presentation queue */
+    this.blocked = false;
+
     this.generation += 1;
   }
 
   private async drain(): Promise<void> {
-    if (this.processing) {
+    if (this.processing || this.blocked) {
       return;
     }
 
@@ -114,17 +131,34 @@ export class BattlePresentationQueue {
           }
         }
       }
+    } catch {
+      if (generation === this.generation) {
+        this.blocked = true;
+      }
     } finally {
       this.processing = false;
     }
 
-    /* A new generation could have been enqueued while the previous one was being cancelled */
-    if (this.pendingTurns.length > 0) {
-      void this.drain();
+    /*
+     * Critical workflow failure:
+     *
+     * absolutely no:
+     * - later events,
+     * - onTurnCompleted,
+     * - onIdle.
+     */
+    if (this.blocked) {
       return;
     }
 
-    /* Never report idle for a stale generation */
+    /* A newer generation may have been enqueued while the previous one was finishing */
+    if (this.pendingTurns.length > 0) {
+      void this.drain();
+
+      return;
+    }
+
+    /* Never report idle for stale Battle work */
     if (generation !== this.generation) {
       return;
     }
@@ -140,6 +174,7 @@ export class BattlePresentationQueue {
 
   private async presentTurn(
     payload: PokemonBattleTurnResolvedPayload,
+
     generation: number,
   ): Promise<void> {
     const eventCount = payload.events.length;
@@ -162,24 +197,18 @@ export class BattlePresentationQueue {
        * ------------------------------------------------------
        * EXP BATCH
        * ------------------------------------------------------
-       *
-       * Consecutive experience-gained events belong to the
-       * same authoritative Turn and may be PRESENTED
-       * concurrently.
-       *
-       * Gameplay is NOT being resolved here.
+       * Consecutive EXP events from the same authoritative Turn may be presented simultaneously.
+       * EXP presentation itself is visual-only.
        */
       if (
         event.type === "experience-gained" &&
         this.options.presentExperienceBatch
       ) {
         const experienceEvents: BattleExperienceGainedPresentationEvent[] = [];
-
         let batchEndIndex = eventIndex;
 
         while (batchEndIndex < eventCount) {
           const candidate = payload.events[batchEndIndex];
-
           if (!candidate || candidate.type !== "experience-gained") {
             break;
           }
@@ -203,22 +232,19 @@ export class BattlePresentationQueue {
               batchContext,
             );
           } catch (error) {
-            /* Presentation failures must never deadlock authoritative Battle state */
+            /* EXP animation/presentation failure is cosmetic. Server state already exists */
             console.error(
               "[BattlePresentationQueue] EXP batch presentation failed",
               {
                 ...batchContext,
-
                 events: experienceEvents,
-
                 error,
               },
             );
           }
 
-          /* Skip every EXP event already consumed by the batch */
+          /* Skip every EXP event consumed by the batch */
           eventIndex = batchEndIndex;
-
           continue;
         }
       }
@@ -228,7 +254,6 @@ export class BattlePresentationQueue {
        * NORMAL SEQUENTIAL EVENT
        * ------------------------------------------------------
        */
-
       const context: BattlePresentationEventContext = {
         battleId: payload.battleId,
         turnNumber: payload.turnNumber,
@@ -239,6 +264,28 @@ export class BattlePresentationQueue {
       try {
         await this.options.presentEvent(event, context);
       } catch (error) {
+        if (isAuthoritativeDecisionEvent(event)) {
+          /*
+           * Move Learning / Evolution are not
+           * cosmetic presentations.
+           *
+           * If their server-authoritative
+           * acknowledgement failed, later events
+           * and Victory must not continue.
+           */
+          console.error(
+            "[BattlePresentationQueue] authoritative decision presentation failed",
+            {
+              ...context,
+              event,
+              error,
+            },
+          );
+
+          throw error;
+        }
+
+        /* Ordinary visual failures remain non-fatal */
         console.error("[BattlePresentationQueue] event presentation failed", {
           ...context,
           event,

@@ -1568,25 +1568,21 @@ export class BattleController {
   public applyEvolutionRequired(
     payload: PokemonEvolutionRequiredPayload,
   ): void {
-    /* Battle-owned Evolution continues through the existing Battle presentation path */
+    /* Standalone EVOLUTION_REQUIRED is reserved for reconnect / durable pending recovery */
     if (this.isActive) {
-      void this.presentNetworkEvolutionRequired(payload);
+      console.warn(
+        "[BattleController] ignoring standalone Evolution during active Battle",
+        {
+          battleId: this.activeBattlePayload?.battle.battleId,
+          pokemonInstanceId: payload.pokemonInstanceId,
+          revision: payload.revision,
+        },
+      );
 
       return;
     }
 
-    /* No active Battle means this can be a reconnect/restored durable Evolution */
     this.recoveryEvolutionQueue.enqueue(payload);
-  }
-
-  private async presentNetworkEvolutionRequired(
-    payload: PokemonEvolutionRequiredPayload,
-  ): Promise<void> {
-    try {
-      await this.evolutionHudSyncCoordinator.presentRequiredEvolution(payload);
-    } catch (error) {
-      console.error("[BattleController] Evolution presentation failed", error);
-    }
   }
 
   private getEvolutionPokemonDisplayName(pokemonInstanceId: string): string {

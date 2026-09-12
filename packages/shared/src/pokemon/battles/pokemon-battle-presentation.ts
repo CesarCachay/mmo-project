@@ -2,10 +2,6 @@ import type { BattleParticipantId } from "./pokemon-battle.types.js";
 import { isPokemonItemId } from "../inventory/pokemon-inventory.js";
 import type { PokemonItemId } from "../inventory/pokemon-inventory.js";
 import type { PokemonInstanceMove } from "../pokemon.types.js";
-import {
-  isPokemonEvolutionPresentation,
-  type PokemonEvolutionPresentation,
-} from "../evolution/pokemon-evolution-presentation.js";
 
 // moves
 export interface BattleMoveUsedEvent {
@@ -138,11 +134,6 @@ export interface BattleMoveLearnedEvent {
   readonly moveId: number;
 }
 
-export interface BattlePokemonEvolvedEvent extends PokemonEvolutionPresentation {
-  readonly type: "pokemon-evolved";
-  readonly participantId: BattleParticipantId;
-}
-
 export interface BattleEvolutionRequiredEvent {
   readonly type: "evolution-required";
 
@@ -175,7 +166,6 @@ export type BattlePresentationEvent =
   | BattlePokemonLeveledUpEvent
   | BattleMoveLearningRequiredEvent
   | BattleMoveLearnedEvent
-  | BattlePokemonEvolvedEvent
   | BattleEvolutionRequiredEvent;
 
 function isMoveEvent(value: Record<string, unknown>): boolean {
