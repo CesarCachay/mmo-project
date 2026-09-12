@@ -33,7 +33,10 @@ export const POKEMON_EVENTS = {
   MOVE_LEARNING_RESOLVED: "pokemon:move-learning-resolved",
   MOVE_LEARNING_ERROR: "pokemon:move-learning-error",
 
+  EVOLUTION_REQUIRED: "pokemon:evolution-required",
+  EVOLUTION_DECISION: "pokemon:evolution-decision",
   EVOLUTION_RESOLVED: "pokemon:evolution-resolved",
+  EVOLUTION_ERROR: "pokemon:evolution-error",
 
   STORAGE_OPEN: "pokemon:storage-open",
   STORAGE_CLOSE: "pokemon:storage-close",

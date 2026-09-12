@@ -93,6 +93,12 @@ import { PokemonBattleTurnExecutor } from 'src/pokemon/battles/pokemon-battle-tu
 import { PokemonBattleNetworkController } from 'src/pokemon/battles/pokemon-battle-network.controller';
 import { PokemonWildBattleStarter } from 'src/pokemon/battles/pokemon-wild-battle.starter';
 import { PokemonProgressionNetworkController } from 'src/pokemon/progression/pokemon-progression-network.controller';
+import {
+  PokemonEvolutionNetworkController,
+  emitPokemonEvolutionRequired,
+} from 'src/pokemon/evolution/pokemon-evolution-network.controller';
+import { PokemonPendingEvolutionRecoveryService } from 'src/pokemon/evolution/pokemon-pending-evolution-recovery.service';
+import type { PokemonPendingEvolutionState } from 'src/pokemon/evolution/pokemon-pending-evolution.types';
 
 // stores
 import { PlayerWorldRuntimeStore } from './world/player-world-runtime.store';
@@ -157,6 +163,7 @@ export class GameGateway
   private readonly pokemonWildBattleStarter: PokemonWildBattleStarter;
 
   private readonly pokemonProgressionNetworkController: PokemonProgressionNetworkController;
+  private readonly pokemonEvolutionNetworkController: PokemonEvolutionNetworkController;
 
   private nextColorIndex = 0;
   private gameLoop?: ReturnType<typeof setInterval>;
@@ -174,6 +181,7 @@ export class GameGateway
     private readonly pokemonOverworldItemRepository: PokemonOverworldItemRepository,
     private readonly wildBattleProgressionService: PokemonWildBattleProgressionService,
     private readonly pokemonProgressionManager: PokemonProgressionManager,
+    private readonly pokemonPendingEvolutionRecoveryService: PokemonPendingEvolutionRecoveryService,
   ) {
     this.pokemonTrainerService = new PokemonTrainerService(
       this.pokemonTrainerStateStore,
@@ -198,6 +206,12 @@ export class GameGateway
 
     this.pokemonProgressionNetworkController =
       new PokemonProgressionNetworkController({
+        progressionManager: this.pokemonProgressionManager,
+        trainerStatePresenter: this.pokemonTrainerStateNetworkPresenter,
+        resolveTrainerId: (playerId) => this.getTrainerId(playerId),
+      });
+    this.pokemonEvolutionNetworkController =
+      new PokemonEvolutionNetworkController({
         progressionManager: this.pokemonProgressionManager,
         trainerStatePresenter: this.pokemonTrainerStateNetworkPresenter,
         resolveTrainerId: (playerId) => this.getTrainerId(playerId),
@@ -340,6 +354,8 @@ export class GameGateway
     let trainerState: PokemonTrainerState;
     let initialWorldLocation: PlayerWorldLocation;
 
+    let pendingEvolutions: readonly PokemonPendingEvolutionState[] = [];
+
     try {
       const resolution = await this.resolvePokemonTrainerIdentity(
         client.id,
@@ -377,6 +393,16 @@ export class GameGateway
       //   await this.pokemonTrainerService.ensureDevelopmentBattleTestParty(
       //     trainerIdentity.trainerId,
       //   );
+
+      pendingEvolutions =
+        await this.pokemonPendingEvolutionRecoveryService.restoreTrainerPendings(
+          {
+            trainerId: trainerIdentity.trainerId,
+            partyPokemonInstanceIds: trainerState.party.pokemon.map(
+              (pokemon) => pokemon.instanceId,
+            ),
+          },
+        );
     } catch (error: unknown) {
       console.error('[PokemonTrainerIdentity] resolution failed', error);
       this.pokemonTrainerIdentityStore.unbind(client.id);
@@ -423,6 +449,10 @@ export class GameGateway
     } satisfies PokemonTrainerSessionPayload);
 
     client.emit(POKEMON_EVENTS.TRAINER_STATE, trainerStatePayload);
+
+    for (const pendingEvolution of pendingEvolutions) {
+      emitPokemonEvolutionRequired(client, pendingEvolution);
+    }
 
     const mapRoom = this.getMapRoom(newPlayer.mapId);
     await client.join(mapRoom);
@@ -606,7 +636,6 @@ export class GameGateway
   handlePokemonMoveLearningDecision(
     @ConnectedSocket()
     client: Socket,
-
     @MessageBody()
     payload: unknown,
   ): Promise<void> {
@@ -616,11 +645,23 @@ export class GameGateway
     );
   }
 
+  @SubscribeMessage(POKEMON_EVENTS.EVOLUTION_DECISION)
+  handlePokemonEvolutionDecision(
+    @ConnectedSocket()
+    client: Socket,
+    @MessageBody()
+    payload: unknown,
+  ): Promise<void> {
+    return this.pokemonEvolutionNetworkController.handleEvolutionDecision(
+      client,
+      payload,
+    );
+  }
+
   @SubscribeMessage(POKEMON_EVENTS.CHOOSE_STARTER)
   handleChooseStarter(
     @ConnectedSocket()
     client: Socket,
-
     @MessageBody()
     payload: unknown,
   ): Promise<void> {

@@ -298,6 +298,9 @@ export class GameScene extends Phaser.Scene {
       (input) => {
         this.network.sendPokemonMoveLearningDecision(input);
       },
+      (input) => {
+        this.network.sendPokemonEvolutionDecision(input);
+      },
     );
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -530,7 +533,7 @@ export class GameScene extends Phaser.Scene {
     this.trainerPanelController = new TrainerPanelController(this, {
       isInteractionBlocked: () =>
         Boolean(this.pokemonStorageController?.isBlockingGameplay) ||
-        Boolean(this.battleController?.isActive) ||
+        Boolean(this.battleController?.isBlockingGameplay) ||
         this.isMapTransitioning ||
         this.dialogueBox.isOpen() ||
         this.chatBox.isTyping() ||
@@ -674,6 +677,18 @@ export class GameScene extends Phaser.Scene {
 
     this.network.onPokemonMoveLearningError((payload) => {
       this.battleController.applyMoveLearningError(payload);
+    });
+
+    this.network.onPokemonEvolutionRequired((payload) => {
+      this.battleController.applyEvolutionRequired(payload);
+    });
+
+    this.network.onPokemonEvolutionResolved((payload) => {
+      this.battleController.applyEvolutionResolved(payload);
+    });
+
+    this.network.onPokemonEvolutionError((payload) => {
+      this.battleController.applyEvolutionError(payload);
     });
 
     this.network.onBattleCompleted((payload) => {
@@ -894,7 +909,7 @@ export class GameScene extends Phaser.Scene {
     if (
       this.starterSelectionPanel.isVisible() ||
       this.trainerPanelController.isOpen ||
-      this.battleController?.isActive ||
+      this.battleController?.isBlockingGameplay ||
       this.pokemonStorageController?.isBlockingGameplay
     ) {
       return;
@@ -1045,7 +1060,7 @@ export class GameScene extends Phaser.Scene {
       this.chatBox.isTyping() ||
       this.starterSelectionPanel.isVisible() ||
       this.trainerPanelController.isPartyVisible ||
-      this.battleController.isActive ||
+      this.battleController.isBlockingGameplay ||
       this.pokemonStorageController?.isBlockingGameplay
     ) {
       return;
@@ -1091,7 +1106,7 @@ export class GameScene extends Phaser.Scene {
       this.chatBox.isTyping() ||
       this.starterSelectionPanel.isVisible() ||
       this.trainerPanelController.isOpen ||
-      this.battleController?.isActive
+      this.battleController?.isBlockingGameplay
     );
   }
 
@@ -1113,7 +1128,7 @@ export class GameScene extends Phaser.Scene {
       this.chatBox.isTyping() ||
       this.starterSelectionPanel.isVisible() ||
       this.trainerPanelController.isPartyVisible ||
-      this.battleController?.isActive ||
+      this.battleController?.isBlockingGameplay ||
       this.pokemonStorageController?.isBlockingGameplay;
 
     this.pokemonStorageTerminalInteraction.update(

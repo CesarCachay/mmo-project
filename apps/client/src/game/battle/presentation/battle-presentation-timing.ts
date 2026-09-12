@@ -72,13 +72,14 @@ export function getBattlePresentationMessageDuration(
     case "move-learned":
       return BATTLE_PRESENTATION_TIMING.moveLearnedMessageMs;
 
-    case "pokemon-leveled-up":
-      return BATTLE_PRESENTATION_TIMING.levelUpMessageMs;
-
     case "move-learning-required":
       return BATTLE_PRESENTATION_TIMING.moveLearningMessageMs;
 
     case "pokemon-evolved":
       return 0;
+
+    case "evolution-required": {
+      return 0;
+    }
   }
 }

@@ -6,6 +6,8 @@ import { PrismaService } from '../../database/prisma.service';
 
 import type { PokemonTrainerId } from '../pokemon-trainer-identity';
 
+import type { PokemonPendingEvolutionCreation } from '../evolution/pokemon-pending-evolution.types';
+
 export interface PokemonPartyProgressionPendingCandidate {
   readonly moveId: number;
   readonly learnedAtLevel: number;
@@ -14,16 +16,6 @@ export interface PokemonPartyProgressionPendingCandidate {
 export interface PokemonPartyProgressionPendingMoveLearning {
   readonly candidate: PokemonPartyProgressionPendingCandidate;
   readonly remainingCandidates: readonly PokemonPartyProgressionPendingCandidate[];
-}
-
-export interface PokemonPartyProgressionPendingEvolution {
-  readonly sourceSpeciesId: number;
-  readonly sourceFormId: number;
-
-  readonly targetSpeciesId: number;
-  readonly targetFormId: number;
-
-  readonly triggerLevel: number;
 }
 
 export interface ApplyPokemonPartyProgressionEntry {
@@ -48,7 +40,7 @@ export interface ApplyPokemonPartyProgressionEntry {
 
   readonly pendingMoveLearning: PokemonPartyProgressionPendingMoveLearning | null;
 
-  readonly pendingEvolution: PokemonPartyProgressionPendingEvolution | null;
+  readonly pendingEvolution: PokemonPendingEvolutionCreation | null;
 }
 
 export interface ApplyPokemonPartyProgressionInput {
@@ -84,29 +76,67 @@ export class PokemonPartyProgressionRepository {
       );
     }
 
+    for (const entry of entries) {
+      if (
+        entry.pendingMoveLearning !== null &&
+        entry.pendingEvolution !== null
+      ) {
+        throw new Error(
+          [
+            `Pokémon "${entry.pokemonInstanceId}"`,
+            'cannot persist pending Move Learning',
+            'and pending Evolution simultaneously',
+          ].join(' '),
+        );
+      }
+    }
+
     await this.prisma.$transaction(async (tx) => {
       /*
        * --------------------------------------------------
        * 1. Existing pending workflow guard
        * --------------------------------------------------
        */
-      const existingPending = await tx.pokemonPendingMoveLearning.findFirst({
-        where: {
-          trainerId,
-          pokemonInstanceId: {
-            in: instanceIds,
+      const existingPendingMoveLearning =
+        await tx.pokemonPendingMoveLearning.findFirst({
+          where: {
+            trainerId,
+            pokemonInstanceId: {
+              in: instanceIds,
+            },
           },
-        },
-        select: {
-          pokemonInstanceId: true,
-        },
-      });
+          select: {
+            pokemonInstanceId: true,
+          },
+        });
 
-      if (existingPending) {
+      if (existingPendingMoveLearning) {
         throw new PokemonPartyProgressionPersistenceConflictError(
           [
-            `Pokémon "${existingPending.pokemonInstanceId}"`,
+            `Pokémon "${existingPendingMoveLearning.pokemonInstanceId}"`,
             'already has pending move learning',
+          ].join(' '),
+        );
+      }
+
+      const existingPendingEvolution =
+        await tx.pokemonPendingEvolution.findFirst({
+          where: {
+            trainerId,
+            pokemonInstanceId: {
+              in: instanceIds,
+            },
+          },
+          select: {
+            pokemonInstanceId: true,
+          },
+        });
+
+      if (existingPendingEvolution) {
+        throw new PokemonPartyProgressionPersistenceConflictError(
+          [
+            `Pokémon "${existingPendingEvolution.pokemonInstanceId}"`,
+            'already has pending evolution',
           ].join(' '),
         );
       }
@@ -207,25 +237,21 @@ export class PokemonPartyProgressionRepository {
           });
         }
 
-        const existingEvolution = await tx.pokemonPendingEvolution.findFirst({
-          where: {
-            trainerId,
-            pokemonInstanceId: {
-              in: instanceIds,
-            },
-          },
-          select: {
-            pokemonInstanceId: true,
-          },
-        });
+        if (entry.pendingEvolution) {
+          const pending = entry.pendingEvolution;
 
-        if (existingEvolution) {
-          throw new PokemonPartyProgressionPersistenceConflictError(
-            [
-              `Pokémon "${existingEvolution.pokemonInstanceId}"`,
-              'already has pending evolution',
-            ].join(' '),
-          );
+          await tx.pokemonPendingEvolution.create({
+            data: {
+              trainerId,
+              pokemonInstanceId: entry.pokemonInstanceId,
+              sourceSpeciesId: pending.sourceSpeciesId,
+              sourceFormId: pending.sourceFormId,
+              targetSpeciesId: pending.targetSpeciesId,
+              targetFormId: pending.targetFormId,
+              triggerLevel: pending.triggerLevel,
+              revision: 0,
+            },
+          });
         }
       }
     });

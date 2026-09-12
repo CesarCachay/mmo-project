@@ -11,6 +11,8 @@ import type {
 
 import type { PokemonInstanceMove } from '@cesar-mmo/shared';
 
+import type { PokemonPendingEvolutionCreation } from '../evolution/pokemon-pending-evolution.types';
+
 export class PokemonPendingMoveLearningPersistenceConflictError extends Error {
   constructor(message: string) {
     super(message);
@@ -39,11 +41,13 @@ export interface ApplyPokemonMoveLearningDecisionPersistenceInput {
   readonly expectedRevision: number;
 
   /*
-   * Final authoritative Pokémon state.
+   * Final authoritative Pokémon state after
+   * resolving this Move Learning decision.
    *
-   * These values remain unchanged while another
-   * move decision exists, and become the evolved
-   * values after the final decision when eligible.
+   * Evolution is never applied here.
+   * If eligible after the final Move Learning
+   * decision, a separate Pending Evolution row
+   * is created atomically.
    */
   readonly speciesId: number;
   readonly formId: number;
@@ -57,6 +61,8 @@ export interface ApplyPokemonMoveLearningDecisionPersistenceInput {
 
     readonly remainingCandidates: readonly PokemonPendingMoveLearningCandidate[];
   } | null;
+
+  readonly pendingEvolution: PokemonPendingEvolutionCreation | null;
 }
 
 @Injectable()
@@ -93,6 +99,16 @@ export class PokemonPendingMoveLearningRepository {
   public async applyDecision(
     input: ApplyPokemonMoveLearningDecisionPersistenceInput,
   ): Promise<void> {
+    if (input.nextPending && input.pendingEvolution) {
+      throw new Error(
+        [
+          `Pokémon "${input.pokemonInstanceId}"`,
+          'cannot keep pending Move Learning',
+          'and create pending Evolution simultaneously',
+        ].join(' '),
+      );
+    }
+
     await this.prisma.$transaction(async (tx) => {
       /* 1. Validate the pending workflow revision */
       const pending = await tx.pokemonPendingMoveLearning.findUnique({
@@ -116,6 +132,24 @@ export class PokemonPendingMoveLearningRepository {
             `Pending move-learning state changed for Pokémon "${input.pokemonInstanceId}"`,
             `expectedRevision=${input.expectedRevision}`,
           ].join(', '),
+        );
+      }
+
+      const existingEvolution = await tx.pokemonPendingEvolution.findUnique({
+        where: {
+          pokemonInstanceId: input.pokemonInstanceId,
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      if (existingEvolution) {
+        throw new PokemonPendingMoveLearningPersistenceConflictError(
+          [
+            `Pokémon "${input.pokemonInstanceId}"`,
+            'already has a pending evolution',
+          ].join(' '),
         );
       }
 
@@ -220,6 +254,21 @@ export class PokemonPendingMoveLearningRepository {
         throw new PokemonPendingMoveLearningPersistenceConflictError(
           `Pending move-learning state changed for Pokémon "${input.pokemonInstanceId}"`,
         );
+      }
+
+      if (input.pendingEvolution) {
+        await tx.pokemonPendingEvolution.create({
+          data: {
+            trainerId: input.trainerId,
+            pokemonInstanceId: input.pokemonInstanceId,
+            sourceSpeciesId: input.pendingEvolution.sourceSpeciesId,
+            sourceFormId: input.pendingEvolution.sourceFormId,
+            targetSpeciesId: input.pendingEvolution.targetSpeciesId,
+            targetFormId: input.pendingEvolution.targetFormId,
+            triggerLevel: input.pendingEvolution.triggerLevel,
+            revision: 0,
+          },
+        });
       }
     });
   }

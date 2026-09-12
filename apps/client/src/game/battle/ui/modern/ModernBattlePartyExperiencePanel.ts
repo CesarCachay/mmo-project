@@ -188,11 +188,19 @@ export class ModernBattlePartyExperiencePanel {
   public clear(): void {
     this.hide();
     this.clearRows();
+    this.root.classList.remove("battle-modern-party-exp--cinematic-hidden");
   }
 
   public destroy(): void {
     this.clear();
     this.root.remove();
+  }
+
+  public setCinematicHidden(hidden: boolean): void {
+    this.root.classList.toggle(
+      "battle-modern-party-exp--cinematic-hidden",
+      hidden,
+    );
   }
 
   public async animateExperienceGain(

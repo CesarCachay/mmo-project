@@ -143,6 +143,22 @@ export interface BattlePokemonEvolvedEvent extends PokemonEvolutionPresentation 
   readonly participantId: BattleParticipantId;
 }
 
+export interface BattleEvolutionRequiredEvent {
+  readonly type: "evolution-required";
+
+  readonly participantId: BattleParticipantId;
+  readonly pokemonInstanceId: string;
+
+  readonly sourceSpeciesId: number;
+  readonly sourceFormId: number;
+
+  readonly targetSpeciesId: number;
+  readonly targetFormId: number;
+
+  readonly triggerLevel: number;
+  readonly revision: number;
+}
+
 export type BattlePresentationEvent =
   | BattleMoveUsedEvent
   | BattleMoveMissedEvent
@@ -159,7 +175,8 @@ export type BattlePresentationEvent =
   | BattlePokemonLeveledUpEvent
   | BattleMoveLearningRequiredEvent
   | BattleMoveLearnedEvent
-  | BattlePokemonEvolvedEvent;
+  | BattlePokemonEvolvedEvent
+  | BattleEvolutionRequiredEvent;
 
 function isMoveEvent(value: Record<string, unknown>): boolean {
   return (
@@ -328,8 +345,8 @@ export function isBattlePresentationEvent(
     case "move-learning-required":
       return isMoveLearningRequiredEvent(value);
 
-    case "pokemon-evolved":
-      return isPokemonEvolvedEvent(value);
+    case "evolution-required":
+      return isEvolutionRequiredEvent(value);
 
     default:
       return false;
@@ -408,9 +425,15 @@ function isMoveLearningRequiredEvent(value: Record<string, unknown>): boolean {
   );
 }
 
-function isPokemonEvolvedEvent(value: Record<string, unknown>): boolean {
+function isEvolutionRequiredEvent(value: Record<string, unknown>): boolean {
   return (
     isNonEmptyString(value.participantId) &&
-    isPokemonEvolutionPresentation(value)
+    isNonEmptyString(value.pokemonInstanceId) &&
+    isPositiveInteger(value.sourceSpeciesId) &&
+    isPositiveInteger(value.sourceFormId) &&
+    isPositiveInteger(value.targetSpeciesId) &&
+    isPositiveInteger(value.targetFormId) &&
+    isPositiveInteger(value.triggerLevel) &&
+    isNonNegativeInteger(value.revision)
   );
 }

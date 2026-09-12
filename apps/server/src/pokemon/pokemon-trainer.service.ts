@@ -157,19 +157,30 @@ export class PokemonTrainerService {
   //   if (process.env.NODE_ENV === 'production') {
   //     return trainerState;
   //   }
-  //   const hasLatios = trainerState.party.pokemon.some(
-  //     (pokemon) => pokemon.speciesId === 381,
+  //   const hasCharmander = trainerState.party.pokemon.some(
+  //     (pokemon) => pokemon.speciesId === 7,
   //   );
-  //   const hasLarvitar = trainerState.party.pokemon.some(
-  //     (pokemon) => pokemon.speciesId === 246,
+  //   const hasSquirtle = trainerState.party.pokemon.some(
+  //     (pokemon) => pokemon.speciesId === 4,
+  //   );
+  //   const hasBulbasaur = trainerState.party.pokemon.some(
+  //     (pokemon) => pokemon.speciesId === 1,
+  //   );
+  //   const hasTotodile = trainerState.party.pokemon.some(
+  //     (pokemon) => pokemon.speciesId === 158,
   //   );
   //   let updatedState = trainerState;
-
-  //   if (!hasLatios) {
-  //     updatedState = await this.addPokemon(trainerId, 381, 15);
+  //   if (!hasCharmander) {
+  //     updatedState = await this.addPokemon(trainerId, 7, 15);
   //   }
-  //   if (!hasLarvitar) {
-  //     updatedState = await this.addPokemon(trainerId, 246, 7);
+  //   if (!hasSquirtle) {
+  //     updatedState = await this.addPokemon(trainerId, 4, 15);
+  //   }
+  //   if (!hasBulbasaur) {
+  //     updatedState = await this.addPokemon(trainerId, 1, 15);
+  //   }
+  //   if (!hasTotodile) {
+  //     updatedState = await this.addPokemon(trainerId, 158, 15);
   //   }
   //   const pokeBallQuantity = getPokemonInventoryItemQuantity(
   //     updatedState.inventory,

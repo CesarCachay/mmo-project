@@ -282,27 +282,21 @@ export class ModernBattlePokemonHud {
     );
 
     this.progression.hidden = true;
-
     this.experienceText.textContent = "EXP";
-
     this.experienceFill.classList.remove("battle-progression__fill--gaining");
-
     this.experienceFill.style.width = "0%";
 
     this.level.classList.remove("battle-progression__level--up");
-
     this.card.classList.remove("battle-progression__card--level-up");
-
     this.progression.classList.remove("battle-progression--visible");
-
     this.experienceFill.style.removeProperty("--battle-exp-duration");
 
     this.sprite.removeAttribute("src");
-
     this.hitSprite.removeAttribute("src");
     this.hitSprite.style.opacity = "0";
-
     this.sprite.alt = "";
+
+    this.root.classList.remove("battle-modern-hud--cinematic-hidden");
   }
 
   public destroy(): void {
@@ -536,6 +530,10 @@ export class ModernBattlePokemonHud {
     this.level.textContent = `Lv. ${currentLevel}`;
     this.setExperienceRatio(finalRatio);
     this.experienceText.textContent = "EXP";
+  }
+
+  public setCinematicHidden(hidden: boolean): void {
+    this.root.classList.toggle("battle-modern-hud--cinematic-hidden", hidden);
   }
 
   private getExperienceLevelRatio(

@@ -307,6 +307,7 @@ export type {
   BattleExperienceGainedEvent,
   BattlePokemonLeveledUpEvent,
   BattleMoveLearningRequiredEvent,
+  BattleEvolutionRequiredEvent,
 } from "./pokemon/battles/pokemon-battle-presentation.js";
 export { isPokemonBattleTurnResolvedPayload } from "./pokemon/battles/pokemon-battle-presentation-network.js";
 export type { PokemonBattleTurnResolvedPayload } from "./pokemon/battles/pokemon-battle-presentation-network.js";
@@ -484,7 +485,10 @@ export {
   isPokemonMoveLearningDecisionInput,
   isPokemonMoveLearningResolvedPayload,
   isPokemonMoveLearningErrorPayload,
+  isPokemonEvolutionRequiredPayload,
+  isPokemonEvolutionDecisionInput,
   isPokemonEvolutionResolvedPayload,
+  isPokemonEvolutionErrorPayload,
 } from "./pokemon/progression/pokemon-progression-network.js";
 export type {
   PokemonPendingMoveLearningNetworkState,
@@ -492,6 +496,9 @@ export type {
   PokemonMoveLearningResolvedPayload,
   PokemonMoveLearningErrorPayload,
   PokemonEvolutionResolvedPayload,
+  PokemonEvolutionRequiredPayload,
+  PokemonEvolutionDecisionInput,
+  PokemonEvolutionErrorPayload,
 } from "./pokemon/progression/pokemon-progression-network.js";
 
 // EVOLUTION

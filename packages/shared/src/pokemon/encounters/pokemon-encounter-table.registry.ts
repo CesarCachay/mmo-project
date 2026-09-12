@@ -29,32 +29,32 @@ export const POKEMON_ENCOUNTER_TABLES = {
     entries: [
       {
         speciesId: 33, // Nidorino
-        minLevel: 4,
-        maxLevel: 8,
+        minLevel: 8,
+        maxLevel: 10,
         weight: 1,
       },
       {
         speciesId: 30, // Nidorina
-        minLevel: 4,
-        maxLevel: 7,
+        minLevel: 7,
+        maxLevel: 11,
         weight: 1,
       },
       {
         speciesId: 92, // Gastly
-        minLevel: 2,
-        maxLevel: 4,
+        minLevel: 7,
+        maxLevel: 10,
         weight: 1,
       },
       {
         speciesId: 77, // Ponyta
-        minLevel: 3,
-        maxLevel: 7,
+        minLevel: 7,
+        maxLevel: 11,
         weight: 1,
       },
       {
         speciesId: 74, // Geodude
-        minLevel: 4,
-        maxLevel: 8,
+        minLevel: 8,
+        maxLevel: 12,
         weight: 1,
       },
     ],
@@ -64,32 +64,32 @@ export const POKEMON_ENCOUNTER_TABLES = {
     entries: [
       {
         speciesId: 23, // Ekans
-        minLevel: 4,
-        maxLevel: 8,
+        minLevel: 8,
+        maxLevel: 10,
         weight: 1,
       },
       {
         speciesId: 27, // Sandshrew
-        minLevel: 4,
-        maxLevel: 7,
+        minLevel: 7,
+        maxLevel: 11,
         weight: 1,
       },
       {
         speciesId: 137, // Tauros
-        minLevel: 2,
-        maxLevel: 4,
+        minLevel: 8,
+        maxLevel: 12,
         weight: 1,
       },
       {
         speciesId: 43, // Meowth
-        minLevel: 3,
-        maxLevel: 7,
+        minLevel: 7,
+        maxLevel: 11,
         weight: 1,
       },
       {
         speciesId: 43, // Oddish
-        minLevel: 4,
-        maxLevel: 8,
+        minLevel: 8,
+        maxLevel: 10,
         weight: 1,
       },
     ],

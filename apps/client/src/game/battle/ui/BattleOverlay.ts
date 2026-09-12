@@ -7,6 +7,8 @@ import type {
   PokemonItemId,
   PokemonMoveLearningDecision,
   BattlePresentationEvent,
+  PokemonEvolutionDecision,
+  BattlePokemonState,
 } from "@cesar-mmo/shared";
 
 import { BattleDomRoot } from "./modern/BattleDomRoot";
@@ -20,6 +22,10 @@ import { ModernBattleActionMenu } from "./modern/ModernBattleActionMenu";
 import { ModernBattleBagPanel } from "./modern/ModernBattleBagPanel";
 import { ModernBattleCaptureLayer } from "./modern/ModernBattleCaptureLayer";
 import { ModernBattlePartyExperiencePanel } from "./modern/ModernBattlePartyExperiencePanel";
+import {
+  ModernBattleEvolutionDecisionPanel,
+  type EvolutionDecisionPrompt,
+} from "./modern/ModernBattleEvolutionDecisionPanel";
 
 import {
   ModernBattleMoveLearningPanel,
@@ -33,6 +39,13 @@ import { ModernBattleMessagePanel } from "./modern/ModernBattleMessagePanel";
 import { getPokemonItemSpriteAsset } from "../../pokemon/pokemon-item-sprite.registry";
 
 import type { BattleClientInteractionState } from "../battle-client.types";
+
+import { ModernBattleEvolutionLayer } from "./modern/ModernBattleEvolutionLayer";
+
+import {
+  PokemonEvolutionAnimator,
+  type PokemonEvolutionAnimationInput,
+} from "../evolution/PokemonEvolutionAnimator";
 
 const CAPTURE_TARGET_HEAD_OFFSET_PX = 44;
 
@@ -60,6 +73,10 @@ export class BattleOverlay {
   private readonly captureLayer: ModernBattleCaptureLayer;
 
   private readonly moveLearningPanel: ModernBattleMoveLearningPanel;
+
+  private readonly evolutionDecisionPanel: ModernBattleEvolutionDecisionPanel;
+  private readonly evolutionLayer: ModernBattleEvolutionLayer;
+  private readonly evolutionAnimator: PokemonEvolutionAnimator;
 
   private readonly partyExperiencePanel: ModernBattlePartyExperiencePanel;
 
@@ -121,6 +138,18 @@ export class BattleOverlay {
     this.moveLearningPanel = new ModernBattleMoveLearningPanel(
       this.modernRoot.element,
     );
+    this.evolutionDecisionPanel = new ModernBattleEvolutionDecisionPanel(
+      this.modernRoot.element,
+    );
+    this.evolutionLayer = new ModernBattleEvolutionLayer(
+      this.modernRoot.element,
+    );
+
+    this.evolutionAnimator = new PokemonEvolutionAnimator({
+      layer: this.evolutionLayer,
+      presentMessage: (message, durationMs) =>
+        this.presentMessage(message, durationMs),
+    });
     this.partyExperiencePanel = new ModernBattlePartyExperiencePanel(
       this.modernRoot.element,
     );
@@ -152,6 +181,9 @@ export class BattleOverlay {
     this.replacementPanel.clear();
     this.bagPanel.clear();
     this.moveLearningPanel.clear();
+    this.evolutionDecisionPanel.clear();
+    this.evolutionLayer.clear();
+
     this.partyExperiencePanel.clear();
   }
 
@@ -202,6 +234,7 @@ export class BattleOverlay {
     this.movePanel.destroy();
     this.replacementPanel.destroy();
     this.moveLearningPanel.destroy();
+    this.evolutionDecisionPanel.destroy();
 
     this.captureLayer.clear();
 
@@ -212,6 +245,8 @@ export class BattleOverlay {
     this.completionPanel.destroy();
 
     this.partyExperiencePanel.destroy();
+
+    this.evolutionLayer.destroy();
 
     this.stage.destroy();
 
@@ -241,12 +276,21 @@ export class BattleOverlay {
       height: commandAreaHeight,
     };
 
+    const evolutionBounds = {
+      x: width / 2,
+      y: battleFieldHeight / 2,
+      width,
+      height: battleFieldHeight,
+    };
+
     this.actionMenu.setBounds(commandBounds, viewport);
     this.movePanel.setBounds(commandBounds, viewport);
     this.replacementPanel.setBounds(commandBounds, viewport);
     this.messagePanel.setBounds(commandBounds, viewport);
     this.bagPanel.setBounds(commandBounds, viewport);
     this.moveLearningPanel.setBounds(commandBounds, viewport);
+    this.evolutionDecisionPanel.setBounds(commandBounds, viewport);
+    this.evolutionLayer.setBounds(evolutionBounds, viewport);
 
     /*
      * Conservamos exactamente la distribución
@@ -287,6 +331,54 @@ export class BattleOverlay {
       trainerBounds,
       wildBounds,
     });
+  }
+
+  public async animatePokemonEvolution(
+    input: PokemonEvolutionAnimationInput,
+  ): Promise<void> {
+    /*
+     * IMPORTANT:
+     *
+     * Do NOT restore the normal Battle HUD here.
+     *
+     * The animation can already be displaying the evolved
+     * species while the normal trainer HUD still contains
+     * the pre-Evolution Battle snapshot.
+     *
+     * BattleController owns the authoritative TrainerState,
+     * so it must synchronize that state before cinematic
+     * mode is released.
+     */
+    this.setEvolutionCinematicMode(true);
+
+    await this.evolutionAnimator.play(input);
+  }
+
+  public syncTrainerPokemonAfterEvolution(
+    evolvedPokemon: BattlePokemonState,
+    trainerParty: readonly BattlePokemonState[],
+  ): void {
+    /*
+     * Party EXP presentation may contain the evolved Pokémon
+     * even when that Pokémon is not currently active.
+     */
+    this.partyExperiencePanel.renderParty(trainerParty);
+
+    /* A benched Pokémon can also gain EXP and evolve */
+    if (
+      !this.trainerHud.isDisplayingPokemon(evolvedPokemon.pokemon.instanceId)
+    ) {
+      return;
+    }
+
+    /* We are still inside cinematic mode here */
+    this.trainerHud.setPokemon(evolvedPokemon);
+    this.actionMenu.setPokemon(evolvedPokemon);
+    this.movePanel.setPokemon(evolvedPokemon);
+  }
+
+  public finishPokemonEvolutionCinematic(): void {
+    this.setEvolutionCinematicMode(false);
   }
 
   public setInteractionState(state: BattleClientInteractionState): void {
@@ -394,6 +486,7 @@ export class BattleOverlay {
     this.partyExperiencePanel.hide();
     this.completionPanel.show(outcome);
     this.moveLearningPanel.setVisible(false);
+    this.evolutionDecisionPanel.setVisible(false);
   }
 
   public setVoluntaryPokemonOptions(battle: BattleInstance): void {
@@ -696,6 +789,30 @@ export class BattleOverlay {
     this.moveLearningPanel.setVisible(false);
   }
 
+  public requestEvolutionDecision(
+    prompt: EvolutionDecisionPrompt,
+  ): Promise<PokemonEvolutionDecision> {
+    this.messagePanel.clear();
+
+    this.actionMenu.setVisible(false);
+    this.movePanel.setVisible(false);
+    this.replacementPanel.setVisible(false);
+    this.bagPanel.setVisible(false);
+
+    /* Evolution cannot overlap the Move Learning UI */
+    this.moveLearningPanel.setVisible(false);
+
+    return this.evolutionDecisionPanel.prompt(prompt);
+  }
+
+  public setEvolutionDecisionWaiting(waiting: boolean): void {
+    this.evolutionDecisionPanel.setWaiting(waiting);
+  }
+
+  public hideEvolutionDecision(): void {
+    this.evolutionDecisionPanel.setVisible(false);
+  }
+
   public animatePartyExperienceGainBatch(
     battle: BattleInstance,
     events: readonly BattleExperienceGainedPresentationEvent[],
@@ -798,5 +915,19 @@ export class BattleOverlay {
     }
 
     return Promise.all(animations).then(() => undefined);
+  }
+
+  private setEvolutionCinematicMode(active: boolean): void {
+    this.trainerHud.setCinematicHidden(active);
+    this.wildHud.setCinematicHidden(active);
+    this.partyExperiencePanel.setCinematicHidden(active);
+
+    if (!active) {
+      return;
+    }
+
+    this.hideCommandPanelsForPresentation();
+    this.moveLearningPanel.setVisible(false);
+    this.evolutionDecisionPanel.setVisible(false);
   }
 }

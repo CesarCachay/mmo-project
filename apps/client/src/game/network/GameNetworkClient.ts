@@ -19,6 +19,9 @@ import {
   isPokemonPartyReorderErrorPayload,
   isPokemonMoveLearningResolvedPayload,
   isPokemonMoveLearningErrorPayload,
+  isPokemonEvolutionRequiredPayload,
+  isPokemonEvolutionResolvedPayload,
+  isPokemonEvolutionErrorPayload,
 } from "@cesar-mmo/shared";
 
 import type {
@@ -58,6 +61,10 @@ import type {
   PokemonMoveLearningDecisionInput,
   PokemonMoveLearningResolvedPayload,
   PokemonMoveLearningErrorPayload,
+  PokemonEvolutionRequiredPayload,
+  PokemonEvolutionDecisionInput,
+  PokemonEvolutionResolvedPayload,
+  PokemonEvolutionErrorPayload,
 } from "@cesar-mmo/shared";
 
 type ConnectionRejectedError = {
@@ -204,6 +211,50 @@ export class GameNetworkClient {
     });
   }
 
+  // evolution
+  public sendPokemonEvolutionDecision(
+    input: PokemonEvolutionDecisionInput,
+  ): void {
+    this.socket.emit(POKEMON_EVENTS.EVOLUTION_DECISION, input);
+  }
+
+  public onPokemonEvolutionRequired(
+    callback: (payload: PokemonEvolutionRequiredPayload) => void,
+  ): void {
+    this.socket.on(POKEMON_EVENTS.EVOLUTION_REQUIRED, (payload: unknown) => {
+      if (!isPokemonEvolutionRequiredPayload(payload)) {
+        console.warn("[Evolution] invalid REQUIRED payload", payload);
+        return;
+      }
+      callback(payload);
+    });
+  }
+
+  public onPokemonEvolutionResolved(
+    callback: (payload: PokemonEvolutionResolvedPayload) => void,
+  ): void {
+    this.socket.on(POKEMON_EVENTS.EVOLUTION_RESOLVED, (payload: unknown) => {
+      if (!isPokemonEvolutionResolvedPayload(payload)) {
+        console.warn("[Evolution] invalid RESOLVED payload", payload);
+        return;
+      }
+      callback(payload);
+    });
+  }
+
+  public onPokemonEvolutionError(
+    callback: (payload: PokemonEvolutionErrorPayload) => void,
+  ): void {
+    this.socket.on(POKEMON_EVENTS.EVOLUTION_ERROR, (payload: unknown) => {
+      if (!isPokemonEvolutionErrorPayload(payload)) {
+        console.warn("[Evolution] invalid ERROR payload", payload);
+        return;
+      }
+      callback(payload);
+    });
+  }
+
+  // multiplayer
   public onCurrentPlayers(
     callback: (players: Record<string, Player>) => void,
   ): void {

@@ -67,6 +67,37 @@ export class PokemonPendingEvolutionRepository {
     };
   }
 
+  public async findAllByTrainerId(
+    trainerId: PokemonTrainerId,
+  ): Promise<readonly PokemonPendingEvolutionState[]> {
+    const records = await this.prisma.pokemonPendingEvolution.findMany({
+      where: {
+        trainerId,
+      },
+
+      /*
+       * DB order is deterministic only as a fallback.
+       *
+       * The RecoveryService will ultimately restore
+       * Party order from TrainerState.
+       */
+      orderBy: {
+        pokemonInstanceId: 'asc',
+      },
+    });
+
+    return records.map((record) => ({
+      trainerId: record.trainerId,
+      pokemonInstanceId: record.pokemonInstanceId,
+      sourceSpeciesId: record.sourceSpeciesId,
+      sourceFormId: record.sourceFormId,
+      targetSpeciesId: record.targetSpeciesId,
+      targetFormId: record.targetFormId,
+      triggerLevel: record.triggerLevel,
+      revision: record.revision,
+    }));
+  }
+
   public async resolveDecision(
     input: ResolvePokemonPendingEvolutionPersistenceInput,
   ): Promise<void> {

@@ -148,6 +148,10 @@ export function formatBattlePresentationMessage(
     case "move-learning-required": {
       return null;
     }
+
+    case "evolution-required": {
+      return null;
+    }
   }
 }
 

@@ -25,6 +25,7 @@ import { PokemonPendingMoveLearningService } from 'src/pokemon/progression/pokem
 import { PokemonPendingEvolutionRepository } from 'src/pokemon/evolution/pokemon-pending-evolution.repository';
 import { PokemonPendingEvolutionStore } from 'src/pokemon/evolution/pokemon-pending-evolution.store';
 import { PokemonEvolutionDecisionService } from 'src/pokemon/evolution/pokemon-evolution-decision.service';
+import { PokemonPendingEvolutionRecoveryService } from 'src/pokemon/evolution/pokemon-pending-evolution-recovery.service';
 
 import { GameGateway } from './game.gateway';
 
@@ -56,6 +57,7 @@ import { GameGateway } from './game.gateway';
     PokemonPendingEvolutionRepository,
     PokemonPendingEvolutionStore,
     PokemonEvolutionDecisionService,
+    PokemonPendingEvolutionRecoveryService,
   ],
 })
 export class GameModule {}

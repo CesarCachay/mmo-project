@@ -36,6 +36,9 @@ import {
   type PokemonPendingMoveLearningCandidate,
 } from './pokemon-pending-move-learning.types';
 
+import type { PokemonPendingEvolutionState } from '../evolution/pokemon-pending-evolution.types';
+import { PokemonPendingEvolutionStore } from '../evolution/pokemon-pending-evolution.store';
+
 export type PokemonPendingMoveLearningErrorCode =
   | 'TRAINER_STATE_NOT_FOUND'
   | 'POKEMON_NOT_IN_PARTY'
@@ -66,7 +69,7 @@ export interface ResolvePendingMoveLearningResult {
   readonly decision: PokemonMoveLearningDecisionResult;
   readonly continuation: PokemonMoveLearningSequenceResult;
   readonly hasNextPendingDecision: boolean;
-  readonly evolution: PokemonEvolutionPlan | null;
+  readonly pendingEvolution: PokemonPendingEvolutionState | null;
 }
 
 @Injectable()
@@ -76,6 +79,7 @@ export class PokemonPendingMoveLearningService {
     private readonly pendingStore: PokemonPendingMoveLearningStore,
     private readonly repository: PokemonPendingMoveLearningRepository,
     private readonly operationQueue: PokemonProgressionOperationQueue,
+    private readonly pendingEvolutionStore: PokemonPendingEvolutionStore,
   ) {}
 
   public resolveDecision(
@@ -200,7 +204,7 @@ export class PokemonPendingMoveLearningService {
       })),
     };
 
-    let evolution: PokemonEvolutionPlan | null = null;
+    let evolutionPlan: PokemonEvolutionPlan | null = null;
 
     if (nextPending === null) {
       const evaluation = evaluatePokemonLevelEvolution({
@@ -209,15 +213,26 @@ export class PokemonPendingMoveLearningService {
       });
 
       if (evaluation.status === 'eligible') {
-        evolution = planPokemonEvolution({
+        evolutionPlan = planPokemonEvolution({
           pokemon: pokemonAfterMoveLearning,
           candidate: evaluation.candidate,
         });
       }
     }
 
-    const finalPokemonState =
-      evolution?.evolvedPokemonState ?? pokemonAfterMoveLearning;
+    const finalPokemonState = pokemonAfterMoveLearning;
+
+    const pendingEvolutionCreation = evolutionPlan
+      ? {
+          sourceSpeciesId: evolutionPlan.sourceSpeciesId,
+          sourceFormId: evolutionPlan.sourceFormId,
+          targetSpeciesId: evolutionPlan.targetSpeciesId,
+          targetFormId: evolutionPlan.targetFormId,
+          triggerLevel: pokemonAfterMoveLearning.level,
+        }
+      : null;
+
+    let pendingEvolutionState: PokemonPendingEvolutionState | null = null;
 
     /* PostgreSQL FIRST */
     try {
@@ -237,6 +252,7 @@ export class PokemonPendingMoveLearningService {
         currentHp: finalPokemonState.currentHp,
         moves: finalPokemonState.moves,
         nextPending,
+        pendingEvolution: pendingEvolutionCreation,
       });
     } catch (error: unknown) {
       if (error instanceof PokemonPendingMoveLearningPersistenceConflictError) {
@@ -255,7 +271,6 @@ export class PokemonPendingMoveLearningService {
 
       throw new PokemonPendingMoveLearningError(
         'PERSISTENCE_FAILED',
-
         'Failed to persist Pokémon move-learning decision',
       );
     }
@@ -285,12 +300,27 @@ export class PokemonPendingMoveLearningService {
       this.pendingStore.remove(pokemonInstanceId);
     }
 
+    if (pendingEvolutionCreation) {
+      pendingEvolutionState = {
+        trainerId,
+        pokemonInstanceId,
+        sourceSpeciesId: pendingEvolutionCreation.sourceSpeciesId,
+        sourceFormId: pendingEvolutionCreation.sourceFormId,
+        targetSpeciesId: pendingEvolutionCreation.targetSpeciesId,
+        targetFormId: pendingEvolutionCreation.targetFormId,
+        triggerLevel: pendingEvolutionCreation.triggerLevel,
+        revision: 0,
+      };
+
+      this.pendingEvolutionStore.set(pendingEvolutionState);
+    }
+
     return {
       trainerState: updatedTrainerState,
       decision: decisionResult,
       continuation,
       hasNextPendingDecision: nextPending !== null,
-      evolution,
+      pendingEvolution: pendingEvolutionState,
     };
   }
 }

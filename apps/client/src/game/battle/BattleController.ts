@@ -16,14 +16,16 @@ import type {
   PokemonMoveLearningResolvedPayload,
   PokemonMoveLearningErrorPayload,
   BattleMoveLearningRequiredEvent,
-  PokemonPendingMoveLearningNetworkState,
+  PokemonEvolutionDecisionInput,
+  PokemonEvolutionRequiredPayload,
+  PokemonEvolutionResolvedPayload,
+  PokemonEvolutionErrorPayload,
 } from "@cesar-mmo/shared";
 
 import {
   calculatePokemonMaxHp,
   getPokemonInventoryItemQuantity,
   getPokemonItem,
-  getPokemonMove,
 } from "@cesar-mmo/shared";
 
 import { PokemonSpriteLoader } from "../pokemon/PokemonSpriteLoader";
@@ -42,6 +44,11 @@ import {
   getBattlePresentationMessageDuration,
 } from "./presentation/battle-presentation-timing";
 import { getPokemonDisplayName } from "../pokemon/pokemon-presentation.utils";
+import { PokemonEvolutionPresentationController } from "./evolution/PokemonEvolutionPresentationController";
+import { PokemonEvolutionRecoveryPresentationQueue } from "./evolution/PokemonEvolutionRecoveryPresentationQueue";
+import { PokemonBattleProgressionPresentationCoordinator } from "./progression/PokemonBattleProgressionPresentationCoordinator";
+import { PokemonBattleEvolutionHudSyncCoordinator } from "./evolution/PokemonBattleEvolutionHudSyncCoordinator";
+import { syncAuthoritativeTrainerPokemonIntoBattleSnapshot } from "./evolution/syncAuthoritativeTrainerPokemonIntoBattleSnapshot";
 
 type BattleExperienceGainedPresentationEvent = Extract<
   BattlePresentationEvent,
@@ -78,12 +85,18 @@ export class BattleController {
     input: PokemonMoveLearningDecisionInput,
   ) => void;
 
+  private readonly evolutionPresentationController: PokemonEvolutionPresentationController;
+  private readonly progressionPresentationCoordinator: PokemonBattleProgressionPresentationCoordinator;
+  private readonly evolutionHudSyncCoordinator: PokemonBattleEvolutionHudSyncCoordinator;
+  private readonly recoveryEvolutionQueue: PokemonEvolutionRecoveryPresentationQueue;
+
   constructor(
     scene: Phaser.Scene,
     pokemonSpriteLoader: PokemonSpriteLoader,
     sendBattleCommand: (input: PokemonBattleCommandInput) => void,
     sendBattleReplacement: (input: PokemonBattleReplacementInput) => void,
     sendMoveLearningDecision: (input: PokemonMoveLearningDecisionInput) => void,
+    sendEvolutionDecision: (input: PokemonEvolutionDecisionInput) => void,
   ) {
     this.pokemonSpriteLoader = pokemonSpriteLoader;
     this.sendBattleCommand = sendBattleCommand;
@@ -137,6 +150,128 @@ export class BattleController {
       },
     );
 
+    this.evolutionPresentationController =
+      new PokemonEvolutionPresentationController({
+        sendDecision: sendEvolutionDecision,
+        requestDecision: (input) =>
+          this.overlay.requestEvolutionDecision({
+            ...input,
+            pokemonName: this.getEvolutionPokemonDisplayName(
+              input.pokemonInstanceId,
+            ),
+          }),
+        hideDecision: () => {
+          this.overlay.hideEvolutionDecision();
+        },
+        onIdle: () => {
+          this.handleEvolutionPresentationIdle();
+        },
+        animateEvolution: (input) =>
+          this.overlay.animatePokemonEvolution(input),
+      });
+
+    this.evolutionHudSyncCoordinator =
+      new PokemonBattleEvolutionHudSyncCoordinator({
+        presentRequiredEvolution: (payload) =>
+          this.evolutionPresentationController.presentRequiredEvolution(
+            payload,
+          ),
+        getTrainerState: () => this.trainerState,
+        syncTrainerPokemonAfterEvolution: (evolvedPokemon, trainerParty) => {
+          let battlePresentationPokemon = evolvedPokemon;
+
+          const activeBattlePayload = this.activeBattlePayload;
+
+          if (activeBattlePayload) {
+            const syncedBattle =
+              syncAuthoritativeTrainerPokemonIntoBattleSnapshot(
+                activeBattlePayload.battle,
+                evolvedPokemon.pokemon,
+              );
+
+            if (syncedBattle !== activeBattlePayload.battle) {
+              this.activeBattlePayload = {
+                battle: syncedBattle,
+              };
+
+              const trainerParticipant = syncedBattle.participants.find(
+                (participant) => participant.type === "trainer",
+              );
+
+              const syncedBattlePokemon = trainerParticipant?.pokemon.find(
+                (state) =>
+                  state.pokemon.instanceId ===
+                  evolvedPokemon.pokemon.instanceId,
+              );
+
+              if (syncedBattlePokemon) {
+                battlePresentationPokemon = syncedBattlePokemon;
+              }
+            }
+          }
+
+          this.overlay.syncTrainerPokemonAfterEvolution(
+            battlePresentationPokemon,
+            trainerParty,
+          );
+        },
+        finishEvolutionCinematic: () => {
+          this.overlay.finishPokemonEvolutionCinematic();
+        },
+      });
+
+    this.recoveryEvolutionQueue = new PokemonEvolutionRecoveryPresentationQueue(
+      {
+        presentRequiredEvolution: async (payload) => {
+          /* Reconnect Evolution: no BattleInstance is required */
+          this.overlay.show();
+
+          try {
+            await this.evolutionPresentationController.presentRequiredEvolution(
+              payload,
+            );
+          } finally {
+            this.overlay.finishPokemonEvolutionCinematic();
+            if (
+              !this.isActive &&
+              this.recoveryEvolutionQueue.pendingCount === 1
+            ) {
+              this.overlay.hide();
+            }
+          }
+        },
+
+        onError: (error, payload) => {
+          console.error("[EvolutionRecovery] presentation failed", {
+            pokemonInstanceId: payload.pokemonInstanceId,
+            revision: payload.revision,
+            error,
+          });
+        },
+      },
+    );
+
+    this.progressionPresentationCoordinator =
+      new PokemonBattleProgressionPresentationCoordinator({
+        presentMessage: (message, durationMs) =>
+          this.overlay.presentMessage(message, durationMs),
+        requestMoveLearningDecision: (input) =>
+          this.overlay.requestMoveLearningDecision(input),
+        hideMoveLearning: () => {
+          this.overlay.hideMoveLearning();
+        },
+        sendMoveLearningDecision: (input) => {
+          this.sendMoveLearningDecision(input);
+        },
+        waitForMoveLearningResponse: (pokemonInstanceId, revision) =>
+          this.waitForMoveLearningResponse(pokemonInstanceId, revision),
+        presentRequiredEvolution: async (payload) => {
+          await this.evolutionHudSyncCoordinator.presentRequiredEvolution(
+            payload,
+          );
+        },
+      });
+
     this.presentationQueue = new BattlePresentationQueue({
       presentEvent: (event, context) => this.presentBattleEvent(event, context),
       presentExperienceBatch: (events, context) =>
@@ -156,6 +291,14 @@ export class BattleController {
 
   public get activeBattle(): PokemonBattleStartedPayload | undefined {
     return this.activeBattlePayload;
+  }
+
+  public get isBlockingGameplay(): boolean {
+    return (
+      this.isActive ||
+      this.recoveryEvolutionQueue.isBusy ||
+      this.evolutionPresentationController.isBusy
+    );
   }
 
   public async start(payload: PokemonBattleStartedPayload): Promise<void> {
@@ -300,7 +443,10 @@ export class BattleController {
       return;
     }
 
-    if (this.presentationQueue.isBusy) {
+    if (
+      this.presentationQueue.isBusy ||
+      this.evolutionPresentationController.isBusy
+    ) {
       this.pendingCompletion = payload;
       return;
     }
@@ -319,6 +465,9 @@ export class BattleController {
     this.interactionState = "completed";
     this.replacementPokemonIndexes = [];
     this.activeBattlePayload = undefined;
+
+    this.recoveryEvolutionQueue.clear();
+    this.evolutionPresentationController.destroy();
 
     this.overlay.destroy();
   }
@@ -930,6 +1079,11 @@ export class BattleController {
       return;
     }
 
+    if (event.type === "evolution-required") {
+      await this.evolutionHudSyncCoordinator.presentRequiredEvolution(event);
+      return;
+    }
+
     const message = formatBattlePresentationMessage(activeBattle, event);
     if (!message) {
       return;
@@ -962,7 +1116,18 @@ export class BattleController {
     await this.commitStateUpdate(pendingState);
   }
 
+  private handleEvolutionPresentationIdle(): void {
+    if (this.presentationQueue.isBusy) {
+      return;
+    }
+
+    this.handlePresentationQueueIdle();
+  }
+
   private handlePresentationQueueIdle(): void {
+    if (this.evolutionPresentationController.isBusy) {
+      return;
+    }
     if (!this.pendingCompletion) {
       return;
     }
@@ -1328,6 +1493,26 @@ export class BattleController {
     pending.reject(new Error(payload.message));
   }
 
+  public applyEvolutionResolved(
+    payload: PokemonEvolutionResolvedPayload,
+  ): void {
+    this.evolutionPresentationController.applyResolved(payload);
+  }
+
+  public applyEvolutionError(payload: PokemonEvolutionErrorPayload): void {
+    console.error("[Evolution] authoritative decision failed", {
+      pokemonInstanceId: payload.pokemonInstanceId,
+
+      revision: payload.revision,
+
+      code: payload.code,
+
+      message: payload.message,
+    });
+
+    this.evolutionPresentationController.applyError(payload);
+  }
+
   private async presentMoveLearningWorkflow(
     battle: BattleInstance,
     event: BattleMoveLearningRequiredEvent,
@@ -1344,81 +1529,10 @@ export class BattleController {
       ? getPokemonDisplayName(pokemonState.pokemon)
       : "Pokémon";
 
-    let pending: PokemonPendingMoveLearningNetworkState | null = {
-      pokemonInstanceId: event.pokemonInstanceId,
-      candidateMoveId: event.candidateMoveId,
-      candidateLearnedAtLevel: event.candidateLearnedAtLevel,
-      revision: event.revision,
-      currentMoves: event.currentMoves,
-    };
-
-    while (pending) {
-      const candidate = getPokemonMove(pending.candidateMoveId);
-
-      const candidateName = candidate
-        ? candidate.name
-            .split("-")
-            .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-            .join(" ")
-        : `Move ${pending.candidateMoveId}`;
-
-      await this.overlay.presentMessage(
-        `${pokemonName} wants to learn ${candidateName}!`,
-        900,
-      );
-
-      const decision = await this.overlay.requestMoveLearningDecision({
-        pokemonName,
-        candidateMoveId: pending.candidateMoveId,
-        currentMoves: pending.currentMoves,
-      });
-
-      const responsePromise = this.waitForMoveLearningResponse(
-        pending.pokemonInstanceId,
-        pending.revision,
-      );
-
-      try {
-        this.sendMoveLearningDecision({
-          pokemonInstanceId: pending.pokemonInstanceId,
-          candidateMoveId: pending.candidateMoveId,
-          revision: pending.revision,
-          decision,
-        });
-      } catch (error) {
-        this.pendingMoveLearningResponse = undefined;
-        throw error;
-      }
-
-      const response = await responsePromise;
-
-      this.overlay.hideMoveLearning();
-
-      if (decision.type === "forget") {
-        const forgotten = getPokemonMove(decision.moveId);
-
-        const forgottenName = forgotten
-          ? forgotten.name
-              .split("-")
-              .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-              .join(" ")
-          : `Move ${decision.moveId}`;
-
-        await this.overlay.presentMessage(
-          `${pokemonName} forgot ${forgottenName} and learned ${candidateName}!`,
-          950,
-        );
-      } else {
-        await this.overlay.presentMessage(
-          `${pokemonName} did not learn ${candidateName}.`,
-          850,
-        );
-      }
-
-      pending = response.nextPending;
-    }
-
-    this.overlay.hideMoveLearning();
+    await this.progressionPresentationCoordinator.presentMoveLearningWorkflow({
+      pokemonName,
+      event,
+    });
   }
 
   private waitForMoveLearningResponse(
@@ -1449,5 +1563,54 @@ export class BattleController {
     return new Promise<void>((resolve) => {
       window.setTimeout(resolve, durationMs);
     });
+  }
+
+  public applyEvolutionRequired(
+    payload: PokemonEvolutionRequiredPayload,
+  ): void {
+    /* Battle-owned Evolution continues through the existing Battle presentation path */
+    if (this.isActive) {
+      void this.presentNetworkEvolutionRequired(payload);
+
+      return;
+    }
+
+    /* No active Battle means this can be a reconnect/restored durable Evolution */
+    this.recoveryEvolutionQueue.enqueue(payload);
+  }
+
+  private async presentNetworkEvolutionRequired(
+    payload: PokemonEvolutionRequiredPayload,
+  ): Promise<void> {
+    try {
+      await this.evolutionHudSyncCoordinator.presentRequiredEvolution(payload);
+    } catch (error) {
+      console.error("[BattleController] Evolution presentation failed", error);
+    }
+  }
+
+  private getEvolutionPokemonDisplayName(pokemonInstanceId: string): string {
+    const trainerPokemon = this.trainerState?.party.pokemon.find(
+      (pokemon) => pokemon.instanceId === pokemonInstanceId,
+    );
+
+    if (trainerPokemon) {
+      return getPokemonDisplayName(trainerPokemon);
+    }
+
+    const trainerParticipant =
+      this.activeBattlePayload?.battle.participants.find(
+        (participant) => participant.type === "trainer",
+      );
+
+    const battlePokemon = trainerParticipant?.pokemon.find(
+      (pokemonState) => pokemonState.pokemon.instanceId === pokemonInstanceId,
+    );
+
+    if (battlePokemon) {
+      return getPokemonDisplayName(battlePokemon.pokemon);
+    }
+
+    return "Pokémon";
   }
 }

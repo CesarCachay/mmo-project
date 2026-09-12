@@ -26,4 +26,46 @@ export class PokemonPendingEvolutionStore {
   public clear(): void {
     this.byPokemonInstanceId.clear();
   }
+
+  public getByTrainerId(
+    trainerId: string,
+  ): readonly PokemonPendingEvolutionState[] {
+    return [...this.byPokemonInstanceId.values()].filter(
+      (pending) => pending.trainerId === trainerId,
+    );
+  }
+
+  public replaceForTrainer(
+    trainerId: string,
+    pendings: readonly PokemonPendingEvolutionState[],
+  ): void {
+    /*
+     * PostgreSQL is durable authority.
+     *
+     * Remove any stale RAM state for this
+     * Trainer before hydrating the DB snapshot.
+     */
+    for (const [
+      pokemonInstanceId,
+      pending,
+    ] of this.byPokemonInstanceId.entries()) {
+      if (pending.trainerId === trainerId) {
+        this.byPokemonInstanceId.delete(pokemonInstanceId);
+      }
+    }
+
+    for (const pending of pendings) {
+      if (pending.trainerId !== trainerId) {
+        throw new Error(
+          [
+            'Cannot restore pending Evolution',
+            `for trainer "${trainerId}":`,
+            `received state owned by "${pending.trainerId}"`,
+          ].join(' '),
+        );
+      }
+
+      this.set(pending);
+    }
+  }
 }

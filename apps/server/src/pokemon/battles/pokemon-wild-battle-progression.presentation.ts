@@ -100,5 +100,37 @@ export function createPokemonWildBattleProgressionPresentationEvents(
     });
   }
 
+  /*
+   * ==========================================================
+   * PHASE 4 — INTERACTIVE EVOLUTION
+   * ==========================================================
+   *
+   * Direct Level Up Evolution reaches this phase only when
+   * there is no pending interactive Move Learning for the
+   * same Pokémon.
+   *
+   * When Move Learning exists, Evolution is generated later
+   * by the Move Learning continuation flow instead.
+   */
+  for (const reward of result.rewards) {
+    const pending = reward.pendingEvolution;
+
+    if (!pending) {
+      continue;
+    }
+
+    events.push({
+      type: 'evolution-required',
+      participantId,
+      pokemonInstanceId: reward.pokemonInstanceId,
+      sourceSpeciesId: pending.sourceSpeciesId,
+      sourceFormId: pending.sourceFormId,
+      targetSpeciesId: pending.targetSpeciesId,
+      targetFormId: pending.targetFormId,
+      triggerLevel: pending.triggerLevel,
+      revision: pending.revision,
+    });
+  }
+
   return events;
 }
