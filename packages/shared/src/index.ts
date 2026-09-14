@@ -1,7 +1,6 @@
 export type { Player, PlayerInput, Direction } from "./game.types.js";
 
 export {
-  PLAYER_COLORS,
   PLAYER_SIZE,
   PLAYER_SPEED,
   SERVER_TICK_RATE,
@@ -139,7 +138,6 @@ export {
 export type {
   PokemonTrainerStatePayload,
   PokemonStarterSelectionStatus,
-  PokemonTrainerSessionPayload,
   PokemonWildEncounterStartedPayload,
   PokemonBattleReplacementInput,
   PokemonBattleReplacementResolvedPayload,

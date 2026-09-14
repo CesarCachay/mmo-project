@@ -6,8 +6,8 @@ import {
   type PokemonItemId,
 } from '@cesar-mmo/shared';
 
-import { PrismaService } from 'src/database/prisma.service';
-import { PokemonTrainerId } from 'src/pokemon/pokemon-trainer-identity';
+import { PrismaService } from '#app/database/prisma.service';
+import { PokemonTrainerId } from '#app/pokemon/pokemon-trainer-identity';
 
 export interface PersistSuccessfulPokemonCaptureInput {
   readonly trainerId: PokemonTrainerId;

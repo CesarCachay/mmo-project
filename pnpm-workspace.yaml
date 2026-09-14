@@ -3,5 +3,6 @@ packages:
   - "packages/*"
 allowBuilds:
   '@prisma/engines': false
+  argon2: false
   prisma: false
   unrs-resolver: false

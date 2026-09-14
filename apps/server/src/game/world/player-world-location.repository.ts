@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
-import { PrismaService } from 'src/database/prisma.service';
+import { PrismaService } from '#app/database/prisma.service';
 
-import type { PokemonTrainerId } from 'src/pokemon/pokemon-trainer-identity';
+import type { PokemonTrainerId } from '#app/pokemon/pokemon-trainer-identity';
 
 import type {
   PersistedPlayerWorldLocation,

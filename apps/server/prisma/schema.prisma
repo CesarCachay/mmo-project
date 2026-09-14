@@ -7,9 +7,71 @@ datasource db {
   provider = "postgresql"
 }
 
+enum AccountProvider {
+  GOOGLE
+  LOCAL
+}
+
+model Account {
+  id String @id @default(uuid()) @db.Uuid
+
+  provider       AccountProvider
+  providerUserId String          @map("provider_user_id") @db.VarChar(255)
+
+  email String? @db.VarChar(320)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  trainers           PokemonTrainer[]
+  sessions           AccountSession[]
+  passwordCredential AccountPasswordCredential?
+
+  @@unique([provider, providerUserId])
+  @@index([email])
+  @@map("accounts")
+}
+
+model AccountSession {
+  id String @id @default(uuid()) @db.Uuid
+
+  accountId String @map("account_id") @db.Uuid
+
+  tokenHash String @unique @map("token_hash") @db.VarChar(64)
+
+  expiresAt DateTime  @map("expires_at")
+  revokedAt DateTime? @map("revoked_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId])
+  @@index([expiresAt])
+  @@map("account_sessions")
+}
+
+model AccountPasswordCredential {
+  accountId String @id @map("account_id") @db.Uuid
+
+  passwordHash String @map("password_hash") @db.VarChar(255)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("account_password_credentials")
+}
+
 model PokemonTrainer {
-  id               String @id @db.Uuid
-  sessionTokenHash String @unique @map("session_token_hash")
+  id String @id @db.Uuid
+
+  accountId String @map("account_id") @db.Uuid
+
+  displayName String @map("display_name") @db.VarChar(16)
+  avatarId    String @map("avatar_id") @db.VarChar(64)
 
   worldMapId     String? @map("world_map_id") @db.VarChar(64)
   worldX         Float?  @map("world_x")
@@ -19,13 +81,14 @@ model PokemonTrainer {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  pokemonInstances PokemonInstance[]
-  inventoryItems   PokemonTrainerInventoryItem[]
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
+  pokemonInstances    PokemonInstance[]
+  inventoryItems      PokemonTrainerInventoryItem[]
   pendingMoveLearning PokemonPendingMoveLearning[]
+  pendingEvolutions   PokemonPendingEvolution[]
 
-  pendingEvolutions PokemonPendingEvolution[]
-
+  @@index([accountId])
   @@map("pokemon_trainers")
 }
 

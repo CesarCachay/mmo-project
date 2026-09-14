@@ -1,0 +1,5 @@
+export const ACCOUNT_SESSION_TOKEN_PREFIX = 'accs_';
+
+export const ACCOUNT_SESSION_TOKEN_RANDOM_BYTES = 32;
+
+export const ACCOUNT_SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;

@@ -30,7 +30,6 @@ import type {
   MapTransitionInput,
   MapTransitionResolved,
   Player,
-  PlayerAvatarId,
   PlayerInput,
   PokemonTrainerStatePayload,
   PokemonStarterId,
@@ -39,7 +38,6 @@ import type {
   DialogueStartInput,
   DialogueSessionState,
   DialogueAdvanceInput,
-  PokemonTrainerSessionPayload,
   PokemonWildEncounterStartedPayload,
   PokemonBattleStartedPayload,
   PokemonBattleCommandInput,
@@ -72,19 +70,20 @@ type ConnectionRejectedError = {
   message: string;
 };
 
+export type GameNetworkClientConnectionInput = {
+  selectedTrainerId: string;
+};
 export class GameNetworkClient {
   private readonly socket: Socket;
 
-  constructor(
-    displayName: string,
-    avatarId: PlayerAvatarId,
-    trainerSessionToken?: string,
-  ) {
-    this.socket = io("http://localhost:3000", {
+  constructor(input: GameNetworkClientConnectionInput) {
+    const serverUrl =
+      import.meta.env.VITE_API_URL?.trim() || "http://localhost:3000";
+
+    this.socket = io(serverUrl, {
+      withCredentials: true,
       auth: {
-        displayName,
-        avatarId,
-        trainerSessionToken,
+        selectedTrainerId: input.selectedTrainerId,
       },
     });
   }
@@ -430,12 +429,6 @@ export class GameNetworkClient {
       sessionId,
     };
     this.socket.emit(DIALOGUE_EVENTS.ADVANCE, payload);
-  }
-
-  public onPokemonTrainerSession(
-    callback: (payload: PokemonTrainerSessionPayload) => void,
-  ): void {
-    this.socket.on(POKEMON_EVENTS.TRAINER_SESSION, callback);
   }
 
   public onBattleStarted(

@@ -397,6 +397,9 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 
 export const ModelName = {
+  Account: 'Account',
+  AccountSession: 'AccountSession',
+  AccountPasswordCredential: 'AccountPasswordCredential',
   PokemonTrainer: 'PokemonTrainer',
   PokemonInstance: 'PokemonInstance',
   PokemonInstanceMove: 'PokemonInstanceMove',
@@ -418,10 +421,232 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "pokemonTrainer" | "pokemonInstance" | "pokemonInstanceMove" | "pokemonPendingMoveLearning" | "pokemonTrainerInventoryItem" | "pokemonPendingEvolution"
+    modelProps: "account" | "accountSession" | "accountPasswordCredential" | "pokemonTrainer" | "pokemonInstance" | "pokemonInstanceMove" | "pokemonPendingMoveLearning" | "pokemonTrainerInventoryItem" | "pokemonPendingEvolution"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
+    Account: {
+      payload: Prisma.$AccountPayload<ExtArgs>
+      fields: Prisma.AccountFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AccountFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AccountFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountPayload>
+        }
+        findFirst: {
+          args: Prisma.AccountFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AccountFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountPayload>
+        }
+        findMany: {
+          args: Prisma.AccountFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountPayload>[]
+        }
+        create: {
+          args: Prisma.AccountCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountPayload>
+        }
+        createMany: {
+          args: Prisma.AccountCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AccountCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountPayload>[]
+        }
+        delete: {
+          args: Prisma.AccountDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountPayload>
+        }
+        update: {
+          args: Prisma.AccountUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountPayload>
+        }
+        deleteMany: {
+          args: Prisma.AccountDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AccountUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AccountUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountPayload>[]
+        }
+        upsert: {
+          args: Prisma.AccountUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountPayload>
+        }
+        aggregate: {
+          args: Prisma.AccountAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAccount>
+        }
+        groupBy: {
+          args: Prisma.AccountGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccountGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AccountCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccountCountAggregateOutputType> | number
+        }
+      }
+    }
+    AccountSession: {
+      payload: Prisma.$AccountSessionPayload<ExtArgs>
+      fields: Prisma.AccountSessionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AccountSessionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountSessionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AccountSessionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountSessionPayload>
+        }
+        findFirst: {
+          args: Prisma.AccountSessionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountSessionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AccountSessionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountSessionPayload>
+        }
+        findMany: {
+          args: Prisma.AccountSessionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountSessionPayload>[]
+        }
+        create: {
+          args: Prisma.AccountSessionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountSessionPayload>
+        }
+        createMany: {
+          args: Prisma.AccountSessionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AccountSessionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountSessionPayload>[]
+        }
+        delete: {
+          args: Prisma.AccountSessionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountSessionPayload>
+        }
+        update: {
+          args: Prisma.AccountSessionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountSessionPayload>
+        }
+        deleteMany: {
+          args: Prisma.AccountSessionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AccountSessionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AccountSessionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountSessionPayload>[]
+        }
+        upsert: {
+          args: Prisma.AccountSessionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountSessionPayload>
+        }
+        aggregate: {
+          args: Prisma.AccountSessionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAccountSession>
+        }
+        groupBy: {
+          args: Prisma.AccountSessionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccountSessionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AccountSessionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccountSessionCountAggregateOutputType> | number
+        }
+      }
+    }
+    AccountPasswordCredential: {
+      payload: Prisma.$AccountPasswordCredentialPayload<ExtArgs>
+      fields: Prisma.AccountPasswordCredentialFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AccountPasswordCredentialFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountPasswordCredentialPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AccountPasswordCredentialFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountPasswordCredentialPayload>
+        }
+        findFirst: {
+          args: Prisma.AccountPasswordCredentialFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountPasswordCredentialPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AccountPasswordCredentialFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountPasswordCredentialPayload>
+        }
+        findMany: {
+          args: Prisma.AccountPasswordCredentialFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountPasswordCredentialPayload>[]
+        }
+        create: {
+          args: Prisma.AccountPasswordCredentialCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountPasswordCredentialPayload>
+        }
+        createMany: {
+          args: Prisma.AccountPasswordCredentialCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AccountPasswordCredentialCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountPasswordCredentialPayload>[]
+        }
+        delete: {
+          args: Prisma.AccountPasswordCredentialDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountPasswordCredentialPayload>
+        }
+        update: {
+          args: Prisma.AccountPasswordCredentialUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountPasswordCredentialPayload>
+        }
+        deleteMany: {
+          args: Prisma.AccountPasswordCredentialDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AccountPasswordCredentialUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AccountPasswordCredentialUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountPasswordCredentialPayload>[]
+        }
+        upsert: {
+          args: Prisma.AccountPasswordCredentialUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccountPasswordCredentialPayload>
+        }
+        aggregate: {
+          args: Prisma.AccountPasswordCredentialAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAccountPasswordCredential>
+        }
+        groupBy: {
+          args: Prisma.AccountPasswordCredentialGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccountPasswordCredentialGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AccountPasswordCredentialCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccountPasswordCredentialCountAggregateOutputType> | number
+        }
+      }
+    }
     PokemonTrainer: {
       payload: Prisma.$PokemonTrainerPayload<ExtArgs>
       fields: Prisma.PokemonTrainerFieldRefs
@@ -905,9 +1130,46 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+export const AccountScalarFieldEnum = {
+  id: 'id',
+  provider: 'provider',
+  providerUserId: 'providerUserId',
+  email: 'email',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AccountScalarFieldEnum = (typeof AccountScalarFieldEnum)[keyof typeof AccountScalarFieldEnum]
+
+
+export const AccountSessionScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  revokedAt: 'revokedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AccountSessionScalarFieldEnum = (typeof AccountSessionScalarFieldEnum)[keyof typeof AccountSessionScalarFieldEnum]
+
+
+export const AccountPasswordCredentialScalarFieldEnum = {
+  accountId: 'accountId',
+  passwordHash: 'passwordHash',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AccountPasswordCredentialScalarFieldEnum = (typeof AccountPasswordCredentialScalarFieldEnum)[keyof typeof AccountPasswordCredentialScalarFieldEnum]
+
+
 export const PokemonTrainerScalarFieldEnum = {
   id: 'id',
-  sessionTokenHash: 'sessionTokenHash',
+  accountId: 'accountId',
+  displayName: 'displayName',
+  avatarId: 'avatarId',
   worldMapId: 'worldMapId',
   worldX: 'worldX',
   worldY: 'worldY',
@@ -1049,16 +1311,16 @@ export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMod
 
 
 /**
- * Reference to a field of type 'Float'
+ * Reference to a field of type 'AccountProvider'
  */
-export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+export type EnumAccountProviderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AccountProvider'>
     
 
 
 /**
- * Reference to a field of type 'Float[]'
+ * Reference to a field of type 'AccountProvider[]'
  */
-export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+export type ListEnumAccountProviderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AccountProvider[]'>
     
 
 
@@ -1073,6 +1335,20 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Float'
+ */
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+/**
+ * Reference to a field of type 'Float[]'
+ */
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
 
@@ -1254,6 +1530,9 @@ export interface PrismaClientOptionsWithAdapter extends PrismaClientBaseOptions 
  */
 export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaClientOptionsWithAdapter
 export type GlobalOmitConfig = {
+  account?: Prisma.AccountOmit
+  accountSession?: Prisma.AccountSessionOmit
+  accountPasswordCredential?: Prisma.AccountPasswordCredentialOmit
   pokemonTrainer?: Prisma.PokemonTrainerOmit
   pokemonInstance?: Prisma.PokemonInstanceOmit
   pokemonInstanceMove?: Prisma.PokemonInstanceMoveOmit

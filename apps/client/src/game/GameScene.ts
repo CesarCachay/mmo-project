@@ -36,12 +36,6 @@ import { PokemonStorageTerminalInteractionController } from "./storage/PokemonSt
 // helpers
 import { MAP_REGISTRY } from "./maps/mapRegistry";
 
-// storage
-import {
-  getPokemonTrainerSessionToken,
-  setPokemonTrainerSessionToken,
-} from "./pokemon/pokemon-trainer-session.storage";
-
 // class managers
 import { NpcManager } from "./npc/NpcManager";
 import { MapManager } from "./maps/MapManager";
@@ -59,6 +53,9 @@ import { RemotePokemonFollowerManager } from "./pokemon/RemotePokemonFollowerMan
 import { OverworldCameraController } from "./camera/OverworldCameraController";
 import { TrainerPanelController } from "./ui/TrainerPanelController";
 import { PokemonTrainerPresentationController } from "./pokemon/PokemonTrainerPresentationController";
+
+// stores
+import { selectedTrainerStore } from "../account/selected-trainer.store";
 
 // types
 import type {
@@ -120,7 +117,6 @@ export class GameScene extends Phaser.Scene {
   private remotePokemonFollowerManager!: RemotePokemonFollowerManager;
   private pokemonTrainerPresentationController!: PokemonTrainerPresentationController;
 
-  private displayName = "";
   private avatarId: PlayerAvatarId = "male-01";
 
   constructor() {
@@ -128,7 +124,6 @@ export class GameScene extends Phaser.Scene {
   }
 
   init(data: { displayName: string; avatarId: PlayerAvatarId }) {
-    this.displayName = data.displayName;
     this.avatarId = data.avatarId;
     this.hasAppliedInitialWorldState = false;
   }
@@ -578,26 +573,35 @@ export class GameScene extends Phaser.Scene {
   }
 
   private connectToServer(): void {
-    const trainerSessionToken = getPokemonTrainerSessionToken();
+    const selectedTrainer = selectedTrainerStore.getSelected();
 
-    this.network = new GameNetworkClient(
-      this.displayName,
-      this.avatarId,
-      trainerSessionToken,
-    );
-    this.createPokemonStorageUi();
+    if (!selectedTrainer) {
+      this.scene.start("TrainerSelectionScene", {
+        errorMessage: "Debes seleccionar un Trainer antes de entrar al mundo.",
+      });
 
-    this.network.onPokemonTrainerSession(({ sessionToken }) => {
-      setPokemonTrainerSessionToken(sessionToken);
+      return;
+    }
+
+    this.network = new GameNetworkClient({
+      selectedTrainerId: selectedTrainer?.trainerId,
     });
+
+    this.createPokemonStorageUi();
 
     this.network.onConnectionRejected((error) => {
       this.network.disconnect();
 
-      this.scene.start("JoinScene", {
+      if (error.code === "ACCOUNT_SESSION_REQUIRED") {
+        selectedTrainerStore.clear();
+        this.scene.start("AccountLoginScene");
+        return;
+      }
+
+      selectedTrainerStore.clear();
+
+      this.scene.start("TrainerSelectionScene", {
         errorMessage: error.message,
-        displayName: this.displayName,
-        avatarId: this.avatarId,
       });
     });
 

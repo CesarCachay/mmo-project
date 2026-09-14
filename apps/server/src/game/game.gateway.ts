@@ -14,7 +14,6 @@ import { Server, Socket } from 'socket.io';
 
 import {
   PLAYER_SIZE,
-  PLAYER_COLORS,
   SERVER_TICK_RATE,
   applyPlayerMovement,
   resolveMapCollision,
@@ -42,7 +41,7 @@ import {
   isPlayerNearMapNpc,
   getServerEncounterZoneAtPosition,
 } from './maps/serverMapRegistry';
-import { ChatService } from 'src/chat/chat.service';
+import { ChatService } from '#app/chat/chat.service';
 
 import type { PlayerWorldLocation } from './world/player-world.types';
 import type {
@@ -53,69 +52,71 @@ import type {
   PokemonTrainerStatePayload,
   PokemonStarterSelectionStatus,
   SharedMapNpc,
-  PokemonTrainerSessionPayload,
   PokemonTrainerState,
   PokemonWildEncounterStartedPayload,
+  PlayerAvatarId,
 } from '@cesar-mmo/shared';
-import type {
-  PokemonTrainerId,
-  PokemonTrainerSessionToken,
-  PokemonTrainerIdentity,
-} from 'src/pokemon/pokemon-trainer-identity';
-import type { PokemonWildEncounterSession } from 'src/pokemon/encounters/pokemon-wild-encounter-session';
+import type { PokemonTrainerId } from '#app/pokemon/pokemon-trainer-identity';
+import type { PokemonWildEncounterSession } from '#app/pokemon/encounters/pokemon-wild-encounter-session';
 
 // db and repositories
-import { PokemonTrainerRepository } from 'src/pokemon/pokemon-trainer.repository';
-import { PokemonPartyRepository } from 'src/pokemon/pokemon-party.repository';
-import { PokemonInventoryRepository } from 'src/pokemon/inventory/pokemon-inventory.repository';
-import { PokemonCaptureRepository } from 'src/pokemon/battles/capture/pokemon-capture.repository';
-import { PokemonStorageRepository } from 'src/pokemon/storage/pokemon-storage.repository';
-import { PokemonOverworldItemRepository } from 'src/pokemon/items/pokemon-overworld-item.repository';
+import { PokemonPartyRepository } from '#app/pokemon/pokemon-party.repository';
+import { PokemonInventoryRepository } from '#app/pokemon/inventory/pokemon-inventory.repository';
+import { PokemonCaptureRepository } from '#app/pokemon/battles/capture/pokemon-capture.repository';
+import { PokemonStorageRepository } from '#app/pokemon/storage/pokemon-storage.repository';
+import { PokemonOverworldItemRepository } from '#app/pokemon/items/pokemon-overworld-item.repository';
 
 // services
-import { PokemonTrainerService } from 'src/pokemon/pokemon-trainer.service';
-import { DialogueSessionService } from 'src/dialogue/dialogue-session.service';
-import { isPokemonTrainerSessionToken } from 'src/pokemon/pokemon-trainer-identity';
-import { PokemonWildEncounterTriggerService } from 'src/pokemon/encounters/pokemon-wild-encounter-trigger.service';
-import { PokemonWildEncounterSessionStore } from 'src/pokemon/encounters/pokemon-wild-encounter-session.store';
+import { PokemonTrainerService } from '#app/pokemon/pokemon-trainer.service';
+import { DialogueSessionService } from '#app/dialogue/dialogue-session.service';
+import { PokemonWildEncounterTriggerService } from '#app/pokemon/encounters/pokemon-wild-encounter-trigger.service';
+import { PokemonWildEncounterSessionStore } from '#app/pokemon/encounters/pokemon-wild-encounter-session.store';
 import { PokemonBattleSessionStore } from '../pokemon/battles/pokemon-battle-session.store';
-import { PokemonWildBattleProgressionService } from 'src/pokemon/battles/pokemon-wild-battle-progression.service';
+import { PokemonWildBattleProgressionService } from '#app/pokemon/battles/pokemon-wild-battle-progression.service';
 
-import { PokemonCaptureService } from 'src/pokemon/battles/capture/pokemon-capture.service';
+import { PokemonCaptureService } from '#app/pokemon/battles/capture/pokemon-capture.service';
 import { PlayerWorldStateService } from './world/player-world-state.service';
-import { PokemonStorageService } from 'src/pokemon/storage/pokemon-storage.service';
-import { PokemonOverworldItemService } from 'src/pokemon/items/pokemon-overworld-item.service';
+import { PokemonStorageService } from '#app/pokemon/storage/pokemon-storage.service';
+import { PokemonOverworldItemService } from '#app/pokemon/items/pokemon-overworld-item.service';
 
 // controller
-import { PokemonPartyNetworkController } from 'src/pokemon/party/pokemon-party-network.controller';
-import { PokemonTrainerStateNetworkPresenter } from 'src/pokemon/network/PokemonTrainerStateNetworkPresenter';
-import { PokemonBattleTurnExecutor } from 'src/pokemon/battles/pokemon-battle-turn.executor';
-import { PokemonBattleNetworkController } from 'src/pokemon/battles/pokemon-battle-network.controller';
-import { PokemonWildBattleStarter } from 'src/pokemon/battles/pokemon-wild-battle.starter';
-import { PokemonProgressionNetworkController } from 'src/pokemon/progression/pokemon-progression-network.controller';
+import { PokemonPartyNetworkController } from '#app/pokemon/party/pokemon-party-network.controller';
+import { PokemonTrainerStateNetworkPresenter } from '#app/pokemon/network/PokemonTrainerStateNetworkPresenter';
+import { PokemonBattleTurnExecutor } from '#app/pokemon/battles/pokemon-battle-turn.executor';
+import { PokemonBattleNetworkController } from '#app/pokemon/battles/pokemon-battle-network.controller';
+import { PokemonWildBattleStarter } from '#app/pokemon/battles/pokemon-wild-battle.starter';
+import { PokemonProgressionNetworkController } from '#app/pokemon/progression/pokemon-progression-network.controller';
 import {
   PokemonEvolutionNetworkController,
   emitPokemonEvolutionRequired,
-} from 'src/pokemon/evolution/pokemon-evolution-network.controller';
-import { PokemonPendingEvolutionRecoveryService } from 'src/pokemon/evolution/pokemon-pending-evolution-recovery.service';
-import type { PokemonPendingEvolutionState } from 'src/pokemon/evolution/pokemon-pending-evolution.types';
+} from '#app/pokemon/evolution/pokemon-evolution-network.controller';
+import { PokemonPendingEvolutionRecoveryService } from '#app/pokemon/evolution/pokemon-pending-evolution-recovery.service';
+import type { PokemonPendingEvolutionState } from '#app/pokemon/evolution/pokemon-pending-evolution.types';
 
 // stores
 import { PlayerWorldRuntimeStore } from './world/player-world-runtime.store';
-import { PokemonStorageNetworkController } from 'src/pokemon/storage/pokemon-storage-network.controller';
-import { PokemonStorageAccessSessionStore } from 'src/pokemon/storage/pokemon-storage-access-session.store';
-import { PokemonOverworldItemNetworkController } from 'src/pokemon/items/pokemon-overworld-item-network.controller';
-import { PokemonBattleTurnStore } from 'src/pokemon/battles/pokemon-battle-turn.store';
-import { PokemonTrainerIdentityStore } from 'src/pokemon/pokemon-trainer-identity.store';
-import { PokemonTrainerStateStore } from 'src/pokemon/pokemon-trainer-state.store';
-import { DialogueSessionStore } from 'src/dialogue/dialogue-session.store';
+import { PokemonStorageNetworkController } from '#app/pokemon/storage/pokemon-storage-network.controller';
+import { PokemonStorageAccessSessionStore } from '#app/pokemon/storage/pokemon-storage-access-session.store';
+import { PokemonOverworldItemNetworkController } from '#app/pokemon/items/pokemon-overworld-item-network.controller';
+import { PokemonBattleTurnStore } from '#app/pokemon/battles/pokemon-battle-turn.store';
+import { PokemonTrainerStateStore } from '#app/pokemon/pokemon-trainer-state.store';
+import { DialogueSessionStore } from '#app/dialogue/dialogue-session.store';
+import {
+  AccountSocketAuthenticationError,
+  AccountSocketAuthenticationService,
+} from '#app/account/account-socket-authentication.service';
+import {
+  TrainerAlreadyConnectedError,
+  TrainerConnectionStore,
+} from './player/trainer-connection.store';
 
 // manager
-import { PokemonProgressionManager } from 'src/pokemon/progression/pokemon-progression.manager';
+import { PokemonProgressionManager } from '#app/pokemon/progression/pokemon-progression.manager';
 
 @WebSocketGateway({
   cors: {
     origin: 'http://localhost:5173',
+    credentials: true,
   },
 })
 export class GameGateway
@@ -130,8 +131,6 @@ export class GameGateway
 
   private readonly playerEncounterZoneIds = new Map<string, string>();
 
-  private readonly pokemonTrainerIdentityStore =
-    new PokemonTrainerIdentityStore();
   private readonly pokemonTrainerService: PokemonTrainerService;
 
   private readonly dialogueSessionStore = new DialogueSessionStore();
@@ -165,13 +164,11 @@ export class GameGateway
   private readonly pokemonProgressionNetworkController: PokemonProgressionNetworkController;
   private readonly pokemonEvolutionNetworkController: PokemonEvolutionNetworkController;
 
-  private nextColorIndex = 0;
   private gameLoop?: ReturnType<typeof setInterval>;
 
   constructor(
     private readonly chatService: ChatService,
     private readonly pokemonTrainerStateStore: PokemonTrainerStateStore,
-    private readonly pokemonTrainerRepository: PokemonTrainerRepository,
     private readonly pokemonPartyRepository: PokemonPartyRepository,
     private readonly pokemonInventoryRepository: PokemonInventoryRepository,
     private readonly pokemonCaptureRepository: PokemonCaptureRepository,
@@ -182,6 +179,8 @@ export class GameGateway
     private readonly wildBattleProgressionService: PokemonWildBattleProgressionService,
     private readonly pokemonProgressionManager: PokemonProgressionManager,
     private readonly pokemonPendingEvolutionRecoveryService: PokemonPendingEvolutionRecoveryService,
+    private readonly accountSocketAuthenticationService: AccountSocketAuthenticationService,
+    private readonly trainerConnectionStore: TrainerConnectionStore,
   ) {
     this.pokemonTrainerService = new PokemonTrainerService(
       this.pokemonTrainerStateStore,
@@ -313,28 +312,77 @@ export class GameGateway
   }
 
   async handleConnection(client: Socket): Promise<void> {
-    const displayName = this.getRequestedDisplayName(client);
-    const avatarId: unknown = client.handshake.auth.avatarId;
+    let displayName: string;
+    let avatarId: PlayerAvatarId;
+    let trainerId: PokemonTrainerId;
 
-    if (!isPlayerAvatarId(avatarId)) {
-      client.emit('connectionRejected', {
-        code: 'INVALID_AVATAR',
-        message: 'Invalid character selected.',
-      });
-      client.disconnect();
-      return;
-    }
+    const selectedTrainerId: unknown = client.handshake.auth.selectedTrainerId;
 
-    if (!displayName) {
+    try {
+      const connection =
+        await this.accountSocketAuthenticationService.requireAuthenticatedTrainer(
+          {
+            cookieHeader: client.handshake.headers.cookie,
+            selectedTrainerId,
+          },
+        );
+
+      const trainerDisplayName = connection.trainer.displayName.trim();
+      const trainerAvatarId = connection.trainer.avatarId;
+
+      if (
+        !trainerDisplayName ||
+        trainerDisplayName.length < 3 ||
+        trainerDisplayName.length > 16 ||
+        !isPlayerAvatarId(trainerAvatarId)
+      ) {
+        client.emit('connectionRejected', {
+          code: 'TRAINER_PROFILE_INVALID',
+          message: 'The selected Trainer profile is incomplete.',
+        });
+
+        client.disconnect(true);
+        return;
+      }
+
+      trainerId = connection.trainer.trainerId;
+      displayName = trainerDisplayName;
+      avatarId = trainerAvatarId;
+
+      this.trainerConnectionStore.bind(client.id, trainerId);
+    } catch (error: unknown) {
+      if (error instanceof AccountSocketAuthenticationError) {
+        client.emit('connectionRejected', {
+          code: error.code,
+          message: error.message,
+        });
+        client.disconnect(true);
+        return;
+      }
+
+      if (error instanceof TrainerAlreadyConnectedError) {
+        client.emit('connectionRejected', {
+          code: 'TRAINER_ALREADY_CONNECTED',
+          message: 'That Trainer is already connected.',
+        });
+        client.disconnect(true);
+        return;
+      }
+
+      console.error('[AccountTrainerConnection] resolution failed', error);
+
       client.emit('connectionRejected', {
-        code: 'INVALID_DISPLAY_NAME',
-        message: 'Player name must contain between 3 and 16 characters.',
+        code: 'TRAINER_CONNECTION_ERROR',
+        message: 'Could not authenticate the selected Trainer.',
       });
+
       client.disconnect(true);
       return;
     }
 
     if (this.isDisplayNameInUse(displayName)) {
+      this.unbindTrainerConnection(client.id);
+
       client.emit('connectionRejected', {
         code: 'NAME_ALREADY_IN_USE',
         message: 'That player name is already in use.',
@@ -343,72 +391,55 @@ export class GameGateway
       return;
     }
 
-    const color = PLAYER_COLORS[this.nextColorIndex % PLAYER_COLORS.length];
-
-    this.nextColorIndex++;
-
-    const requestedTrainerSessionToken =
-      this.getRequestedTrainerSessionToken(client);
-
-    let trainerIdentity: PokemonTrainerIdentity;
     let trainerState: PokemonTrainerState;
     let initialWorldLocation: PlayerWorldLocation;
-
     let pendingEvolutions: readonly PokemonPendingEvolutionState[] = [];
 
     try {
-      const resolution = await this.resolvePokemonTrainerIdentity(
-        client.id,
-        requestedTrainerSessionToken,
-      );
-      trainerIdentity = resolution.identity;
-      const existingTrainerState = this.pokemonTrainerStateStore.get(
-        trainerIdentity.trainerId,
-      );
+      const existingTrainerState = this.pokemonTrainerStateStore.get(trainerId);
 
       if (existingTrainerState) {
         trainerState = existingTrainerState;
       } else {
         const [persistedParty, persistedInventory] = await Promise.all([
-          this.pokemonPartyRepository.loadParty(trainerIdentity.trainerId),
-          this.pokemonInventoryRepository.loadInventory(
-            trainerIdentity.trainerId,
-          ),
+          this.pokemonPartyRepository.loadParty(trainerId),
+
+          this.pokemonInventoryRepository.loadInventory(trainerId),
         ]);
 
         trainerState = this.pokemonTrainerStateStore.create(
-          trainerIdentity.trainerId,
+          trainerId,
           persistedParty,
           persistedInventory,
         );
       }
 
       initialWorldLocation =
-        await this.playerWorldStateService.loadInitialLocation(
-          trainerIdentity.trainerId,
-        );
+        await this.playerWorldStateService.loadInitialLocation(trainerId);
 
       // TO REMOVE - TEST
       // trainerState =
-      //   await this.pokemonTrainerService.ensureDevelopmentBattleTestParty(
-      //     trainerIdentity.trainerId,
-      //   );
+      //   await this.pokemonTrainerService
+      //     .ensureDevelopmentBattleTestParty(
+      //       trainerId,
+      //     );
 
       pendingEvolutions =
         await this.pokemonPendingEvolutionRecoveryService.restoreTrainerPendings(
           {
-            trainerId: trainerIdentity.trainerId,
+            trainerId,
+
             partyPokemonInstanceIds: trainerState.party.pokemon.map(
               (pokemon) => pokemon.instanceId,
             ),
           },
         );
     } catch (error: unknown) {
-      console.error('[PokemonTrainerIdentity] resolution failed', error);
-      this.pokemonTrainerIdentityStore.unbind(client.id);
+      console.error('[TrainerConnection] state hydration failed', error);
+      this.unbindTrainerConnection(client.id);
       client.emit('connectionRejected', {
-        code: 'TRAINER_SESSION_ERROR',
-        message: 'Could not restore the trainer session.',
+        code: 'TRAINER_STATE_LOAD_ERROR',
+        message: 'Could not load the selected Trainer state.',
       });
       client.disconnect(true);
       return;
@@ -421,17 +452,18 @@ export class GameGateway
       avatarId,
       x: initialWorldLocation.x,
       y: initialWorldLocation.y,
-      color,
       direction: initialWorldLocation.direction,
       isMoving: false,
       lastProcessedInputSequence: 0,
     };
 
     this.playerWorldRuntimeStore.addPlayer(newPlayer);
+
     this.pokemonTrainerStateNetworkPresenter.syncPlayerFollower(
       client.id,
       trainerState,
     );
+
     this.playerWorldRuntimeStore.setInput(client.id, {
       sequence: 0,
       up: false,
@@ -444,10 +476,6 @@ export class GameGateway
       trainerState,
     };
 
-    client.emit(POKEMON_EVENTS.TRAINER_SESSION, {
-      sessionToken: trainerIdentity.sessionToken,
-    } satisfies PokemonTrainerSessionPayload);
-
     client.emit(POKEMON_EVENTS.TRAINER_STATE, trainerStatePayload);
 
     for (const pendingEvolution of pendingEvolutions) {
@@ -455,12 +483,14 @@ export class GameGateway
     }
 
     const mapRoom = this.getMapRoom(newPlayer.mapId);
+
     await client.join(mapRoom);
 
     client.emit(
       'currentPlayers',
       this.playerWorldRuntimeStore.getPlayersInMap(newPlayer.mapId),
     );
+
     client.to(mapRoom).emit('playerJoined', newPlayer);
   }
 
@@ -475,7 +505,7 @@ export class GameGateway
       this.pokemonTrainerStateStore.lockStarterSelection(trainerId);
     }
 
-    this.pokemonTrainerIdentityStore.unbind(client.id);
+    this.unbindTrainerConnection(client.id);
     this.dialogueSessionStore.remove(client.id);
     this.pokemonStorageAccessSessionStore.remove(client.id);
 
@@ -1020,28 +1050,6 @@ export class GameGateway
     this.pokemonWildBattleStarter.start(encounterSession);
   }
 
-  private getRequestedDisplayName(client: Socket): string | null {
-    const auth: unknown = client.handshake.auth;
-
-    if (typeof auth !== 'object' || auth === null) {
-      return null;
-    }
-
-    const { displayName } = auth as Record<string, unknown>;
-
-    if (typeof displayName !== 'string') {
-      return null;
-    }
-
-    const normalizedDisplayName = displayName.trim();
-
-    if (normalizedDisplayName.length < 3 || normalizedDisplayName.length > 16) {
-      return null;
-    }
-
-    return normalizedDisplayName;
-  }
-
   private isDisplayNameInUse(displayName: string): boolean {
     return this.playerWorldRuntimeStore.isDisplayNameInUse(displayName);
   }
@@ -1059,55 +1067,7 @@ export class GameGateway
   }
 
   private getTrainerId(playerId: string): PokemonTrainerId | undefined {
-    return this.pokemonTrainerIdentityStore.get(playerId)?.trainerId;
-  }
-
-  private getRequestedTrainerSessionToken(
-    client: Socket,
-  ): PokemonTrainerSessionToken | undefined {
-    const value: unknown = client.handshake.auth.trainerSessionToken;
-
-    if (!isPokemonTrainerSessionToken(value)) {
-      return undefined;
-    }
-
-    return value;
-  }
-
-  private async resolvePokemonTrainerIdentity(
-    playerId: string,
-    sessionToken?: PokemonTrainerSessionToken,
-  ): Promise<{
-    identity: PokemonTrainerIdentity;
-    restored: boolean;
-  }> {
-    if (sessionToken) {
-      const persistedTrainer =
-        await this.pokemonTrainerRepository.findBySessionToken(sessionToken);
-
-      if (persistedTrainer) {
-        const identity: PokemonTrainerIdentity = {
-          trainerId: persistedTrainer.trainerId,
-          sessionToken,
-        };
-
-        this.pokemonTrainerIdentityStore.bindRecovered(playerId, identity);
-
-        return {
-          identity,
-          restored: true,
-        };
-      }
-    }
-
-    const { identity } = this.pokemonTrainerIdentityStore.resolve(playerId);
-
-    await this.pokemonTrainerRepository.create(identity);
-
-    return {
-      identity,
-      restored: false,
-    };
+    return this.trainerConnectionStore.getTrainerId(playerId);
   }
 
   private updatePlayerEncounterZone(player: Player): void {
@@ -1185,5 +1145,9 @@ export class GameGateway
       return;
     }
     this.playerWorldStateService.checkpointPlayer(trainerId, player);
+  }
+
+  private unbindTrainerConnection(playerId: string): void {
+    this.trainerConnectionStore.unbind(playerId);
   }
 }

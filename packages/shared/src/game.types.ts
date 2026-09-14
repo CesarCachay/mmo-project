@@ -7,7 +7,6 @@ export type Player = {
   mapId: MapId;
   x: number;
   y: number;
-  color: number;
   isMoving: boolean;
   direction: Direction;
   displayName: string;

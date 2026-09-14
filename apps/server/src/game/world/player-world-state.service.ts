@@ -4,7 +4,7 @@ import { DEFAULT_MAP_ID, MAP_DATA_REGISTRY } from '@cesar-mmo/shared';
 
 import type { Direction, MapId, Player } from '@cesar-mmo/shared';
 
-import type { PokemonTrainerId } from 'src/pokemon/pokemon-trainer-identity';
+import type { PokemonTrainerId } from '#app/pokemon/pokemon-trainer-identity';
 
 import { PlayerWorldLocationRepository } from './player-world-location.repository';
 

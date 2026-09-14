@@ -1,4 +1,4 @@
-import type { ServerMapEncounterZone } from 'src/game/maps/serverMapRegistry';
+import type { ServerMapEncounterZone } from '#app/game/maps/serverMapRegistry';
 
 const ENCOUNTER_DISTANCE_PER_ROLL_PX = 16;
 

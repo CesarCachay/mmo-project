@@ -1,0 +1,1 @@
+export const MAX_TRAINERS_PER_ACCOUNT = 3;

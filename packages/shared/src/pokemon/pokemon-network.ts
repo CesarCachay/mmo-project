@@ -15,8 +15,6 @@ export const POKEMON_EVENTS = {
 
   STARTER_SELECTION_STATUS: "pokemon:starter-selection-status",
 
-  TRAINER_SESSION: "pokemon:trainer-session",
-
   WILD_ENCOUNTER_STARTED: "pokemon:wild-encounter-started",
 
   BATTLE_STARTED: "pokemon:battle-started",
@@ -51,10 +49,6 @@ export interface PokemonTrainerStatePayload {
 
 export interface PokemonStarterSelectionStatus {
   unlocked: boolean;
-}
-
-export interface PokemonTrainerSessionPayload {
-  sessionToken: string;
 }
 
 export interface PokemonWildEncounterStartedPayload {

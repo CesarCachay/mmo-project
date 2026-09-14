@@ -10,8 +10,8 @@ import type {
   PokemonTrainerState,
 } from '@cesar-mmo/shared';
 
-import type { PokemonTrainerId } from 'src/pokemon/pokemon-trainer-identity';
-import { PokemonTrainerStateStore } from 'src/pokemon/pokemon-trainer-state.store';
+import type { PokemonTrainerId } from '#app/pokemon/pokemon-trainer-identity';
+import { PokemonTrainerStateStore } from '#app/pokemon/pokemon-trainer-state.store';
 import { PokemonCaptureRepository } from './pokemon-capture.repository';
 
 export interface PersistSuccessfulPokemonCaptureResult {

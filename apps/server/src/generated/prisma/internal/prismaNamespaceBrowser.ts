@@ -51,6 +51,9 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
+  Account: 'Account',
+  AccountSession: 'AccountSession',
+  AccountPasswordCredential: 'AccountPasswordCredential',
   PokemonTrainer: 'PokemonTrainer',
   PokemonInstance: 'PokemonInstance',
   PokemonInstanceMove: 'PokemonInstanceMove',
@@ -75,9 +78,46 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+export const AccountScalarFieldEnum = {
+  id: 'id',
+  provider: 'provider',
+  providerUserId: 'providerUserId',
+  email: 'email',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AccountScalarFieldEnum = (typeof AccountScalarFieldEnum)[keyof typeof AccountScalarFieldEnum]
+
+
+export const AccountSessionScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  revokedAt: 'revokedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AccountSessionScalarFieldEnum = (typeof AccountSessionScalarFieldEnum)[keyof typeof AccountSessionScalarFieldEnum]
+
+
+export const AccountPasswordCredentialScalarFieldEnum = {
+  accountId: 'accountId',
+  passwordHash: 'passwordHash',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AccountPasswordCredentialScalarFieldEnum = (typeof AccountPasswordCredentialScalarFieldEnum)[keyof typeof AccountPasswordCredentialScalarFieldEnum]
+
+
 export const PokemonTrainerScalarFieldEnum = {
   id: 'id',
-  sessionTokenHash: 'sessionTokenHash',
+  accountId: 'accountId',
+  displayName: 'displayName',
+  avatarId: 'avatarId',
   worldMapId: 'worldMapId',
   worldX: 'worldX',
   worldY: 'worldY',

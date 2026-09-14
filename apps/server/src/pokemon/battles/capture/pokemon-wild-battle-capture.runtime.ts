@@ -22,7 +22,7 @@ import type { PokemonTrainerId } from '../../pokemon-trainer-identity';
 
 import { PokemonTrainerStateStore } from '../../pokemon-trainer-state.store';
 
-import { PokemonTrainerService } from 'src/pokemon/pokemon-trainer.service';
+import { PokemonTrainerService } from '#app/pokemon/pokemon-trainer.service';
 import { PokemonCaptureService } from './pokemon-capture.service';
 
 export interface PokemonWildBattleCapturePlan {
