@@ -44,11 +44,7 @@ import { RemotePlayerManager } from "./player/RemotePlayerManager";
 import { LocalPlayerController } from "./player/LocalPlayerController";
 import { MapTransitionController } from "./maps/MapTransitionController";
 import { MovementInputController } from "./player/MovementInputController";
-import type {
-  NpcDirection,
-  NpcInstance,
-  NpcInteractionType,
-} from "./npc/types";
+import type { NpcDirection, NpcInstance, NpcInteractionType } from "./npc/types";
 import { RemotePokemonFollowerManager } from "./pokemon/RemotePokemonFollowerManager";
 import { OverworldCameraController } from "./camera/OverworldCameraController";
 import { TrainerPanelController } from "./ui/TrainerPanelController";
@@ -158,7 +154,7 @@ export class GameScene extends Phaser.Scene {
           {
             frameWidth: 24,
             frameHeight: 24,
-          },
+          }
         );
       });
     });
@@ -178,24 +174,21 @@ export class GameScene extends Phaser.Scene {
 
     this.createPlayerAnimations();
     this.createPlayer();
-    this.localPlayerController = new LocalPlayerController(
-      this.player,
-      this.avatarId,
-    );
+    this.localPlayerController = new LocalPlayerController(this.player, this.avatarId);
 
     this.mapTransitionController = new MapTransitionController(
       this,
       (transitionId) => this.requestMapTransition(transitionId),
       (transition) => this.handleMapTransitionResolved(transition),
-      () => this.localPlayerController.setIdle(),
+      () => this.localPlayerController.setIdle()
     );
     this.mapTransitionController.loadZones(this.mapManager.map);
 
     this.remotePlayerManager = new RemotePlayerManager(this, (displayName) =>
-      this.createPlayerNameLabel(displayName),
+      this.createPlayerNameLabel(displayName)
     );
     this.npcManager = new NpcManager(this, (displayName) =>
-      this.createPlayerNameLabel(displayName),
+      this.createPlayerNameLabel(displayName)
     );
 
     this.npcManager.create(this.mapManager.map);
@@ -203,7 +196,7 @@ export class GameScene extends Phaser.Scene {
 
     this.overworldCameraController = new OverworldCameraController(
       this.cameras.main,
-      this.player,
+      this.player
     );
     this.setupCamera();
     this.createDialogueUi();
@@ -234,7 +227,7 @@ export class GameScene extends Phaser.Scene {
     this.handleWorldInteraction();
 
     const input = this.movementInputController.getCurrentInput(
-      this.isMovementInputBlocked(),
+      this.isMovementInputBlocked()
     );
     this.localPlayerController.updateAnimation(input);
     this.sendInputIfChanged(input);
@@ -243,20 +236,20 @@ export class GameScene extends Phaser.Scene {
       input,
       delta,
       this.currentMapId,
-      this.isMapTransitioning,
+      this.isMapTransitioning
     );
     this.localPlayerController.reconcile(delta);
     this.overworldCameraController.update(
       delta,
       this.localPlayerController.direction,
-      isPlayerMoving(input),
+      isPlayerMoving(input)
     );
 
     this.pokemonTrainerPresentationController.updateFollower(
       this.player.x,
       this.player.y,
       this.localPlayerController.direction,
-      delta,
+      delta
     );
 
     this.remotePlayerManager.interpolate(delta);
@@ -295,7 +288,7 @@ export class GameScene extends Phaser.Scene {
       },
       (input) => {
         this.network.sendPokemonEvolutionDecision(input);
-      },
+      }
     );
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -328,7 +321,7 @@ export class GameScene extends Phaser.Scene {
       spawn.x,
       spawn.y,
       getPlayerTextureKey(this.avatarId, "down"),
-      0,
+      0
     );
 
     this.player.setDepth(5);
@@ -340,7 +333,7 @@ export class GameScene extends Phaser.Scene {
     this.nearbyNpc = this.npcManager.findNearby(
       this.player.x,
       this.player.y,
-      this.npcInteractionDistance,
+      this.npcInteractionDistance
     );
 
     if (previousNpc?.definition.id !== this.nearbyNpc?.definition.id) {
@@ -410,9 +403,7 @@ export class GameScene extends Phaser.Scene {
 
     const line = dialogue.lines[state.lineIndex];
     if (line === undefined) {
-      console.warn(
-        `Dialogue line ${state.lineIndex} not found for ${state.dialogueId}`,
-      );
+      console.warn(`Dialogue line ${state.lineIndex} not found for ${state.dialogueId}`);
       return;
     }
 
@@ -433,7 +424,7 @@ export class GameScene extends Phaser.Scene {
     fromY: number,
     targetX: number,
     targetY: number,
-    fallback: NpcDirection,
+    fallback: NpcDirection
   ): NpcDirection {
     const deltaX = targetX - fromX;
     const deltaY = targetY - fromY;
@@ -454,24 +445,21 @@ export class GameScene extends Phaser.Scene {
       this.player.y,
       npc.sprite.x,
       npc.sprite.y,
-      this.localPlayerController.direction,
+      this.localPlayerController.direction
     );
     const npcDirection = this.getFacingDirection(
       npc.sprite.x,
       npc.sprite.y,
       this.player.x,
       this.player.y,
-      npc.definition.direction,
+      npc.definition.direction
     );
 
     this.localPlayerController.setDirection(playerDirection);
     this.localPlayerController.setIdle();
 
     npc.sprite.anims.stop();
-    npc.sprite.setTexture(
-      getNpcTextureKey(npc.definition.sprite, npcDirection),
-      0,
-    );
+    npc.sprite.setTexture(getNpcTextureKey(npc.definition.sprite, npcDirection), 0);
   }
 
   private restoreActiveDialogueNpcDirection(): void {
@@ -482,7 +470,7 @@ export class GameScene extends Phaser.Scene {
     npc.sprite.anims.stop();
     npc.sprite.setTexture(
       getNpcTextureKey(npc.definition.sprite, npc.definition.direction),
-      0,
+      0
     );
     this.activeDialogueNpc = undefined;
   }
@@ -505,14 +493,10 @@ export class GameScene extends Phaser.Scene {
       for (const direction of definition.directions) {
         const textureKey = getNpcTextureKey(spriteId, direction);
 
-        this.load.spritesheet(
-          textureKey,
-          `${definition.folder}/walk-${direction}.png`,
-          {
-            frameWidth: NPC_FRAME_WIDTH,
-            frameHeight: NPC_FRAME_HEIGHT,
-          },
-        );
+        this.load.spritesheet(textureKey, `${definition.folder}/walk-${direction}.png`, {
+          frameWidth: NPC_FRAME_WIDTH,
+          frameHeight: NPC_FRAME_HEIGHT,
+        });
       }
     }
   }
@@ -523,7 +507,7 @@ export class GameScene extends Phaser.Scene {
     this.remotePokemonFollowerManager = new RemotePokemonFollowerManager(
       this,
       this.pokemonOverworldSpriteLoader,
-      (playerId) => this.remotePlayerManager.getRenderPosition(playerId),
+      (playerId) => this.remotePlayerManager.getRenderPosition(playerId)
     );
     this.trainerPanelController = new TrainerPanelController(this, {
       isInteractionBlocked: () =>
@@ -540,8 +524,9 @@ export class GameScene extends Phaser.Scene {
         this.network.reorderPokemonParty(input);
       },
     });
-    this.pokemonTrainerPresentationController =
-      new PokemonTrainerPresentationController(this, {
+    this.pokemonTrainerPresentationController = new PokemonTrainerPresentationController(
+      this,
+      {
         pokemonSpriteLoader: this.pokemonSpriteLoader,
         pokemonOverworldSpriteLoader: this.pokemonOverworldSpriteLoader,
         trainerPanelController: this.trainerPanelController,
@@ -558,7 +543,8 @@ export class GameScene extends Phaser.Scene {
           this.starterSelectionPanel.hide();
           this.chatBox.setVisible(true);
         },
-      });
+      }
+    );
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.pokemonTrainerPresentationController.destroy();
     });
@@ -620,7 +606,7 @@ export class GameScene extends Phaser.Scene {
     this.network.onPokemonTrainerState((payload) => {
       this.battleController.setTrainerState(payload.trainerState);
       void this.pokemonTrainerPresentationController.applyTrainerState(
-        payload.trainerState,
+        payload.trainerState
       );
     });
 
@@ -710,9 +696,7 @@ export class GameScene extends Phaser.Scene {
 
     this.network.onCurrentPlayers((players) => {
       const playerStates = Object.values(players);
-      const localPlayer = playerStates.find(
-        (player) => player.id === this.network.id,
-      );
+      const localPlayer = playerStates.find((player) => player.id === this.network.id);
       if (!localPlayer) {
         console.warn("[PlayerWorld] Local player missing from currentPlayers", {
           networkId: this.network.id,
@@ -767,10 +751,7 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.network.onTransitionResolved((transition) => {
-      this.mapTransitionController.handleResolved(
-        transition,
-        this.currentMapId,
-      );
+      this.mapTransitionController.handleResolved(transition, this.currentMapId);
     });
 
     this.network.onPlayerDisconnected((playerId) => {
@@ -795,14 +776,11 @@ export class GameScene extends Phaser.Scene {
     this.pokemonTrainerPresentationController.resetFollowerToPlayerPosition(
       player.x,
       player.y,
-      player.direction,
+      player.direction
     );
 
     this.mapTransitionController.resetExitTracking();
-    this.overworldCameraController.resetForMap(
-      this.currentMapId,
-      this.mapManager.map,
-    );
+    this.overworldCameraController.resetForMap(this.currentMapId, this.mapManager.map);
     this.movementInputController.resetLastInputToNeutral();
     this.localPlayerController.setIdle();
 
@@ -833,12 +811,9 @@ export class GameScene extends Phaser.Scene {
     this.pokemonTrainerPresentationController.resetFollowerToPlayerPosition(
       transition.x,
       transition.y,
-      this.localPlayerController.direction,
+      this.localPlayerController.direction
     );
-    this.overworldCameraController.resetForMap(
-      this.currentMapId,
-      this.mapManager.map,
-    );
+    this.overworldCameraController.resetForMap(this.currentMapId, this.mapManager.map);
     this.movementInputController.resetLastInputToNeutral();
     this.localPlayerController.setIdle();
   }
@@ -856,7 +831,7 @@ export class GameScene extends Phaser.Scene {
           key: animationKey,
           frames: this.anims.generateFrameNumbers(
             getPlayerTextureKey(avatar.id, direction),
-            { start: 0, end: 11 },
+            { start: 0, end: 11 }
           ),
           frameRate: 12,
           repeat: -1,
@@ -868,10 +843,7 @@ export class GameScene extends Phaser.Scene {
   private setupCamera(): void {
     const camera = this.cameras.main;
     camera.setAlpha(0);
-    this.overworldCameraController.start(
-      this.currentMapId,
-      this.mapManager.map,
-    );
+    this.overworldCameraController.start(this.currentMapId, this.mapManager.map);
   }
 
   private createPlayerNameLabel(displayName: string): Phaser.GameObjects.Text {
@@ -919,8 +891,7 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    const storageTerminalId =
-      this.pokemonStorageTerminalInteraction.nearbyTerminalId;
+    const storageTerminalId = this.pokemonStorageTerminalInteraction.nearbyTerminalId;
 
     if (storageTerminalId) {
       this.trainerPanelController.close();
@@ -934,7 +905,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     const interactionPrompt = this.getNpcInteractionPromptText(
-      this.nearbyNpc.definition.interactionType,
+      this.nearbyNpc.definition.interactionType
     );
 
     if (!interactionPrompt) {
@@ -985,9 +956,7 @@ export class GameScene extends Phaser.Scene {
     }
     const npc = this.nearbyNpc;
 
-    const promptText = this.getNpcInteractionPromptText(
-      npc.definition.interactionType,
-    );
+    const promptText = this.getNpcInteractionPromptText(npc.definition.interactionType);
     if (!promptText) {
       prompt.setVisible(false);
       return;
@@ -1000,7 +969,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private getNpcInteractionPromptText(
-    interactionType: NpcInteractionType,
+    interactionType: NpcInteractionType
   ): string | undefined {
     switch (interactionType) {
       case "dialogue":
@@ -1114,9 +1083,7 @@ export class GameScene extends Phaser.Scene {
     );
   }
 
-  private handleWildEncounterStarted(
-    payload: PokemonWildEncounterStartedPayload,
-  ): void {
+  private handleWildEncounterStarted(payload: PokemonWildEncounterStartedPayload): void {
     console.log("[WildEncounter] received", {
       encounterId: payload.encounterId,
       zoneId: payload.zoneId,
@@ -1139,7 +1106,7 @@ export class GameScene extends Phaser.Scene {
       this.currentMapId,
       this.player.x,
       this.player.y,
-      blocked,
+      blocked
     );
   }
 }

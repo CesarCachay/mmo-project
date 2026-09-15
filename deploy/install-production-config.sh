@@ -3,6 +3,11 @@
 set -Eeuo pipefail
 
 APP_DIR="/opt/cesar-mmo"
+SERVER_ENV="/etc/cesar-mmo/server.env"
+
+RDS_CA_DIR="/etc/cesar-mmo/certs"
+RDS_CA_FILE="${RDS_CA_DIR}/sa-east-1-bundle.pem"
+RDS_CA_URL="https://truststore.pki.rds.amazonaws.com/sa-east-1/sa-east-1-bundle.pem"
 
 if [ "$(id -u)" -ne 0 ]; then
   echo "ERROR: Este script debe ejecutarse como root."
@@ -17,16 +22,19 @@ echo " Cesar MMO Edition - Install Production Config"
 echo "=============================================="
 
 echo
-echo "[1/6] Validando archivos versionados..."
+echo "[1/7] Validando archivos versionados..."
 
 test -f deploy/cesar-mmo-server.service
 test -f deploy/nginx/cesar-mmo.conf
 test -f deploy/cesar-mmo-deploy
+test -f "$SERVER_ENV"
+
+command -v curl >/dev/null
 
 echo "✅ Archivos encontrados"
 
 echo
-echo "[2/6] Instalando servicio systemd..."
+echo "[2/7] Instalando servicio systemd..."
 
 install \
   -o root \
@@ -36,7 +44,7 @@ install \
   /etc/systemd/system/cesar-mmo-server.service
 
 echo
-echo "[3/6] Instalando configuración Nginx..."
+echo "[3/7] Instalando configuración Nginx..."
 
 install \
   -o root \
@@ -46,7 +54,7 @@ install \
   /etc/nginx/conf.d/cesar-mmo.conf
 
 echo
-echo "[4/6] Instalando deployment script..."
+echo "[4/7] Instalando deployment script..."
 
 install \
   -o root \
@@ -56,13 +64,59 @@ install \
   /usr/local/bin/cesar-mmo-deploy
 
 echo
-echo "[5/6] Validando configuración..."
+echo "[5/7] Instalando certificado CA de Amazon RDS..."
+
+install \
+  -d \
+  -o root \
+  -g cesarmmo \
+  -m 0750 \
+  "$RDS_CA_DIR"
+
+TMP_CA="$(mktemp)"
+
+cleanup() {
+  rm -f "$TMP_CA"
+}
+
+trap cleanup EXIT
+
+curl -fsSL \
+  "$RDS_CA_URL" \
+  -o "$TMP_CA"
+
+grep -q "BEGIN CERTIFICATE" "$TMP_CA"
+
+install \
+  -o root \
+  -g cesarmmo \
+  -m 0640 \
+  "$TMP_CA" \
+  "$RDS_CA_FILE"
+
+if grep -q '^NODE_EXTRA_CA_CERTS=' "$SERVER_ENV"; then
+  sed -i \
+    "s|^NODE_EXTRA_CA_CERTS=.*|NODE_EXTRA_CA_CERTS=${RDS_CA_FILE}|" \
+    "$SERVER_ENV"
+else
+  printf '\nNODE_EXTRA_CA_CERTS=%s\n' "$RDS_CA_FILE" >> "$SERVER_ENV"
+fi
+
+chown root:cesarmmo "$SERVER_ENV"
+chmod 0640 "$SERVER_ENV"
+
+sudo -u cesarmmo test -r "$RDS_CA_FILE"
+
+echo "✅ Certificado RDS instalado"
+
+echo
+echo "[6/7] Validando configuración..."
 
 systemctl daemon-reload
 nginx -t
 
 echo
-echo "[6/6] Reiniciando servicios..."
+echo "[7/7] Reiniciando servicios..."
 
 systemctl restart cesar-mmo-server
 systemctl restart nginx
