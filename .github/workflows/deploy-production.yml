@@ -6,18 +6,63 @@ on:
       - main
   workflow_dispatch:
 
-permissions:
-  contents: read
-  id-token: write
-
 concurrency:
   group: cesar-mmo-production
   cancel-in-progress: false
 
 jobs:
+  verify:
+    name: Verify production build
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.21.0
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate Prisma schema
+        run: pnpm --filter server prisma:validate
+
+      - name: Generate Prisma client
+        run: pnpm --filter server prisma:generate
+
+      - name: Build shared package
+        run: pnpm --filter @cesar-mmo/shared build
+
+      - name: Build server
+        run: pnpm --filter server build
+
+      - name: Build client
+        run: pnpm --filter client build
+
+      - name: Run available tests
+        run: pnpm -r --if-present test
+
   deploy:
     name: Deploy to AWS EC2
     runs-on: ubuntu-latest
+    needs: verify
+
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - name: Checkout repository
