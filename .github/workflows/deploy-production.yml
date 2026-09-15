@@ -1,0 +1,116 @@
+name: Deploy Production
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: cesar-mmo-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to AWS EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::766577086076:role/cesar-mmo-github-deploy-role
+          aws-region: sa-east-1
+
+      - name: Verify AWS identity
+        run: aws sts get-caller-identity
+
+      - name: Start production deployment
+        id: deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          COMMAND_ID="$(
+            aws ssm send-command \
+              --instance-ids "i-01aadc58743593bb0" \
+              --document-name "AWS-RunShellScript" \
+              --comment "Cesar MMO production deployment from GitHub Actions" \
+              --parameters 'commands=["sudo /usr/local/bin/cesar-mmo-deploy"]' \
+              --query 'Command.CommandId' \
+              --output text
+          )"
+
+          echo "command_id=$COMMAND_ID" >> "$GITHUB_OUTPUT"
+          echo "SSM Command ID: $COMMAND_ID"
+
+      - name: Wait for deployment
+        shell: bash
+        env:
+          COMMAND_ID: ${{ steps.deploy.outputs.command_id }}
+        run: |
+          set -euo pipefail
+
+          for attempt in $(seq 1 90); do
+            STATUS="$(
+              aws ssm get-command-invocation \
+                --command-id "$COMMAND_ID" \
+                --instance-id "i-01aadc58743593bb0" \
+                --query 'Status' \
+                --output text 2>/dev/null || true
+            )"
+
+            echo "Attempt $attempt - status: ${STATUS:-pending}"
+
+            case "$STATUS" in
+              Success)
+                break
+                ;;
+              Failed|Cancelled|TimedOut|Cancelling)
+                echo "Deployment failed: $STATUS"
+                exit 1
+                ;;
+            esac
+
+            sleep 10
+          done
+
+          FINAL_STATUS="$(
+            aws ssm get-command-invocation \
+              --command-id "$COMMAND_ID" \
+              --instance-id "i-01aadc58743593bb0" \
+              --query 'Status' \
+              --output text
+          )"
+
+          if [ "$FINAL_STATUS" != "Success" ]; then
+            echo "Deployment did not finish successfully: $FINAL_STATUS"
+            exit 1
+          fi
+
+      - name: Show deployment output
+        env:
+          COMMAND_ID: ${{ steps.deploy.outputs.command_id }}
+        run: |
+          aws ssm get-command-invocation \
+            --command-id "$COMMAND_ID" \
+            --instance-id "i-01aadc58743593bb0" \
+            --query 'StandardOutputContent' \
+            --output text
+
+      - name: Show deployment errors
+        if: failure()
+        env:
+          COMMAND_ID: ${{ steps.deploy.outputs.command_id }}
+        run: |
+          if [ -n "${COMMAND_ID:-}" ]; then
+            aws ssm get-command-invocation \
+              --command-id "$COMMAND_ID" \
+              --instance-id "i-01aadc58743593bb0" \
+              --query 'StandardErrorContent' \
+              --output text || true
+          fi
