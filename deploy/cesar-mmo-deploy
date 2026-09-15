@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+APP_DIR="/opt/cesar-mmo"
+ENV_FILE="/etc/cesar-mmo/server.env"
+APP_USER="cesarmmo"
+
+echo "========================================"
+echo " Cesar MMO Edition - Production Deploy"
+echo "========================================"
+
+echo
+echo "[1/10] Validando repositorio..."
+
+sudo -u "$APP_USER" bash -lc "
+  cd '$APP_DIR'
+
+  if [ -n \"\$(git status --porcelain)\" ]; then
+    echo 'ERROR: El repositorio del servidor tiene cambios sin commit.'
+    git status --short
+    exit 1
+  fi
+"
+
+echo
+echo "[2/10] Actualizando código desde origin/main..."
+
+sudo -u "$APP_USER" bash -lc "
+  cd '$APP_DIR'
+  git fetch origin main
+  git checkout main
+  git pull --ff-only origin main
+"
+
+echo
+echo "[3/10] Instalando dependencias..."
+
+sudo -u "$APP_USER" bash -lc "
+  cd '$APP_DIR'
+  pnpm install --frozen-lockfile
+"
+
+echo
+echo "[4/10] Construyendo paquete shared..."
+
+sudo -u "$APP_USER" bash -lc "
+  cd '$APP_DIR'
+  pnpm --filter @cesar-mmo/shared build
+"
+
+echo
+echo "[5/10] Construyendo backend..."
+
+sudo -u "$APP_USER" bash -lc "
+  cd '$APP_DIR'
+  pnpm --filter server build
+"
+
+echo
+echo "[6/10] Generando Prisma Client y aplicando migraciones..."
+
+sudo -u "$APP_USER" bash -lc "
+  cd '$APP_DIR'
+
+  set -a
+  source '$ENV_FILE'
+  set +a
+
+  pnpm prisma:generate
+  pnpm prisma:migrate:deploy
+"
+
+echo
+echo "[7/10] Construyendo frontend production..."
+
+sudo -u "$APP_USER" bash -lc "
+  cd '$APP_DIR'
+
+  set -a
+  source '$ENV_FILE'
+  set +a
+
+  export VITE_API_URL=\"\$CLIENT_ORIGIN\"
+  export VITE_GOOGLE_CLIENT_ID=\"\$GOOGLE_CLIENT_ID\"
+
+  pnpm --filter client build
+"
+
+echo
+echo "[8/10] Validando Nginx..."
+
+nginx -t
+
+echo
+echo "[9/10] Reiniciando servicios..."
+
+systemctl restart cesar-mmo-server
+systemctl restart nginx
+
+sleep 2
+
+systemctl is-active --quiet cesar-mmo-server
+systemctl is-active --quiet nginx
+
+echo
+echo "[10/10] Smoke tests..."
+
+curl --fail --silent --show-error \
+  http://127.0.0.1/health \
+  >/tmp/cesar-mmo-health.json
+
+grep -q '"status":"ok"' /tmp/cesar-mmo-health.json
+
+curl --fail --silent --show-error \
+  http://127.0.0.1/ \
+  >/tmp/cesar-mmo-index.html
+
+grep -qi '<html' /tmp/cesar-mmo-index.html
+
+echo
+echo "========================================"
+echo " DEPLOY COMPLETADO CORRECTAMENTE"
+echo "========================================"
+
+echo
+echo "Commit desplegado:"
+sudo -u "$APP_USER" bash -lc "
+  cd '$APP_DIR'
+  git log -1 --oneline
+"
+
+echo
+echo "Servicios:"
+systemctl is-active cesar-mmo-server
+systemctl is-active nginx
+
+echo
+echo "Health:"
+cat /tmp/cesar-mmo-health.json
+echo

@@ -1,0 +1,20 @@
+[Unit]
+Description=Cesar MMO Edition NestJS Server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=cesarmmo
+Group=cesarmmo
+
+WorkingDirectory=/opt/cesar-mmo/apps/server
+EnvironmentFile=/etc/cesar-mmo/server.env
+
+ExecStart=/usr/local/bin/node /opt/cesar-mmo/apps/server/dist/main.js
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -32,3 +32,6 @@ Thumbs.db
 *.sav
 
 *.tsbuildinfo
+# Production deployment secrets
+deploy/env/server.env
+deploy/env/*.local
