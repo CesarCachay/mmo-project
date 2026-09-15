@@ -2,6 +2,8 @@ import { isPlayerAvatarId } from "@cesar-mmo/shared";
 
 import type { PlayerAvatarId } from "@cesar-mmo/shared";
 
+import { resolveApiBaseUrl } from "../config/runtime-environment";
+
 export type AccountTrainer = {
   trainerId: string;
   displayName: string;
@@ -81,10 +83,7 @@ export class TrainerHttpClient {
   private readonly baseUrl: string;
 
   constructor(baseUrl?: string) {
-    const configuredBaseUrl = import.meta.env.VITE_API_URL?.trim();
-
-    this.baseUrl =
-      baseUrl?.trim() || configuredBaseUrl || "http://localhost:3000";
+    this.baseUrl = resolveApiBaseUrl(baseUrl);
   }
 
   async listTrainers(): Promise<AccountTrainer[]> {

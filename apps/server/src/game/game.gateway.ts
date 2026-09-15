@@ -113,9 +113,12 @@ import {
 // manager
 import { PokemonProgressionManager } from '#app/pokemon/progression/pokemon-progression.manager';
 
+// deploy
+import { resolveClientOrigin } from '#app/config/runtime-environment';
+
 @WebSocketGateway({
   cors: {
-    origin: 'http://localhost:5173',
+    origin: resolveClientOrigin(),
     credentials: true,
   },
 })

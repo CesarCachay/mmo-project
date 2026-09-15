@@ -26,9 +26,6 @@ importers:
       phaser:
         specifier: ^4.2.1
         version: 4.2.1
-      pnpm:
-        specifier: ^11.21.0
-        version: 11.21.0
       socket.io-client:
         specifier: ^4.8.3
         version: 4.8.3(supports-color@8.1.1)
@@ -81,9 +78,6 @@ importers:
       pg:
         specifier: ^8.23.0
         version: 8.23.0
-      pnpm:
-        specifier: ^11.21.0
-        version: 11.21.0
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -3455,11 +3449,6 @@ packages:
   pluralize@8.0.0:
     resolution: {integrity: sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==}
     engines: {node: '>=4'}
-
-  pnpm@11.21.0:
-    resolution: {integrity: sha512-UhcFvOaJkk6scvWjWHEi82JonvZXHlW6gAdv1jfBETLs/62ib61Op5xIW/3b/T1aKlsFgFp36JPeceyKbMo7sQ==}
-    engines: {node: '>=22.13'}
-    hasBin: true
 
   postcss@8.5.26:
     resolution: {integrity: sha512-u82N74LFzG8ca+dD8puPnplTXoGH4fTPpVGuIbt36G3qvNlkvfD0lEAZSxaly3KX8TS/L1A1gsCEmvKmBcVbkQ==}
@@ -7878,8 +7867,6 @@ snapshots:
       pathe: 2.0.3
 
   pluralize@8.0.0: {}
-
-  pnpm@11.21.0: {}
 
   postcss@8.5.26:
     dependencies:

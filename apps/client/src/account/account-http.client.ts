@@ -1,3 +1,5 @@
+import { resolveApiBaseUrl } from "../config/runtime-environment";
+
 export type AuthenticatedAccountSession = {
   authenticated: true;
 
@@ -45,9 +47,7 @@ export class AccountHttpClient {
   private readonly baseUrl: string;
 
   constructor(baseUrl?: string) {
-    const configuredBaseUrl = import.meta.env.VITE_API_URL?.trim();
-    this.baseUrl =
-      baseUrl?.trim() || configuredBaseUrl || "http://localhost:3000";
+    this.baseUrl = resolveApiBaseUrl(baseUrl);
   }
 
   async getSession(): Promise<AuthenticatedAccountSession | undefined> {

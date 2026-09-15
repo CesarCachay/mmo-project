@@ -65,6 +65,9 @@ import type {
   PokemonEvolutionErrorPayload,
 } from "@cesar-mmo/shared";
 
+// deploy
+import { resolveApiBaseUrl } from "../../config/runtime-environment";
+
 type ConnectionRejectedError = {
   code: string;
   message: string;
@@ -77,8 +80,7 @@ export class GameNetworkClient {
   private readonly socket: Socket;
 
   constructor(input: GameNetworkClientConnectionInput) {
-    const serverUrl =
-      import.meta.env.VITE_API_URL?.trim() || "http://localhost:3000";
+    const serverUrl = resolveApiBaseUrl();
 
     this.socket = io(serverUrl, {
       withCredentials: true,

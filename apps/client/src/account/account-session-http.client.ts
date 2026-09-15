@@ -1,3 +1,5 @@
+import { resolveApiBaseUrl } from "../config/runtime-environment";
+
 export class AccountSessionHttpError extends Error {
   readonly status: number;
 
@@ -21,11 +23,8 @@ function isLogoutResponse(value: unknown): value is {
 export class AccountSessionHttpClient {
   private readonly baseUrl: string;
 
-  constructor(
-    baseUrl: string = import.meta.env.VITE_API_URL?.trim() ||
-      "http://localhost:3000",
-  ) {
-    this.baseUrl = baseUrl;
+  constructor(baseUrl?: string) {
+    this.baseUrl = resolveApiBaseUrl(baseUrl);
   }
 
   async logout(): Promise<void> {

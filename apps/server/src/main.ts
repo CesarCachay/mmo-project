@@ -3,11 +3,12 @@ import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
+import { resolveClientOrigin } from './config/runtime-environment';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const clientOrigin =
-    process.env.CLIENT_ORIGIN?.trim() || 'http://localhost:5173';
+  const clientOrigin = resolveClientOrigin();
 
   app.enableCors({
     origin: clientOrigin,

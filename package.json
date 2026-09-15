@@ -2,8 +2,17 @@
   "name": "pokemmo-cesar-edition",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "24.21.0",
+    "pnpm": "11.21.0"
+  },
+  "packageManager": "pnpm@11.21.0",
   "scripts": {
     "generate:maps": "node scripts/generate-map-data-full-route-chain.mjs",
+    "prisma:generate": "pnpm --filter server prisma:generate",
+    "prisma:validate": "pnpm --filter server prisma:validate",
+    "prisma:migrate:status": "pnpm --filter server prisma:migrate:status",
+    "prisma:migrate:deploy": "pnpm --filter server prisma:migrate:deploy",
     "build": "pnpm run build:shared && pnpm --filter server build && pnpm --filter client build",
     "build:shared": "pnpm --filter @cesar-mmo/shared build",
     "build:server": "pnpm --filter server build",

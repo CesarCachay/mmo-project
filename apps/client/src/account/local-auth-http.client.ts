@@ -1,3 +1,5 @@
+import { resolveApiBaseUrl } from "../config/runtime-environment";
+
 export interface LocalAuthInput {
   readonly loginId: string;
   readonly password: string;
@@ -71,11 +73,8 @@ function resolveErrorMessage(value: unknown, fallback: string): string {
 export class LocalAuthHttpClient {
   private readonly baseUrl: string;
 
-  constructor(
-    baseUrl: string = import.meta.env.VITE_API_URL?.trim() ||
-      "http://localhost:3000",
-  ) {
-    this.baseUrl = baseUrl;
+  constructor(baseUrl?: string) {
+    this.baseUrl = resolveApiBaseUrl(baseUrl);
   }
 
   async register(input: LocalAuthInput): Promise<LocalAuthResponse> {
