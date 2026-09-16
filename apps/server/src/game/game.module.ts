@@ -51,6 +51,11 @@ import { AccountLocalRegistrationRepository } from '#app/account/local/account-l
 import { AccountLocalLoginService } from '#app/account/local/account-local-login.service';
 import { AccountLocalAuthController } from '#app/account/local/account-local-auth.controller';
 
+// Pokemon center
+import { PokemonCenterHealingRepository } from '#app/pokemon/healing/pokemon-center-healing.repository';
+import { PokemonCenterHealingOperationQueue } from '#app/pokemon/healing/pokemon-center-healing-operation.queue';
+import { PokemonCenterHealingService } from '#app/pokemon/healing/pokemon-center-healing.service';
+
 // store
 import { TrainerConnectionStore } from './player/trainer-connection.store';
 
@@ -107,6 +112,9 @@ import { GameGateway } from './game.gateway';
     AccountLocalRegistrationService,
     AccountLocalRegistrationRepository,
     AccountLocalLoginService,
+    PokemonCenterHealingRepository,
+    PokemonCenterHealingOperationQueue,
+    PokemonCenterHealingService,
   ],
 })
 export class GameModule {}

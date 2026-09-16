@@ -34,6 +34,8 @@ export const ROUTE_01_MAP = {
 
   storageTerminals: {},
 
+  healingStations: {},
+
   transitions: {
     "returnTown01": {
       targetMapId: "town-01",

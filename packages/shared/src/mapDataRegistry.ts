@@ -64,9 +64,16 @@ export type SharedMapData = {
   readonly encounterZones: Readonly<Record<string, SharedMapEncounterZone>>;
 
   readonly storageTerminals: Readonly<Record<string, SharedMapStorageTerminal>>;
+
+  readonly healingStations: Readonly<Record<string, SharedMapHealingStation>>;
 };
 
 export type SharedMapStorageTerminal = {
+  readonly x: number;
+  readonly y: number;
+};
+
+export type SharedMapHealingStation = {
   readonly x: number;
   readonly y: number;
 };

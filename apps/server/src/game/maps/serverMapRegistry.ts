@@ -7,6 +7,7 @@ import type {
   SharedMapNpc,
   SharedMapEncounterZone,
   SharedMapStorageTerminal,
+  SharedMapHealingStation,
 } from '@cesar-mmo/shared';
 
 const MAP_TRANSITION_TRIGGER_TOLERANCE = 8;
@@ -24,6 +25,13 @@ const STORAGE_TERMINAL_SERVER_TOLERANCE = 4;
 
 const MAX_STORAGE_TERMINAL_INTERACTION_DISTANCE =
   STORAGE_TERMINAL_INTERACTION_DISTANCE + STORAGE_TERMINAL_SERVER_TOLERANCE;
+
+const HEALING_STATION_INTERACTION_DISTANCE = 36;
+
+const HEALING_STATION_SERVER_TOLERANCE = 4;
+
+const MAX_HEALING_STATION_INTERACTION_DISTANCE =
+  HEALING_STATION_INTERACTION_DISTANCE + HEALING_STATION_SERVER_TOLERANCE;
 
 export type ServerMapEncounterZone = SharedMapEncounterZone & {
   readonly id: string;
@@ -142,6 +150,30 @@ export function isPlayerNearMapStorageTerminal(
   const maxDistanceSquared =
     MAX_STORAGE_TERMINAL_INTERACTION_DISTANCE *
     MAX_STORAGE_TERMINAL_INTERACTION_DISTANCE;
+
+  return distanceSquared <= maxDistanceSquared;
+}
+
+export function getServerMapHealingStation(
+  mapId: MapId,
+  healingStationId: string,
+): SharedMapHealingStation | undefined {
+  return MAP_DATA_REGISTRY[mapId].healingStations[healingStationId.trim()];
+}
+
+export function isPlayerNearMapHealingStation(
+  playerX: number,
+  playerY: number,
+  station: SharedMapHealingStation,
+): boolean {
+  const deltaX = playerX - station.x;
+  const deltaY = playerY - station.y;
+
+  const distanceSquared = deltaX * deltaX + deltaY * deltaY;
+
+  const maxDistanceSquared =
+    MAX_HEALING_STATION_INTERACTION_DISTANCE *
+    MAX_HEALING_STATION_INTERACTION_DISTANCE;
 
   return distanceSquared <= maxDistanceSquared;
 }

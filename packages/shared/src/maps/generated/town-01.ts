@@ -46,6 +46,8 @@ export const TOWN_01_MAP = {
 
   storageTerminals: {},
 
+  healingStations: {},
+
   transitions: {
     "enterHouse01": {
       targetMapId: "house-01",

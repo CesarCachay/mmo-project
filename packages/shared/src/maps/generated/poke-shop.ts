@@ -30,6 +30,8 @@ export const POKE_SHOP_MAP = {
 
   storageTerminals: {},
 
+  healingStations: {},
+
   transitions: {
     "exitToCity01": {
       targetMapId: "city-01",

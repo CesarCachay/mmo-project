@@ -29,9 +29,6 @@ import { getPokemonItemIconAsset } from "./items/pokemon-item-icon.registry";
 import { ChatBox } from "./ui/ChatBox";
 import { DialogueBox } from "./ui/DialogueBox";
 import { StarterSelectionPanel } from "./ui/StarterSelectionPanel";
-import { BattleController } from "./battle/BattleController";
-import { PokemonStorageController } from "./storage/PokemonStorageController";
-import { PokemonStorageTerminalInteractionController } from "./storage/PokemonStorageTerminalInteractionController";
 
 // helpers
 import { MAP_REGISTRY } from "./maps/mapRegistry";
@@ -49,6 +46,18 @@ import { RemotePokemonFollowerManager } from "./pokemon/RemotePokemonFollowerMan
 import { OverworldCameraController } from "./camera/OverworldCameraController";
 import { TrainerPanelController } from "./ui/TrainerPanelController";
 import { PokemonTrainerPresentationController } from "./pokemon/PokemonTrainerPresentationController";
+
+// controllers
+import { BattleController } from "./battle/BattleController";
+import { PokemonStorageController } from "./storage/PokemonStorageController";
+import { PokemonStorageTerminalInteractionController } from "./storage/PokemonStorageTerminalInteractionController";
+import { PokemonCenterHealingInteractionController } from "./pokemon-center/PokemonCenterHealingInteractionController";
+import { PokemonCenterHealingPresentationController } from "./pokemon-center/PokemonCenterHealingPresentationController";
+import { PokemonCenterHealingWorldFxController } from "./pokemon-center/PokemonCenterHealingWorldFxController";
+import {
+  POKEMON_CENTER_HEALING_AUDIO_KEYS,
+  PokemonCenterHealingAudioController,
+} from "./pokemon-center/PokemonCenterHealingAudioController";
 
 // stores
 import { selectedTrainerStore } from "../account/selected-trainer.store";
@@ -106,6 +115,11 @@ export class GameScene extends Phaser.Scene {
   private pokemonStorageController!: PokemonStorageController;
   private pokemonStorageTerminalInteraction!: PokemonStorageTerminalInteractionController;
 
+  private pokemonCenterHealingInteraction!: PokemonCenterHealingInteractionController;
+  private pokemonCenterHealingPresentation!: PokemonCenterHealingPresentationController;
+  private pokemonCenterHealingWorldFx!: PokemonCenterHealingWorldFxController;
+  private pokemonCenterHealingAudio!: PokemonCenterHealingAudioController;
+
   // managers
   private npcManager!: NpcManager;
   private remotePlayerManager!: RemotePlayerManager;
@@ -162,6 +176,16 @@ export class GameScene extends Phaser.Scene {
     // NPCs
     this.preloadNpcSprites();
 
+    // audio - pokecenter
+    this.load.audio(
+      POKEMON_CENTER_HEALING_AUDIO_KEYS.STEP,
+      "/assets/audio/pokemon-center/heal-step.wav"
+    );
+    this.load.audio(
+      POKEMON_CENTER_HEALING_AUDIO_KEYS.COMPLETE,
+      "/assets/audio/pokemon-center/heal-complete.wav"
+    );
+
     // Pokemon Starter Assets
     Object.values(POKEMON_STARTER_ASSETS).forEach((asset) => {
       this.load.image(asset.textureKey, asset.path);
@@ -171,6 +195,18 @@ export class GameScene extends Phaser.Scene {
   create() {
     this.mapManager = new MapManager(this);
     this.mapManager.create(this.currentMapId);
+
+    const unlockAudio = () => {
+      if (!this.sound.locked) {
+        return;
+      }
+
+      this.sound.unlock();
+      console.log("[Audio] unlock requested");
+    };
+
+    this.input.once("pointerdown", unlockAudio);
+    this.input.keyboard?.once("keydown", unlockAudio);
 
     this.createPlayerAnimations();
     this.createPlayer();
@@ -209,6 +245,39 @@ export class GameScene extends Phaser.Scene {
       this.pokemonStorageTerminalInteraction.destroy();
     });
 
+    this.pokemonCenterHealingWorldFx = new PokemonCenterHealingWorldFxController(this);
+    this.pokemonCenterHealingAudio = new PokemonCenterHealingAudioController(this);
+
+    this.pokemonCenterHealingPresentation =
+      new PokemonCenterHealingPresentationController(this, {
+        onHealingStep: (stepNumber, totalSteps) => {
+          this.pokemonCenterHealingWorldFx.pulseStep(stepNumber, totalSteps);
+          this.pokemonCenterHealingAudio.playStep(stepNumber, totalSteps);
+        },
+        onHealingSuccessReveal: () => {
+          this.pokemonCenterHealingWorldFx.complete();
+          this.pokemonCenterHealingAudio.playComplete();
+        },
+      });
+    this.pokemonCenterHealingInteraction = new PokemonCenterHealingInteractionController(
+      this,
+      {
+        onHealRequested: (healingStationId: string) => {
+          this.sound.unlock();
+          this.pokemonCenterHealingWorldFx.begin(this.currentMapId, healingStationId);
+          this.pokemonCenterHealingPresentation.beginHealing();
+          this.network.requestPokemonCenterHealing(healingStationId);
+        },
+      }
+    );
+
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.pokemonCenterHealingInteraction.destroy();
+      this.pokemonCenterHealingPresentation.destroy();
+      this.pokemonCenterHealingWorldFx.destroy();
+      this.pokemonCenterHealingAudio.destroy();
+    });
+
     this.createPokemonPresentation();
     this.createBattleUi();
 
@@ -221,6 +290,8 @@ export class GameScene extends Phaser.Scene {
     this.handleChatFocus();
 
     this.updateNearbyNpc();
+
+    this.updatePokemonCenterHealingStation();
     this.updatePokemonStorageTerminal();
 
     this.updateNpcInteractionPrompt();
@@ -512,6 +583,8 @@ export class GameScene extends Phaser.Scene {
     this.trainerPanelController = new TrainerPanelController(this, {
       isInteractionBlocked: () =>
         Boolean(this.pokemonStorageController?.isBlockingGameplay) ||
+        Boolean(this.pokemonCenterHealingInteraction?.isPending) ||
+        Boolean(this.pokemonCenterHealingPresentation?.isBlockingGameplay) ||
         Boolean(this.battleController?.isBlockingGameplay) ||
         this.isMapTransitioning ||
         this.dialogueBox.isOpen() ||
@@ -624,6 +697,18 @@ export class GameScene extends Phaser.Scene {
 
     this.network.onPokemonOverworldItemError((payload) => {
       this.trainerPanelController.handleOverworldItemError(payload);
+    });
+
+    this.network.onPokemonCenterHealed((payload) => {
+      this.pokemonCenterHealingInteraction.completeRequest();
+      this.pokemonCenterHealingPresentation.presentSuccess(payload);
+    });
+
+    this.network.onPokemonCenterHealingError((payload) => {
+      this.pokemonCenterHealingInteraction.completeRequest();
+      this.pokemonCenterHealingWorldFx.cancel();
+      this.pokemonCenterHealingAudio.cancel();
+      this.pokemonCenterHealingPresentation.presentError(payload);
     });
 
     this.network.onStarterSelectionStatus((status) => {
@@ -866,6 +951,9 @@ export class GameScene extends Phaser.Scene {
     if (this.chatBox.isTyping()) {
       return;
     }
+    if (this.pokemonCenterHealingPresentation?.isBlockingGameplay) {
+      return;
+    }
     if (!Phaser.Input.Keyboard.JustDown(this.interactKey)) {
       return;
     }
@@ -888,6 +976,14 @@ export class GameScene extends Phaser.Scene {
       this.battleController?.isBlockingGameplay ||
       this.pokemonStorageController?.isBlockingGameplay
     ) {
+      return;
+    }
+
+    const healingStationId = this.pokemonCenterHealingInteraction.nearbyStationId;
+
+    if (healingStationId) {
+      this.trainerPanelController.close();
+      this.pokemonCenterHealingInteraction.requestHealing();
       return;
     }
 
@@ -939,7 +1035,11 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    if (this.pokemonStorageTerminalInteraction.hasNearbyTerminal) {
+    if (
+      this.pokemonCenterHealingPresentation?.isBlockingGameplay ||
+      this.pokemonCenterHealingInteraction.hasNearbyStation ||
+      this.pokemonStorageTerminalInteraction.hasNearbyTerminal
+    ) {
       prompt.setVisible(false);
       return;
     }
@@ -1001,6 +1101,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private handleChatFocus(): void {
+    if (this.pokemonCenterHealingPresentation?.isBlockingGameplay) {
+      return;
+    }
     if (this.pokemonStorageController?.isBlockingGameplay) {
       return;
     }
@@ -1034,7 +1137,9 @@ export class GameScene extends Phaser.Scene {
       this.starterSelectionPanel.isVisible() ||
       this.trainerPanelController.isPartyVisible ||
       this.battleController.isBlockingGameplay ||
-      this.pokemonStorageController?.isBlockingGameplay
+      this.pokemonStorageController?.isBlockingGameplay ||
+      this.pokemonCenterHealingPresentation?.isBlockingGameplay ||
+      this.pokemonCenterHealingInteraction?.isPending
     ) {
       return;
     }
@@ -1046,7 +1151,11 @@ export class GameScene extends Phaser.Scene {
 
   private destroyCurrentMap(): void {
     this.nearbyNpc = undefined;
+    this.pokemonCenterHealingPresentation?.cancel();
+    this.pokemonCenterHealingInteraction?.clear();
     this.pokemonStorageTerminalInteraction?.clear();
+    this.pokemonCenterHealingWorldFx?.cancel();
+    this.pokemonCenterHealingAudio?.cancel();
     this.npcManager.destroy();
     this.mapTransitionController.clearZones();
     this.mapManager.destroy();
@@ -1075,6 +1184,8 @@ export class GameScene extends Phaser.Scene {
     return (
       this.isMapTransitioning ||
       this.pokemonStorageController?.isBlockingGameplay ||
+      this.pokemonCenterHealingInteraction?.isPending ||
+      this.pokemonCenterHealingPresentation?.isBlockingGameplay ||
       this.dialogueBox.isOpen() ||
       this.chatBox.isTyping() ||
       this.starterSelectionPanel.isVisible() ||
@@ -1092,6 +1203,25 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  private updatePokemonCenterHealingStation(): void {
+    const blocked =
+      this.isMapTransitioning ||
+      this.dialogueBox.isOpen() ||
+      this.chatBox.isTyping() ||
+      this.starterSelectionPanel.isVisible() ||
+      this.trainerPanelController.isOpen ||
+      this.battleController?.isBlockingGameplay ||
+      this.pokemonStorageController?.isBlockingGameplay ||
+      this.pokemonCenterHealingPresentation?.isBlockingGameplay;
+
+    this.pokemonCenterHealingInteraction.update(
+      this.currentMapId,
+      this.player.x,
+      this.player.y,
+      blocked
+    );
+  }
+
   private updatePokemonStorageTerminal(): void {
     const blocked =
       this.isMapTransitioning ||
@@ -1100,7 +1230,10 @@ export class GameScene extends Phaser.Scene {
       this.starterSelectionPanel.isVisible() ||
       this.trainerPanelController.isPartyVisible ||
       this.battleController?.isBlockingGameplay ||
-      this.pokemonStorageController?.isBlockingGameplay;
+      this.pokemonStorageController?.isBlockingGameplay ||
+      this.pokemonCenterHealingInteraction.hasNearbyStation ||
+      this.pokemonCenterHealingInteraction.isPending ||
+      this.pokemonCenterHealingPresentation?.isBlockingGameplay;
 
     this.pokemonStorageTerminalInteraction.update(
       this.currentMapId,

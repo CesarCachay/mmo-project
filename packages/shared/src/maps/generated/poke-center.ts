@@ -35,6 +35,13 @@ export const POKE_CENTER_MAP = {
     },
   },
 
+  healingStations: {
+    "pokeCenterHealingStation01": {
+      x: 256,
+      y: 128,
+    },
+  },
+
   transitions: {
     "exitToCity01": {
       targetMapId: "city-01",

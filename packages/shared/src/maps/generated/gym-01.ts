@@ -30,6 +30,8 @@ export const GYM_01_MAP = {
 
   storageTerminals: {},
 
+  healingStations: {},
+
   transitions: {
     "exitToCity01": {
       targetMapId: "city-01",

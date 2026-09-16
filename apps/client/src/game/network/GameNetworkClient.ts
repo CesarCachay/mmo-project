@@ -22,6 +22,9 @@ import {
   isPokemonEvolutionRequiredPayload,
   isPokemonEvolutionResolvedPayload,
   isPokemonEvolutionErrorPayload,
+  POKEMON_CENTER_HEALING_EVENTS,
+  isPokemonCenterHealedPayload,
+  isPokemonCenterHealingErrorPayload,
 } from "@cesar-mmo/shared";
 
 import type {
@@ -63,6 +66,9 @@ import type {
   PokemonEvolutionDecisionInput,
   PokemonEvolutionResolvedPayload,
   PokemonEvolutionErrorPayload,
+  PokemonCenterHealInput,
+  PokemonCenterHealedPayload,
+  PokemonCenterHealingErrorPayload,
 } from "@cesar-mmo/shared";
 
 // deploy
@@ -102,9 +108,7 @@ export class GameNetworkClient {
     this.socket.disconnect();
   }
 
-  public onConnectionRejected(
-    callback: (error: ConnectionRejectedError) => void,
-  ): void {
+  public onConnectionRejected(callback: (error: ConnectionRejectedError) => void): void {
     this.socket.on("connectionRejected", callback);
   }
 
@@ -120,13 +124,13 @@ export class GameNetworkClient {
 
   // pokemon trainer party
   public onPokemonTrainerState(
-    callback: (payload: PokemonTrainerStatePayload) => void,
+    callback: (payload: PokemonTrainerStatePayload) => void
   ): void {
     this.socket.on(POKEMON_EVENTS.TRAINER_STATE, callback);
   }
 
   public onStarterSelectionStatus(
-    callback: (status: PokemonStarterSelectionStatus) => void,
+    callback: (status: PokemonStarterSelectionStatus) => void
   ): void {
     this.socket.on(POKEMON_EVENTS.STARTER_SELECTION_STATUS, callback);
   }
@@ -136,22 +140,19 @@ export class GameNetworkClient {
   }
 
   public onPokemonPartyReordered(
-    callback: (payload: PokemonPartyReorderedPayload) => void,
+    callback: (payload: PokemonPartyReorderedPayload) => void
   ): void {
-    this.socket.on(
-      POKEMON_PARTY_REORDER_EVENTS.REORDERED,
-      (payload: unknown) => {
-        if (!isPokemonPartyReorderedPayload(payload)) {
-          console.warn("[PokemonParty] invalid REORDERED payload", payload);
-          return;
-        }
-        callback(payload);
-      },
-    );
+    this.socket.on(POKEMON_PARTY_REORDER_EVENTS.REORDERED, (payload: unknown) => {
+      if (!isPokemonPartyReorderedPayload(payload)) {
+        console.warn("[PokemonParty] invalid REORDERED payload", payload);
+        return;
+      }
+      callback(payload);
+    });
   }
 
   public onPokemonPartyReorderError(
-    callback: (payload: PokemonPartyReorderErrorPayload) => void,
+    callback: (payload: PokemonPartyReorderErrorPayload) => void
   ): void {
     this.socket.on(POKEMON_PARTY_REORDER_EVENTS.ERROR, (payload: unknown) => {
       if (!isPokemonPartyReorderErrorPayload(payload)) {
@@ -164,44 +165,36 @@ export class GameNetworkClient {
 
   // wild encounters
   public onWildEncounterStarted(
-    callback: (payload: PokemonWildEncounterStartedPayload) => void,
+    callback: (payload: PokemonWildEncounterStartedPayload) => void
   ): void {
-    this.socket.on(
-      POKEMON_EVENTS.WILD_ENCOUNTER_STARTED,
-      (payload: unknown) => {
-        if (!isPokemonWildEncounterStartedPayload(payload)) {
-          console.warn("[WildEncounter] invalid payload received");
-          return;
-        }
-        callback(payload);
-      },
-    );
+    this.socket.on(POKEMON_EVENTS.WILD_ENCOUNTER_STARTED, (payload: unknown) => {
+      if (!isPokemonWildEncounterStartedPayload(payload)) {
+        console.warn("[WildEncounter] invalid payload received");
+        return;
+      }
+      callback(payload);
+    });
   }
 
   // progression
-  public sendPokemonMoveLearningDecision(
-    input: PokemonMoveLearningDecisionInput,
-  ): void {
+  public sendPokemonMoveLearningDecision(input: PokemonMoveLearningDecisionInput): void {
     this.socket.emit(POKEMON_EVENTS.MOVE_LEARNING_DECISION, input);
   }
 
   public onPokemonMoveLearningResolved(
-    callback: (payload: PokemonMoveLearningResolvedPayload) => void,
+    callback: (payload: PokemonMoveLearningResolvedPayload) => void
   ): void {
-    this.socket.on(
-      POKEMON_EVENTS.MOVE_LEARNING_RESOLVED,
-      (payload: unknown) => {
-        if (!isPokemonMoveLearningResolvedPayload(payload)) {
-          console.warn("[MoveLearning] invalid RESOLVED payload", payload);
-          return;
-        }
-        callback(payload);
-      },
-    );
+    this.socket.on(POKEMON_EVENTS.MOVE_LEARNING_RESOLVED, (payload: unknown) => {
+      if (!isPokemonMoveLearningResolvedPayload(payload)) {
+        console.warn("[MoveLearning] invalid RESOLVED payload", payload);
+        return;
+      }
+      callback(payload);
+    });
   }
 
   public onPokemonMoveLearningError(
-    callback: (payload: PokemonMoveLearningErrorPayload) => void,
+    callback: (payload: PokemonMoveLearningErrorPayload) => void
   ): void {
     this.socket.on(POKEMON_EVENTS.MOVE_LEARNING_ERROR, (payload: unknown) => {
       if (!isPokemonMoveLearningErrorPayload(payload)) {
@@ -213,14 +206,12 @@ export class GameNetworkClient {
   }
 
   // evolution
-  public sendPokemonEvolutionDecision(
-    input: PokemonEvolutionDecisionInput,
-  ): void {
+  public sendPokemonEvolutionDecision(input: PokemonEvolutionDecisionInput): void {
     this.socket.emit(POKEMON_EVENTS.EVOLUTION_DECISION, input);
   }
 
   public onPokemonEvolutionRequired(
-    callback: (payload: PokemonEvolutionRequiredPayload) => void,
+    callback: (payload: PokemonEvolutionRequiredPayload) => void
   ): void {
     this.socket.on(POKEMON_EVENTS.EVOLUTION_REQUIRED, (payload: unknown) => {
       if (!isPokemonEvolutionRequiredPayload(payload)) {
@@ -232,7 +223,7 @@ export class GameNetworkClient {
   }
 
   public onPokemonEvolutionResolved(
-    callback: (payload: PokemonEvolutionResolvedPayload) => void,
+    callback: (payload: PokemonEvolutionResolvedPayload) => void
   ): void {
     this.socket.on(POKEMON_EVENTS.EVOLUTION_RESOLVED, (payload: unknown) => {
       if (!isPokemonEvolutionResolvedPayload(payload)) {
@@ -244,7 +235,7 @@ export class GameNetworkClient {
   }
 
   public onPokemonEvolutionError(
-    callback: (payload: PokemonEvolutionErrorPayload) => void,
+    callback: (payload: PokemonEvolutionErrorPayload) => void
   ): void {
     this.socket.on(POKEMON_EVENTS.EVOLUTION_ERROR, (payload: unknown) => {
       if (!isPokemonEvolutionErrorPayload(payload)) {
@@ -256,9 +247,7 @@ export class GameNetworkClient {
   }
 
   // multiplayer
-  public onCurrentPlayers(
-    callback: (players: Record<string, Player>) => void,
-  ): void {
+  public onCurrentPlayers(callback: (players: Record<string, Player>) => void): void {
     this.socket.on("currentPlayers", callback);
   }
 
@@ -266,14 +255,12 @@ export class GameNetworkClient {
     this.socket.on("playerJoined", callback);
   }
 
-  public onPlayersState(
-    callback: (players: Record<string, Player>) => void,
-  ): void {
+  public onPlayersState(callback: (players: Record<string, Player>) => void): void {
     this.socket.on("playersState", callback);
   }
 
   public onTransitionResolved(
-    callback: (transition: MapTransitionResolved) => void,
+    callback: (transition: MapTransitionResolved) => void
   ): void {
     this.socket.on(MAP_EVENTS.TRANSITION_RESOLVED, callback);
   }
@@ -286,9 +273,7 @@ export class GameNetworkClient {
     this.socket.on(MAP_EVENTS.PLAYER_LEFT, callback);
   }
 
-  public onDialogueState(
-    callback: (state: DialogueSessionState) => void,
-  ): void {
+  public onDialogueState(callback: (state: DialogueSessionState) => void): void {
     this.socket.on(DIALOGUE_EVENTS.STATE, callback);
   }
 
@@ -310,22 +295,19 @@ export class GameNetworkClient {
   }
 
   public onBattleReplacementResolved(
-    callback: (payload: PokemonBattleReplacementResolvedPayload) => void,
+    callback: (payload: PokemonBattleReplacementResolvedPayload) => void
   ): void {
-    this.socket.on(
-      POKEMON_EVENTS.BATTLE_REPLACEMENT_RESOLVED,
-      (payload: unknown) => {
-        if (!isPokemonBattleReplacementResolvedPayload(payload)) {
-          console.warn("[BattleReplacement] invalid resolved payload", payload);
-          return;
-        }
-        callback(payload);
-      },
-    );
+    this.socket.on(POKEMON_EVENTS.BATTLE_REPLACEMENT_RESOLVED, (payload: unknown) => {
+      if (!isPokemonBattleReplacementResolvedPayload(payload)) {
+        console.warn("[BattleReplacement] invalid resolved payload", payload);
+        return;
+      }
+      callback(payload);
+    });
   }
 
   public onBattleCompleted(
-    callback: (payload: PokemonBattleCompletedPayload) => void,
+    callback: (payload: PokemonBattleCompletedPayload) => void
   ): void {
     this.socket.on(POKEMON_EVENTS.BATTLE_COMPLETED, (payload: unknown) => {
       if (!isPokemonBattleCompletedPayload(payload)) {
@@ -337,7 +319,7 @@ export class GameNetworkClient {
   }
 
   public onBattleStateUpdated(
-    callback: (payload: PokemonBattleStateUpdatedPayload) => void,
+    callback: (payload: PokemonBattleStateUpdatedPayload) => void
   ): void {
     this.socket.on(POKEMON_EVENTS.BATTLE_STATE_UPDATED, (payload: unknown) => {
       if (!isPokemonBattleStateUpdatedPayload(payload)) {
@@ -354,7 +336,7 @@ export class GameNetworkClient {
   }
 
   public onPokemonOverworldItemUsed(
-    callback: (payload: PokemonOverworldItemUsedPayload) => void,
+    callback: (payload: PokemonOverworldItemUsedPayload) => void
   ): void {
     this.socket.on(POKEMON_OVERWORLD_ITEM_EVENTS.USED, (payload: unknown) => {
       if (!isPokemonOverworldItemUsedPayload(payload)) {
@@ -366,11 +348,43 @@ export class GameNetworkClient {
   }
 
   public onPokemonOverworldItemError(
-    callback: (payload: PokemonOverworldItemErrorPayload) => void,
+    callback: (payload: PokemonOverworldItemErrorPayload) => void
   ): void {
     this.socket.on(POKEMON_OVERWORLD_ITEM_EVENTS.ERROR, (payload: unknown) => {
       if (!isPokemonOverworldItemErrorPayload(payload)) {
         console.warn("[PokemonOverworldItem] invalid ERROR payload", payload);
+        return;
+      }
+      callback(payload);
+    });
+  }
+
+  // pokemon center healing
+  public requestPokemonCenterHealing(healingStationId: string): void {
+    const payload: PokemonCenterHealInput = {
+      healingStationId,
+    };
+    this.socket.emit(POKEMON_CENTER_HEALING_EVENTS.HEAL, payload);
+  }
+
+  public onPokemonCenterHealed(
+    callback: (payload: PokemonCenterHealedPayload) => void
+  ): void {
+    this.socket.on(POKEMON_CENTER_HEALING_EVENTS.HEALED, (payload: unknown) => {
+      if (!isPokemonCenterHealedPayload(payload)) {
+        console.warn("[PokemonCenterHealing] invalid HEALED payload", payload);
+        return;
+      }
+      callback(payload);
+    });
+  }
+
+  public onPokemonCenterHealingError(
+    callback: (payload: PokemonCenterHealingErrorPayload) => void
+  ): void {
+    this.socket.on(POKEMON_CENTER_HEALING_EVENTS.ERROR, (payload: unknown) => {
+      if (!isPokemonCenterHealingErrorPayload(payload)) {
+        console.warn("[PokemonCenterHealing] invalid ERROR payload", payload);
         return;
       }
       callback(payload);
@@ -395,13 +409,13 @@ export class GameNetworkClient {
   }
 
   public onPokemonStorageState(
-    callback: (payload: PokemonStorageStatePayload) => void,
+    callback: (payload: PokemonStorageStatePayload) => void
   ): void {
     this.socket.on(POKEMON_EVENTS.STORAGE_STATE, callback);
   }
 
   public onPokemonStorageError(
-    callback: (payload: PokemonStorageErrorPayload) => void,
+    callback: (payload: PokemonStorageErrorPayload) => void
   ): void {
     this.socket.on(POKEMON_EVENTS.STORAGE_ERROR, callback);
   }
@@ -434,7 +448,7 @@ export class GameNetworkClient {
   }
 
   public onBattleStarted(
-    callback: (payload: PokemonBattleStartedPayload) => void,
+    callback: (payload: PokemonBattleStartedPayload) => void
   ): () => void {
     const handler = (payload: unknown) => {
       if (!isPokemonBattleStartedPayload(payload)) {
@@ -450,7 +464,7 @@ export class GameNetworkClient {
   }
 
   public onBattleTurnResolved(
-    callback: (payload: PokemonBattleTurnResolvedPayload) => void,
+    callback: (payload: PokemonBattleTurnResolvedPayload) => void
   ): void {
     this.socket.on(POKEMON_EVENTS.BATTLE_TURN_RESOLVED, (payload: unknown) => {
       if (!isPokemonBattleTurnResolvedPayload(payload)) {

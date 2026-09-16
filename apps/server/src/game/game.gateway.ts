@@ -32,6 +32,7 @@ import {
   createWildPokemonEncounter,
   POKEMON_OVERWORLD_ITEM_EVENTS,
   POKEMON_PARTY_REORDER_EVENTS,
+  POKEMON_CENTER_HEALING_EVENTS,
 } from '@cesar-mmo/shared';
 import {
   getServerMapSpawn,
@@ -92,6 +93,8 @@ import {
 } from '#app/pokemon/evolution/pokemon-evolution-network.controller';
 import { PokemonPendingEvolutionRecoveryService } from '#app/pokemon/evolution/pokemon-pending-evolution-recovery.service';
 import type { PokemonPendingEvolutionState } from '#app/pokemon/evolution/pokemon-pending-evolution.types';
+import { PokemonCenterHealingService } from '#app/pokemon/healing/pokemon-center-healing.service';
+import { PokemonCenterHealingNetworkController } from '#app/pokemon/healing/pokemon-center-healing-network.controller';
 
 // stores
 import { PlayerWorldRuntimeStore } from './world/player-world-runtime.store';
@@ -167,6 +170,8 @@ export class GameGateway
   private readonly pokemonProgressionNetworkController: PokemonProgressionNetworkController;
   private readonly pokemonEvolutionNetworkController: PokemonEvolutionNetworkController;
 
+  private readonly pokemonCenterHealingNetworkController: PokemonCenterHealingNetworkController;
+
   private gameLoop?: ReturnType<typeof setInterval>;
 
   constructor(
@@ -180,6 +185,7 @@ export class GameGateway
     private readonly playerWorldStateService: PlayerWorldStateService,
     private readonly pokemonOverworldItemRepository: PokemonOverworldItemRepository,
     private readonly wildBattleProgressionService: PokemonWildBattleProgressionService,
+    private readonly pokemonCenterHealingService: PokemonCenterHealingService,
     private readonly pokemonProgressionManager: PokemonProgressionManager,
     private readonly pokemonPendingEvolutionRecoveryService: PokemonPendingEvolutionRecoveryService,
     private readonly accountSocketAuthenticationService: AccountSocketAuthenticationService,
@@ -205,6 +211,18 @@ export class GameGateway
     );
     this.pokemonTrainerStateNetworkPresenter =
       new PokemonTrainerStateNetworkPresenter(this.playerWorldRuntimeStore);
+
+    this.pokemonCenterHealingNetworkController =
+      new PokemonCenterHealingNetworkController({
+        healingService: this.pokemonCenterHealingService,
+        trainerStatePresenter: this.pokemonTrainerStateNetworkPresenter,
+        playerWorldRuntimeStore: this.playerWorldRuntimeStore,
+        dialogueSessionStore: this.dialogueSessionStore,
+        storageAccessSessionStore: this.pokemonStorageAccessSessionStore,
+        wildEncounterSessionStore: this.pokemonWildEncounterSessionStore,
+        battleSessionStore: this.pokemonBattleSessionStore,
+        resolveTrainerId: (playerId) => this.getTrainerId(playerId),
+      });
 
     this.pokemonProgressionNetworkController =
       new PokemonProgressionNetworkController({
@@ -722,6 +740,20 @@ export class GameGateway
     payload: unknown,
   ): Promise<void> {
     return this.pokemonOverworldItemNetworkController.handleUse(
+      client,
+      payload,
+    );
+  }
+
+  @SubscribeMessage(POKEMON_CENTER_HEALING_EVENTS.HEAL)
+  handlePokemonCenterHealing(
+    @ConnectedSocket()
+    client: Socket,
+
+    @MessageBody()
+    payload: unknown,
+  ): Promise<void> {
+    return this.pokemonCenterHealingNetworkController.handleHeal(
       client,
       payload,
     );

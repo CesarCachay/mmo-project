@@ -160,6 +160,50 @@ ${entries.join("\n")}
   },`;
 }
 
+function parseHealingStation(object, mapName) {
+  if (typeof object.name !== "string" || object.name.trim().length === 0) {
+    throw new Error(`Map "${mapName}" contains a healing station without a name`);
+  }
+
+  const objectType = getTiledObjectType(object);
+
+  if (objectType !== "healing-station") {
+    throw new Error(
+      `Healing station "${object.name}" in map "${mapName}" must have class/type "healing-station"`
+    );
+  }
+
+  if (!Number.isFinite(object.x) || !Number.isFinite(object.y)) {
+    throw new Error(
+      `Invalid coordinates for healing station "${object.name}" in map "${mapName}"`
+    );
+  }
+
+  return {
+    id: object.name.trim(),
+    x: object.x,
+    y: object.y,
+  };
+}
+
+function formatHealingStations(healingStations) {
+  if (healingStations.length === 0) {
+    return `  healingStations: {},`;
+  }
+
+  const entries = healingStations.map(
+    (station) =>
+      `    ${JSON.stringify(station.id)}: {
+      x: ${station.x},
+      y: ${station.y},
+    },`
+  );
+
+  return `  healingStations: {
+${entries.join("\n")}
+  },`;
+}
+
 function parseMapTransition(object, mapName) {
   if (typeof object.name !== "string" || object.name.trim().length === 0) {
     throw new Error(`Map "${mapName}" contains a mapExit without a name`);
@@ -450,6 +494,10 @@ for (const mapDefinition of MAPS) {
     .filter((object) => getTiledObjectType(object) === "storage-terminal")
     .map((object) => parseStorageTerminal(object, name));
 
+  const healingStations = objectsLayer.objects
+    .filter((object) => getTiledObjectType(object) === "healing-station")
+    .map((object) => parseHealingStation(object, name));
+
   const transitions = objectsLayer.objects
     .filter((object) => object.type === "mapExit")
     .map((object) => parseMapTransition(object, name));
@@ -463,6 +511,8 @@ for (const mapDefinition of MAPS) {
   ensureUniqueIds(npcs, "NPC", name);
 
   ensureUniqueIds(storageTerminals, "storage terminal", name);
+
+  ensureUniqueIds(healingStations, "healing station", name);
 
   ensureUniqueIds(transitions, "mapExit", name);
 
@@ -479,6 +529,7 @@ for (const mapDefinition of MAPS) {
     spawns,
     npcs,
     storageTerminals,
+    healingStations,
     transitions,
     encounterZones,
   });
@@ -522,6 +573,7 @@ for (const parsedMap of parsedMaps) {
     transitions,
     encounterZones,
     storageTerminals,
+    healingStations,
   } = parsedMap;
 
   const generatedFile = `// AUTO-GENERATED FILE.
@@ -551,6 +603,8 @@ ${formatNpcs(npcs)}
 
 ${formatStorageTerminals(storageTerminals)}
 
+${formatHealingStations(healingStations)}
+
 ${formatTransitions(transitions)}
 
 ${formatEncounterZones(encounterZones)}
@@ -578,6 +632,8 @@ ${collisionRows.join("\n")}
   console.log(`NPCs: ${npcs.length}`);
 
   console.log(`Storage terminals: ${storageTerminals.length}`);
+
+  console.log(`Healing stations: ${healingStations.length}`);
 
   console.log(`Map transitions: ${transitions.length}`);
 
