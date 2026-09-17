@@ -1,0 +1,713 @@
+/* =========================================================
+   Party Drawer
+   Milestone 1.31 — Step 7
+
+   Feature-local stylesheet.
+   Keep this file separate from global style.css.
+========================================================= */
+
+.party-drawer {
+  position: absolute;
+  top: 10px;
+  right: 68px;
+  bottom: 10px;
+  z-index: 120;
+
+  width: min(330px, calc(100% - 88px));
+
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+
+  overflow: hidden;
+
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      155deg,
+      rgba(15, 23, 42, 0.985),
+      rgba(7, 13, 24, 0.985)
+    );
+
+  box-shadow:
+    0 22px 58px rgba(0, 0, 0, 0.44),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  color: #f8fafc;
+
+  opacity: 0;
+  transform: translateX(calc(100% + 24px));
+
+  pointer-events: none;
+
+  transition:
+    transform 170ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 130ms ease;
+}
+
+.party-drawer[hidden] {
+  display: none;
+}
+
+.party-drawer--open {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.party-drawer--pending {
+  cursor: progress;
+}
+
+/* =========================================================
+   Header
+========================================================= */
+
+.party-drawer__header {
+  min-height: 62px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  padding: 11px 12px 10px 14px;
+
+  border-bottom:
+    1px solid rgba(148, 163, 184, 0.16);
+
+  background:
+    rgba(15, 23, 42, 0.68);
+}
+
+.party-drawer__heading {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.party-drawer__eyebrow {
+  color: #64748b;
+
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+
+  text-transform: uppercase;
+}
+
+.party-drawer__title {
+  margin: 0;
+
+  overflow: hidden;
+
+  color: #f8fafc;
+
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.1;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.party-drawer__close {
+  width: 30px;
+  height: 30px;
+
+  flex: 0 0 30px;
+
+  display: grid;
+  place-items: center;
+
+  border:
+    1px solid rgba(148, 163, 184, 0.2);
+
+  border-radius: 9px;
+
+  background:
+    rgba(30, 41, 59, 0.58);
+
+  color: #94a3b8;
+
+  font: inherit;
+  font-size: 19px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background-color 110ms ease,
+    border-color 110ms ease,
+    color 110ms ease;
+}
+
+.party-drawer__close:hover:not(:disabled) {
+  border-color:
+    rgba(148, 163, 184, 0.42);
+
+  background:
+    rgba(51, 65, 85, 0.72);
+
+  color: #f8fafc;
+}
+
+.party-drawer__close:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}
+
+.party-drawer__close:disabled {
+  cursor: progress;
+  opacity: 0.45;
+}
+
+/* =========================================================
+   Party list
+========================================================= */
+
+.party-drawer__list {
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  padding: 10px;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  overscroll-behavior: contain;
+
+  scrollbar-width: thin;
+  scrollbar-color:
+    rgba(100, 116, 139, 0.58)
+    transparent;
+}
+
+.party-drawer__empty {
+  margin: auto;
+
+  padding: 24px 12px;
+
+  color: #94a3b8;
+
+  font-size: 11px;
+  text-align: center;
+}
+
+/* =========================================================
+   Pokémon slot
+========================================================= */
+
+.party-drawer__pokemon {
+  position: relative;
+
+  border:
+    1px solid rgba(148, 163, 184, 0.16);
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(30, 41, 59, 0.66),
+      rgba(15, 23, 42, 0.82)
+    );
+
+  overflow: hidden;
+
+  transition:
+    border-color 110ms ease,
+    background-color 110ms ease,
+    opacity 110ms ease,
+    box-shadow 110ms ease;
+}
+
+.party-drawer__pokemon:hover {
+  border-color:
+    rgba(148, 163, 184, 0.3);
+}
+
+.party-drawer__pokemon--selected {
+  border-color:
+    rgba(96, 165, 250, 0.72);
+
+  box-shadow:
+    0 0 0 1px
+      rgba(96, 165, 250, 0.12) inset;
+}
+
+.party-drawer__pokemon--source {
+  border-color:
+    rgba(250, 204, 21, 0.72);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(113, 63, 18, 0.3),
+      rgba(15, 23, 42, 0.82)
+    );
+}
+
+.party-drawer__pokemon--pending {
+  opacity: 0.58;
+}
+
+.party-drawer__pokemon--fainted {
+  border-color:
+    rgba(239, 68, 68, 0.28);
+}
+
+.party-drawer__pokemon--healing {
+  border-color:
+    rgba(74, 222, 128, 0.72);
+
+  box-shadow:
+    0 0 24px
+      rgba(34, 197, 94, 0.16);
+}
+
+.party-drawer__pokemon--reviving {
+  border-color:
+    rgba(250, 204, 21, 0.78);
+
+  box-shadow:
+    0 0 26px
+      rgba(250, 204, 21, 0.18);
+}
+
+.party-drawer__pokemon-button {
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+
+  padding: 9px 10px;
+
+  border: 0;
+
+  background: transparent;
+  color: inherit;
+
+  text-align: left;
+
+  font: inherit;
+
+  cursor: pointer;
+}
+
+.party-drawer__pokemon-button:disabled {
+  cursor: progress;
+}
+
+.party-drawer__pokemon-button:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: -2px;
+}
+
+.party-drawer__sprite-frame {
+  width: 44px;
+  height: 44px;
+
+  display: grid;
+  place-items: center;
+
+  border:
+    1px solid rgba(148, 163, 184, 0.14);
+
+  border-radius: 10px;
+
+  background:
+    rgba(2, 6, 23, 0.42);
+}
+
+.party-drawer__sprite {
+  width: 38px;
+  height: 38px;
+
+  object-fit: contain;
+
+  image-rendering: pixelated;
+
+  transform-origin: center;
+
+  animation:
+    party-drawer-idle 1.35s ease-in-out infinite alternate;
+}
+
+.party-drawer__sprite--fainted {
+  filter: grayscale(1);
+  opacity: 0.48;
+}
+
+.party-drawer__pokemon--healing
+  .party-drawer__sprite {
+  filter:
+    drop-shadow(
+      0 0 7px rgba(74, 222, 128, 0.75)
+    );
+}
+
+.party-drawer__pokemon--reviving
+  .party-drawer__sprite {
+  filter:
+    drop-shadow(
+      0 0 8px rgba(250, 204, 21, 0.82)
+    );
+}
+
+.party-drawer__pokemon-content {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.party-drawer__pokemon-heading,
+.party-drawer__hp-header,
+.party-drawer__status-row {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.party-drawer__pokemon-name {
+  min-width: 0;
+
+  overflow: hidden;
+
+  color: #f8fafc;
+
+  font-size: 12px;
+  font-weight: 750;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.party-drawer__pokemon-level {
+  flex: 0 0 auto;
+
+  color: #cbd5e1;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.party-drawer__hp-label,
+.party-drawer__position {
+  color: #64748b;
+
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+
+  text-transform: uppercase;
+}
+
+.party-drawer__hp-text {
+  color: #cbd5e1;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  font-variant-numeric: tabular-nums;
+}
+
+.party-drawer__hp-track {
+  position: relative;
+
+  width: 100%;
+  height: 6px;
+
+  overflow: hidden;
+
+  border-radius: 999px;
+
+  background:
+    rgba(2, 6, 23, 0.7);
+
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.32);
+}
+
+.party-drawer__hp-fill {
+  display: block;
+
+  width: 0;
+  height: 100%;
+
+  border-radius: inherit;
+
+  transition:
+    width 80ms linear,
+    background 120ms ease;
+}
+
+.party-drawer__hp-fill--healthy {
+  background:
+    linear-gradient(
+      90deg,
+      #16a34a,
+      #22c55e
+    );
+}
+
+.party-drawer__hp-fill--warning {
+  background:
+    linear-gradient(
+      90deg,
+      #d97706,
+      #f59e0b
+    );
+}
+
+.party-drawer__hp-fill--danger {
+  background:
+    linear-gradient(
+      90deg,
+      #dc2626,
+      #ef4444
+    );
+}
+
+.party-drawer__position--lead {
+  color: #93c5fd;
+}
+
+.party-drawer__status {
+  color: #fca5a5;
+
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.party-drawer__status[hidden] {
+  display: none;
+}
+
+/* =========================================================
+   Inline context actions
+========================================================= */
+
+.party-drawer__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  padding: 7px 9px 9px;
+
+  border-top:
+    1px solid rgba(148, 163, 184, 0.13);
+
+  background:
+    rgba(2, 6, 23, 0.28);
+}
+
+.party-drawer__actions-label {
+  color: #64748b;
+
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+}
+
+.party-drawer__actions-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.party-drawer__action {
+  min-height: 27px;
+
+  padding: 0 8px;
+
+  border:
+    1px solid rgba(148, 163, 184, 0.2);
+
+  border-radius: 7px;
+
+  background:
+    rgba(30, 41, 59, 0.7);
+
+  color: #cbd5e1;
+
+  font: inherit;
+  font-size: 9px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.party-drawer__action:hover:not(:disabled) {
+  border-color:
+    rgba(148, 163, 184, 0.4);
+
+  color: #f8fafc;
+}
+
+.party-drawer__action--primary {
+  border-color:
+    rgba(96, 165, 250, 0.36);
+
+  background:
+    rgba(30, 64, 175, 0.24);
+
+  color: #bfdbfe;
+}
+
+.party-drawer__action:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+/* =========================================================
+   Footer
+========================================================= */
+
+.party-drawer__footer {
+  min-height: 34px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 7px 12px;
+
+  border-top:
+    1px solid rgba(148, 163, 184, 0.14);
+
+  background:
+    rgba(2, 6, 23, 0.28);
+
+  color: #64748b;
+
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.party-drawer--special-mode
+  .party-drawer__footer {
+  color: #94a3b8;
+}
+
+/* =========================================================
+   Responsive foundation
+========================================================= */
+
+@media (max-width: 700px) {
+  .party-drawer {
+    top: 7px;
+    right: 56px;
+    bottom: 7px;
+
+    width: min(
+      310px,
+      calc(100% - 68px)
+    );
+
+    border-radius: 11px;
+  }
+
+  .party-drawer__header {
+    min-height: 54px;
+
+    padding:
+      9px 9px 8px 11px;
+  }
+
+  .party-drawer__title {
+    font-size: 13px;
+  }
+
+  .party-drawer__list {
+    gap: 6px;
+
+    padding: 7px;
+  }
+
+  .party-drawer__pokemon-button {
+    grid-template-columns:
+      42px minmax(0, 1fr);
+
+    gap: 8px;
+
+    padding: 7px 8px;
+  }
+
+  .party-drawer__sprite-frame {
+    width: 39px;
+    height: 39px;
+  }
+
+  .party-drawer__sprite {
+    width: 34px;
+    height: 34px;
+  }
+
+  .party-drawer__actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-height: 520px) {
+  .party-drawer__header {
+    min-height: 48px;
+  }
+
+  .party-drawer__list {
+    gap: 5px;
+    padding: 6px;
+  }
+
+  .party-drawer__pokemon-button {
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+
+  .party-drawer__footer {
+    min-height: 28px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .party-drawer,
+  .party-drawer__sprite,
+  .party-drawer__hp-fill {
+    animation: none;
+    transition: none;
+  }
+}
+
+@keyframes party-drawer-idle {
+  from {
+    transform: translateY(1px);
+  }
+
+  to {
+    transform: translateY(-1px);
+  }
+}

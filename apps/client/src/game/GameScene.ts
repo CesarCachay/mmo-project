@@ -26,8 +26,10 @@ import { PokemonOverworldSpriteLoader } from "./pokemon/PokemonOverworldSpriteLo
 import { getPokemonItemIconAsset } from "./items/pokemon-item-icon.registry";
 
 // ui components
-import { ChatBox } from "./ui/ChatBox";
+import { ChatDock } from "./ui/ChatDock";
 import { DialogueBox } from "./ui/DialogueBox";
+import { RightHudRail } from "./ui/RightHudRail";
+import { InteractionPrompt } from "./ui/InteractionPrompt";
 import { StarterSelectionPanel } from "./ui/StarterSelectionPanel";
 
 // helpers
@@ -61,6 +63,8 @@ import {
 
 // stores
 import { selectedTrainerStore } from "../account/selected-trainer.store";
+import { setAccountShellTrainerContext } from "../account/account-shell.controller";
+import { initializeGameTopBar } from "../shell/GameTopBarController";
 
 // types
 import type {
@@ -86,6 +90,7 @@ export class GameScene extends Phaser.Scene {
   private movementInputController!: MovementInputController;
   private overworldCameraController!: OverworldCameraController;
   private trainerPanelController!: TrainerPanelController;
+  private rightHudRail!: RightHudRail;
 
   private interactKey!: Phaser.Input.Keyboard.Key;
   private chatKey!: Phaser.Input.Keyboard.Key;
@@ -95,14 +100,14 @@ export class GameScene extends Phaser.Scene {
   private nearbyNpc?: NpcInstance;
   private activeDialogueNpc?: NpcInstance;
   private readonly npcInteractionDistance = 36;
-  private npcInteractionPrompt?: Phaser.GameObjects.Text;
+  private interactionPrompt!: InteractionPrompt;
 
   private dialogueBox!: DialogueBox;
   private pendingDialogueNpc?: NpcInstance;
   private activeDialogueSessionId?: string;
   private isDialogueAdvancePending = false;
 
-  private chatBox!: ChatBox;
+  private chatBox!: ChatDock;
 
   private starterSelectionPanel!: StarterSelectionPanel;
 
@@ -196,6 +201,13 @@ export class GameScene extends Phaser.Scene {
     this.mapManager = new MapManager(this);
     this.mapManager.create(this.currentMapId);
 
+    this.syncGameTopBar();
+
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      initializeGameTopBar().clearWorldContext();
+      setAccountShellTrainerContext(undefined);
+    });
+
     const unlockAudio = () => {
       if (!this.sound.locked) {
         return;
@@ -228,7 +240,11 @@ export class GameScene extends Phaser.Scene {
     );
 
     this.npcManager.create(this.mapManager.map);
-    this.createNpcInteractionPrompt();
+
+    this.interactionPrompt = new InteractionPrompt();
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.interactionPrompt.destroy();
+    });
 
     this.overworldCameraController = new OverworldCameraController(
       this.cameras.main,
@@ -287,6 +303,9 @@ export class GameScene extends Phaser.Scene {
 
   update(_: number, delta: number) {
     this.trainerPanelController.update();
+    const activePanel = this.trainerPanelController.activePanel;
+    this.rightHudRail.setActivePanel(activePanel);
+
     this.handleChatFocus();
 
     this.updateNearbyNpc();
@@ -294,7 +313,7 @@ export class GameScene extends Phaser.Scene {
     this.updatePokemonCenterHealingStation();
     this.updatePokemonStorageTerminal();
 
-    this.updateNpcInteractionPrompt();
+    this.updateInteractionPrompt();
     this.handleWorldInteraction();
 
     const input = this.movementInputController.getCurrentInput(
@@ -332,8 +351,8 @@ export class GameScene extends Phaser.Scene {
     this.dialogueBox = new DialogueBox(this);
   }
 
-  private createChatUi() {
-    this.chatBox = new ChatBox(this, (text) => this.sendChatMessage(text));
+  private createChatUi(): void {
+    this.chatBox = new ChatDock(this, (text) => this.sendChatMessage(text));
   }
 
   private createStarterSelectionUi(): void {
@@ -597,6 +616,17 @@ export class GameScene extends Phaser.Scene {
         this.network.reorderPokemonParty(input);
       },
     });
+    this.rightHudRail = new RightHudRail({
+      onPartyRequested: () => {
+        this.trainerPanelController.toggleParty();
+      },
+      onBagRequested: () => {
+        this.trainerPanelController.toggleInventory();
+      },
+      onTrainerRequested: () => {
+        this.trainerPanelController.toggleTrainer();
+      },
+    });
     this.pokemonTrainerPresentationController = new PokemonTrainerPresentationController(
       this,
       {
@@ -609,10 +639,13 @@ export class GameScene extends Phaser.Scene {
           direction: this.localPlayerController.direction,
         }),
         onPartyPresenceChanged: (hasParty) => {
+          this.rightHudRail.setVisible(hasParty);
           this.starterSelectionPanel.setSelectionPending(false);
+
           if (!hasParty) {
             return;
           }
+
           this.starterSelectionPanel.hide();
           this.chatBox.setVisible(true);
         },
@@ -620,6 +653,7 @@ export class GameScene extends Phaser.Scene {
     );
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.pokemonTrainerPresentationController.destroy();
+      this.rightHudRail.destroy();
     });
   }
 
@@ -1011,61 +1045,62 @@ export class GameScene extends Phaser.Scene {
     this.interactWithNpc(this.nearbyNpc);
   }
 
-  private createNpcInteractionPrompt(): void {
-    this.npcInteractionPrompt = this.add
-      .text(40, 0, "", {
-        fontFamily: "Arial",
-        fontSize: "9px",
-        color: "#ffffff",
-        backgroundColor: "rgba(0, 0, 0, 0.35)",
-        padding: {
-          x: 5,
-          y: 3,
-        },
-      })
-      .setOrigin(0.5, 1)
-      .setDepth(30)
-      .setVisible(false)
-      .setResolution(2);
-  }
-
-  private updateNpcInteractionPrompt(): void {
-    const prompt = this.npcInteractionPrompt;
-    if (!prompt) {
-      return;
-    }
-
-    if (
-      this.pokemonCenterHealingPresentation?.isBlockingGameplay ||
-      this.pokemonCenterHealingInteraction.hasNearbyStation ||
-      this.pokemonStorageTerminalInteraction.hasNearbyTerminal
-    ) {
-      prompt.setVisible(false);
-      return;
-    }
-
+  private updateInteractionPrompt(): void {
     if (
       this.isMapTransitioning ||
       this.starterSelectionPanel.isVisible() ||
-      !this.nearbyNpc ||
+      this.trainerPanelController.isOpen ||
+      this.battleController?.isBlockingGameplay ||
+      this.pokemonStorageController?.isBlockingGameplay ||
+      this.pokemonCenterHealingPresentation?.isBlockingGameplay ||
       this.dialogueBox.isOpen() ||
       this.chatBox.isTyping()
     ) {
-      prompt.setVisible(false);
+      this.interactionPrompt.hide();
       return;
     }
+
+    if (this.pokemonCenterHealingInteraction.hasNearbyStation) {
+      this.interactionPrompt.show({
+        keyLabel: "E",
+        actionLabel: "Curar Pokémon",
+        variant: "healing",
+      });
+
+      return;
+    }
+
+    if (this.pokemonStorageTerminalInteraction.hasNearbyTerminal) {
+      this.interactionPrompt.show({
+        keyLabel: "E",
+        actionLabel: "Usar PC",
+        variant: "storage",
+      });
+
+      return;
+    }
+
     const npc = this.nearbyNpc;
 
-    const promptText = this.getNpcInteractionPromptText(npc.definition.interactionType);
-    if (!promptText) {
-      prompt.setVisible(false);
+    if (!npc) {
+      this.interactionPrompt.hide();
       return;
     }
 
-    prompt
-      .setText(promptText)
-      .setPosition(Math.round(npc.sprite.x), Math.round(npc.sprite.y - 28))
-      .setVisible(true);
+    const promptText = this.getNpcInteractionPromptText(npc.definition.interactionType);
+
+    if (!promptText) {
+      this.interactionPrompt.hide();
+      return;
+    }
+
+    const actionLabel = promptText.replace(/^\[E\]\s*/, "");
+
+    this.interactionPrompt.show({
+      keyLabel: "E",
+      actionLabel,
+      variant: "default",
+    });
   }
 
   private getNpcInteractionPromptText(
@@ -1149,6 +1184,16 @@ export class GameScene extends Phaser.Scene {
     this.network.requestMapTransition(payload);
   }
 
+  private syncGameTopBar(): void {
+    const selectedTrainer = selectedTrainerStore.getSelected();
+    setAccountShellTrainerContext(selectedTrainer);
+    if (!selectedTrainer) {
+      initializeGameTopBar().clearWorldContext();
+      return;
+    }
+    initializeGameTopBar().setMap(this.currentMapId);
+  }
+
   private destroyCurrentMap(): void {
     this.nearbyNpc = undefined;
     this.pokemonCenterHealingPresentation?.cancel();
@@ -1169,9 +1214,9 @@ export class GameScene extends Phaser.Scene {
     this.destroyCurrentMap();
     this.remotePokemonFollowerManager.clear();
     this.remotePlayerManager.clear();
-
     this.currentMapId = mapId;
     this.mapManager.create(this.currentMapId);
+    initializeGameTopBar().setMap(this.currentMapId);
     this.mapTransitionController.loadZones(this.mapManager.map);
     this.npcManager.create(this.mapManager.map);
   }

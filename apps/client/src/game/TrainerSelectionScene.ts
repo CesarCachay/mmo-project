@@ -4,10 +4,7 @@ import type { PlayerAvatarId } from "@cesar-mmo/shared";
 
 import { PLAYER_AVATARS } from "./config/playerAssets";
 
-import {
-  TrainerHttpClient,
-  TrainerHttpError,
-} from "../account/trainer-http.client";
+import { TrainerHttpClient, TrainerHttpError } from "../account/trainer-http.client";
 
 import type { AccountTrainer } from "../account/trainer-http.client";
 
@@ -65,10 +62,6 @@ export class TrainerSelectionScene extends Phaser.Scene {
     container.innerHTML = `
       <div class="trainer-selection-header">
         <div>
-          <p class="trainer-selection-eyebrow">
-            MMO · CESAR EDITION
-          </p>
-
           <h1 class="trainer-selection-title">
             Elige tu Trainer
           </h1>
@@ -197,21 +190,16 @@ export class TrainerSelectionScene extends Phaser.Scene {
       </div>
     `;
 
-    this.domElement = this.add
-      .dom(width / 2, height / 2, container)
-      .setOrigin(0.5, 0.5);
+    this.domElement = this.add.dom(width / 2, height / 2, container).setOrigin(0.5, 0.5);
 
     this.slotsElement =
-      container.querySelector<HTMLDivElement>("[data-trainer-slots]") ??
-      undefined;
+      container.querySelector<HTMLDivElement>("[data-trainer-slots]") ?? undefined;
 
     this.creationElement =
-      container.querySelector<HTMLDivElement>("[data-trainer-create]") ??
-      undefined;
+      container.querySelector<HTMLDivElement>("[data-trainer-create]") ?? undefined;
 
     this.statusElement =
-      container.querySelector<HTMLDivElement>("[data-trainer-status]") ??
-      undefined;
+      container.querySelector<HTMLDivElement>("[data-trainer-status]") ?? undefined;
 
     if (!this.slotsElement || !this.creationElement || !this.statusElement) {
       throw new Error("Could not create Trainer selection UI");
@@ -281,37 +269,31 @@ export class TrainerSelectionScene extends Phaser.Scene {
 
     this.refreshDomLayout();
 
-    slots
-      .querySelectorAll<HTMLButtonElement>("[data-trainer-id]")
-      .forEach((button) => {
-        button.addEventListener("click", () => {
-          const trainerId = button.dataset.trainerId;
+    slots.querySelectorAll<HTMLButtonElement>("[data-trainer-id]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const trainerId = button.dataset.trainerId;
 
-          if (!trainerId) {
-            return;
-          }
+        if (!trainerId) {
+          return;
+        }
 
-          this.selectTrainer(trainerId);
-        });
+        this.selectTrainer(trainerId);
       });
+    });
 
-    slots
-      .querySelectorAll<HTMLButtonElement>("[data-empty-slot]")
-      .forEach((button) => {
-        button.addEventListener("click", () => {
-          this.openCreatePanel();
-        });
+    slots.querySelectorAll<HTMLButtonElement>("[data-empty-slot]").forEach((button) => {
+      button.addEventListener("click", () => {
+        this.openCreatePanel();
       });
+    });
   }
 
   private renderTrainerCard(
     trainer: AccountTrainer,
 
-    index: number,
+    index: number
   ): string {
-    const avatar = trainer.avatarId
-      ? PLAYER_AVATARS[trainer.avatarId]
-      : undefined;
+    const avatar = trainer.avatarId ? PLAYER_AVATARS[trainer.avatarId] : undefined;
 
     const avatarStyle = avatar
       ? `
@@ -322,8 +304,7 @@ export class TrainerSelectionScene extends Phaser.Scene {
 
     const displayName = escapeHtml(trainer.displayName ?? "Trainer");
 
-    const selected =
-      selectedTrainerStore.getSelected()?.trainerId === trainer.trainerId;
+    const selected = selectedTrainerStore.getSelected()?.trainerId === trainer.trainerId;
 
     return `
       <button
@@ -385,9 +366,7 @@ export class TrainerSelectionScene extends Phaser.Scene {
   }
 
   private selectTrainer(trainerId: string): void {
-    const trainer = this.trainers.find(
-      (candidate) => candidate.trainerId === trainerId,
-    );
+    const trainer = this.trainers.find((candidate) => candidate.trainerId === trainerId);
 
     if (!trainer) {
       return;
@@ -399,19 +378,13 @@ export class TrainerSelectionScene extends Phaser.Scene {
   private configureCreateForm(container: HTMLDivElement): void {
     const form = container.querySelector<HTMLFormElement>("[data-create-form]");
 
-    const nameInput =
-      container.querySelector<HTMLInputElement>("[data-create-name]");
+    const nameInput = container.querySelector<HTMLInputElement>("[data-create-name]");
 
-    const errorElement = container.querySelector<HTMLDivElement>(
-      "[data-create-error]",
-    );
+    const errorElement = container.querySelector<HTMLDivElement>("[data-create-error]");
 
-    const closeButton = container.querySelector<HTMLButtonElement>(
-      "[data-create-close]",
-    );
+    const closeButton = container.querySelector<HTMLButtonElement>("[data-create-close]");
 
-    const avatarButtons =
-      container.querySelectorAll<HTMLButtonElement>("[data-avatar]");
+    const avatarButtons = container.querySelectorAll<HTMLButtonElement>("[data-avatar]");
 
     if (!form || !nameInput || !errorElement || !closeButton) {
       throw new Error("Could not create Trainer form");
@@ -421,7 +394,7 @@ export class TrainerSelectionScene extends Phaser.Scene {
       avatarButtons.forEach((button) => {
         button.classList.toggle(
           "selected",
-          button.dataset.avatar === this.selectedAvatar,
+          button.dataset.avatar === this.selectedAvatar
         );
       });
     };
@@ -455,7 +428,7 @@ export class TrainerSelectionScene extends Phaser.Scene {
 
   private async createTrainer(
     nameInput: HTMLInputElement,
-    errorElement: HTMLDivElement,
+    errorElement: HTMLDivElement
   ): Promise<void> {
     if (this.isCreating) {
       return;
@@ -466,8 +439,7 @@ export class TrainerSelectionScene extends Phaser.Scene {
     errorElement.textContent = "";
 
     if (displayName.length < 3 || displayName.length > 16) {
-      errorElement.textContent =
-        "El nombre debe tener entre 3 y 16 caracteres.";
+      errorElement.textContent = "El nombre debe tener entre 3 y 16 caracteres.";
 
       return;
     }
@@ -540,7 +512,7 @@ export class TrainerSelectionScene extends Phaser.Scene {
   private setStatus(
     message: string,
 
-    isError = false,
+    isError = false
   ): void {
     if (!this.statusElement) {
       return;

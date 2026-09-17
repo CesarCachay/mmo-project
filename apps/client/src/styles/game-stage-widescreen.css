@@ -1,0 +1,113 @@
+/* =========================================================
+   Widescreen GameStage
+   Milestone 1.31 — Step 12
+
+   Presentation-only shell override.
+   Keep this separate from global style.css.
+
+   Phaser logical viewport target:
+   960 x 540  -> 16:9
+
+   Overworld camera target:
+   zoom 1.5   -> effective world view 640 x 360
+========================================================= */
+
+:root {
+  --game-logical-width: 960;
+  --game-logical-height: 540;
+
+  /*
+   * Step 1 originally used 16px.
+   * A smaller shell gutter gives the game noticeably more
+   * screen real estate without making it touch browser edges.
+   */
+  --game-viewport-padding: 8px;
+}
+
+/*
+ * Unauthenticated scenes:
+ * the TopBar is hidden, so let the stage use the full
+ * available browser height.
+ */
+.game-shell__stage {
+  width:
+    min(
+      100%,
+      calc(
+        (
+          100vh -
+          (var(--game-viewport-padding) * 2)
+        ) *
+        16 / 9
+      )
+    );
+
+  width:
+    min(
+      100%,
+      calc(
+        (
+          100dvh -
+          (var(--game-viewport-padding) * 2)
+        ) *
+        16 / 9
+      )
+    );
+
+  max-width: 1920px;
+
+  aspect-ratio: 16 / 9;
+}
+
+/*
+ * Authenticated GameScene:
+ * subtract the visible TopBar height.
+ */
+.game-shell--authenticated
+  .game-shell__stage {
+  width:
+    min(
+      100%,
+      calc(
+        (
+          100vh -
+          var(--game-topbar-height) -
+          (var(--game-viewport-padding) * 2)
+        ) *
+        16 / 9
+      )
+    );
+
+  width:
+    min(
+      100%,
+      calc(
+        (
+          100dvh -
+          var(--game-topbar-height) -
+          (var(--game-viewport-padding) * 2)
+        ) *
+        16 / 9
+      )
+    );
+}
+
+/*
+ * Make sure the Phaser canvas uses the stage completely.
+ * Scale.FIT still preserves the logical 16:9 ratio.
+ */
+#app > canvas {
+  width: 100% !important;
+  height: 100% !important;
+
+  max-width: none;
+  max-height: none;
+
+  image-rendering: pixelated;
+}
+
+@media (max-height: 600px) {
+  :root {
+    --game-viewport-padding: 6px;
+  }
+}

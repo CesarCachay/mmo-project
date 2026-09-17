@@ -1,0 +1,166 @@
+/* =========================================================
+   Interaction Prompt
+   Milestone 1.31 — Step 9
+
+   Feature-local stylesheet.
+   Do not move these rules into global style.css.
+========================================================= */
+
+.interaction-prompt {
+  position: absolute;
+
+  left: 50%;
+  bottom: 16px;
+
+  z-index: 118;
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  min-height: 34px;
+
+  max-width: min(340px, calc(100% - 150px));
+
+  padding: 5px 10px 5px 6px;
+
+  border: 1px solid rgba(148, 163, 184, 0.28);
+
+  border-radius: 10px;
+
+  background: rgba(9, 15, 25, 0.94);
+
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+
+  backdrop-filter: blur(10px);
+
+  -webkit-backdrop-filter: blur(10px);
+
+  color: #f8fafc;
+
+  opacity: 0;
+
+  transform: translate(-50%, 5px);
+
+  pointer-events: none;
+
+  transition:
+    opacity 110ms ease,
+    transform 110ms ease,
+    border-color 110ms ease;
+}
+
+.interaction-prompt[hidden] {
+  display: none;
+}
+
+.interaction-prompt--visible {
+  opacity: 1;
+
+  transform: translate(-50%, 0);
+}
+
+.interaction-prompt__key {
+  min-width: 24px;
+  height: 24px;
+
+  display: grid;
+  place-items: center;
+
+  flex: 0 0 auto;
+
+  padding: 0 5px;
+
+  border: 1px solid rgba(148, 163, 184, 0.36);
+
+  border-radius: 7px;
+
+  background: linear-gradient(180deg, rgba(51, 65, 85, 0.82), rgba(30, 41, 59, 0.82));
+
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.28);
+
+  color: #f8fafc;
+
+  font-size: 10px;
+  font-weight: 850;
+
+  line-height: 1;
+}
+
+.interaction-prompt__action {
+  min-width: 0;
+
+  overflow: hidden;
+
+  color: #e2e8f0;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  line-height: 1.2;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Storage ------------------------------------------------ */
+
+.interaction-prompt[data-variant="storage"] {
+  border-color: rgba(96, 165, 250, 0.42);
+}
+
+.interaction-prompt[data-variant="storage"] .interaction-prompt__key {
+  border-color: rgba(96, 165, 250, 0.48);
+
+  background: linear-gradient(180deg, rgba(30, 64, 175, 0.74), rgba(30, 58, 138, 0.72));
+}
+
+/* Healing ------------------------------------------------ */
+
+.interaction-prompt[data-variant="healing"] {
+  border-color: rgba(248, 113, 113, 0.42);
+}
+
+.interaction-prompt[data-variant="healing"] .interaction-prompt__key {
+  border-color: rgba(248, 113, 113, 0.46);
+
+  background: linear-gradient(180deg, rgba(185, 28, 28, 0.76), rgba(127, 29, 29, 0.74));
+}
+
+/* Responsive foundation --------------------------------- */
+
+@media (max-width: 700px) {
+  .interaction-prompt {
+    bottom: 10px;
+
+    min-height: 32px;
+
+    max-width: calc(100% - 128px);
+
+    gap: 6px;
+
+    padding: 4px 8px 4px 5px;
+
+    border-radius: 9px;
+  }
+
+  .interaction-prompt__key {
+    min-width: 22px;
+    height: 22px;
+
+    font-size: 9px;
+  }
+
+  .interaction-prompt__action {
+    font-size: 9px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interaction-prompt {
+    transition: none;
+  }
+}

@@ -1,0 +1,40 @@
+/*
+ * Milestone 1.31 — Game Shell compatibility for the existing Battle UI.
+ *
+ * Battle UI lives inside the responsive 4:3 GameStage, while the browser
+ * viewport can be considerably wider. Avoid sizing battle typography from
+ * browser vw units and give Pokémon identity cards enough horizontal room.
+ */
+
+.battle-modern-hud__card {
+  width: min(280px, 78%);
+  min-width: 180px;
+}
+
+.battle-modern-hud__header {
+  gap: 8px;
+}
+
+.battle-modern-hud__name {
+  font-size: 16px;
+}
+
+.battle-modern-hud__level {
+  font-size: 11px;
+}
+
+@media (max-width: 720px) {
+  .battle-modern-hud__card {
+    width: min(240px, 80%);
+    min-width: 145px;
+  }
+
+  .battle-modern-hud__name {
+    font-size: 14px;
+  }
+
+  .battle-modern-hud__level {
+    padding-inline: 6px;
+    font-size: 10px;
+  }
+}

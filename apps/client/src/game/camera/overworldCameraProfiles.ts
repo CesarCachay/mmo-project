@@ -7,11 +7,11 @@ export type OverworldCameraProfile = {
 };
 
 const OUTDOOR_CAMERA_PROFILE: OverworldCameraProfile = {
-  zoom: 1,
+  zoom: 1.5,
 };
 
 const INTERIOR_CAMERA_PROFILE: OverworldCameraProfile = {
-  zoom: 1.25,
+  zoom: 1.75,
 };
 
 export const OVERWORLD_CAMERA_PROFILES: Record<MapId, OverworldCameraProfile> = {

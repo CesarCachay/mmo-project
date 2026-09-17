@@ -13,14 +13,20 @@ import {
   type PokemonPartyReorderErrorPayload,
 } from "@cesar-mmo/shared";
 
-import { PartyPanel } from "./PartyPanel";
-import { InventoryPanel } from "./InventoryPanel";
+import { PartyDrawer } from "./PartyDrawer";
+import { InventoryDrawer } from "./InventoryDrawer";
+import { TrainerDrawer } from "./TrainerDrawer";
 
 export interface TrainerPanelControllerOptions {
   readonly isInteractionBlocked: () => boolean;
   readonly onUseOverworldItem: (input: PokemonOverworldItemUseInput) => void;
   readonly onReorderParty: (input: PokemonPartyReorderInput) => void;
 }
+
+export type TrainerPanelSurface =
+  | "party"
+  | "inventory"
+  | "trainer";
 
 interface PendingOverworldItemPresentation {
   readonly itemId: PokemonOverworldItemUseInput["itemId"];
@@ -31,8 +37,9 @@ interface PendingOverworldItemPresentation {
 export class TrainerPanelController {
   private readonly scene: Phaser.Scene;
 
-  private readonly partyPanel: PartyPanel;
-  private readonly inventoryPanel: InventoryPanel;
+  private readonly partyDrawer: PartyDrawer;
+  private readonly inventoryDrawer: InventoryDrawer;
+  private readonly trainerDrawer: TrainerDrawer;
 
   private readonly partyKey: Phaser.Input.Keyboard.Key;
   private readonly inventoryKey: Phaser.Input.Keyboard.Key;
@@ -76,19 +83,42 @@ export class TrainerPanelController {
     );
     this.escapeKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC, false);
 
-    this.partyPanel = new PartyPanel(this.scene, {
+    this.partyDrawer = new PartyDrawer({
       onPokemonSelected: (pokemon, index) => {
         this.handlePartyPokemonSelected(pokemon, index);
       },
       onChangeRequested: (pokemon) => {
         this.handlePartyChangeRequested(pokemon);
       },
+
+      onCloseRequested: () => {
+        this.handlePartyDrawerCloseRequested();
+      },
     });
-    this.inventoryPanel = new InventoryPanel(this.scene, {
+    this.inventoryDrawer = new InventoryDrawer({
       onItemSelected: (itemId) => {
         this.handleOverworldItemSelected(itemId);
       },
+
+      onCloseRequested: () => {
+        this.handleInventoryDrawerCloseRequested();
+      },
     });
+
+    this.trainerDrawer = new TrainerDrawer({
+      onCloseRequested: () => {
+        this.trainerDrawer.hide();
+      },
+    });
+
+    this.scene.events.once(
+      Phaser.Scenes.Events.SHUTDOWN,
+      () => {
+        this.partyDrawer.destroy();
+        this.inventoryDrawer.destroy();
+        this.trainerDrawer.destroy();
+      },
+    );
 
     this.feedbackText = this.scene.add
       .text(this.scene.scale.width / 2, 18, "", {
@@ -114,20 +144,43 @@ export class TrainerPanelController {
   }
 
   public setParty(party: readonly PokemonInstance[]): void {
+    this.trainerDrawer.setPartyCount(party.length);
+
     /* Si hay un item esperando presentación, conservamos visualmente la Party anterior */
     if (this.pendingOverworldItemPresentation) {
       this.deferredPartyDuringOverworldItem = party;
       return;
     }
-    this.partyPanel.setParty(party);
+    this.partyDrawer.setParty(party);
   }
 
   public setInventory(inventory: PokemonInventory): void {
-    this.inventoryPanel.setInventory(inventory);
+    this.inventoryDrawer.setInventory(inventory);
+    this.trainerDrawer.setInventory(inventory);
   }
 
   public get isOpen(): boolean {
-    return this.partyPanel.isVisible() || this.inventoryPanel.isVisible();
+    return (
+      this.partyDrawer.isVisible() ||
+      this.inventoryDrawer.isVisible() ||
+      this.trainerDrawer.isVisible()
+    );
+  }
+
+  public get activePanel(): TrainerPanelSurface | undefined {
+    if (this.partyDrawer.isVisible()) {
+      return "party";
+    }
+
+    if (this.inventoryDrawer.isVisible()) {
+      return "inventory";
+    }
+
+    if (this.trainerDrawer.isVisible()) {
+      return "trainer";
+    }
+
+    return undefined;
   }
 
   /*
@@ -139,7 +192,7 @@ export class TrainerPanelController {
    * el refactor.
    */
   public get isPartyVisible(): boolean {
-    return this.partyPanel.isVisible();
+    return this.partyDrawer.isVisible();
   }
 
   public close(): void {
@@ -148,14 +201,15 @@ export class TrainerPanelController {
     this.pendingOverworldItemPresentation = undefined;
     this.deferredPartyDuringOverworldItem = undefined;
     this.partyReorderSourceInstanceId = undefined;
-    this.partyPanel.setTargetSelectionMode(false);
-    this.partyPanel.setReorderState({
+    this.partyDrawer.setTargetSelectionMode(false);
+    this.partyDrawer.setReorderState({
       active: false,
       sourcePokemonInstanceId: undefined,
       pending: false,
     });
-    this.partyPanel.hide();
-    this.inventoryPanel.hide();
+    this.partyDrawer.hide();
+    this.inventoryDrawer.hide();
+    this.trainerDrawer.hide();
   }
 
   public async handleOverworldItemUsed(
@@ -181,10 +235,10 @@ export class TrainerPanelController {
     this.showFeedback(`Used a ${item.name}!`);
 
     /* Party permanece como superficie principal mientras ocurre toda la presentación del healing item. */
-    this.partyPanel.show();
+    this.partyDrawer.show();
 
     try {
-      await this.partyPanel.animateHpRestore(
+      await this.partyDrawer.animateHpRestore(
         payload.targetPokemonInstanceId,
         payload.previousHp,
         payload.currentHp,
@@ -204,8 +258,8 @@ export class TrainerPanelController {
       this.finishOverworldItemPresentation();
 
       /* Después restauramos la superficie desde la cual comenzó originalmente el flujo */
-      this.partyPanel.hide();
-      this.inventoryPanel.show();
+      this.partyDrawer.hide();
+      this.inventoryDrawer.show();
     }
   }
 
@@ -216,10 +270,11 @@ export class TrainerPanelController {
     this.showFeedback(this.getOverworldItemErrorMessage(payload.code));
   }
 
-  private handleInventoryToggle(): void {
-    if (this.isPartyReorderPending || this.partyPanel.isReorderMode()) {
+  public toggleInventory(): void {
+    if (this.isPartyReorderPending || this.partyDrawer.isReorderMode()) {
       return;
     }
+
     if (this.selectedOverworldItemId || this.isOverworldItemUsePending) {
       return;
     }
@@ -228,46 +283,121 @@ export class TrainerPanelController {
       return;
     }
 
+    const willOpen = !this.inventoryDrawer.isVisible();
+
+    if (willOpen) {
+      this.partyDrawer.hide();
+      this.trainerDrawer.hide();
+    }
+
+    this.inventoryDrawer.toggle();
+  }
+
+  public toggleParty(): void {
+    if (this.isPartyReorderPending) {
+      return;
+    }
+
+    if (this.selectedOverworldItemId || this.isOverworldItemUsePending) {
+      return;
+    }
+
+    if (this.isInteractionBlocked()) {
+      return;
+    }
+
+    const willOpen = !this.partyDrawer.isVisible();
+
+    if (willOpen) {
+      this.inventoryDrawer.hide();
+      this.trainerDrawer.hide();
+    }
+
+    if (!willOpen && this.partyDrawer.isReorderMode()) {
+      this.exitPartyReorderMode();
+    }
+
+    /* PartyDrawer ya sabe si existe al menos un Pokémon */
+    this.partyDrawer.toggle();
+  }
+
+  public toggleTrainer(): void {
+    if (
+      this.isPartyReorderPending ||
+      this.partyDrawer.isReorderMode()
+    ) {
+      return;
+    }
+
+    if (
+      this.selectedOverworldItemId ||
+      this.isOverworldItemUsePending
+    ) {
+      return;
+    }
+
+    if (this.isInteractionBlocked()) {
+      return;
+    }
+
+    const willOpen =
+      !this.trainerDrawer.isVisible();
+
+    if (willOpen) {
+      this.partyDrawer.hide();
+      this.inventoryDrawer.hide();
+    }
+
+    this.trainerDrawer.toggle();
+  }
+
+  private handlePartyDrawerCloseRequested(): void {
+    if (this.selectedOverworldItemId) {
+      this.cancelOverworldItemTargetSelection();
+      return;
+    }
+
+    if (
+      this.isOverworldItemUsePending ||
+      this.isPartyReorderPending
+    ) {
+      return;
+    }
+
+    if (this.partyDrawer.isReorderMode()) {
+      this.exitPartyReorderMode();
+      return;
+    }
+
+    this.partyDrawer.hide();
+  }
+
+  private handleInventoryDrawerCloseRequested(): void {
+    if (
+      this.selectedOverworldItemId ||
+      this.isOverworldItemUsePending ||
+      this.isPartyReorderPending
+    ) {
+      return;
+    }
+
+    this.inventoryDrawer.hide();
+  }
+
+  private handleInventoryToggle(): void {
     if (!Phaser.Input.Keyboard.JustDown(this.inventoryKey)) {
       return;
     }
 
-    const willOpen = !this.inventoryPanel.isVisible();
-
-    if (willOpen) {
-      this.partyPanel.hide();
-    }
-
-    this.inventoryPanel.toggle();
+    this.toggleInventory();
   }
 
   private handlePartyToggle(): void {
-    if (this.isPartyReorderPending) {
-      return;
-    }
-    if (this.selectedOverworldItemId || this.isOverworldItemUsePending) {
-      return;
-    }
-
-    if (this.isInteractionBlocked()) {
-      return;
-    }
-
     if (!Phaser.Input.Keyboard.JustDown(this.partyKey)) {
       return;
     }
 
-    const willOpen = !this.partyPanel.isVisible();
-
-    if (willOpen) {
-      this.inventoryPanel.hide();
-    }
-
-    if (!willOpen && this.partyPanel.isReorderMode()) {
-      this.exitPartyReorderMode();
-    }
-    /* PartyPanel ya sabe si existe al menos un Pokémon */
-    this.partyPanel.toggle();
+    this.toggleParty();
   }
 
   private handleClose(): void {
@@ -288,7 +418,7 @@ export class TrainerPanelController {
       return;
     }
 
-    if (this.partyPanel.isReorderMode()) {
+    if (this.partyDrawer.isReorderMode()) {
       this.exitPartyReorderMode();
       return;
     }
@@ -304,9 +434,9 @@ export class TrainerPanelController {
     itemId: PokemonOverworldItemUseInput["itemId"],
   ): void {
     this.selectedOverworldItemId = itemId;
-    this.inventoryPanel.hide();
-    this.partyPanel.setTargetSelectionMode(true);
-    this.partyPanel.show();
+    this.inventoryDrawer.hide();
+    this.partyDrawer.setTargetSelectionMode(true);
+    this.partyDrawer.show();
   }
 
   private handleOverworldItemTargetSelected(pokemon: PokemonInstance): void {
@@ -339,15 +469,15 @@ export class TrainerPanelController {
     this.selectedOverworldItemId = undefined;
 
     /* Salimos de target-selection para impedir un segundo click, pero mantenemos Party visible */
-    this.partyPanel.setTargetSelectionMode(false);
-    this.partyPanel.show();
+    this.partyDrawer.setTargetSelectionMode(false);
+    this.partyDrawer.show();
   }
 
   private cancelOverworldItemTargetSelection(): void {
     this.selectedOverworldItemId = undefined;
-    this.partyPanel.setTargetSelectionMode(false);
-    this.partyPanel.hide();
-    this.inventoryPanel.show();
+    this.partyDrawer.setTargetSelectionMode(false);
+    this.partyDrawer.hide();
+    this.inventoryDrawer.show();
   }
 
   private showFeedback(message: string): void {
@@ -401,7 +531,7 @@ export class TrainerPanelController {
       return;
     }
 
-    if (!this.partyPanel.isVisible()) {
+    if (!this.partyDrawer.isVisible()) {
       return;
     }
 
@@ -416,7 +546,7 @@ export class TrainerPanelController {
      */
     this.partyReorderSourceInstanceId = pokemon.instanceId;
 
-    this.partyPanel.setReorderState({
+    this.partyDrawer.setReorderState({
       active: true,
       sourcePokemonInstanceId: pokemon.instanceId,
       pending: false,
@@ -433,7 +563,7 @@ export class TrainerPanelController {
       return;
     }
 
-    if (!this.partyPanel.isReorderMode()) {
+    if (!this.partyDrawer.isReorderMode()) {
       return;
     }
 
@@ -462,7 +592,7 @@ export class TrainerPanelController {
 
   private exitPartyReorderMode(): void {
     this.partyReorderSourceInstanceId = undefined;
-    this.partyPanel.setReorderState({
+    this.partyDrawer.setReorderState({
       active: false,
       sourcePokemonInstanceId: undefined,
       pending: false,
@@ -470,8 +600,8 @@ export class TrainerPanelController {
   }
 
   private refreshPartyReorderUi(): void {
-    this.partyPanel.setReorderState({
-      active: this.partyPanel.isReorderMode(),
+    this.partyDrawer.setReorderState({
+      active: this.partyDrawer.isReorderMode(),
       sourcePokemonInstanceId: this.partyReorderSourceInstanceId,
       pending: this.isPartyReorderPending,
     });
@@ -527,7 +657,7 @@ export class TrainerPanelController {
     this.deferredPartyDuringOverworldItem = undefined;
 
     if (deferredParty) {
-      this.partyPanel.setParty(deferredParty);
+      this.partyDrawer.setParty(deferredParty);
     }
   }
 }

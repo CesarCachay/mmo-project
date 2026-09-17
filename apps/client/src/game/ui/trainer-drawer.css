@@ -1,0 +1,542 @@
+/* =========================================================
+   Trainer Drawer
+   Milestone 1.31 — Step 10
+
+   Feature-local stylesheet.
+   Keep this file separate from global style.css.
+========================================================= */
+
+.trainer-drawer {
+  position: absolute;
+
+  top: 10px;
+  right: 68px;
+  bottom: 10px;
+
+  z-index: 120;
+
+  width: min(330px, calc(100% - 88px));
+
+  display: grid;
+
+  grid-template-rows:
+    auto
+    minmax(0, 1fr)
+    auto;
+
+  overflow: hidden;
+
+  border: 1px solid rgba(148, 163, 184, 0.28);
+
+  border-radius: 14px;
+
+  background: linear-gradient(155deg, rgba(15, 23, 42, 0.985), rgba(7, 13, 24, 0.985));
+
+  box-shadow:
+    0 22px 58px rgba(0, 0, 0, 0.44),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+
+  backdrop-filter: blur(14px);
+
+  -webkit-backdrop-filter: blur(14px);
+
+  color: #f8fafc;
+
+  opacity: 0;
+
+  transform: translateX(calc(100% + 24px));
+
+  pointer-events: none;
+
+  transition:
+    transform 170ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 130ms ease;
+}
+
+.trainer-drawer[hidden] {
+  display: none;
+}
+
+.trainer-drawer--open {
+  opacity: 1;
+
+  transform: translateX(0);
+
+  pointer-events: auto;
+}
+
+/* =========================================================
+   Header
+========================================================= */
+
+.trainer-drawer__header {
+  min-height: 62px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding: 11px 12px 10px 14px;
+
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+
+  background: rgba(15, 23, 42, 0.68);
+}
+
+.trainer-drawer__heading {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.trainer-drawer__eyebrow {
+  color: #64748b;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  letter-spacing: 0.1em;
+
+  text-transform: uppercase;
+}
+
+.trainer-drawer__title {
+  margin: 0;
+
+  color: #f8fafc;
+
+  font-size: 15px;
+  font-weight: 800;
+
+  line-height: 1.1;
+}
+
+.trainer-drawer__close {
+  width: 30px;
+  height: 30px;
+
+  flex: 0 0 30px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid rgba(148, 163, 184, 0.2);
+
+  border-radius: 9px;
+
+  background: rgba(30, 41, 59, 0.58);
+
+  color: #94a3b8;
+
+  font: inherit;
+
+  font-size: 19px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background-color 110ms ease,
+    border-color 110ms ease,
+    color 110ms ease;
+}
+
+.trainer-drawer__close:hover {
+  border-color: rgba(148, 163, 184, 0.42);
+
+  background: rgba(51, 65, 85, 0.72);
+
+  color: #f8fafc;
+}
+
+.trainer-drawer__close:focus-visible {
+  outline: 2px solid #60a5fa;
+
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   Content
+========================================================= */
+
+.trainer-drawer__content {
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+
+  padding: 12px;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  overscroll-behavior: contain;
+
+  scrollbar-width: thin;
+
+  scrollbar-color: rgba(100, 116, 139, 0.58) transparent;
+}
+
+/* =========================================================
+   Trainer identity
+========================================================= */
+
+.trainer-drawer__identity {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 13px;
+
+  border: 1px solid rgba(96, 165, 250, 0.18);
+
+  border-radius: 13px;
+
+  background: linear-gradient(145deg, rgba(30, 64, 175, 0.2), rgba(15, 23, 42, 0.76));
+}
+
+.trainer-drawer__avatar {
+  width: 54px;
+  height: 54px;
+
+  flex: 0 0 54px;
+
+  border: 1px solid rgba(147, 197, 253, 0.28);
+
+  border-radius: 12px;
+
+  background-color: rgba(15, 23, 42, 0.82);
+
+  background-repeat: no-repeat;
+
+  /*
+   * Player sprite sheets are 288x24.
+   * 2x presentation => 576x48.
+   * The first frame is the idle/down frame.
+   */
+  background-size: 576px 48px;
+
+  background-position: 3px 3px;
+
+  image-rendering: pixelated;
+
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.trainer-drawer__identity-text {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+.trainer-drawer__display-name {
+  margin: 0;
+
+  overflow: hidden;
+
+  color: #f8fafc;
+
+  font-size: 17px;
+  font-weight: 850;
+
+  line-height: 1.1;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+.trainer-drawer__avatar-label {
+  color: #93c5fd;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   Summary
+========================================================= */
+
+.trainer-drawer__summary {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 8px;
+}
+
+.trainer-drawer__stat {
+  min-height: 82px;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+
+  gap: 5px;
+
+  padding: 11px;
+
+  border: 1px solid rgba(148, 163, 184, 0.16);
+
+  border-radius: 12px;
+
+  background: rgba(30, 41, 59, 0.46);
+}
+
+.trainer-drawer__stat-label {
+  color: #94a3b8;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  letter-spacing: 0.06em;
+
+  text-transform: uppercase;
+}
+
+.trainer-drawer__stat-value {
+  color: #f8fafc;
+
+  font-size: 21px;
+  font-weight: 850;
+
+  line-height: 1;
+}
+
+.trainer-drawer__stat-meta {
+  color: #64748b;
+
+  font-size: 9px;
+  font-weight: 650;
+}
+
+/* =========================================================
+   Metadata
+========================================================= */
+
+.trainer-drawer__metadata {
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  border: 1px solid rgba(148, 163, 184, 0.14);
+
+  border-radius: 12px;
+
+  background: rgba(15, 23, 42, 0.48);
+}
+
+.trainer-drawer__section-title {
+  margin: 0;
+
+  padding: 11px 12px 9px;
+
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+
+  color: #cbd5e1;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 0.05em;
+
+  text-transform: uppercase;
+}
+
+.trainer-drawer__metadata-row {
+  min-height: 42px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding: 8px 12px;
+
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.trainer-drawer__metadata-row:last-child {
+  border-bottom: 0;
+}
+
+.trainer-drawer__metadata-label {
+  color: #64748b;
+
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.trainer-drawer__metadata-value {
+  min-width: 0;
+
+  overflow: hidden;
+
+  color: #cbd5e1;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+/* =========================================================
+   Footer
+========================================================= */
+
+.trainer-drawer__footer {
+  min-height: 42px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 9px 12px;
+
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+
+  background: rgba(15, 23, 42, 0.62);
+
+  color: #64748b;
+
+  font-size: 9px;
+  font-weight: 650;
+
+  line-height: 1.35;
+}
+
+/* =========================================================
+   Responsive foundation
+
+   This does NOT implement mobile navigation / bottom sheets.
+   It only keeps the V1 drawer usable on smaller viewports.
+========================================================= */
+
+@media (max-width: 700px) {
+  .trainer-drawer {
+    top: 7px;
+    right: 56px;
+    bottom: 7px;
+
+    width: min(310px, calc(100% - 68px));
+
+    border-radius: 12px;
+  }
+
+  .trainer-drawer__header {
+    min-height: 54px;
+
+    padding: 8px 9px 8px 11px;
+  }
+
+  .trainer-drawer__content {
+    gap: 9px;
+
+    padding: 9px;
+  }
+
+  .trainer-drawer__identity {
+    padding: 10px;
+  }
+
+  .trainer-drawer__avatar {
+    width: 48px;
+    height: 48px;
+
+    flex-basis: 48px;
+
+    background-size: 576px 48px;
+
+    background-position: 0 0;
+  }
+
+  .trainer-drawer__display-name {
+    font-size: 15px;
+  }
+
+  .trainer-drawer__stat {
+    min-height: 70px;
+
+    padding: 9px;
+  }
+
+  .trainer-drawer__stat-value {
+    font-size: 18px;
+  }
+}
+
+@media (max-height: 520px) {
+  .trainer-drawer__header {
+    min-height: 48px;
+  }
+
+  .trainer-drawer__content {
+    gap: 7px;
+    padding: 7px 9px;
+  }
+
+  .trainer-drawer__identity {
+    padding: 8px 10px;
+  }
+
+  .trainer-drawer__avatar {
+    width: 42px;
+    height: 42px;
+
+    flex-basis: 42px;
+
+    background-size: 504px 42px;
+
+    background-position: 0 0;
+  }
+
+  .trainer-drawer__summary {
+    gap: 6px;
+  }
+
+  .trainer-drawer__stat {
+    min-height: 58px;
+
+    padding: 7px 9px;
+  }
+
+  .trainer-drawer__stat-value {
+    font-size: 16px;
+  }
+
+  .trainer-drawer__metadata-row {
+    min-height: 34px;
+
+    padding: 6px 10px;
+  }
+
+  .trainer-drawer__footer {
+    min-height: 34px;
+
+    padding: 6px 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trainer-drawer {
+    transition: none;
+  }
+}

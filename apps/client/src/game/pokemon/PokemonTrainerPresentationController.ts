@@ -1,10 +1,6 @@
 import Phaser from "phaser";
 
-import type {
-  Direction,
-  PokemonInstance,
-  PokemonTrainerState,
-} from "@cesar-mmo/shared";
+import type { Direction, PokemonInstance, PokemonTrainerState } from "@cesar-mmo/shared";
 
 import { PokemonFollowerController } from "./PokemonFollowerController";
 import { PokemonOverworldSpriteLoader } from "./PokemonOverworldSpriteLoader";
@@ -35,10 +31,7 @@ export class PokemonTrainerPresentationController {
   /* Último TRAINER_STATE recibido */
   private trainerState?: PokemonTrainerState;
 
-  constructor(
-    scene: Phaser.Scene,
-    options: PokemonTrainerPresentationControllerOptions,
-  ) {
+  constructor(scene: Phaser.Scene, options: PokemonTrainerPresentationControllerOptions) {
     this.pokemonSpriteLoader = options.pokemonSpriteLoader;
     this.pokemonOverworldSpriteLoader = options.pokemonOverworldSpriteLoader;
     this.trainerPanelController = options.trainerPanelController;
@@ -54,9 +47,7 @@ export class PokemonTrainerPresentationController {
     return this.trainerState.party.pokemon.length === 0;
   }
 
-  public async applyTrainerState(
-    trainerState: PokemonTrainerState,
-  ): Promise<void> {
+  public async applyTrainerState(trainerState: PokemonTrainerState): Promise<void> {
     /* Esta asignación debe ocurrir ANTES de cualquier await */
     this.trainerState = trainerState;
     this.trainerPanelController.setInventory(trainerState.inventory);
@@ -81,10 +72,7 @@ export class PokemonTrainerPresentationController {
 
       this.trainerPanelController.setParty(party);
     } catch (error) {
-      console.error(
-        "[Pokemon Party] Failed to prepare party presentation",
-        error,
-      );
+      console.error("[Pokemon Party] Failed to prepare party presentation", error);
       return;
     }
 
@@ -103,25 +91,20 @@ export class PokemonTrainerPresentationController {
     playerX: number,
     playerY: number,
     playerDirection: Direction,
-    delta: number,
+    delta: number
   ): void {
-    this.pokemonFollowerController.update(
-      playerX,
-      playerY,
-      playerDirection,
-      delta,
-    );
+    this.pokemonFollowerController.update(playerX, playerY, playerDirection, delta);
   }
 
   public resetFollowerToPlayerPosition(
     playerX: number,
     playerY: number,
-    playerDirection: Direction,
+    playerDirection: Direction
   ): void {
     this.pokemonFollowerController.resetToPlayerPosition(
       playerX,
       playerY,
-      playerDirection,
+      playerDirection
     );
   }
 
@@ -132,7 +115,7 @@ export class PokemonTrainerPresentationController {
 
   private async prepareFollower(
     trainerState: PokemonTrainerState,
-    pokemon: PokemonInstance,
+    pokemon: PokemonInstance
   ): Promise<void> {
     try {
       await this.pokemonOverworldSpriteLoader.ensurePokemonLoaded(pokemon);
@@ -145,10 +128,7 @@ export class PokemonTrainerPresentationController {
       /* Segunda protección: incluso dentro del mismo flujo, position 0 debe seguir correspondiendo al mismo Pokémon */
       const currentFirstPokemon = this.trainerState.party.pokemon[0];
 
-      if (
-        !currentFirstPokemon ||
-        currentFirstPokemon.instanceId !== pokemon.instanceId
-      ) {
+      if (!currentFirstPokemon || currentFirstPokemon.instanceId !== pokemon.instanceId) {
         return;
       }
 
@@ -158,7 +138,7 @@ export class PokemonTrainerPresentationController {
         pokemon,
         player.x,
         player.y,
-        player.direction,
+        player.direction
       );
 
       /* La posición actual del jugador se obtiene mediante getPlayerPresentationState() */
