@@ -30,66 +30,38 @@
  * available browser height.
  */
 .game-shell__stage {
-  width:
-    min(
-      100%,
-      calc(
-        (
-          100vh -
-          (var(--game-viewport-padding) * 2)
-        ) *
-        16 / 9
-      )
-    );
-
-  width:
-    min(
-      100%,
-      calc(
-        (
-          100dvh -
-          (var(--game-viewport-padding) * 2)
-        ) *
-        16 / 9
-      )
-    );
-
+  justify-self: center;
+  align-self: center;
+  margin-inline: auto;
+  width: min(100%, calc((100vh - (var(--game-viewport-padding) * 2)) * 16 / 9));
+  width: min(100%, calc((100dvh - (var(--game-viewport-padding) * 2)) * 16 / 9));
   max-width: 1920px;
-
   aspect-ratio: 16 / 9;
+}
+
+.game-shell__viewport {
+  justify-items: center;
+  align-items: center;
 }
 
 /*
  * Authenticated GameScene:
  * subtract the visible TopBar height.
  */
-.game-shell--authenticated
-  .game-shell__stage {
-  width:
-    min(
-      100%,
-      calc(
-        (
-          100vh -
-          var(--game-topbar-height) -
-          (var(--game-viewport-padding) * 2)
-        ) *
-        16 / 9
-      )
-    );
+.game-shell--authenticated .game-shell__stage {
+  width: min(
+    100%,
+    calc(
+      (100vh - var(--game-topbar-height) - (var(--game-viewport-padding) * 2)) * 16 / 9
+    )
+  );
 
-  width:
-    min(
-      100%,
-      calc(
-        (
-          100dvh -
-          var(--game-topbar-height) -
-          (var(--game-viewport-padding) * 2)
-        ) *
-        16 / 9
-      )
-    );
+  width: min(
+    100%,
+    calc(
+      (100dvh - var(--game-topbar-height) - (var(--game-viewport-padding) * 2)) * 16 / 9
+    )
+  );
 }
 
 /*

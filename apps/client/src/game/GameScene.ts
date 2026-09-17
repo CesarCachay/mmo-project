@@ -29,11 +29,18 @@ import { getPokemonItemIconAsset } from "./items/pokemon-item-icon.registry";
 import { ChatDock } from "./ui/ChatDock";
 import { DialogueBox } from "./ui/DialogueBox";
 import { RightHudRail } from "./ui/RightHudRail";
-import { InteractionPrompt } from "./ui/InteractionPrompt";
+import { VirtualJoystick } from "./mobile/VirtualJoystick";
 import { StarterSelectionPanel } from "./ui/StarterSelectionPanel";
 
 // helpers
 import { MAP_REGISTRY } from "./maps/mapRegistry";
+
+// movement (touch and keyboard)
+import { MovementInputController } from "./player/MovementInputController";
+import { KeyboardMovementInputSource } from "./input/KeyboardMovementInputSource";
+import { TouchMovementInputSource } from "./input/TouchMovementInputSource";
+import { CompositeMovementInputSource } from "./input/CompositeMovementInputSource";
+import { WorldInteractionControlsController } from "./interaction/WorldInteractionControlsController";
 
 // class managers
 import { NpcManager } from "./npc/NpcManager";
@@ -42,7 +49,6 @@ import { GameNetworkClient } from "./network/GameNetworkClient";
 import { RemotePlayerManager } from "./player/RemotePlayerManager";
 import { LocalPlayerController } from "./player/LocalPlayerController";
 import { MapTransitionController } from "./maps/MapTransitionController";
-import { MovementInputController } from "./player/MovementInputController";
 import type { NpcDirection, NpcInstance, NpcInteractionType } from "./npc/types";
 import { RemotePokemonFollowerManager } from "./pokemon/RemotePokemonFollowerManager";
 import { OverworldCameraController } from "./camera/OverworldCameraController";
@@ -88,11 +94,13 @@ export class GameScene extends Phaser.Scene {
   private player!: Phaser.GameObjects.Sprite;
   private localPlayerController!: LocalPlayerController;
   private movementInputController!: MovementInputController;
+  private touchMovementInputSource!: TouchMovementInputSource;
+  private virtualJoystick?: VirtualJoystick;
   private overworldCameraController!: OverworldCameraController;
   private trainerPanelController!: TrainerPanelController;
   private rightHudRail!: RightHudRail;
 
-  private interactKey!: Phaser.Input.Keyboard.Key;
+  private worldInteractionControls!: WorldInteractionControlsController;
   private chatKey!: Phaser.Input.Keyboard.Key;
 
   private network!: GameNetworkClient;
@@ -100,7 +108,6 @@ export class GameScene extends Phaser.Scene {
   private nearbyNpc?: NpcInstance;
   private activeDialogueNpc?: NpcInstance;
   private readonly npcInteractionDistance = 36;
-  private interactionPrompt!: InteractionPrompt;
 
   private dialogueBox!: DialogueBox;
   private pendingDialogueNpc?: NpcInstance;
@@ -241,11 +248,6 @@ export class GameScene extends Phaser.Scene {
 
     this.npcManager.create(this.mapManager.map);
 
-    this.interactionPrompt = new InteractionPrompt();
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-      this.interactionPrompt.destroy();
-    });
-
     this.overworldCameraController = new OverworldCameraController(
       this.cameras.main,
       this.player
@@ -298,6 +300,7 @@ export class GameScene extends Phaser.Scene {
     this.createBattleUi();
 
     this.createControls();
+    this.createMobileControls();
     this.connectToServer();
   }
 
@@ -313,12 +316,15 @@ export class GameScene extends Phaser.Scene {
     this.updatePokemonCenterHealingStation();
     this.updatePokemonStorageTerminal();
 
-    this.updateInteractionPrompt();
+    this.updateWorldInteractionControls();
     this.handleWorldInteraction();
 
-    const input = this.movementInputController.getCurrentInput(
-      this.isMovementInputBlocked()
-    );
+    const movementInputBlocked = this.isMovementInputBlocked();
+
+    this.virtualJoystick?.setEnabled(!movementInputBlocked);
+
+    const input = this.movementInputController.getCurrentInput(movementInputBlocked);
+
     this.localPlayerController.updateAnimation(input);
     this.sendInputIfChanged(input);
 
@@ -565,7 +571,7 @@ export class GameScene extends Phaser.Scene {
     this.activeDialogueNpc = undefined;
   }
 
-  private createControls() {
+  private createControls(): void {
     const keyboard = this.input.keyboard;
 
     if (!keyboard) {
@@ -573,9 +579,57 @@ export class GameScene extends Phaser.Scene {
     }
 
     keyboard.enableGlobalCapture();
-    this.movementInputController = new MovementInputController(keyboard);
-    this.interactKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+
+    const app = document.getElementById("app");
+
+    if (!(app instanceof HTMLElement)) {
+      throw new Error('World interaction controls require "#app"');
+    }
+
+    this.worldInteractionControls = new WorldInteractionControlsController({
+      keyboard,
+      parent: app,
+    });
+
+    const keyboardMovementInputSource = new KeyboardMovementInputSource(keyboard);
+    this.touchMovementInputSource = new TouchMovementInputSource();
+
+    const compositeMovementInputSource = new CompositeMovementInputSource([
+      keyboardMovementInputSource,
+      this.touchMovementInputSource,
+    ]);
+
+    this.movementInputController = new MovementInputController(
+      compositeMovementInputSource
+    );
+
     this.chatKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.touchMovementInputSource.reset();
+    });
+  }
+
+  private createMobileControls(): void {
+    const app = document.getElementById("app");
+
+    if (!(app instanceof HTMLElement)) {
+      throw new Error('Mobile controls require "#app"');
+    }
+
+    this.virtualJoystick = new VirtualJoystick({
+      parent: app,
+
+      onChange: (state) => {
+        this.touchMovementInputSource.setState(state);
+      },
+    });
+
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.virtualJoystick?.destroy();
+      this.virtualJoystick = undefined;
+      this.touchMovementInputSource.reset();
+    });
   }
 
   private preloadNpcSprites() {
@@ -979,6 +1033,11 @@ export class GameScene extends Phaser.Scene {
   }
 
   private handleWorldInteraction(): void {
+    const interactPressed = this.worldInteractionControls.consumeInteract();
+
+    if (!interactPressed) {
+      return;
+    }
     if (this.isMapTransitioning) {
       return;
     }
@@ -986,9 +1045,6 @@ export class GameScene extends Phaser.Scene {
       return;
     }
     if (this.pokemonCenterHealingPresentation?.isBlockingGameplay) {
-      return;
-    }
-    if (!Phaser.Input.Keyboard.JustDown(this.interactKey)) {
       return;
     }
 
@@ -1045,24 +1101,43 @@ export class GameScene extends Phaser.Scene {
     this.interactWithNpc(this.nearbyNpc);
   }
 
-  private updateInteractionPrompt(): void {
+  private updateWorldInteractionControls(): void {
+    /* Blockers que también tienen prioridad sobre un diálogo */
     if (
       this.isMapTransitioning ||
+      this.chatBox.isTyping() ||
+      this.pokemonCenterHealingPresentation?.isBlockingGameplay
+    ) {
+      this.worldInteractionControls.hide();
+      return;
+    }
+
+    /*
+     * Dialogue:
+     * desktop: DialogueBox continúa manejando su presentación.
+     * mobile: mostramos A / Continuar.
+     */
+    if (this.dialogueBox.isOpen()) {
+      this.worldInteractionControls.showDialogueContinue();
+
+      return;
+    }
+
+    /* Otras superficies bloquean interacción overworld */
+    if (
       this.starterSelectionPanel.isVisible() ||
       this.trainerPanelController.isOpen ||
       this.battleController?.isBlockingGameplay ||
       this.pokemonStorageController?.isBlockingGameplay ||
-      this.pokemonCenterHealingPresentation?.isBlockingGameplay ||
-      this.dialogueBox.isOpen() ||
-      this.chatBox.isTyping()
+      this.pokemonCenterHealingInteraction?.isPending
     ) {
-      this.interactionPrompt.hide();
+      this.worldInteractionControls.hide();
       return;
     }
 
+    /* Healing tiene prioridad */
     if (this.pokemonCenterHealingInteraction.hasNearbyStation) {
-      this.interactionPrompt.show({
-        keyLabel: "E",
+      this.worldInteractionControls.showAction({
         actionLabel: "Curar Pokémon",
         variant: "healing",
       });
@@ -1070,9 +1145,8 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    if (this.pokemonStorageTerminalInteraction.hasNearbyTerminal) {
-      this.interactionPrompt.show({
-        keyLabel: "E",
+    /* Storage */ if (this.pokemonStorageTerminalInteraction.hasNearbyTerminal) {
+      this.worldInteractionControls.showAction({
         actionLabel: "Usar PC",
         variant: "storage",
       });
@@ -1080,24 +1154,22 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
+    /* NPC */
     const npc = this.nearbyNpc;
 
     if (!npc) {
-      this.interactionPrompt.hide();
+      this.worldInteractionControls.hide();
       return;
     }
 
-    const promptText = this.getNpcInteractionPromptText(npc.definition.interactionType);
+    const actionLabel = this.getNpcInteractionPromptText(npc.definition.interactionType);
 
-    if (!promptText) {
-      this.interactionPrompt.hide();
+    if (!actionLabel) {
+      this.worldInteractionControls.hide();
       return;
     }
 
-    const actionLabel = promptText.replace(/^\[E\]\s*/, "");
-
-    this.interactionPrompt.show({
-      keyLabel: "E",
+    this.worldInteractionControls.showAction({
       actionLabel,
       variant: "default",
     });
@@ -1108,7 +1180,7 @@ export class GameScene extends Phaser.Scene {
   ): string | undefined {
     switch (interactionType) {
       case "dialogue":
-        return "[E] Hablar";
+        return "Hablar";
 
       case "shop":
       case "quest":

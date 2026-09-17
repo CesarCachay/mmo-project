@@ -1,14 +1,9 @@
-import Phaser from "phaser";
-
 import type { PlayerInput } from "@cesar-mmo/shared";
 
-export class MovementInputController {
-  private readonly cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+import type { MovementInputSource } from "../input/MovementInputSource";
 
-  private readonly wasd: Record<
-    "up" | "down" | "left" | "right",
-    Phaser.Input.Keyboard.Key
-  >;
+export class MovementInputController {
+  private readonly inputSource: MovementInputSource;
 
   private lastInput: PlayerInput = {
     sequence: 0,
@@ -20,15 +15,8 @@ export class MovementInputController {
 
   private inputSequence = 0;
 
-  constructor(keyboard: Phaser.Input.Keyboard.KeyboardPlugin) {
-    this.cursors = keyboard.createCursorKeys();
-
-    this.wasd = keyboard.addKeys({
-      up: Phaser.Input.Keyboard.KeyCodes.W,
-      down: Phaser.Input.Keyboard.KeyCodes.S,
-      left: Phaser.Input.Keyboard.KeyCodes.A,
-      right: Phaser.Input.Keyboard.KeyCodes.D,
-    }) as Record<"up" | "down" | "left" | "right", Phaser.Input.Keyboard.Key>;
+  constructor(inputSource: MovementInputSource) {
+    this.inputSource = inputSource;
   }
 
   public getCurrentInput(isBlocked: boolean): PlayerInput {
@@ -36,12 +24,11 @@ export class MovementInputController {
       return this.createNeutralInput();
     }
 
+    const state = this.inputSource.read();
+
     return {
       sequence: this.inputSequence,
-      left: this.cursors.left.isDown || this.wasd.left.isDown,
-      right: this.cursors.right.isDown || this.wasd.right.isDown,
-      up: this.cursors.up.isDown || this.wasd.up.isDown,
-      down: this.cursors.down.isDown || this.wasd.down.isDown,
+      ...state,
     };
   }
 

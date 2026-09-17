@@ -1,0 +1,55 @@
+.mobile-action-control {
+  position: absolute;
+  right: max(26px, env(safe-area-inset-right));
+  bottom: max(28px, env(safe-area-inset-bottom));
+  z-index: 171;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.mobile-action-control__button {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  padding: 0;
+  border: 2px solid rgba(191, 219, 254, 0.72);
+  border-radius: 50%;
+  background: rgba(37, 99, 235, 0.78);
+  color: #ffffff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(4px);
+  pointer-events: auto;
+  touch-action: none;
+  cursor: pointer;
+}
+
+.mobile-action-control__key {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.mobile-action-control__label {
+  max-width: 110px;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.75);
+}
+
+.mobile-action-control--disabled {
+  opacity: 0.36;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .mobile-action-control:not([hidden]) {
+    display: flex;
+  }
+}

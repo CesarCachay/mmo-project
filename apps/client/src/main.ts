@@ -17,6 +17,8 @@ import "./game/battle/ui/modern/battle-shell-compat.css";
 import "./game/storage/ui/pokemon-storage-ui.css";
 import "./game/ui/interaction-prompt.css";
 import "./game/ui/trainer-drawer.css";
+import "./game/mobile/virtual-joystick.css";
+import "./game/mobile/mobile-action-button.css";
 
 import { GameScene } from "./game/GameScene";
 import { AccountLoginScene } from "./game/AccountLoginScene";
