@@ -42,11 +42,12 @@ export class ModernBattleActionMenu {
     this.prompt.textContent = "What will your Pokémon do?";
 
     const actions = document.createElement("div");
+
     actions.className = "battle-action-menu__actions";
 
     this.fightButton = this.createButton(
       "FIGHT",
-      "battle-action-menu__button battle-action-menu__button--fight",
+      ["battle-action-menu__button", "battle-action-menu__button--fight"].join(" "),
       () => {
         this.callbacks.onFightSelected();
       }
@@ -54,7 +55,7 @@ export class ModernBattleActionMenu {
 
     this.pokemonButton = this.createButton(
       "POKÉMON",
-      "battle-action-menu__button battle-action-menu__button--pokemon",
+      ["battle-action-menu__button", "battle-action-menu__button--pokemon"].join(" "),
       () => {
         this.callbacks.onPokemonSelected();
       }
@@ -62,30 +63,19 @@ export class ModernBattleActionMenu {
 
     this.itemButton = this.createButton(
       "ITEM",
-      "battle-action-menu__button battle-action-menu__button--item",
+      ["battle-action-menu__button", "battle-action-menu__button--item"].join(" "),
       () => {
         this.callbacks.onItemSelected();
       }
     );
-    this.itemButton.type = "button";
-    this.itemButton.className = [
-      "battle-action-menu__button",
-      "battle-action-menu__button--item",
-    ].join(" ");
 
-    this.itemButton.textContent = "ITEM";
-    this.itemButton.disabled = true;
-
-    this.runButton = document.createElement("button");
-    this.runButton.type = "button";
-    this.runButton.className = [
-      "battle-action-menu__button",
-      "battle-action-menu__button--run",
-    ].join(" ");
-    this.runButton.textContent = "RUN";
-    this.runButton.addEventListener("click", () => {
-      this.callbacks.onRunSelected();
-    });
+    this.runButton = this.createButton(
+      "RUN",
+      ["battle-action-menu__button", "battle-action-menu__button--run"].join(" "),
+      () => {
+        this.callbacks.onRunSelected();
+      }
+    );
 
     actions.append(this.fightButton, this.pokemonButton, this.itemButton, this.runButton);
 
@@ -97,14 +87,6 @@ export class ModernBattleActionMenu {
   public setPokemon(pokemonState: BattlePokemonState): void {
     const pokemon = pokemonState.pokemon;
 
-    /*
-     * Por ahora usamos nickname cuando existe.
-     * Si no existe, mantenemos un prompt neutro.
-     *
-     * Más adelante podemos reutilizar
-     * getPokemonDisplayName() si queremos
-     * nombre de especie exactamente igual al HUD.
-     */
     const displayName = pokemon.nickname?.trim();
 
     this.prompt.textContent = displayName
@@ -113,23 +95,16 @@ export class ModernBattleActionMenu {
   }
 
   public setBounds(bounds: BattleUiBounds, viewport: BattleUiViewport): void {
-    /*
-     * Battle DOM root comparte las dimensiones
-     * lógicas de Phaser.
-     *
-     * Convertimos el centro recibido por
-     * BattleOverlay a left/top.
-     */
-    const left = bounds.x - bounds.width / 2;
+    if (viewport.width <= 0 || viewport.height <= 0) {
+      return;
+    }
 
+    const left = bounds.x - bounds.width / 2;
     const top = bounds.y - bounds.height / 2;
 
     this.root.style.left = `${(left / viewport.width) * 100}%`;
-
     this.root.style.top = `${(top / viewport.height) * 100}%`;
-
     this.root.style.width = `${(bounds.width / viewport.width) * 100}%`;
-
     this.root.style.height = `${(bounds.height / viewport.height) * 100}%`;
   }
 
@@ -140,8 +115,8 @@ export class ModernBattleActionMenu {
   public setEnabled(enabled: boolean): void {
     this.fightButton.disabled = !enabled;
     this.pokemonButton.disabled = !enabled;
-    this.runButton.disabled = !enabled;
     this.itemButton.disabled = !enabled;
+    this.runButton.disabled = !enabled;
   }
 
   public clear(): void {

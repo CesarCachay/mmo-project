@@ -194,3 +194,9 @@
     display: none;
   }
 }
+
+@media (hover: none) and (pointer: coarse) {
+  .right-hud-rail {
+    display: none !important;
+  }
+}

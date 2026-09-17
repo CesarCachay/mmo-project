@@ -1,0 +1,139 @@
+:root {
+  --game-safe-top: env(safe-area-inset-top, 0px);
+  --game-safe-right: env(safe-area-inset-right, 0px);
+  --game-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --game-safe-left: env(safe-area-inset-left, 0px);
+}
+
+#app {
+  --game-keyboard-inset: 0px;
+}
+
+/* =========================================================
+     Touch devices
+  ========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+  /*
+     * Prevent browser overscroll around the gameplay shell.
+     */
+  html,
+  body,
+  #game-shell,
+  #game-shell-viewport,
+  #game-stage,
+  #app {
+    overscroll-behavior: none;
+  }
+
+  /*
+     * Phaser canvas owns its gestures.
+     *
+     * Prevent:
+     * - scroll by dragging
+     * - pinch gestures over gameplay
+     * - text selection
+     * - long-press callout
+     */
+  #app canvas {
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  /*
+     * DOM controls should retain native tap semantics.
+     */
+  #app button,
+  #app [role="button"] {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /*
+     * Inputs need native behavior for the virtual keyboard.
+     */
+  #app input,
+  #app textarea {
+    touch-action: manipulation;
+  }
+
+  /*
+     * Prevent accidental selection on gameplay controls.
+     *
+     * Do NOT apply this to chat messages or inputs.
+     */
+  #app .virtual-joystick,
+  #app .mobile-action-control,
+  #app .mobile-trainer-hud-dock,
+  #app .interaction-prompt {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  #app .virtual-joystick__base {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /*
+     * Avoid touch focus rings while keeping
+     * :focus-visible available for keyboard users.
+     */
+  #app button:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /*
+     * Safe-area protection for the shell top bar.
+     */
+  .game-shell__topbar {
+    padding-left: max(12px, var(--game-safe-left));
+    padding-right: max(12px, var(--game-safe-right));
+  }
+
+  /*
+     * Minimum touch target.
+     *
+     * 40px is deliberately conservative so it does
+     * not distort the existing compact HUD layouts.
+     */
+  #app button {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  /*
+     * While the virtual keyboard is open, hide
+     * gameplay controls that compete for screen space.
+     */
+  #app.game-viewport--keyboard-open .virtual-joystick,
+  #app.game-viewport--keyboard-open .mobile-action-control,
+  #app.game-viewport--keyboard-open .mobile-trainer-hud-dock,
+  #app.game-viewport--keyboard-open .interaction-prompt {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+/* =========================================================
+     Reduced motion
+  ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  #app .virtual-joystick,
+  #app .virtual-joystick__knob,
+  #app .mobile-action-control,
+  #app .mobile-trainer-hud-dock,
+  #app .mobile-trainer-hud-dock__button,
+  #app .mobile-orientation-hint,
+  #app .game-chat-dock,
+  #app .party-drawer,
+  #app .inventory-drawer,
+  #app .trainer-drawer {
+    transition: none !important;
+    animation: none !important;
+  }
+}

@@ -1,0 +1,170 @@
+@media (hover: none) and (pointer: coarse) {
+  .party-drawer__content,
+  .party-drawer__list,
+  .inventory-drawer__content,
+  .inventory-drawer__list,
+  .trainer-drawer__content {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .party-drawer,
+  .inventory-drawer,
+  .trainer-drawer {
+    top: auto;
+    left: max(8px, env(safe-area-inset-left));
+    right: max(8px, env(safe-area-inset-right));
+    bottom: max(8px, env(safe-area-inset-bottom));
+    width: auto;
+    height: min(82%, 440px);
+    max-height: calc(100% - 16px);
+    z-index: 180;
+    border-radius: 16px;
+
+    /*
+       * Desktop drawers enter from the right.
+       * Mobile sheets enter from the bottom.
+       */
+    transform: translateY(calc(100% + 28px));
+    transform-origin: center bottom;
+    transition:
+      transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      opacity 140ms ease;
+  }
+
+  .party-drawer--open,
+  .inventory-drawer--open,
+  .trainer-drawer--open {
+    transform: translateY(0);
+  }
+
+  .party-drawer__header,
+  .inventory-drawer__header,
+  .trainer-drawer__header {
+    min-height: 54px;
+    padding: 8px 10px 8px 14px;
+  }
+
+  .party-drawer__close,
+  .inventory-drawer__close,
+  .trainer-drawer__close {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+    border-radius: 11px;
+    font-size: 22px;
+    touch-action: manipulation;
+  }
+
+  .party-drawer__footer,
+  .inventory-drawer__footer,
+  .trainer-drawer__footer {
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+}
+
+/* Party drawer */
+
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) {
+  .party-drawer__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    gap: 7px;
+    padding: 8px;
+  }
+
+  .party-drawer__pokemon {
+    min-width: 0;
+  }
+
+  .party-drawer__pokemon-button {
+    grid-template-columns:
+      42px
+      minmax(0, 1fr);
+    min-height: 58px;
+    padding: 6px 8px;
+  }
+
+  .party-drawer__actions {
+    gap: 5px;
+  }
+}
+
+/* Inventory drawer */
+
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) {
+  .inventory-drawer__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    gap: 7px;
+    padding: 8px;
+  }
+
+  .inventory-drawer__item {
+    min-width: 0;
+    min-height: 56px;
+    grid-template-columns:
+      40px
+      minmax(0, 1fr)
+      auto;
+    gap: 7px;
+    padding: 6px 8px;
+  }
+}
+
+/* Trainer drawer */
+
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) {
+  .trainer-drawer__content {
+    padding: 10px;
+    gap: 9px;
+  }
+
+  .trainer-drawer__identity {
+    padding: 9px 11px;
+  }
+
+  .trainer-drawer__summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .trainer-drawer__stat {
+    min-height: 62px;
+    padding: 8px 10px;
+  }
+
+  .trainer-drawer__metadata-row {
+    min-height: 36px;
+    padding: 6px 10px;
+  }
+}
+
+/* Portrait fallback */
+@media (hover: none) and (pointer: coarse) and (orientation: portrait) {
+  .party-drawer,
+  .inventory-drawer,
+  .trainer-drawer {
+    height: min(78%, 620px);
+    left: max(8px, env(safe-area-inset-left));
+    right: max(8px, env(safe-area-inset-right));
+  }
+
+  .party-drawer__list,
+  .inventory-drawer__list {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* Touch hover cleanup */
+@media (hover: none) and (pointer: coarse) {
+  .inventory-drawer__item:hover:not(:disabled) {
+    transform: none;
+  }
+
+  .party-drawer__pokemon:hover {
+    border-color: rgba(148, 163, 184, 0.16);
+  }
+}

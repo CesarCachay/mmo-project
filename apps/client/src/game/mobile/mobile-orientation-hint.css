@@ -1,0 +1,61 @@
+.mobile-orientation-hint {
+  position: absolute;
+  inset: 0;
+  z-index: 220;
+  display: none;
+  place-items: start center;
+  padding: max(18px, var(--game-safe-top)) max(16px, var(--game-safe-right)) 16px
+    max(16px, var(--game-safe-left));
+  pointer-events: none;
+}
+
+.mobile-orientation-hint__card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(100%, 330px);
+  padding: 12px 14px;
+  border: 1px solid rgba(148, 163, 184, 0.34);
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.94);
+  color: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+}
+
+.mobile-orientation-hint__icon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(37, 99, 235, 0.28);
+  color: #bfdbfe;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.mobile-orientation-hint__content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mobile-orientation-hint__content strong {
+  font-size: 14px;
+}
+
+.mobile-orientation-hint__content span {
+  color: #94a3b8;
+
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+@media (hover: none) and (pointer: coarse) and (orientation: portrait) {
+  .mobile-orientation-hint {
+    display: grid;
+  }
+}

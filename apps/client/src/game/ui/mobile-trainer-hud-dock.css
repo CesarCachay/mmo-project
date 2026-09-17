@@ -1,0 +1,93 @@
+.mobile-trainer-hud-dock {
+  position: absolute;
+  left: 50%;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  z-index: 172;
+  display: none;
+  align-items: center;
+  gap: 4px;
+  padding: 5px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 14px;
+  background: rgba(9, 15, 25, 0.88);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(8px);
+  transform: translateX(-50%);
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.mobile-trainer-hud-dock[hidden] {
+  display: none;
+}
+
+.mobile-trainer-hud-dock__button {
+  width: 54px;
+  height: 48px;
+  display: grid;
+  grid-template-rows: 24px auto;
+  place-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: #cbd5e1;
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.mobile-trainer-hud-dock__button:active {
+  transform: scale(0.96);
+}
+
+.mobile-trainer-hud-dock__button--active {
+  border-color: rgba(96, 165, 250, 0.66);
+  background: rgba(30, 64, 175, 0.38);
+  color: #eff6ff;
+}
+
+.mobile-trainer-hud-dock__icon {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 7px;
+  background: rgba(30, 41, 59, 0.82);
+  color: #bfdbfe;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.mobile-trainer-hud-dock__button--active .mobile-trainer-hud-dock__icon {
+  border-color: rgba(147, 197, 253, 0.56);
+  background: rgba(37, 99, 235, 0.46);
+  color: #ffffff;
+}
+
+.mobile-trainer-hud-dock__label {
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .mobile-trainer-hud-dock:not([hidden]) {
+    display: flex;
+  }
+}
+
+/*
+   * Gameplay portrait todavía no es nuestro
+   * target principal, pero evitamos que el dock
+   * choque con joystick + botón A.
+   */
+@media (hover: none) and (pointer: coarse) and (orientation: portrait) and (max-width: 520px) {
+  .mobile-trainer-hud-dock {
+    top: max(10px, env(safe-area-inset-top));
+    bottom: auto;
+  }
+}

@@ -1,3 +1,5 @@
+import "./chat-dock.css";
+
 import Phaser from "phaser";
 
 import type { ChatMessage } from "@cesar-mmo/shared";
@@ -128,6 +130,9 @@ export class ChatDock {
     this.inputElement.maxLength = CHAT_MESSAGE_MAX_LENGTH;
     this.inputElement.autocomplete = "off";
 
+    this.inputElement.spellcheck = false;
+    this.inputElement.setAttribute("enterkeyhint", "send");
+
     composer.append(this.inputElement);
 
     this.panel.append(header, this.messagesViewport, composer);
@@ -142,8 +147,25 @@ export class ChatDock {
 
     this.collapsedButton.addEventListener("click", () => {
       this.open();
-    });
 
+      const isTouchPrimary = window.matchMedia(
+        "(hover: none) and (pointer: coarse)"
+      ).matches;
+
+      if (!isTouchPrimary) {
+        return;
+      }
+
+      requestAnimationFrame(() => {
+        if (this.destroyed || !this.externalVisible || !this.expanded) {
+          return;
+        }
+
+        this.inputElement.focus({
+          preventScroll: true,
+        });
+      });
+    });
     minimizeButton.addEventListener("click", () => {
       this.collapse();
     });

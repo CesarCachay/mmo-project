@@ -28,9 +28,10 @@ import { getPokemonItemIconAsset } from "./items/pokemon-item-icon.registry";
 // ui components
 import { ChatDock } from "./ui/ChatDock";
 import { DialogueBox } from "./ui/DialogueBox";
-import { RightHudRail } from "./ui/RightHudRail";
 import { VirtualJoystick } from "./mobile/VirtualJoystick";
 import { StarterSelectionPanel } from "./ui/StarterSelectionPanel";
+import { TrainerHudNavigationController } from "./ui/TrainerHudNavigationController";
+import { MobileGameplayUxController } from "./mobile/MobileGameplayUxController";
 
 // helpers
 import { MAP_REGISTRY } from "./maps/mapRegistry";
@@ -98,7 +99,8 @@ export class GameScene extends Phaser.Scene {
   private virtualJoystick?: VirtualJoystick;
   private overworldCameraController!: OverworldCameraController;
   private trainerPanelController!: TrainerPanelController;
-  private rightHudRail!: RightHudRail;
+  private trainerHudNavigation!: TrainerHudNavigationController;
+  private mobileGameplayUx?: MobileGameplayUxController;
 
   private worldInteractionControls!: WorldInteractionControlsController;
   private chatKey!: Phaser.Input.Keyboard.Key;
@@ -306,8 +308,7 @@ export class GameScene extends Phaser.Scene {
 
   update(_: number, delta: number) {
     this.trainerPanelController.update();
-    const activePanel = this.trainerPanelController.activePanel;
-    this.rightHudRail.setActivePanel(activePanel);
+    this.trainerHudNavigation.update();
 
     this.handleChatFocus();
 
@@ -586,6 +587,8 @@ export class GameScene extends Phaser.Scene {
       throw new Error('World interaction controls require "#app"');
     }
 
+    this.mobileGameplayUx = new MobileGameplayUxController(app);
+
     this.worldInteractionControls = new WorldInteractionControlsController({
       keyboard,
       parent: app,
@@ -606,7 +609,10 @@ export class GameScene extends Phaser.Scene {
     this.chatKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.worldInteractionControls.destroy();
       this.touchMovementInputSource.reset();
+      this.mobileGameplayUx?.destroy();
+      this.mobileGameplayUx = undefined;
     });
   }
 
@@ -670,17 +676,9 @@ export class GameScene extends Phaser.Scene {
         this.network.reorderPokemonParty(input);
       },
     });
-    this.rightHudRail = new RightHudRail({
-      onPartyRequested: () => {
-        this.trainerPanelController.toggleParty();
-      },
-      onBagRequested: () => {
-        this.trainerPanelController.toggleInventory();
-      },
-      onTrainerRequested: () => {
-        this.trainerPanelController.toggleTrainer();
-      },
-    });
+    this.trainerHudNavigation = new TrainerHudNavigationController(
+      this.trainerPanelController
+    );
     this.pokemonTrainerPresentationController = new PokemonTrainerPresentationController(
       this,
       {
@@ -693,7 +691,7 @@ export class GameScene extends Phaser.Scene {
           direction: this.localPlayerController.direction,
         }),
         onPartyPresenceChanged: (hasParty) => {
-          this.rightHudRail.setVisible(hasParty);
+          this.trainerHudNavigation.setVisible(hasParty);
           this.starterSelectionPanel.setSelectionPending(false);
 
           if (!hasParty) {
@@ -707,7 +705,7 @@ export class GameScene extends Phaser.Scene {
     );
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.pokemonTrainerPresentationController.destroy();
-      this.rightHudRail.destroy();
+      this.trainerHudNavigation.destroy();
     });
   }
 

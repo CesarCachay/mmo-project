@@ -1,0 +1,572 @@
+/* =========================================================
+   Active mobile Battle
+========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+  /*
+     * Battle replaces overworld controls while active.
+     *
+     * Battle UI already owns its interaction through
+     * DOM buttons, so joystick / A / overworld HUD
+     * should not compete for the screen.
+     */
+  #app:has(.battle-ui-modern:not([hidden])) .virtual-joystick,
+  #app:has(.battle-ui-modern:not([hidden])) .mobile-action-control,
+  #app:has(.battle-ui-modern:not([hidden])) .mobile-trainer-hud-dock,
+  #app:has(.battle-ui-modern:not([hidden])) .interaction-prompt,
+  #app:has(.battle-ui-modern:not([hidden])) .game-chat-dock {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+/* =========================================================
+     Action Menu
+  ========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+  .battle-action-menu {
+    gap: 14px;
+    padding: 10px max(14px, var(--game-safe-right));
+  }
+
+  .battle-action-menu__prompt {
+    flex: 0 1 42%;
+    font-size: 14px;
+    line-height: 1.2;
+  }
+
+  .battle-action-menu__actions {
+    width: 56%;
+    min-width: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .battle-action-menu__button {
+    min-width: 0;
+    min-height: 48px;
+    padding: 8px 10px;
+    font-size: 13px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .battle-action-menu__button:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* =========================================================
+     Move Selection
+  ========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+  .battle-modern-moves {
+    padding: 8px 12px 10px;
+  }
+
+  .battle-modern-moves__header {
+    min-height: 44px;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .battle-modern-moves__header-left {
+    gap: 8px;
+  }
+
+  .battle-move-panel__back {
+    min-width: 72px;
+    min-height: 44px;
+    padding: 6px 12px;
+    font-size: 11px;
+    touch-action: manipulation;
+  }
+
+  .battle-modern-moves__grid {
+    gap: 6px;
+  }
+
+  .battle-modern-move-card {
+    min-height: 44px;
+    padding: 7px 9px;
+    border-radius: 11px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .battle-modern-move-card:not(:disabled):hover {
+    transform: none;
+  }
+
+  .battle-modern-move-card__name {
+    font-size: 12px;
+  }
+
+  .battle-modern-move-card__type {
+    padding: 2px 6px;
+    font-size: 8px;
+  }
+
+  .battle-modern-move-card__bottom {
+    margin-top: 3px;
+  }
+}
+
+/* =========================================================
+   Party / Replacement / Item Target
+========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+  .battle-modern-replacement {
+    padding: 7px 10px 9px;
+  }
+
+  .battle-modern-replacement__header {
+    min-height: 44px;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .battle-modern-replacement__header-left {
+    gap: 8px;
+  }
+
+  .battle-modern-replacement__title {
+    font-size: 13px;
+    line-height: 1.15;
+  }
+
+  .battle-modern-replacement__waiting {
+    font-size: 10px;
+  }
+
+  /*
+     * Party max = 6.
+     * Landscape: 3 columns × 2 rows.
+     */
+  .battle-modern-replacement__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .battle-modern-replacement-card {
+    min-width: 0;
+    min-height: 0;
+    gap: 6px;
+    padding: 5px 6px;
+    border-radius: 10px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Remove sticky hover presentation on touch */
+  .battle-modern-replacement-card--selectable:hover {
+    transform: none;
+  }
+
+  .battle-modern-replacement-card__sprite-wrap {
+    width: 42px;
+    height: 42px;
+    border-radius: 9px;
+  }
+
+  .battle-modern-replacement-card__top {
+    gap: 4px;
+    margin-bottom: 2px;
+  }
+
+  .battle-modern-replacement-card__name {
+    font-size: 11px;
+  }
+
+  .battle-modern-replacement-card__level {
+    font-size: 8px;
+  }
+
+  .battle-modern-replacement-card__hp-row {
+    gap: 5px;
+    font-size: 8px;
+  }
+
+  .battle-modern-replacement-card__hp-track {
+    height: 5px;
+    margin-top: 2px;
+  }
+
+  .battle-modern-replacement-card__status {
+    margin-top: 3px;
+    padding: 2px 5px;
+    font-size: 7px;
+  }
+
+  /*
+     * Shared BACK button:
+     * Replacement Panel + Battle Bag.
+     */
+  .battle-replacement-panel__back {
+    min-width: 72px;
+    min-height: 44px;
+    padding: 6px 12px;
+    font-size: 11px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .battle-replacement-panel__back:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* =========================================================
+   Battle Bag
+========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+  .battle-modern-bag {
+    padding: 7px 10px 9px;
+  }
+
+  .battle-modern-bag__header {
+    flex: 0 0 auto;
+    min-height: 44px;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .battle-modern-bag__header-left {
+    gap: 8px;
+  }
+
+  .battle-modern-bag__title {
+    font-size: 13px;
+  }
+
+  .battle-modern-bag__list {
+    flex: 1;
+    min-height: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    gap: 6px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+
+  .battle-modern-bag__item {
+    min-width: 0;
+    min-height: 48px;
+    gap: 7px;
+    padding: 6px 9px;
+    border-radius: 10px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .battle-modern-bag__item:hover:not(:disabled) {
+    transform: none;
+  }
+
+  .battle-modern-bag__item-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 11px;
+  }
+
+  .battle-modern-bag__item-quantity {
+    flex: 0 0 auto;
+    font-size: 10px;
+  }
+
+  .battle-modern-bag__empty {
+    padding: 12px;
+    font-size: 11px;
+  }
+}
+
+/* =========================================================
+   Move Learning
+========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+  .battle-modern-move-learning {
+    padding: 7px 10px 9px;
+  }
+
+  .battle-modern-move-learning__header {
+    margin-bottom: 6px;
+  }
+
+  .battle-modern-move-learning__title {
+    font-size: 13px;
+    line-height: 1.15;
+  }
+
+  .battle-modern-move-learning__subtitle {
+    margin-top: 3px;
+
+    font-size: 10px;
+    line-height: 1.25;
+  }
+
+  .battle-modern-move-learning__candidate {
+    width: min(460px, 94%);
+    margin: 0 auto 6px;
+    padding: 7px 10px;
+    border-radius: 10px;
+  }
+
+  .battle-modern-move-learning__candidate-info {
+    gap: 6px;
+  }
+
+  .battle-modern-move-learning__candidate-name {
+    font-size: 11px;
+  }
+
+  .battle-modern-move-learning__candidate-pp {
+    font-size: 9px;
+  }
+
+  .battle-modern-move-learning__actions {
+    width: 96%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .battle-modern-move-learning__action {
+    min-width: 0;
+    min-height: 48px;
+    padding: 8px 10px;
+    border-radius: 11px;
+    font-size: 11px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .battle-modern-move-learning__action:not(:disabled):hover {
+    transform: none;
+  }
+
+  /*
+     * Move-to-forget selection reuses the same
+     * battle move cards already adapted in Step 8B.
+     */
+  .battle-modern-move-learning__moves {
+    gap: 6px;
+  }
+
+  .battle-modern-move-learning__moves .battle-modern-move-card {
+    min-height: 44px;
+  }
+
+  .battle-move-learning__back {
+    min-width: 72px;
+    min-height: 44px;
+    margin-top: 5px;
+    padding: 6px 12px;
+    font-size: 11px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .battle-move-learning__back:not(:disabled):hover {
+    transform: none;
+    color: var(--battle-text-primary);
+  }
+}
+
+/* =========================================================
+   Evolution Decision
+========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+  .battle-modern-evolution-decision {
+    position: absolute;
+    z-index: 80;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px max(14px, var(--game-safe-right));
+    pointer-events: auto;
+  }
+
+  .battle-modern-evolution-decision[hidden] {
+    display: none;
+  }
+
+  .battle-modern-evolution-decision__title {
+    width: min(520px, 92%);
+    color: var(--battle-text-primary);
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.25;
+    text-align: center;
+  }
+
+  .battle-modern-evolution-decision__actions {
+    width: min(460px, 92%);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .battle-modern-evolution-decision__accept,
+  .battle-modern-evolution-decision__cancel {
+    min-width: 0;
+    min-height: 52px;
+    padding: 9px 14px;
+    border-radius: 12px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 850;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background 140ms ease,
+      border-color 140ms ease,
+      opacity 140ms ease;
+  }
+
+  .battle-modern-evolution-decision__accept {
+    border: 1px solid rgba(74, 222, 128, 0.45);
+    background: rgba(22, 101, 52, 0.78);
+    color: #bbf7d0;
+  }
+
+  .battle-modern-evolution-decision__cancel {
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background: rgba(30, 41, 59, 0.9);
+    color: var(--battle-text-secondary);
+  }
+
+  .battle-modern-evolution-decision__accept:disabled,
+  .battle-modern-evolution-decision__cancel:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+/* =========================================================
+   Battle Completion
+   Victory / Defeat / Captured
+========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+  .battle-modern-completion {
+    padding: max(12px, var(--game-safe-top)) max(14px, var(--game-safe-right))
+      max(12px, var(--game-safe-bottom)) max(14px, var(--game-safe-left));
+  }
+
+  .battle-modern-completion__card {
+    width: min(340px, 88%);
+    max-height: 92%;
+    padding: 18px 20px 17px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .battle-modern-completion__icon {
+    width: 38px;
+    height: 38px;
+    margin: 0 auto 8px;
+    font-size: 15px;
+  }
+
+  .battle-modern-completion__eyebrow {
+    margin-bottom: 4px;
+    font-size: 8px;
+  }
+
+  .battle-modern-completion__title {
+    font-size: 24px;
+    line-height: 1;
+  }
+
+  .battle-modern-completion__message {
+    max-width: 280px;
+    margin: 8px auto 14px;
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .battle-modern-completion__continue {
+    min-width: 160px;
+    min-height: 48px;
+    padding: 8px 18px;
+    font-size: 12px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .battle-modern-completion__continue:not(:disabled):hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .battle-modern-completion__backdrop,
+  .battle-modern-completion__card {
+    animation: none !important;
+  }
+
+  .battle-modern-completion__continue {
+    transition: none !important;
+  }
+}
+
+/* MEDIA PORTRAIT */
+@media (hover: none) and (pointer: coarse) and (orientation: portrait) {
+  .battle-modern-replacement__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+  }
+
+  .battle-modern-bag__list {
+    grid-template-columns: 1fr;
+  }
+
+  .battle-modern-move-learning__actions {
+    grid-template-columns: 1fr;
+  }
+
+  .battle-modern-move-learning__candidate {
+    width: 100%;
+  }
+
+  .battle-modern-evolution-decision__actions {
+    grid-template-columns: 1fr;
+  }
+
+  .battle-modern-evolution-decision__accept,
+  .battle-modern-evolution-decision__cancel {
+    min-height: 48px;
+  }
+
+  .battle-modern-completion__card {
+    width: min(360px, 94%);
+    padding: 22px 18px;
+  }
+
+  .battle-modern-completion__title {
+    font-size: 26px;
+  }
+
+  .battle-modern-completion__continue {
+    width: 100%;
+    min-height: 50px;
+  }
+}

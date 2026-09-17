@@ -13,9 +13,18 @@ const CAMERA_LOOK_AHEAD_Y = 16;
 
 const CAMERA_LOOK_AHEAD_RATE = 7;
 
+const TOUCH_PRIMARY_QUERY = "(hover: none) and (pointer: coarse)";
+const TOUCH_CAMERA_ZOOM_MULTIPLIER = 1.12;
+const CAMERA_ZOOM_EPSILON = 0.001;
+
 export class OverworldCameraController {
   private readonly camera: Phaser.Cameras.Scene2D.Camera;
   private readonly player: Phaser.GameObjects.Sprite;
+
+  private activeMapId?: MapId;
+  private activeMap?: Phaser.Tilemaps.Tilemap;
+  private readonly touchPrimaryMedia = window.matchMedia(TOUCH_PRIMARY_QUERY);
+  private appliedZoom = 0;
 
   private followOffsetX = 0;
   private followOffsetY = 0;
@@ -26,6 +35,9 @@ export class OverworldCameraController {
   }
 
   public start(mapId: MapId, map: Phaser.Tilemaps.Tilemap): void {
+    this.activeMapId = mapId;
+    this.activeMap = map;
+
     this.followOffsetX = 0;
     this.followOffsetY = 0;
 
@@ -46,6 +58,7 @@ export class OverworldCameraController {
   }
 
   public update(delta: number, direction: Direction, isMoving: boolean): void {
+    this.refreshResponsiveZoom();
     const targetOffset = this.getTargetFollowOffset(direction, isMoving);
 
     const alpha = 1 - Math.exp(-CAMERA_LOOK_AHEAD_RATE * (delta / 1000));
@@ -116,16 +129,64 @@ export class OverworldCameraController {
   }
 
   public applyMap(mapId: MapId, map: Phaser.Tilemaps.Tilemap): void {
-    const profile = getOverworldCameraProfile(mapId);
-    this.camera.setZoom(profile.zoom);
+    this.activeMapId = mapId;
+    this.activeMap = map;
+
+    const zoom = this.resolveZoom(mapId);
+
+    const zoomChanged = Math.abs(this.appliedZoom - zoom) >= CAMERA_ZOOM_EPSILON;
+
+    if (zoomChanged) {
+      this.appliedZoom = zoom;
+      this.camera.setZoom(zoom);
+    }
+
     this.updateBounds(map);
   }
 
   public resetForMap(mapId: MapId, map: Phaser.Tilemaps.Tilemap): void {
+    this.activeMapId = mapId;
+    this.activeMap = map;
+
     this.followOffsetX = 0;
     this.followOffsetY = 0;
+
     this.camera.setFollowOffset(0, 0);
+
     this.applyMap(mapId, map);
+
     this.camera.centerOn(this.player.x, this.player.y);
+  }
+
+  private resolveZoom(mapId: MapId): number {
+    const profile = getOverworldCameraProfile(mapId);
+
+    if (!this.touchPrimaryMedia.matches) {
+      return profile.zoom;
+    }
+
+    return profile.zoom * TOUCH_CAMERA_ZOOM_MULTIPLIER;
+  }
+
+  private refreshResponsiveZoom(): void {
+    const mapId = this.activeMapId;
+    const map = this.activeMap;
+
+    if (!mapId || !map) {
+      return;
+    }
+
+    const zoom = this.resolveZoom(mapId);
+    const zoomChanged = Math.abs(this.appliedZoom - zoom) >= CAMERA_ZOOM_EPSILON;
+
+    if (!zoomChanged) {
+      return;
+    }
+
+    this.appliedZoom = zoom;
+    this.camera.setZoom(zoom);
+
+    /* Aquí sí recalculamos bounds únicamente cuando cambia el zoom responsive */
+    this.updateBounds(map);
   }
 }

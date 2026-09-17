@@ -6,9 +6,12 @@ import "./styles/account-login-scene.css";
 import "./styles/trainer-selection-scene.css";
 import "./styles/game-ui-responsive.css";
 import "./styles/game-stage-widescreen.css";
+import "./styles/mobile-trainer-sheets.css";
+import "./styles/mobile-gameplay-ux.css";
 
 // ui
 import "./game/battle/ui/modern/battle-ui.css";
+import "./game/battle/ui/modern/mobile-battle-ui.css";
 import "./game/battle/ui/modern/animations.css";
 import "./game/battle/ui/modern/items.css";
 import "./game/battle/ui/modern/progression.css";
