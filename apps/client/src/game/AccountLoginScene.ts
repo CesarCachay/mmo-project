@@ -8,12 +8,16 @@ import {
 import { GoogleIdentityClient } from "../account/google-identity.client";
 import { selectedTrainerStore } from "../account/selected-trainer.store";
 
+import { GameViewportOverlay } from "../shell/GameViewportOverlay";
+
 import { setAccountShellAuthenticated } from "../account/account-shell.controller";
 
 export class AccountLoginScene extends Phaser.Scene {
   private readonly accountHttpClient = new AccountHttpClient();
   private readonly localAuthHttpClient = new LocalAuthHttpClient();
   private readonly googleIdentityClient = new GoogleIdentityClient();
+
+  private viewportOverlay?: GameViewportOverlay;
 
   private isAuthenticating = false;
 
@@ -37,7 +41,7 @@ export class AccountLoginScene extends Phaser.Scene {
     container.innerHTML = `
       <div class="join-header">
         <h1 class="join-title">
-          MMO-Trainer
+          POKE-Gangsters
         </h1>
       </div>
 
@@ -115,33 +119,27 @@ export class AccountLoginScene extends Phaser.Scene {
       </p>
     `;
 
-    const domElement = this.add
-      .dom(width / 2, height / 2, container)
-      .setOrigin(0.5, 0.5);
+    this.viewportOverlay = new GameViewportOverlay("account-scene-overlay");
+    this.viewportOverlay.mount(container);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.viewportOverlay?.destroy();
+      this.viewportOverlay = undefined;
+    });
 
     const form = container.querySelector<HTMLFormElement>("[data-login-form]");
 
-    const loginIdInput =
-      container.querySelector<HTMLInputElement>("[data-login-id]");
+    const loginIdInput = container.querySelector<HTMLInputElement>("[data-login-id]");
 
-    const passwordInput =
-      container.querySelector<HTMLInputElement>("[data-password]");
+    const passwordInput = container.querySelector<HTMLInputElement>("[data-password]");
 
-    const loginButton = container.querySelector<HTMLButtonElement>(
-      "[data-login-button]",
-    );
+    const loginButton = container.querySelector<HTMLButtonElement>("[data-login-button]");
 
-    const registerLink = container.querySelector<HTMLButtonElement>(
-      "[data-register-link]",
-    );
+    const registerLink =
+      container.querySelector<HTMLButtonElement>("[data-register-link]");
 
-    const googleButton = container.querySelector<HTMLDivElement>(
-      "[data-google-button]",
-    );
+    const googleButton = container.querySelector<HTMLDivElement>("[data-google-button]");
 
-    const status = container.querySelector<HTMLDivElement>(
-      "[data-login-status]",
-    );
+    const status = container.querySelector<HTMLDivElement>("[data-login-status]");
 
     if (
       !form ||
@@ -158,27 +156,19 @@ export class AccountLoginScene extends Phaser.Scene {
     form.addEventListener("submit", (event) => {
       event.preventDefault();
 
-      void this.handleLocalLogin(
-        loginIdInput,
-        passwordInput,
-        loginButton,
-        domElement,
-        status,
-      );
+      void this.handleLocalLogin(loginIdInput, passwordInput, loginButton, status);
     });
 
     registerLink.addEventListener("click", () => {
-      domElement.destroy();
       this.scene.start("AccountRegisterScene");
     });
 
-    void this.initialize(domElement, googleButton, status);
+    void this.initialize(googleButton, status);
   }
 
   private async initialize(
-    domElement: Phaser.GameObjects.DOMElement,
     googleButton: HTMLDivElement,
-    status: HTMLDivElement,
+    status: HTMLDivElement
   ): Promise<void> {
     this.setStatus(status, "Verificando sesión...");
 
@@ -188,7 +178,7 @@ export class AccountLoginScene extends Phaser.Scene {
       if (session) {
         setAccountShellAuthenticated(true);
 
-        this.continueToGame(domElement);
+        this.continueToGame();
         return;
       }
     } catch {
@@ -198,17 +188,11 @@ export class AccountLoginScene extends Phaser.Scene {
     this.setStatus(status, "");
 
     try {
-      await this.googleIdentityClient.renderSignInButton(
-        googleButton,
-        (credential) => {
-          void this.handleGoogleCredential(credential, domElement, status);
-        },
-      );
+      await this.googleIdentityClient.renderSignInButton(googleButton, (credential) => {
+        void this.handleGoogleCredential(credential, status);
+      });
     } catch {
-      this.setStatus(
-        status,
-        "Google no está disponible. Puedes ingresar con tu ID.",
-      );
+      this.setStatus(status, "Google no está disponible. Puedes ingresar con tu ID.");
     }
   }
 
@@ -216,8 +200,7 @@ export class AccountLoginScene extends Phaser.Scene {
     loginIdInput: HTMLInputElement,
     passwordInput: HTMLInputElement,
     loginButton: HTMLButtonElement,
-    domElement: Phaser.GameObjects.DOMElement,
-    status: HTMLDivElement,
+    status: HTMLDivElement
   ): Promise<void> {
     if (this.isAuthenticating) {
       return;
@@ -249,7 +232,7 @@ export class AccountLoginScene extends Phaser.Scene {
 
       setAccountShellAuthenticated(true);
 
-      this.continueToGame(domElement);
+      this.continueToGame();
     } catch (error) {
       this.isAuthenticating = false;
 
@@ -263,8 +246,7 @@ export class AccountLoginScene extends Phaser.Scene {
 
   private async handleGoogleCredential(
     credential: string,
-    domElement: Phaser.GameObjects.DOMElement,
-    status: HTMLDivElement,
+    status: HTMLDivElement
   ): Promise<void> {
     if (this.isAuthenticating) {
       return;
@@ -279,7 +261,7 @@ export class AccountLoginScene extends Phaser.Scene {
 
       setAccountShellAuthenticated(true);
 
-      this.continueToGame(domElement);
+      this.continueToGame();
     } catch {
       this.isAuthenticating = false;
       this.setStatus(status, "No pudimos iniciar sesión con Google.", true);
@@ -294,17 +276,12 @@ export class AccountLoginScene extends Phaser.Scene {
     return "No pudimos iniciar sesión.";
   }
 
-  private continueToGame(domElement: Phaser.GameObjects.DOMElement): void {
+  private continueToGame(): void {
     selectedTrainerStore.clear();
-    domElement.destroy();
     this.scene.start("TrainerSelectionScene");
   }
 
-  private setStatus(
-    element: HTMLDivElement,
-    message: string,
-    isError = false,
-  ): void {
+  private setStatus(element: HTMLDivElement, message: string, isError = false): void {
     element.textContent = message;
     element.classList.toggle("is-error", isError);
   }

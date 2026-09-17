@@ -84,6 +84,7 @@ export class GameShellController {
 
     const viewport = document.createElement("main");
 
+    viewport.id = "game-shell-viewport";
     viewport.className = "game-shell__viewport";
 
     const stage = document.createElement("div");

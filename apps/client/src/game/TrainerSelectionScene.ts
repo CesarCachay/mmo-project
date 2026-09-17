@@ -10,6 +10,8 @@ import type { AccountTrainer } from "../account/trainer-http.client";
 
 import { selectedTrainerStore } from "../account/selected-trainer.store";
 
+import { GameViewportOverlay } from "../shell/GameViewportOverlay";
+
 const MAX_TRAINERS = 3;
 
 function escapeHtml(value: string): string {
@@ -36,7 +38,7 @@ export class TrainerSelectionScene extends Phaser.Scene {
 
   private statusElement?: HTMLDivElement;
 
-  private domElement?: Phaser.GameObjects.DOMElement;
+  private viewportOverlay?: GameViewportOverlay;
 
   private initialErrorMessage = "";
 
@@ -190,8 +192,9 @@ export class TrainerSelectionScene extends Phaser.Scene {
       </div>
     `;
 
-    this.domElement = this.add.dom(width / 2, height / 2, container).setOrigin(0.5, 0.5);
+    this.viewportOverlay = new GameViewportOverlay("trainer-selection-scene-overlay");
 
+    this.viewportOverlay.mount(container);
     this.slotsElement =
       container.querySelector<HTMLDivElement>("[data-trainer-slots]") ?? undefined;
 
@@ -208,8 +211,8 @@ export class TrainerSelectionScene extends Phaser.Scene {
     this.configureCreateForm(container);
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-      this.domElement?.destroy();
-      this.domElement = undefined;
+      this.viewportOverlay?.destroy();
+      this.viewportOverlay = undefined;
     });
 
     void this.loadTrainers();
@@ -266,8 +269,6 @@ export class TrainerSelectionScene extends Phaser.Scene {
     }
 
     slots.innerHTML = html.join("");
-
-    this.refreshDomLayout();
 
     slots.querySelectorAll<HTMLButtonElement>("[data-trainer-id]").forEach((button) => {
       button.addEventListener("click", () => {
@@ -478,7 +479,6 @@ export class TrainerSelectionScene extends Phaser.Scene {
   private openCreatePanel(): void {
     if (this.trainers.length >= MAX_TRAINERS) {
       this.setStatus("Ya tienes el máximo de 3 Trainers.", true);
-
       return;
     }
 
@@ -489,10 +489,6 @@ export class TrainerSelectionScene extends Phaser.Scene {
     if (this.creationElement) {
       this.creationElement.hidden = false;
     }
-
-    requestAnimationFrame(() => {
-      this.refreshDomLayout();
-    });
   }
 
   private closeCreatePanel(): void {
@@ -503,10 +499,6 @@ export class TrainerSelectionScene extends Phaser.Scene {
     if (this.slotsElement) {
       this.slotsElement.hidden = false;
     }
-
-    requestAnimationFrame(() => {
-      this.refreshDomLayout();
-    });
   }
 
   private setStatus(
@@ -528,17 +520,5 @@ export class TrainerSelectionScene extends Phaser.Scene {
     this.scene.start("GameScene", {
       avatarId: trainer.avatarId,
     });
-  }
-
-  private refreshDomLayout(): void {
-    const domElement = this.domElement;
-
-    if (!domElement) {
-      return;
-    }
-
-    domElement.updateSize();
-    domElement.setOrigin(0.5, 0.5);
-    domElement.setPosition(this.scale.width / 2, this.scale.height / 2);
   }
 }

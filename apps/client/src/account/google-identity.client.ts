@@ -18,7 +18,7 @@ type GoogleIdentityApi = {
       shape: "rectangular";
       logo_alignment: "left";
       width: number;
-    },
+    }
   ): void;
 };
 
@@ -76,7 +76,7 @@ async function loadGoogleIdentityServices(): Promise<GoogleGlobal> {
           },
           {
             once: true,
-          },
+          }
         );
 
         return;
@@ -104,7 +104,7 @@ async function loadGoogleIdentityServices(): Promise<GoogleGlobal> {
         },
         {
           once: true,
-        },
+        }
       );
 
       script.addEventListener(
@@ -116,7 +116,7 @@ async function loadGoogleIdentityServices(): Promise<GoogleGlobal> {
         },
         {
           once: true,
-        },
+        }
       );
 
       document.head.appendChild(script);
@@ -129,7 +129,7 @@ async function loadGoogleIdentityServices(): Promise<GoogleGlobal> {
 export class GoogleIdentityClient {
   async renderSignInButton(
     container: HTMLElement,
-    onCredential: (credential: string) => void,
+    onCredential: (credential: string) => void
   ): Promise<void> {
     credentialHandler = onCredential;
 
@@ -154,12 +154,13 @@ export class GoogleIdentityClient {
 
       initializedClientId = clientId;
     } else if (initializedClientId !== clientId) {
-      throw new Error(
-        "Google Identity Services was initialized with another client id",
-      );
+      throw new Error("Google Identity Services was initialized with another client id");
     }
 
     container.replaceChildren();
+
+    const availableWidth = container.clientWidth;
+    const buttonWidth = Math.max(200, Math.min(320, availableWidth || 256));
 
     google.accounts.id.renderButton(container, {
       type: "standard",
@@ -168,7 +169,7 @@ export class GoogleIdentityClient {
       text: "signin_with",
       shape: "rectangular",
       logo_alignment: "left",
-      width: 256,
+      width: buttonWidth,
     });
   }
 }

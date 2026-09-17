@@ -9,8 +9,12 @@ import { selectedTrainerStore } from "../account/selected-trainer.store";
 
 import { setAccountShellAuthenticated } from "../account/account-shell.controller";
 
+import { GameViewportOverlay } from "../shell/GameViewportOverlay";
+
 export class AccountRegisterScene extends Phaser.Scene {
   private readonly localAuthHttpClient = new LocalAuthHttpClient();
+
+  private viewportOverlay?: GameViewportOverlay;
 
   private isRegistering = false;
 
@@ -40,7 +44,7 @@ export class AccountRegisterScene extends Phaser.Scene {
 
       <div class="join-header">
         <h1 class="join-title">
-          MMO-Trainer
+          POKE-Gangsters
         </h1>
       </div>
 
@@ -126,37 +130,32 @@ export class AccountRegisterScene extends Phaser.Scene {
       </p>
     `;
 
-    const domElement = this.add
-      .dom(width / 2, height / 2, container)
-      .setOrigin(0.5, 0.5);
+    this.viewportOverlay = new GameViewportOverlay("account-scene-overlay");
+    this.viewportOverlay.mount(container);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.viewportOverlay?.destroy();
+      this.viewportOverlay = undefined;
+    });
 
-    const form = container.querySelector<HTMLFormElement>(
-      "[data-register-form]",
-    );
+    const form = container.querySelector<HTMLFormElement>("[data-register-form]");
 
-    const backButton =
-      container.querySelector<HTMLButtonElement>("[data-back-button]");
+    const backButton = container.querySelector<HTMLButtonElement>("[data-back-button]");
 
-    const loginIdInput =
-      container.querySelector<HTMLInputElement>("[data-login-id]");
+    const loginIdInput = container.querySelector<HTMLInputElement>("[data-login-id]");
 
-    const passwordInput =
-      container.querySelector<HTMLInputElement>("[data-password]");
+    const passwordInput = container.querySelector<HTMLInputElement>("[data-password]");
 
     const confirmPasswordInput = container.querySelector<HTMLInputElement>(
-      "[data-confirm-password]",
+      "[data-confirm-password]"
     );
 
     const registerButton = container.querySelector<HTMLButtonElement>(
-      "[data-register-button]",
+      "[data-register-button]"
     );
 
-    const loginLink =
-      container.querySelector<HTMLButtonElement>("[data-login-link]");
+    const loginLink = container.querySelector<HTMLButtonElement>("[data-login-link]");
 
-    const status = container.querySelector<HTMLDivElement>(
-      "[data-register-status]",
-    );
+    const status = container.querySelector<HTMLDivElement>("[data-register-status]");
 
     if (
       !form ||
@@ -181,8 +180,7 @@ export class AccountRegisterScene extends Phaser.Scene {
         registerButton,
         backButton,
         loginLink,
-        domElement,
-        status,
+        status
       );
     });
 
@@ -190,9 +188,6 @@ export class AccountRegisterScene extends Phaser.Scene {
       if (this.isRegistering) {
         return;
       }
-
-      domElement.destroy();
-
       this.scene.start("AccountLoginScene");
     });
 
@@ -200,9 +195,6 @@ export class AccountRegisterScene extends Phaser.Scene {
       if (this.isRegistering) {
         return;
       }
-
-      domElement.destroy();
-
       this.scene.start("AccountLoginScene");
     });
   }
@@ -214,8 +206,7 @@ export class AccountRegisterScene extends Phaser.Scene {
     registerButton: HTMLButtonElement,
     backButton: HTMLButtonElement,
     loginLink: HTMLButtonElement,
-    domElement: Phaser.GameObjects.DOMElement,
-    status: HTMLDivElement,
+    status: HTMLDivElement
   ): Promise<void> {
     if (this.isRegistering) {
       return;
@@ -254,7 +245,7 @@ export class AccountRegisterScene extends Phaser.Scene {
       registerButton,
       backButton,
       loginLink,
-      true,
+      true
     );
 
     this.setStatus(status, "Creando cuenta...");
@@ -269,8 +260,6 @@ export class AccountRegisterScene extends Phaser.Scene {
 
       selectedTrainerStore.clear();
 
-      domElement.destroy();
-
       this.scene.start("TrainerSelectionScene");
     } catch (error) {
       this.isRegistering = false;
@@ -282,7 +271,7 @@ export class AccountRegisterScene extends Phaser.Scene {
         registerButton,
         backButton,
         loginLink,
-        false,
+        false
       );
 
       this.setStatus(status, this.getRegisterErrorMessage(error), true);
@@ -310,7 +299,7 @@ export class AccountRegisterScene extends Phaser.Scene {
     registerButton: HTMLButtonElement,
     backButton: HTMLButtonElement,
     loginLink: HTMLButtonElement,
-    disabled: boolean,
+    disabled: boolean
   ): void {
     loginIdInput.disabled = disabled;
     passwordInput.disabled = disabled;
@@ -320,11 +309,7 @@ export class AccountRegisterScene extends Phaser.Scene {
     loginLink.disabled = disabled;
   }
 
-  private setStatus(
-    element: HTMLDivElement,
-    message: string,
-    isError = false,
-  ): void {
+  private setStatus(element: HTMLDivElement, message: string, isError = false): void {
     element.textContent = message;
     element.classList.toggle("is-error", isError);
   }

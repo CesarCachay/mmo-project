@@ -4,7 +4,7 @@
 }
 
 .trainer-selection-panel {
-  width: 500px;
+  width: min(100%, 760px);
   padding: 18px;
   border: 1px solid #334155;
   border-radius: 10px;
@@ -313,4 +313,39 @@
 
 .trainer-create-submit:hover {
   background: #0369a1;
+}
+
+.trainer-selection-scene-overlay {
+  padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right))
+    max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+}
+
+.trainer-selection-scene-overlay .trainer-selection-panel {
+  width: min(100%, 760px);
+}
+
+/* Tablet / mobile portrait */
+@media (max-width: 720px) {
+  .trainer-selection-scene-overlay {
+    align-items: start;
+    padding: max(16px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right))
+      max(16px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+  }
+
+  .trainer-selection-scene-overlay .trainer-selection-panel {
+    width: 100%;
+    padding: 18px;
+  }
+
+  .trainer-selection-scene-overlay .trainer-slots {
+    grid-template-columns: 1fr;
+  }
+
+  .trainer-selection-scene-overlay .trainer-slot {
+    height: 132px;
+  }
+
+  .trainer-selection-scene-overlay .trainer-slot-plus {
+    margin-top: 18px;
+  }
 }
