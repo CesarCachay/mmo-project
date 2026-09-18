@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import type { Direction, MapId } from "@cesar-mmo/shared";
 import { getOverworldCameraProfile } from "./overworldCameraProfiles";
+import { MOBILE_VISUAL_VIEWPORT_STABLE_EVENT } from "../mobile/mobileViewportEvents";
 
 const CAMERA_FOLLOW_LERP_X = 0.18;
 const CAMERA_FOLLOW_LERP_Y = 0.18;
@@ -66,6 +67,7 @@ export class OverworldCameraController {
 
   private followOffsetX = 0;
   private followOffsetY = 0;
+  private viewportRefreshFrame?: number;
 
   constructor(
     camera: Phaser.Cameras.Scene2D.Camera,
@@ -77,6 +79,10 @@ export class OverworldCameraController {
     this.scale = scale;
 
     this.scale.on("resize", this.handleScaleResize, this);
+    window.addEventListener(
+      MOBILE_VISUAL_VIEWPORT_STABLE_EVENT,
+      this.handleVisualViewportStable
+    );
   }
 
   public start(mapId: MapId, map: Phaser.Tilemaps.Tilemap): void {
@@ -196,6 +202,16 @@ export class OverworldCameraController {
 
   public destroy(): void {
     this.scale.off("resize", this.handleScaleResize, this);
+
+    window.removeEventListener(
+      MOBILE_VISUAL_VIEWPORT_STABLE_EVENT,
+      this.handleVisualViewportStable
+    );
+
+    if (this.viewportRefreshFrame !== undefined) {
+      window.cancelAnimationFrame(this.viewportRefreshFrame);
+      this.viewportRefreshFrame = undefined;
+    }
   }
 
   private getTargetFollowOffset(
@@ -360,6 +376,25 @@ export class OverworldCameraController {
 
     this.camera.setDeadzone(deadzoneWidth, deadzoneHeight);
   }
+
+  private readonly handleVisualViewportStable = (): void => {
+    /*
+     * Phaser 4.2.1 already observes parent resize, but iOS Safari can settle its
+     * visual viewport after the first orientation/window resize. Explicitly ask
+     * ScaleManager for one more layout refresh once our DOM viewport has reached
+     * the final visualViewport height.
+     */
+    this.scale.refresh();
+
+    if (this.viewportRefreshFrame !== undefined) {
+      window.cancelAnimationFrame(this.viewportRefreshFrame);
+    }
+
+    this.viewportRefreshFrame = window.requestAnimationFrame(() => {
+      this.viewportRefreshFrame = undefined;
+      this.handleScaleResize();
+    });
+  };
 
   private handleScaleResize(): void {
     const mapId = this.activeMapId;

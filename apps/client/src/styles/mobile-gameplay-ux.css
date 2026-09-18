@@ -137,3 +137,21 @@
     animation: none !important;
   }
 }
+
+/* =========================================================
+   iOS / mobile landscape visual viewport stabilization
+
+   Safari can keep 100dvh / the layout viewport slightly taller than the area
+   that is actually visible while browser chrome is present. The controller
+   publishes window.visualViewport.height after the viewport has stabilized.
+
+   Scope this to touch landscape only so desktop and Android layouts that are
+   already correct keep their existing behavior.
+========================================================= */
+
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) {
+  .game-shell {
+    height: var(--game-visual-viewport-height, 100dvh);
+    max-height: var(--game-visual-viewport-height, 100dvh);
+  }
+}
