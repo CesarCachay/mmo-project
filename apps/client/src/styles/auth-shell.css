@@ -83,3 +83,70 @@
     margin-bottom: 18px;
   }
 }
+
+/* =========================================================
+   Account overlay — scroll-safe portrait + landscape
+========================================================= */
+
+.account-scene-overlay {
+  /*
+   * A centered CSS grid can clip an element taller
+   * than its scroll container.
+   *
+   * Flex + auto block margins gives us:
+   *
+   * - centered card when it fits
+   * - top-aligned scrollable card when it does not
+   */
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.account-scene-overlay .join-panel {
+  flex: 0 0 auto;
+  margin-block: auto;
+}
+
+@media (max-height: 620px) {
+  .account-scene-overlay {
+    padding-top: max(10px, env(safe-area-inset-top));
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+  }
+
+  .account-scene-overlay .join-panel {
+    padding: 16px 20px;
+  }
+
+  .account-scene-overlay .join-header {
+    margin-bottom: 12px;
+  }
+
+  .account-scene-overlay .account-login-copy {
+    margin-bottom: 12px;
+  }
+
+  .account-scene-overlay .account-local-form {
+    gap: 8px;
+  }
+
+  .account-scene-overlay .account-register-prompt {
+    margin-top: 10px;
+  }
+
+  .account-scene-overlay .account-auth-divider {
+    margin: 10px 0;
+  }
+
+  .account-scene-overlay .account-login-status {
+    margin-top: 8px;
+  }
+
+  .account-scene-overlay .join-hint {
+    margin-top: 6px;
+  }
+}

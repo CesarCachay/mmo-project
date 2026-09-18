@@ -80,6 +80,17 @@
   }
 }
 
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) {
+  .mobile-trainer-hud-dock {
+    left: auto;
+    right: max(12px, env(safe-area-inset-right));
+    top: 50%;
+    bottom: auto;
+    flex-direction: column;
+    transform: translateY(-50%);
+  }
+}
+
 /*
    * Gameplay portrait todavía no es nuestro
    * target principal, pero evitamos que el dock

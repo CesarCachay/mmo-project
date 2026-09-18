@@ -10,6 +10,7 @@
 }
 
 .mobile-orientation-hint__card {
+  appearance: none;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -21,6 +22,21 @@
   color: #ffffff;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(8px);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-orientation-hint__card:active {
+  transform: scale(0.985);
+}
+
+.mobile-orientation-hint__card:disabled {
+  opacity: 0.78;
+  cursor: default;
 }
 
 .mobile-orientation-hint__icon {

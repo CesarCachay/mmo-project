@@ -220,5 +220,12 @@ export class OverworldCameraController {
     }
 
     this.updateBounds(map);
+
+    this.followOffsetX = 0;
+    this.followOffsetY = 0;
+
+    this.camera.setFollowOffset(0, 0);
+
+    this.camera.centerOn(this.player.x, this.player.y);
   }
 }
