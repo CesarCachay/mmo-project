@@ -20,6 +20,7 @@ const CAMERA_ZOOM_EPSILON = 0.001;
 export class OverworldCameraController {
   private readonly camera: Phaser.Cameras.Scene2D.Camera;
   private readonly player: Phaser.GameObjects.Sprite;
+  private readonly scale: Phaser.Scale.ScaleManager;
 
   private activeMapId?: MapId;
   private activeMap?: Phaser.Tilemaps.Tilemap;
@@ -29,9 +30,16 @@ export class OverworldCameraController {
   private followOffsetX = 0;
   private followOffsetY = 0;
 
-  constructor(camera: Phaser.Cameras.Scene2D.Camera, player: Phaser.GameObjects.Sprite) {
+  constructor(
+    camera: Phaser.Cameras.Scene2D.Camera,
+    player: Phaser.GameObjects.Sprite,
+    scale: Phaser.Scale.ScaleManager
+  ) {
     this.camera = camera;
     this.player = player;
+    this.scale = scale;
+
+    this.scale.on("resize", this.handleScaleResize, this);
   }
 
   public start(mapId: MapId, map: Phaser.Tilemaps.Tilemap): void {
@@ -187,6 +195,30 @@ export class OverworldCameraController {
     this.camera.setZoom(zoom);
 
     /* Aquí sí recalculamos bounds únicamente cuando cambia el zoom responsive */
+    this.updateBounds(map);
+  }
+
+  public destroy(): void {
+    this.scale.off("resize", this.handleScaleResize, this);
+  }
+
+  private handleScaleResize(): void {
+    const mapId = this.activeMapId;
+    const map = this.activeMap;
+
+    if (!mapId || !map) {
+      return;
+    }
+
+    const zoom = this.resolveZoom(mapId);
+
+    const zoomChanged = Math.abs(this.appliedZoom - zoom) >= CAMERA_ZOOM_EPSILON;
+
+    if (zoomChanged) {
+      this.appliedZoom = zoom;
+      this.camera.setZoom(zoom);
+    }
+
     this.updateBounds(map);
   }
 }

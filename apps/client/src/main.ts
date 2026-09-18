@@ -42,7 +42,7 @@ const config: Phaser.Types.Core.GameConfig = {
   parent: "app",
 
   scale: {
-    mode: Phaser.Scale.FIT,
+    mode: Phaser.Scale.EXPAND,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     width: VIEWPORT_WIDTH,
     height: VIEWPORT_HEIGHT,

@@ -252,9 +252,14 @@ export class GameScene extends Phaser.Scene {
 
     this.overworldCameraController = new OverworldCameraController(
       this.cameras.main,
-      this.player
+      this.player,
+      this.scale
     );
     this.setupCamera();
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.overworldCameraController.destroy();
+    });
+
     this.createDialogueUi();
     this.createChatUi();
     this.createStarterSelectionUi();
