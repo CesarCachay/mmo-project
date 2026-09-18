@@ -16,6 +16,12 @@ export type OverworldCameraProfile = {
   readonly touchLandscapeMinZoom: number;
 
   /**
+   * Upper bound for touch-landscape framing. Mobile is allowed to get slightly
+   * closer than the desktop baseline when that helps eliminate empty gutters.
+   */
+  readonly touchLandscapeMaxZoom: number;
+
+  /**
    * Maximum relative zoom increase allowed when the current map is narrower than
    * the responsive camera viewport. This reduces visible side gutters without
    * sacrificing the vertical framing gains from the responsive zoom.
@@ -27,14 +33,16 @@ export type OverworldCameraProfile = {
 
 const OUTDOOR_CAMERA_PROFILE: OverworldCameraProfile = {
   zoom: 1.5,
-  touchLandscapeMinZoom: 1.26,
-  touchLandscapeMaxMapFillAdjustment: 0.12,
+  touchLandscapeMinZoom: 1.2,
+  touchLandscapeMaxZoom: 1.58,
+  touchLandscapeMaxMapFillAdjustment: 0.35,
 };
 
 const INTERIOR_CAMERA_PROFILE: OverworldCameraProfile = {
   zoom: 1.75,
-  touchLandscapeMinZoom: 1.47,
-  touchLandscapeMaxMapFillAdjustment: 0.12,
+  touchLandscapeMinZoom: 1.4,
+  touchLandscapeMaxZoom: 1.84,
+  touchLandscapeMaxMapFillAdjustment: 0.30,
 };
 
 export const OVERWORLD_CAMERA_PROFILES: Record<MapId, OverworldCameraProfile> = {

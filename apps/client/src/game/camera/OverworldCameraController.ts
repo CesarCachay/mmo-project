@@ -32,19 +32,27 @@ const TOUCH_SAFE_DEADZONE_MIN_HEIGHT = 16;
 const TOUCH_SAFE_DEADZONE_MAX_HEIGHT = 24;
 
 /*
- * Camera edge overscan is expressed in SCREEN pixels so the UX remains stable
- * across zoom levels. It is converted to world units when bounds are applied.
+ * Camera Responsive V2.4 — minimal sprite-aware edge overscan.
  *
- * Bottom gets a larger budget because mobile browser/home-indicator chrome and
- * thumb controls make that edge more likely to hide the player visually.
+ * The old fixed 20..64px budget guaranteed visibility, but could reveal a large
+ * black strip outside short maps. Instead, reserve only enough screen space for
+ * half of the player sprite plus a small comfort margin. Because the calculation
+ * uses the real sprite displayHeight and current camera zoom, increasing mobile
+ * zoom does not reintroduce top/bottom sprite clipping.
  */
-const TOUCH_EDGE_TOP_SCREEN_RATIO = 0.045;
-const TOUCH_EDGE_TOP_SCREEN_MIN = 16;
-const TOUCH_EDGE_TOP_SCREEN_MAX = 24;
+const TOUCH_EDGE_TOP_CLEARANCE_SCREEN = 6;
+const TOUCH_EDGE_BOTTOM_CLEARANCE_SCREEN = 12;
+const TOUCH_EDGE_TOP_SCREEN_MIN = 18;
+const TOUCH_EDGE_TOP_SCREEN_MAX = 32;
+const TOUCH_EDGE_BOTTOM_SCREEN_MIN = 24;
+const TOUCH_EDGE_BOTTOM_SCREEN_MAX = 42;
 
-const TOUCH_EDGE_BOTTOM_SCREEN_RATIO = 0.085;
-const TOUCH_EDGE_BOTTOM_SCREEN_MIN = 28;
-const TOUCH_EDGE_BOTTOM_SCREEN_MAX = 44;
+/*
+ * Mobile landscape intentionally feels a little closer than the pure aspect-ratio
+ * solution. This is a presentation-only multiplier; map-fill constraints and the
+ * per-profile maximum zoom still own the final clamp.
+ */
+const TOUCH_LANDSCAPE_COMFORT_ZOOM_MULTIPLIER = 1.08;
 
 export class OverworldCameraController {
   private readonly camera: Phaser.Cameras.Scene2D.Camera;
@@ -118,14 +126,17 @@ export class OverworldCameraController {
     let bottomEdgePadding = 0;
 
     if (this.isTouchLandscapeViewport()) {
+      const playerHalfHeightScreen =
+        (this.player.displayHeight * this.camera.zoom) / 2;
+
       const topScreenPadding = Phaser.Math.Clamp(
-        this.camera.height * TOUCH_EDGE_TOP_SCREEN_RATIO,
+        playerHalfHeightScreen + TOUCH_EDGE_TOP_CLEARANCE_SCREEN,
         TOUCH_EDGE_TOP_SCREEN_MIN,
         TOUCH_EDGE_TOP_SCREEN_MAX
       );
 
       const bottomScreenPadding = Phaser.Math.Clamp(
-        this.camera.height * TOUCH_EDGE_BOTTOM_SCREEN_RATIO,
+        playerHalfHeightScreen + TOUCH_EDGE_BOTTOM_CLEARANCE_SCREEN,
         TOUCH_EDGE_BOTTOM_SCREEN_MIN,
         TOUCH_EDGE_BOTTOM_SCREEN_MAX
       );
@@ -265,11 +276,17 @@ export class OverworldCameraController {
     const responsiveZoom = Phaser.Math.Clamp(
       profile.zoom * aspectScale,
       profile.touchLandscapeMinZoom,
-      profile.zoom
+      profile.touchLandscapeMaxZoom
+    );
+
+    const comfortZoom = Phaser.Math.Clamp(
+      responsiveZoom * TOUCH_LANDSCAPE_COMFORT_ZOOM_MULTIPLIER,
+      profile.touchLandscapeMinZoom,
+      profile.touchLandscapeMaxZoom
     );
 
     /*
-     * Camera Responsive V2.1 — Map Fill Constraint
+     * Camera Responsive V2.4 — cover-biased Map Fill Constraint
      *
      * A very wide Scale.EXPAND viewport can become wider than the rendered map
      * after responsive zoom-out. Raising the zoom just enough to cover the full
@@ -284,16 +301,16 @@ export class OverworldCameraController {
     const widthCoverZoom = this.camera.width / mapWidth;
 
     const maximumMapFillZoom = Math.min(
-      profile.zoom,
+      profile.touchLandscapeMaxZoom,
       responsiveZoom * (1 + profile.touchLandscapeMaxMapFillAdjustment)
     );
 
     const mapAwareZoom = Math.min(widthCoverZoom, maximumMapFillZoom);
 
     return Phaser.Math.Clamp(
-      Math.max(responsiveZoom, mapAwareZoom),
+      Math.max(comfortZoom, mapAwareZoom),
       profile.touchLandscapeMinZoom,
-      profile.zoom
+      profile.touchLandscapeMaxZoom
     );
   }
 
