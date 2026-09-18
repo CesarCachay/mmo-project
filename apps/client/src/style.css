@@ -448,15 +448,17 @@ canvas {
   }
 
   .account-menu-trigger {
-    height: 32px;
-    gap: 5px;
-    padding: 3px 7px 3px 3px;
+    position: relative;
+    height: 28px;
+    gap: 4px;
+    padding: 2px 6px 2px 2px;
   }
 
   .account-menu-trigger__avatar {
-    width: 24px;
-    height: 24px;
-    flex-basis: 24px;
+    width: 20px;
+    height: 20px;
+    flex-basis: 20px;
+    font-size: 9px;
   }
 
   .account-menu-trigger__name {
@@ -484,7 +486,7 @@ canvas {
 
 @media (hover: none) and (pointer: coarse) and (orientation: landscape) {
   :root {
-    --game-topbar-height: 40px;
+    --game-topbar-height: 32px;
     --game-viewport-padding: 0px;
   }
 
@@ -497,8 +499,8 @@ canvas {
   }
 
   .game-shell__brand {
-    font-size: 10px;
-    letter-spacing: 0.08em;
+    font-size: 9px;
+    letter-spacing: 0.075em;
   }
 
   .game-topbar-location {
@@ -511,7 +513,7 @@ canvas {
 
   .game-topbar-location__value {
     max-width: 32vw;
-    font-size: 10px;
+    font-size: 9px;
     line-height: 1;
   }
 
@@ -528,31 +530,31 @@ canvas {
   }
 
   .account-menu-trigger__name {
-    max-width: 88px;
-    font-size: 10px;
+    max-width: 82px;
+    font-size: 9px;
   }
 }
 
 @media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 460px) {
   :root {
-    --game-topbar-height: 38px;
+    --game-topbar-height: 30px;
   }
 
   .game-shell__brand {
-    font-size: 9px;
+    font-size: 8.5px;
   }
 
   .game-topbar-location__value {
-    font-size: 9px;
+    font-size: 8.5px;
   }
 
   .account-menu-trigger {
-    height: 30px;
+    height: 26px;
   }
 
   .account-menu-trigger__avatar {
-    width: 22px;
-    height: 22px;
-    flex-basis: 22px;
+    width: 19px;
+    height: 19px;
+    flex-basis: 19px;
   }
 }

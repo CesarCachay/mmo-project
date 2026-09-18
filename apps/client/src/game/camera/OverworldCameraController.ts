@@ -38,13 +38,13 @@ const TOUCH_SAFE_DEADZONE_MAX_HEIGHT = 24;
  * Bottom gets a larger budget because mobile browser/home-indicator chrome and
  * thumb controls make that edge more likely to hide the player visually.
  */
-const TOUCH_EDGE_TOP_SCREEN_RATIO = 0.06;
-const TOUCH_EDGE_TOP_SCREEN_MIN = 20;
-const TOUCH_EDGE_TOP_SCREEN_MAX = 32;
+const TOUCH_EDGE_TOP_SCREEN_RATIO = 0.045;
+const TOUCH_EDGE_TOP_SCREEN_MIN = 16;
+const TOUCH_EDGE_TOP_SCREEN_MAX = 24;
 
-const TOUCH_EDGE_BOTTOM_SCREEN_RATIO = 0.12;
-const TOUCH_EDGE_BOTTOM_SCREEN_MIN = 40;
-const TOUCH_EDGE_BOTTOM_SCREEN_MAX = 64;
+const TOUCH_EDGE_BOTTOM_SCREEN_RATIO = 0.085;
+const TOUCH_EDGE_BOTTOM_SCREEN_MIN = 28;
+const TOUCH_EDGE_BOTTOM_SCREEN_MAX = 44;
 
 export class OverworldCameraController {
   private readonly camera: Phaser.Cameras.Scene2D.Camera;

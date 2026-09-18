@@ -27,13 +27,13 @@ export type OverworldCameraProfile = {
 
 const OUTDOOR_CAMERA_PROFILE: OverworldCameraProfile = {
   zoom: 1.5,
-  touchLandscapeMinZoom: 1.2,
+  touchLandscapeMinZoom: 1.26,
   touchLandscapeMaxMapFillAdjustment: 0.12,
 };
 
 const INTERIOR_CAMERA_PROFILE: OverworldCameraProfile = {
   zoom: 1.75,
-  touchLandscapeMinZoom: 1.4,
+  touchLandscapeMinZoom: 1.47,
   touchLandscapeMaxMapFillAdjustment: 0.12,
 };
 
