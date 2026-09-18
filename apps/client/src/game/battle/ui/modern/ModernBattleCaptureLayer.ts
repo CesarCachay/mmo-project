@@ -23,6 +23,9 @@ export interface ModernBattleCaptureAnimationOptions {
 
   readonly onAbsorb: () => void | Promise<void>;
   readonly onBreakFree?: () => void | Promise<void>;
+  readonly onContained?: () => void;
+  readonly onSuccess?: () => void;
+  readonly onFailure?: () => void;
 }
 
 interface CapturePoint {
@@ -97,7 +100,16 @@ export class ModernBattleCaptureLayer {
   }
 
   public async playCapture(options: ModernBattleCaptureAnimationOptions): Promise<void> {
-    const { itemAssetPath, shakeCount, captured, onAbsorb, onBreakFree } = options;
+    const {
+      itemAssetPath,
+      shakeCount,
+      captured,
+      onAbsorb,
+      onBreakFree,
+      onContained,
+      onSuccess,
+      onFailure,
+    } = options;
 
     if (!Number.isInteger(shakeCount) || shakeCount < 0 || shakeCount > 4) {
       console.warn("[ModernBattleCaptureLayer] invalid shakeCount", shakeCount);
@@ -175,6 +187,8 @@ export class ModernBattleCaptureLayer {
       this.playParticleBurst(target, "absorb"),
     ]);
 
+    onContained?.();
+
     await this.delay(ABSORB_HOLD_MS);
 
     this.ball.classList.remove("battle-modern-capture__ball--absorbing");
@@ -244,11 +258,12 @@ export class ModernBattleCaptureLayer {
 
     /* 5. RESULT */
     if (captured) {
+      onSuccess?.();
       await this.playSuccess();
-
       return;
     }
 
+    onFailure?.();
     await Promise.all([
       this.playFailure(),
       this.playShockwave(ground, "strong"),

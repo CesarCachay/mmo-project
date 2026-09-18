@@ -20,6 +20,10 @@ import {
   getPlayerTextureKey,
   getPlayerAnimationKey,
 } from "./config/playerAssets";
+import {
+  WILD_BATTLE_AUDIO_ASSETS,
+  WILD_BATTLE_AUDIO_KEYS,
+} from "./battle/audio/WildBattleAudioController";
 import { POKEMON_STARTER_ASSETS } from "./pokemon/pokemon-starter-assets";
 import { PokemonSpriteLoader } from "./pokemon/PokemonSpriteLoader";
 import { PokemonOverworldSpriteLoader } from "./pokemon/PokemonOverworldSpriteLoader";
@@ -192,6 +196,20 @@ export class GameScene extends Phaser.Scene {
 
     // audio - pokecenter
     this.load.audio(
+      WILD_BATTLE_AUDIO_KEYS.CAPTURE_CONTAINED,
+      WILD_BATTLE_AUDIO_ASSETS.CAPTURE_CONTAINED
+    );
+    this.load.audio(
+      WILD_BATTLE_AUDIO_KEYS.CAPTURE_SUCCESS,
+      WILD_BATTLE_AUDIO_ASSETS.CAPTURE_SUCCESS
+    );
+    this.load.audio(
+      WILD_BATTLE_AUDIO_KEYS.CAPTURE_FAILED,
+      WILD_BATTLE_AUDIO_ASSETS.CAPTURE_FAILED
+    );
+    this.load.audio(WILD_BATTLE_AUDIO_KEYS.VICTORY, WILD_BATTLE_AUDIO_ASSETS.VICTORY);
+    this.load.audio(WILD_BATTLE_AUDIO_KEYS.DEFEAT, WILD_BATTLE_AUDIO_ASSETS.DEFEAT);
+    this.load.audio(
       POKEMON_CENTER_HEALING_AUDIO_KEYS.STEP,
       "/assets/audio/pokemon-center/heal-step.wav"
     );
@@ -217,18 +235,7 @@ export class GameScene extends Phaser.Scene {
       setAccountShellTrainerContext(undefined);
     });
 
-    const unlockAudio = () => {
-      if (!this.sound.locked) {
-        return;
-      }
-
-      this.sound.unlock();
-      console.log("[Audio] unlock requested");
-    };
-
-    this.input.once("pointerdown", unlockAudio);
-    this.input.keyboard?.once("keydown", unlockAudio);
-
+    this.installAudioUnlock();
     this.createPlayerAnimations();
     this.createPlayer();
     this.localPlayerController = new LocalPlayerController(this.player, this.avatarId);
@@ -1361,5 +1368,50 @@ export class GameScene extends Phaser.Scene {
       this.player.y,
       blocked
     );
+  }
+
+  private installAudioUnlock(): void {
+    const unlockAudio = (): void => {
+      if (this.sound.locked) {
+        this.sound.unlock();
+        console.log("[Audio] Phaser sound manager unlock requested");
+      }
+
+      const webAudioSoundManager = this.sound as typeof this.sound & {
+        context?: AudioContext;
+      };
+
+      const context = webAudioSoundManager.context;
+
+      if (context && context.state === "suspended") {
+        void context
+          .resume()
+          .then(() => {
+            console.log("[Audio] AudioContext resumed");
+          })
+          .catch((error: unknown) => {
+            console.warn("[Audio] AudioContext resume failed", error);
+          });
+      }
+    };
+
+    document.addEventListener("pointerdown", unlockAudio, {
+      capture: true,
+    });
+
+    /* Useful fallback for Safari touch behavior. */
+    document.addEventListener("touchend", unlockAudio, {
+      capture: true,
+    });
+
+    document.addEventListener("keydown", unlockAudio, {
+      capture: true,
+    });
+
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      document.removeEventListener("pointerdown", unlockAudio, true);
+      document.removeEventListener("touchend", unlockAudio, true);
+      document.removeEventListener("keydown", unlockAudio, true);
+    });
   }
 }

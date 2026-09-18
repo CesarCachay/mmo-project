@@ -28,6 +28,8 @@ import {
   getPokemonItem,
 } from "@cesar-mmo/shared";
 
+import { WildBattleAudioController } from "./audio/WildBattleAudioController";
+
 import { PokemonSpriteLoader } from "../pokemon/PokemonSpriteLoader";
 import { BattleOverlay } from "./ui/BattleOverlay";
 import type { BattleClientInteractionState } from "./battle-client.types";
@@ -69,20 +71,18 @@ export class BattleController {
   private pendingCompletion?: PokemonBattleCompletedPayload;
 
   private interactionState: BattleClientInteractionState = "completed";
-  private readonly sendBattleCommand: (
-    input: PokemonBattleCommandInput,
-  ) => void;
-  private readonly sendBattleReplacement: (
-    input: PokemonBattleReplacementInput,
-  ) => void;
+  private readonly sendBattleCommand: (input: PokemonBattleCommandInput) => void;
+  private readonly sendBattleReplacement: (input: PokemonBattleReplacementInput) => void;
   private replacementPokemonIndexes: readonly number[] = [];
 
   private trainerState?: PokemonTrainerState;
 
   private selectedItemId?: PokemonItemId;
 
+  private readonly audio: WildBattleAudioController;
+
   private readonly sendMoveLearningDecision: (
-    input: PokemonMoveLearningDecisionInput,
+    input: PokemonMoveLearningDecisionInput
   ) => void;
 
   private readonly evolutionPresentationController: PokemonEvolutionPresentationController;
@@ -96,12 +96,13 @@ export class BattleController {
     sendBattleCommand: (input: PokemonBattleCommandInput) => void,
     sendBattleReplacement: (input: PokemonBattleReplacementInput) => void,
     sendMoveLearningDecision: (input: PokemonMoveLearningDecisionInput) => void,
-    sendEvolutionDecision: (input: PokemonEvolutionDecisionInput) => void,
+    sendEvolutionDecision: (input: PokemonEvolutionDecisionInput) => void
   ) {
     this.pokemonSpriteLoader = pokemonSpriteLoader;
     this.sendBattleCommand = sendBattleCommand;
     this.sendBattleReplacement = sendBattleReplacement;
     this.sendMoveLearningDecision = sendMoveLearningDecision;
+    this.audio = new WildBattleAudioController(scene);
     this.overlay = new BattleOverlay(
       scene,
       // FIGHT
@@ -147,109 +148,92 @@ export class BattleController {
       // COMPLETION CONTINUE
       () => {
         this.handleCompletionAcknowledged();
-      },
+      }
     );
 
-    this.evolutionPresentationController =
-      new PokemonEvolutionPresentationController({
-        sendDecision: sendEvolutionDecision,
-        requestDecision: (input) =>
-          this.overlay.requestEvolutionDecision({
-            ...input,
-            pokemonName: this.getEvolutionPokemonDisplayName(
-              input.pokemonInstanceId,
-            ),
-          }),
-        hideDecision: () => {
-          this.overlay.hideEvolutionDecision();
-        },
-        onIdle: () => {
-          this.handleEvolutionPresentationIdle();
-        },
-        animateEvolution: (input) =>
-          this.overlay.animatePokemonEvolution(input),
-      });
+    this.evolutionPresentationController = new PokemonEvolutionPresentationController({
+      sendDecision: sendEvolutionDecision,
+      requestDecision: (input) =>
+        this.overlay.requestEvolutionDecision({
+          ...input,
+          pokemonName: this.getEvolutionPokemonDisplayName(input.pokemonInstanceId),
+        }),
+      hideDecision: () => {
+        this.overlay.hideEvolutionDecision();
+      },
+      onIdle: () => {
+        this.handleEvolutionPresentationIdle();
+      },
+      animateEvolution: (input) => this.overlay.animatePokemonEvolution(input),
+    });
 
-    this.evolutionHudSyncCoordinator =
-      new PokemonBattleEvolutionHudSyncCoordinator({
-        presentRequiredEvolution: (payload) =>
-          this.evolutionPresentationController.presentRequiredEvolution(
-            payload,
-          ),
-        getTrainerState: () => this.trainerState,
-        syncTrainerPokemonAfterEvolution: (evolvedPokemon, trainerParty) => {
-          let battlePresentationPokemon = evolvedPokemon;
+    this.evolutionHudSyncCoordinator = new PokemonBattleEvolutionHudSyncCoordinator({
+      presentRequiredEvolution: (payload) =>
+        this.evolutionPresentationController.presentRequiredEvolution(payload),
+      getTrainerState: () => this.trainerState,
+      syncTrainerPokemonAfterEvolution: (evolvedPokemon, trainerParty) => {
+        let battlePresentationPokemon = evolvedPokemon;
 
-          const activeBattlePayload = this.activeBattlePayload;
+        const activeBattlePayload = this.activeBattlePayload;
 
-          if (activeBattlePayload) {
-            const syncedBattle =
-              syncAuthoritativeTrainerPokemonIntoBattleSnapshot(
-                activeBattlePayload.battle,
-                evolvedPokemon.pokemon,
-              );
-
-            if (syncedBattle !== activeBattlePayload.battle) {
-              this.activeBattlePayload = {
-                battle: syncedBattle,
-              };
-
-              const trainerParticipant = syncedBattle.participants.find(
-                (participant) => participant.type === "trainer",
-              );
-
-              const syncedBattlePokemon = trainerParticipant?.pokemon.find(
-                (state) =>
-                  state.pokemon.instanceId ===
-                  evolvedPokemon.pokemon.instanceId,
-              );
-
-              if (syncedBattlePokemon) {
-                battlePresentationPokemon = syncedBattlePokemon;
-              }
-            }
-          }
-
-          this.overlay.syncTrainerPokemonAfterEvolution(
-            battlePresentationPokemon,
-            trainerParty,
+        if (activeBattlePayload) {
+          const syncedBattle = syncAuthoritativeTrainerPokemonIntoBattleSnapshot(
+            activeBattlePayload.battle,
+            evolvedPokemon.pokemon
           );
-        },
-        finishEvolutionCinematic: () => {
-          this.overlay.finishPokemonEvolutionCinematic();
-        },
-      });
 
-    this.recoveryEvolutionQueue = new PokemonEvolutionRecoveryPresentationQueue(
-      {
-        presentRequiredEvolution: async (payload) => {
-          /* Reconnect Evolution: no BattleInstance is required */
-          this.overlay.show();
+          if (syncedBattle !== activeBattlePayload.battle) {
+            this.activeBattlePayload = {
+              battle: syncedBattle,
+            };
 
-          try {
-            await this.evolutionPresentationController.presentRequiredEvolution(
-              payload,
+            const trainerParticipant = syncedBattle.participants.find(
+              (participant) => participant.type === "trainer"
             );
-          } finally {
-            this.overlay.finishPokemonEvolutionCinematic();
-            if (
-              !this.isActive &&
-              this.recoveryEvolutionQueue.pendingCount === 1
-            ) {
-              this.overlay.hide();
+
+            const syncedBattlePokemon = trainerParticipant?.pokemon.find(
+              (state) => state.pokemon.instanceId === evolvedPokemon.pokemon.instanceId
+            );
+
+            if (syncedBattlePokemon) {
+              battlePresentationPokemon = syncedBattlePokemon;
             }
           }
-        },
+        }
 
-        onError: (error, payload) => {
-          console.error("[EvolutionRecovery] presentation failed", {
-            pokemonInstanceId: payload.pokemonInstanceId,
-            revision: payload.revision,
-            error,
-          });
-        },
+        this.overlay.syncTrainerPokemonAfterEvolution(
+          battlePresentationPokemon,
+          trainerParty
+        );
       },
-    );
+      finishEvolutionCinematic: () => {
+        this.overlay.finishPokemonEvolutionCinematic();
+      },
+    });
+
+    this.recoveryEvolutionQueue = new PokemonEvolutionRecoveryPresentationQueue({
+      presentRequiredEvolution: async (payload) => {
+        /* Reconnect Evolution: no BattleInstance is required */
+        this.overlay.show();
+
+        try {
+          await this.evolutionPresentationController.presentRequiredEvolution(payload);
+        } finally {
+          this.overlay.finishPokemonEvolutionCinematic();
+          if (!this.isActive && this.recoveryEvolutionQueue.pendingCount === 1) {
+            this.overlay.hide();
+          }
+        }
+      },
+
+      onError: (error, payload) => {
+        console.error("[EvolutionRecovery] presentation failed", {
+          pokemonInstanceId: payload.pokemonInstanceId,
+          revision: payload.revision,
+          error,
+        });
+      },
+    });
 
     this.progressionPresentationCoordinator =
       new PokemonBattleProgressionPresentationCoordinator({
@@ -266,9 +250,7 @@ export class BattleController {
         waitForMoveLearningResponse: (pokemonInstanceId, revision) =>
           this.waitForMoveLearningResponse(pokemonInstanceId, revision),
         presentRequiredEvolution: async (payload) => {
-          await this.evolutionHudSyncCoordinator.presentRequiredEvolution(
-            payload,
-          );
+          await this.evolutionHudSyncCoordinator.presentRequiredEvolution(payload);
         },
       });
 
@@ -326,6 +308,8 @@ export class BattleController {
 
     this.overlay.show();
 
+    this.audio.stopAll();
+
     try {
       await this.ensureBattleSpritesLoaded(payload.battle);
 
@@ -336,22 +320,17 @@ export class BattleController {
       this.overlay.renderBattle(payload.battle);
       this.setInteractionState("action-menu");
     } catch (error) {
-      console.error(
-        "[BattleController] failed to prepare battle presentation",
-        error,
-      );
+      console.error("[BattleController] failed to prepare battle presentation", error);
     }
   }
 
   public async applyReplacement(
-    payload: PokemonBattleReplacementResolvedPayload,
+    payload: PokemonBattleReplacementResolvedPayload
   ): Promise<void> {
     const currentBattle = this.activeBattlePayload;
 
     if (!currentBattle) {
-      console.warn(
-        "[BattleController] replacement received without active battle",
-      );
+      console.warn("[BattleController] replacement received without active battle");
 
       return;
     }
@@ -373,14 +352,12 @@ export class BattleController {
     try {
       await this.ensureBattleSpritesLoaded(payload.battle);
 
-      if (
-        this.activeBattlePayload?.battle.battleId !== payload.battle.battleId
-      ) {
+      if (this.activeBattlePayload?.battle.battleId !== payload.battle.battleId) {
         return;
       }
 
       const trainerParticipant = payload.battle.participants.find(
-        (participant) => participant.type === "trainer",
+        (participant) => participant.type === "trainer"
       );
 
       const replacementPokemon = trainerParticipant
@@ -392,13 +369,13 @@ export class BattleController {
 
         await this.overlay.presentMessage(
           `Go! ${pokemonName}!`,
-          BATTLE_PRESENTATION_TIMING.forcedReplacementMessageMs,
+          BATTLE_PRESENTATION_TIMING.forcedReplacementMessageMs
         );
 
         await this.overlay.animatePokemonSwitchIn(
           payload.battle,
           trainerParticipant.id,
-          replacementPokemon.pokemon.instanceId,
+          replacementPokemon.pokemon.instanceId
         );
       }
 
@@ -422,7 +399,7 @@ export class BattleController {
     } catch (error) {
       console.error(
         "[BattleController] failed to prepare replacement presentation",
-        error,
+        error
       );
     }
   }
@@ -443,10 +420,7 @@ export class BattleController {
       return;
     }
 
-    if (
-      this.presentationQueue.isBusy ||
-      this.evolutionPresentationController.isBusy
-    ) {
+    if (this.presentationQueue.isBusy || this.evolutionPresentationController.isBusy) {
       this.pendingCompletion = payload;
       return;
     }
@@ -469,18 +443,18 @@ export class BattleController {
     this.recoveryEvolutionQueue.clear();
     this.evolutionPresentationController.destroy();
 
+    this.audio.destroy();
+
     this.overlay.destroy();
   }
 
-  private async ensureBattleSpritesLoaded(
-    battle: BattleInstance,
-  ): Promise<void> {
+  private async ensureBattleSpritesLoaded(battle: BattleInstance): Promise<void> {
     const trainerParticipant = battle.participants.find(
-      (participant) => participant.type === "trainer",
+      (participant) => participant.type === "trainer"
     );
 
     const wildParticipant = battle.participants.find(
-      (participant) => participant.type === "wild",
+      (participant) => participant.type === "wild"
     );
 
     if (!trainerParticipant || !wildParticipant) {
@@ -490,8 +464,7 @@ export class BattleController {
     const trainerPokemon =
       trainerParticipant.pokemon[trainerParticipant.activePokemonIndex];
 
-    const wildPokemon =
-      wildParticipant.pokemon[wildParticipant.activePokemonIndex];
+    const wildPokemon = wildParticipant.pokemon[wildParticipant.activePokemonIndex];
 
     if (!trainerPokemon || !wildPokemon) {
       return;
@@ -504,14 +477,12 @@ export class BattleController {
   }
 
   public async applyStateUpdate(
-    payload: PokemonBattleStateUpdatedPayload,
+    payload: PokemonBattleStateUpdatedPayload
   ): Promise<void> {
     const currentBattle = this.activeBattlePayload;
 
     if (!currentBattle) {
-      console.warn(
-        "[BattleController] state update received without active battle",
-      );
+      console.warn("[BattleController] state update received without active battle");
       return;
     }
 
@@ -548,7 +519,7 @@ export class BattleController {
     }
 
     const trainerParticipant = payload.battle.participants.find(
-      (participant) => participant.type === "trainer",
+      (participant) => participant.type === "trainer"
     );
 
     if (!trainerParticipant) {
@@ -563,7 +534,7 @@ export class BattleController {
     }
 
     const instanceMove = activePokemon.pokemon.moves.find(
-      (move) => move.moveId === moveId,
+      (move) => move.moveId === moveId
     );
 
     if (!instanceMove || instanceMove.currentPp <= 0) {
@@ -620,7 +591,7 @@ export class BattleController {
     }
 
     const trainer = payload.battle.participants.find(
-      (participant) => participant.type === "trainer",
+      (participant) => participant.type === "trainer"
     );
 
     if (!trainer) {
@@ -667,11 +638,14 @@ export class BattleController {
     this.replacementPokemonIndexes = [];
     this.selectedItemId = undefined;
     this.activeBattlePayload = undefined;
+
+    this.audio.stopAll();
+
     this.overlay.hide();
   }
 
   private mapServerInteractionState(
-    state: PokemonBattleStateUpdatedPayload["interactionState"],
+    state: PokemonBattleStateUpdatedPayload["interactionState"]
   ): BattleClientInteractionState {
     switch (state) {
       case "selecting-action":
@@ -785,7 +759,7 @@ export class BattleController {
     }
 
     const trainer = payload.battle.participants.find(
-      (participant) => participant.type === "trainer",
+      (participant) => participant.type === "trainer"
     );
 
     if (!trainer) {
@@ -836,16 +810,11 @@ export class BattleController {
     } catch (error) {
       this.overlay.setVoluntaryPokemonOptions(payload.battle);
       this.setInteractionState("pokemon-selection");
-      console.error(
-        "[BattleController] failed to submit voluntary switch",
-        error,
-      );
+      console.error("[BattleController] failed to submit voluntary switch", error);
     }
   }
 
-  public enqueueTurnPresentation(
-    payload: PokemonBattleTurnResolvedPayload,
-  ): void {
+  public enqueueTurnPresentation(payload: PokemonBattleTurnResolvedPayload): void {
     const currentBattle = this.activeBattlePayload;
 
     if (!currentBattle) {
@@ -854,7 +823,7 @@ export class BattleController {
         {
           battleId: payload.battleId,
           turnNumber: payload.turnNumber,
-        },
+        }
       );
       return;
     }
@@ -873,7 +842,7 @@ export class BattleController {
 
   private async presentBattleExperienceBatch(
     events: readonly BattleExperienceGainedPresentationEvent[],
-    context: BattlePresentationEventBatchContext,
+    context: BattlePresentationEventBatchContext
   ): Promise<void> {
     const activeBattle = this.activeBattlePayload?.battle;
 
@@ -891,21 +860,21 @@ export class BattleController {
     }
 
     await this.waitForPresentationDelay(
-      BATTLE_PRESENTATION_TIMING.experienceRewardLeadInMs,
+      BATTLE_PRESENTATION_TIMING.experienceRewardLeadInMs
     );
 
     await Promise.all([
       this.overlay.animatePartyExperienceGainBatch(activeBattle, events),
       this.overlay.presentMessage(
         "Your party gained EXP!",
-        BATTLE_PRESENTATION_TIMING.experienceGainedMessageMs,
+        BATTLE_PRESENTATION_TIMING.experienceGainedMessageMs
       ),
     ]);
   }
 
   private async presentBattleEvent(
     event: BattlePresentationEvent,
-    context: BattlePresentationEventContext,
+    context: BattlePresentationEventContext
   ): Promise<void> {
     const activeBattle = this.activeBattlePayload?.battle;
 
@@ -926,7 +895,7 @@ export class BattleController {
       await this.overlay.animatePokemonSwitchOut(
         activeBattle,
         event.participantId,
-        event.previousPokemonInstanceId,
+        event.previousPokemonInstanceId
       );
 
       const message = formatBattlePresentationMessage(activeBattle, event);
@@ -934,14 +903,14 @@ export class BattleController {
       if (message) {
         await this.overlay.presentMessage(
           message,
-          getBattlePresentationMessageDuration(event),
+          getBattlePresentationMessageDuration(event)
         );
       }
 
       await this.overlay.animatePokemonSwitchIn(
         activeBattle,
         event.participantId,
-        event.currentPokemonInstanceId,
+        event.currentPokemonInstanceId
       );
       return;
     }
@@ -952,14 +921,14 @@ export class BattleController {
       if (message) {
         await this.overlay.presentMessage(
           message,
-          getBattlePresentationMessageDuration(event),
+          getBattlePresentationMessageDuration(event)
         );
       }
 
       await this.overlay.animatePokemonFaint(
         activeBattle,
         event.participantId,
-        event.pokemonInstanceId,
+        event.pokemonInstanceId
       );
       return;
     }
@@ -969,19 +938,31 @@ export class BattleController {
 
       await this.overlay.animatePokemonCapture(
         activeBattle,
-        /* El Server ya nos dijo qué item produjo el Capture. */
         event.itemId,
         event.wildParticipantId,
         event.pokemonInstanceId,
         event.shakeCount,
         captured,
+        {
+          onContained: () => {
+            this.audio.playCaptureContained();
+          },
+          onSuccess: () => {
+            this.audio.playCaptureSuccess();
+          },
+          onFailure: () => {
+            this.audio.playCaptureFailed();
+          },
+        }
       );
 
       const message = formatBattlePresentationMessage(activeBattle, event);
+
       if (message) {
         await this.overlay.presentMessage(
           message,
-          getBattlePresentationMessageDuration(event),
+
+          getBattlePresentationMessageDuration(event)
         );
       }
 
@@ -994,7 +975,7 @@ export class BattleController {
       if (message) {
         await this.overlay.presentMessage(
           message,
-          getBattlePresentationMessageDuration(event),
+          getBattlePresentationMessageDuration(event)
         );
       }
 
@@ -1003,7 +984,7 @@ export class BattleController {
         event.participantId,
         event.pokemonInstanceId,
         event.previousHp,
-        event.currentHp,
+        event.currentHp
       );
 
       return;
@@ -1014,14 +995,14 @@ export class BattleController {
         this.overlay.animatePokemonHit(
           activeBattle,
           event.participantId,
-          event.pokemonInstanceId,
+          event.pokemonInstanceId
         ),
         this.overlay.animatePokemonHp(
           activeBattle,
           event.participantId,
           event.pokemonInstanceId,
           event.previousHp,
-          event.currentHp,
+          event.currentHp
         ),
       ]);
     }
@@ -1030,7 +1011,7 @@ export class BattleController {
       const message = formatBattlePresentationMessage(activeBattle, event);
 
       await this.waitForPresentationDelay(
-        BATTLE_PRESENTATION_TIMING.experienceRewardLeadInMs,
+        BATTLE_PRESENTATION_TIMING.experienceRewardLeadInMs
       );
 
       await Promise.all([
@@ -1042,12 +1023,12 @@ export class BattleController {
           event.previousExperience,
           event.currentExperience,
           event.previousLevel,
-          event.currentLevel,
+          event.currentLevel
         ),
         message
           ? this.overlay.presentMessage(
               message,
-              getBattlePresentationMessageDuration(event),
+              getBattlePresentationMessageDuration(event)
             )
           : Promise.resolve(),
       ]);
@@ -1062,12 +1043,12 @@ export class BattleController {
           activeBattle,
           event.participantId,
           event.pokemonInstanceId,
-          event.currentLevel,
+          event.currentLevel
         ),
         message
           ? this.overlay.presentMessage(
               message,
-              getBattlePresentationMessageDuration(event),
+              getBattlePresentationMessageDuration(event)
             )
           : Promise.resolve(),
       ]);
@@ -1090,12 +1071,12 @@ export class BattleController {
     }
     await this.overlay.presentMessage(
       message,
-      getBattlePresentationMessageDuration(event),
+      getBattlePresentationMessageDuration(event)
     );
   }
 
   private async handlePresentationTurnCompleted(
-    payload: PokemonBattleTurnResolvedPayload,
+    payload: PokemonBattleTurnResolvedPayload
   ): Promise<void> {
     const pendingState = this.pendingStateUpdates.get(payload.turnNumber);
 
@@ -1137,7 +1118,7 @@ export class BattleController {
   }
 
   private async commitStateUpdate(
-    payload: PokemonBattleStateUpdatedPayload,
+    payload: PokemonBattleStateUpdatedPayload
   ): Promise<void> {
     const currentBattle = this.activeBattlePayload;
 
@@ -1146,13 +1127,10 @@ export class BattleController {
     }
 
     if (currentBattle.battle.battleId !== payload.battle.battleId) {
-      console.warn(
-        "[BattleController] cannot commit state for another battle",
-        {
-          activeBattleId: currentBattle.battle.battleId,
-          receivedBattleId: payload.battle.battleId,
-        },
-      );
+      console.warn("[BattleController] cannot commit state for another battle", {
+        activeBattleId: currentBattle.battle.battleId,
+        receivedBattleId: payload.battle.battleId,
+      });
 
       return;
     }
@@ -1172,9 +1150,7 @@ export class BattleController {
     try {
       await this.ensureBattleSpritesLoaded(payload.battle);
 
-      if (
-        this.activeBattlePayload?.battle.battleId !== payload.battle.battleId
-      ) {
+      if (this.activeBattlePayload?.battle.battleId !== payload.battle.battleId) {
         return;
       }
 
@@ -1183,13 +1159,11 @@ export class BattleController {
       if (payload.interactionState === "replacement-required") {
         this.overlay.setReplacementOptions(
           payload.battle,
-          this.replacementPokemonIndexes,
+          this.replacementPokemonIndexes
         );
       }
 
-      this.setInteractionState(
-        this.mapServerInteractionState(payload.interactionState),
-      );
+      this.setInteractionState(this.mapServerInteractionState(payload.interactionState));
     } catch (error) {
       console.error("[BattleController] failed to commit battle state", error);
     }
@@ -1210,6 +1184,7 @@ export class BattleController {
     this.setInteractionState("completed");
     this.replacementPokemonIndexes = [];
     this.overlay.showCompletion(payload.outcome);
+    this.audio.playBattleOutcome(payload.outcome);
   }
 
   public setTrainerState(trainerState: PokemonTrainerState): void {
@@ -1241,10 +1216,10 @@ export class BattleController {
 
   private getTrainerItemTargetPokemonIndexes(
     battle: BattleInstance,
-    itemId: PokemonItemId,
+    itemId: PokemonItemId
   ): number[] {
     const trainer = battle.participants.find(
-      (participant) => participant.type === "trainer",
+      (participant) => participant.type === "trainer"
     );
 
     if (!trainer) {
@@ -1295,10 +1270,7 @@ export class BattleController {
       return;
     }
 
-    const quantity = getPokemonInventoryItemQuantity(
-      trainerState.inventory,
-      itemId,
-    );
+    const quantity = getPokemonInventoryItemQuantity(trainerState.inventory, itemId);
     if (quantity <= 0) {
       return;
     }
@@ -1333,10 +1305,7 @@ export class BattleController {
         this.selectedItemId = undefined;
         this.overlay.setBagInventory(trainerState.inventory);
         this.setInteractionState("item-selection");
-        console.error(
-          "[BattleController] failed to submit capture item",
-          error,
-        );
+        console.error("[BattleController] failed to submit capture item", error);
       }
 
       return;
@@ -1354,7 +1323,7 @@ export class BattleController {
 
     const selectablePokemonIndexes = this.getTrainerItemTargetPokemonIndexes(
       payload.battle,
-      itemId,
+      itemId
     );
 
     this.overlay.setItemTargetOptions(payload.battle, selectablePokemonIndexes);
@@ -1374,7 +1343,7 @@ export class BattleController {
     }
 
     const trainer = payload.battle.participants.find(
-      (participant) => participant.type === "trainer",
+      (participant) => participant.type === "trainer"
     );
     if (!trainer) {
       return;
@@ -1433,12 +1402,9 @@ export class BattleController {
     } catch (error) {
       const selectablePokemonIndexes = this.getTrainerItemTargetPokemonIndexes(
         payload.battle,
-        itemId,
+        itemId
       );
-      this.overlay.setItemTargetOptions(
-        payload.battle,
-        selectablePokemonIndexes,
-      );
+      this.overlay.setItemTargetOptions(payload.battle, selectablePokemonIndexes);
       this.setInteractionState("item-target-selection");
       console.error("[BattleController] failed to submit item", error);
     }
@@ -1451,9 +1417,7 @@ export class BattleController {
     readonly reject: (error: Error) => void;
   };
 
-  public applyMoveLearningResolved(
-    payload: PokemonMoveLearningResolvedPayload,
-  ): void {
+  public applyMoveLearningResolved(payload: PokemonMoveLearningResolvedPayload): void {
     const pending = this.pendingMoveLearningResponse;
 
     if (!pending) {
@@ -1472,9 +1436,7 @@ export class BattleController {
     pending.resolve(payload);
   }
 
-  public applyMoveLearningError(
-    payload: PokemonMoveLearningErrorPayload,
-  ): void {
+  public applyMoveLearningError(payload: PokemonMoveLearningErrorPayload): void {
     const pending = this.pendingMoveLearningResponse;
 
     if (!pending) {
@@ -1493,9 +1455,7 @@ export class BattleController {
     pending.reject(new Error(payload.message));
   }
 
-  public applyEvolutionResolved(
-    payload: PokemonEvolutionResolvedPayload,
-  ): void {
+  public applyEvolutionResolved(payload: PokemonEvolutionResolvedPayload): void {
     this.evolutionPresentationController.applyResolved(payload);
   }
 
@@ -1515,14 +1475,14 @@ export class BattleController {
 
   private async presentMoveLearningWorkflow(
     battle: BattleInstance,
-    event: BattleMoveLearningRequiredEvent,
+    event: BattleMoveLearningRequiredEvent
   ): Promise<void> {
     const participant = battle.participants.find(
-      (candidate) => candidate.id === event.participantId,
+      (candidate) => candidate.id === event.participantId
     );
 
     const pokemonState = participant?.pokemon.find(
-      (candidate) => candidate.pokemon.instanceId === event.pokemonInstanceId,
+      (candidate) => candidate.pokemon.instanceId === event.pokemonInstanceId
     );
 
     const pokemonName = pokemonState
@@ -1537,12 +1497,10 @@ export class BattleController {
 
   private waitForMoveLearningResponse(
     pokemonInstanceId: string,
-    revision: number,
+    revision: number
   ): Promise<PokemonMoveLearningResolvedPayload> {
     if (this.pendingMoveLearningResponse) {
-      throw new Error(
-        "Another move-learning network request is already pending",
-      );
+      throw new Error("Another move-learning network request is already pending");
     }
 
     return new Promise((resolve, reject) => {
@@ -1565,9 +1523,7 @@ export class BattleController {
     });
   }
 
-  public applyEvolutionRequired(
-    payload: PokemonEvolutionRequiredPayload,
-  ): void {
+  public applyEvolutionRequired(payload: PokemonEvolutionRequiredPayload): void {
     /* Standalone EVOLUTION_REQUIRED is reserved for reconnect / durable pending recovery */
     if (this.isActive) {
       console.warn(
@@ -1576,7 +1532,7 @@ export class BattleController {
           battleId: this.activeBattlePayload?.battle.battleId,
           pokemonInstanceId: payload.pokemonInstanceId,
           revision: payload.revision,
-        },
+        }
       );
 
       return;
@@ -1587,20 +1543,19 @@ export class BattleController {
 
   private getEvolutionPokemonDisplayName(pokemonInstanceId: string): string {
     const trainerPokemon = this.trainerState?.party.pokemon.find(
-      (pokemon) => pokemon.instanceId === pokemonInstanceId,
+      (pokemon) => pokemon.instanceId === pokemonInstanceId
     );
 
     if (trainerPokemon) {
       return getPokemonDisplayName(trainerPokemon);
     }
 
-    const trainerParticipant =
-      this.activeBattlePayload?.battle.participants.find(
-        (participant) => participant.type === "trainer",
-      );
+    const trainerParticipant = this.activeBattlePayload?.battle.participants.find(
+      (participant) => participant.type === "trainer"
+    );
 
     const battlePokemon = trainerParticipant?.pokemon.find(
-      (pokemonState) => pokemonState.pokemon.instanceId === pokemonInstanceId,
+      (pokemonState) => pokemonState.pokemon.instanceId === pokemonInstanceId
     );
 
     if (battlePokemon) {

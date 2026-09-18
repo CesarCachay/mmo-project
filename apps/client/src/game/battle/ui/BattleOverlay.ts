@@ -60,7 +60,7 @@ const DESKTOP_COMMAND_AREA_MIN = 110;
  * to every command panel. Action Menu only needs two rows of buttons,
  * while Party / Bag / target selection genuinely need more room.
  */
-const TOUCH_ACTION_COMMAND_AREA_RATIO = 0.30;
+const TOUCH_ACTION_COMMAND_AREA_RATIO = 0.3;
 const TOUCH_ACTION_COMMAND_AREA_MIN = 128;
 
 const TOUCH_MOVE_COMMAND_AREA_RATIO = 0.44;
@@ -75,6 +75,12 @@ type BattleExperienceGainedPresentationEvent = Extract<
   BattlePresentationEvent,
   { readonly type: "experience-gained" }
 >;
+
+export interface BattleCaptureAudioHooks {
+  readonly onContained?: () => void;
+  readonly onSuccess?: () => void;
+  readonly onFailure?: () => void;
+}
 
 export class BattleOverlay {
   private readonly scene: Phaser.Scene;
@@ -272,10 +278,7 @@ export class BattleOverlay {
 
     const isTouchPrimary = window.matchMedia(BATTLE_TOUCH_QUERY).matches;
 
-    const commandAreaHeight = this.resolveCommandAreaHeight(
-      height,
-      isTouchPrimary
-    );
+    const commandAreaHeight = this.resolveCommandAreaHeight(height, isTouchPrimary);
 
     const battleFieldHeight = height - commandAreaHeight;
 
@@ -348,10 +351,7 @@ export class BattleOverlay {
     });
   }
 
-  private resolveCommandAreaHeight(
-    height: number,
-    isTouchPrimary: boolean
-  ): number {
+  private resolveCommandAreaHeight(height: number, isTouchPrimary: boolean): number {
     if (!isTouchPrimary) {
       return Math.min(
         height * MAX_COMMAND_AREA_RATIO,
@@ -770,7 +770,8 @@ export class BattleOverlay {
     wildParticipantId: string,
     pokemonInstanceId: string,
     shakeCount: number,
-    captured: boolean
+    captured: boolean,
+    audioHooks?: BattleCaptureAudioHooks
   ): Promise<void> {
     const participant = battle.participants.find(
       (candidate) => candidate.id === wildParticipantId
@@ -839,6 +840,9 @@ export class BattleOverlay {
       onBreakFree: captured
         ? undefined
         : () => this.wildHud.animateCaptureBreakFree(pokemonInstanceId),
+      onContained: audioHooks?.onContained,
+      onSuccess: audioHooks?.onSuccess,
+      onFailure: audioHooks?.onFailure,
     });
   }
 
