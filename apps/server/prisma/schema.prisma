@@ -78,6 +78,11 @@ model PokemonTrainer {
   worldY         Float?  @map("world_y")
   worldDirection String? @map("world_direction") @db.VarChar(8)
 
+  recoveryMapId     String? @map("recovery_map_id") @db.VarChar(64)
+  recoveryX         Float?  @map("recovery_x")
+  recoveryY         Float?  @map("recovery_y")
+  recoveryDirection String? @map("recovery_direction") @db.VarChar(8)
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

@@ -160,6 +160,10 @@ canvas {
   -webkit-overflow-scrolling: touch;
 }
 
+.game-viewport-overlay[hidden] {
+  display: none !important;
+}
+
 .game-shell__stage {
   position: relative;
   width: min(
@@ -474,7 +478,6 @@ canvas {
     border-radius: 7px;
   }
 }
-
 
 /* =========================================================
    Touch landscape — compact TopBar

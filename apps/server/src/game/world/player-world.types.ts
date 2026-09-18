@@ -13,3 +13,17 @@ export interface PersistedPlayerWorldLocation {
   readonly y: number | null;
   readonly direction: string | null;
 }
+
+export interface PlayerRecoveryCheckpoint {
+  readonly mapId: MapId;
+  readonly x: number;
+  readonly y: number;
+  readonly direction: Direction;
+}
+
+export interface PersistedPlayerRecoveryCheckpoint {
+  readonly mapId: string | null;
+  readonly x: number | null;
+  readonly y: number | null;
+  readonly direction: string | null;
+}

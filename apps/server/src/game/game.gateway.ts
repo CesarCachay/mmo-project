@@ -33,6 +33,7 @@ import {
   POKEMON_OVERWORLD_ITEM_EVENTS,
   POKEMON_PARTY_REORDER_EVENTS,
   POKEMON_CENTER_HEALING_EVENTS,
+  isPokemonPartyWiped,
 } from '@cesar-mmo/shared';
 import {
   getServerMapSpawn,
@@ -77,6 +78,7 @@ import { PokemonWildBattleProgressionService } from '#app/pokemon/battles/pokemo
 
 import { PokemonCaptureService } from '#app/pokemon/battles/capture/pokemon-capture.service';
 import { PlayerWorldStateService } from './world/player-world-state.service';
+import { PlayerRecoveryCheckpointService } from './world/player-recovery-checkpoint.service';
 import { PokemonStorageService } from '#app/pokemon/storage/pokemon-storage.service';
 import { PokemonOverworldItemService } from '#app/pokemon/items/pokemon-overworld-item.service';
 
@@ -95,6 +97,7 @@ import { PokemonPendingEvolutionRecoveryService } from '#app/pokemon/evolution/p
 import type { PokemonPendingEvolutionState } from '#app/pokemon/evolution/pokemon-pending-evolution.types';
 import { PokemonCenterHealingService } from '#app/pokemon/healing/pokemon-center-healing.service';
 import { PokemonCenterHealingNetworkController } from '#app/pokemon/healing/pokemon-center-healing-network.controller';
+import { PokemonBlackoutRecoveryService } from '#app/pokemon/blackout/pokemon-blackout-recovery.service';
 
 // stores
 import { PlayerWorldRuntimeStore } from './world/player-world-runtime.store';
@@ -183,6 +186,8 @@ export class GameGateway
     private readonly pokemonStorageRepository: PokemonStorageRepository,
     private readonly playerWorldRuntimeStore: PlayerWorldRuntimeStore,
     private readonly playerWorldStateService: PlayerWorldStateService,
+    private readonly playerRecoveryCheckpointService: PlayerRecoveryCheckpointService,
+    private readonly pokemonBlackoutRecoveryService: PokemonBlackoutRecoveryService,
     private readonly pokemonOverworldItemRepository: PokemonOverworldItemRepository,
     private readonly wildBattleProgressionService: PokemonWildBattleProgressionService,
     private readonly pokemonCenterHealingService: PokemonCenterHealingService,
@@ -215,6 +220,7 @@ export class GameGateway
     this.pokemonCenterHealingNetworkController =
       new PokemonCenterHealingNetworkController({
         healingService: this.pokemonCenterHealingService,
+        recoveryCheckpointService: this.playerRecoveryCheckpointService,
         trainerStatePresenter: this.pokemonTrainerStateNetworkPresenter,
         playerWorldRuntimeStore: this.playerWorldRuntimeStore,
         dialogueSessionStore: this.dialogueSessionStore,
@@ -250,6 +256,8 @@ export class GameGateway
       turnExecutor: this.pokemonBattleTurnExecutor,
       wildBattleProgressionService: this.wildBattleProgressionService,
       trainerStatePresenter: this.pokemonTrainerStateNetworkPresenter,
+      onTrainerDefeated: (playerId, trainerId) =>
+        this.handleBlackoutRecovery(playerId, trainerId),
     });
 
     this.pokemonWildBattleStarter = new PokemonWildBattleStarter({
@@ -994,8 +1002,15 @@ export class GameGateway
     const isUsingStorage = this.pokemonStorageAccessSessionStore.has(player.id);
     const isInBattle =
       this.pokemonBattleSessionStore.getByPlayerId(player.id) !== undefined;
+    const isRecoveringFromBlackout =
+      this.pokemonBlackoutRecoveryService.isPlayerRecovering(player.id);
 
-    if (isInDialogue || isUsingStorage || isInBattle) {
+    if (
+      isInDialogue ||
+      isUsingStorage ||
+      isInBattle ||
+      isRecoveringFromBlackout
+    ) {
       player.isMoving = false;
       if (wasMoving) {
         this.checkpointPlayerWorldLocation(player);
@@ -1064,6 +1079,36 @@ export class GameGateway
       console.warn('[WildEncounter] trainer identity missing', {
         playerId: player.id,
       });
+
+      return;
+    }
+
+    const trainerState = this.pokemonTrainerStateStore.get(trainerId);
+
+    if (!trainerState) {
+      console.warn('[WildEncounter] trainer state missing', {
+        playerId: player.id,
+        trainerId,
+      });
+
+      return;
+    }
+
+    if (trainerState.party.pokemon.length === 0) {
+      this.pokemonWildEncounterTriggerService.reset(player.id);
+
+      console.warn('[WildEncounter] blocked because Trainer has no Pokémon', {
+        playerId: player.id,
+        trainerId,
+        mapId: player.mapId,
+      });
+
+      return;
+    }
+
+    if (isPokemonPartyWiped(trainerState.party)) {
+      this.pokemonWildEncounterTriggerService.reset(player.id);
+      void this.handleBlackoutRecovery(player.id, trainerId);
       return;
     }
 
@@ -1184,5 +1229,84 @@ export class GameGateway
 
   private unbindTrainerConnection(playerId: string): void {
     this.trainerConnectionStore.unbind(playerId);
+  }
+
+  private async handleBlackoutRecovery(
+    playerId: string,
+    trainerId: PokemonTrainerId,
+  ): Promise<void> {
+    if (this.pokemonBlackoutRecoveryService.isPlayerRecovering(playerId)) {
+      return;
+    }
+
+    try {
+      this.playerEncounterZoneIds.delete(playerId);
+      this.pokemonWildEncounterTriggerService.reset(playerId);
+      this.pokemonWildEncounterSessionStore.remove(playerId);
+      this.pokemonStorageAccessSessionStore.remove(playerId);
+
+      const result = await this.pokemonBlackoutRecoveryService.recover({
+        playerId,
+        trainerId,
+      });
+
+      if (!result.runtimeRelocated) {
+        return;
+      }
+
+      const client = this.server.sockets.sockets.get(playerId);
+
+      if (!client) {
+        return;
+      }
+
+      const player = this.playerWorldRuntimeStore.getPlayer(playerId);
+
+      if (!player) {
+        return;
+      }
+
+      const targetMapId = result.recoveryLocation.mapId;
+
+      const mapChanged = result.fromMapId !== targetMapId;
+
+      if (mapChanged) {
+        const fromRoom = this.getMapRoom(result.fromMapId);
+        const targetRoom = this.getMapRoom(targetMapId);
+
+        client.to(fromRoom).emit(MAP_EVENTS.PLAYER_LEFT, playerId);
+
+        await client.leave(fromRoom);
+        await client.join(targetRoom);
+
+        client.to(targetRoom).emit('playerJoined', player);
+      }
+
+      /* Party is now healed */
+
+      this.pokemonTrainerStateNetworkPresenter.emitTrainerState(
+        client,
+        result.trainerState,
+      );
+
+      /* Reuse existing visual map transition */
+
+      const transition: MapTransitionResolved = {
+        transitionId: 'blackout-recovery',
+        fromMapId: result.fromMapId,
+        targetMapId,
+        targetSpawn: 'playerSpawn',
+        x: result.recoveryLocation.x,
+        y: result.recoveryLocation.y,
+      };
+
+      client.emit(MAP_EVENTS.TRANSITION_RESOLVED, transition);
+    } catch (error: unknown) {
+      console.error('[BlackoutRecovery] failed', {
+        playerId,
+        trainerId,
+        error,
+      });
+    }
   }
 }

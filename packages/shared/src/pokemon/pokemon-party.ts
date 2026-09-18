@@ -18,26 +18,21 @@ export function isPokemonPartyFull(party: PokemonParty): boolean {
   return party.pokemon.length >= MAX_POKEMON_PARTY_SIZE;
 }
 
-export function hasPokemonInstance(
-  party: PokemonParty,
-  instanceId: string,
-): boolean {
+export function hasPokemonInstance(party: PokemonParty, instanceId: string): boolean {
   return party.pokemon.some((pokemon) => pokemon.instanceId === instanceId);
 }
 
 export function addPokemonToParty(
   party: PokemonParty,
-  pokemon: PokemonInstance,
+  pokemon: PokemonInstance
 ): PokemonParty {
   if (hasPokemonInstance(party, pokemon.instanceId)) {
-    throw new Error(
-      `Pokémon instance ${pokemon.instanceId} is already in the party`,
-    );
+    throw new Error(`Pokémon instance ${pokemon.instanceId} is already in the party`);
   }
 
   if (isPokemonPartyFull(party)) {
     throw new Error(
-      `Pokémon party cannot contain more than ${MAX_POKEMON_PARTY_SIZE} Pokémon`,
+      `Pokémon party cannot contain more than ${MAX_POKEMON_PARTY_SIZE} Pokémon`
     );
   }
 
@@ -49,7 +44,7 @@ export function addPokemonToParty(
 
 export function removePokemonFromParty(
   party: PokemonParty,
-  instanceId: string,
+  instanceId: string
 ): PokemonParty {
   if (!hasPokemonInstance(party, instanceId)) {
     throw new Error(`Pokémon instance ${instanceId} is not in the party`);
@@ -57,8 +52,14 @@ export function removePokemonFromParty(
 
   return {
     ...party,
-    pokemon: party.pokemon.filter(
-      (pokemon) => pokemon.instanceId !== instanceId,
-    ),
+    pokemon: party.pokemon.filter((pokemon) => pokemon.instanceId !== instanceId),
   };
+}
+
+export function hasPokemonPartyUsablePokemon(party: PokemonParty): boolean {
+  return party.pokemon.some((pokemon) => pokemon.currentHp > 0);
+}
+
+export function isPokemonPartyWiped(party: PokemonParty): boolean {
+  return party.pokemon.length > 0 && !hasPokemonPartyUsablePokemon(party);
 }

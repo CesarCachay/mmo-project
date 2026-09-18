@@ -1,92 +1,77 @@
 import Phaser from "phaser";
 
+import { GameViewportOverlay } from "../../shell/GameViewportOverlay";
+
 export class DialogueBox {
-  private readonly container: Phaser.GameObjects.Container;
-
-  private readonly speakerText: Phaser.GameObjects.Text;
-
-  private readonly dialogueText: Phaser.GameObjects.Text;
-
-  private readonly hintText: Phaser.GameObjects.Text;
+  private readonly overlay: GameViewportOverlay;
+  private readonly root: HTMLDivElement;
+  private readonly speakerElement: HTMLDivElement;
+  private readonly dialogueElement: HTMLDivElement;
+  private readonly hintElement: HTMLDivElement;
 
   private open = false;
 
   constructor(scene: Phaser.Scene) {
-    const width = scene.scale.width;
+    this.overlay = new GameViewportOverlay("dialogue-overlay");
 
-    const height = scene.scale.height;
+    this.root = document.createElement("div");
+    this.root.className = "dialogue-box";
+    this.root.setAttribute("role", "status");
+    this.root.setAttribute("aria-live", "polite");
 
-    const boxWidth = width - 32;
+    this.speakerElement = document.createElement("div");
+    this.speakerElement.className = "dialogue-box__speaker";
+    this.dialogueElement = document.createElement("div");
+    this.dialogueElement.className = "dialogue-box__text";
+    this.hintElement = document.createElement("div");
+    this.hintElement.className = "dialogue-box__hint";
 
-    const boxHeight = 90;
+    this.root.append(this.speakerElement, this.dialogueElement, this.hintElement);
+    this.overlay.mount(this.root);
+    this.overlay.setVisible(false);
 
-    const x = 16;
-
-    const y = height - boxHeight - 16;
-
-    const background = scene.add
-      .rectangle(0, 0, boxWidth, boxHeight, 0x111111, 0.92)
-      .setOrigin(0);
-
-    background.setStrokeStyle(2, 0xffffff);
-
-    this.speakerText = scene.add.text(12, 10, "", {
-      fontFamily: "Arial",
-      fontSize: "12px",
-      color: "#ffffff",
-      fontStyle: "bold",
+    scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.destroy();
     });
-
-    this.dialogueText = scene.add.text(12, 32, "", {
-      fontFamily: "Arial",
-      fontSize: "11px",
-      color: "#ffffff",
-      wordWrap: {
-        width: boxWidth - 24,
-      },
-    });
-
-    this.hintText = scene.add
-      .text(boxWidth - 10, boxHeight - 8, "", {
-        fontFamily: "Arial",
-        fontSize: "9px",
-        color: "#cccccc",
-      })
-      .setOrigin(1);
-
-    this.container = scene.add.container(x, y, [
-      background,
-      this.speakerText,
-      this.dialogueText,
-      this.hintText,
-    ]);
-
-    this.container.setScrollFactor(0).setDepth(1000).setVisible(false);
   }
 
   public showLine(speaker: string, line: string, isLastLine: boolean): void {
+    this.speakerElement.textContent = speaker;
+    this.dialogueElement.textContent = line;
+    const actionKey = this.getActionKeyLabel();
+
+    this.hintElement.textContent = isLastLine
+      ? `${actionKey} · Cerrar`
+      : `${actionKey} · Continuar`;
+
     this.open = true;
-
-    this.container.setVisible(true);
-
-    this.renderLine(speaker, line, isLastLine);
+    this.overlay.setVisible(true);
   }
 
   public hide(): void {
-    this.container.setVisible(false);
-
     this.open = false;
+
+    this.overlay.setVisible(false);
+    this.speakerElement.textContent = "";
+    this.dialogueElement.textContent = "";
+    this.hintElement.textContent = "";
   }
 
   public isOpen(): boolean {
     return this.open;
   }
 
-  private renderLine(speaker: string, line: string, isLastLine: boolean): void {
-    this.speakerText.setText(speaker);
+  public destroy(): void {
+    this.overlay.destroy();
 
-    this.dialogueText.setText(line);
+    this.open = false;
+  }
 
-    this.hintText.setText(isLastLine ? "E to close" : "E to continue");
+  private getActionKeyLabel(): string {
+    const isTouchPrimary = window.matchMedia(
+      "(hover: none) and (pointer: coarse)"
+    ).matches;
+
+    return isTouchPrimary ? "A" : "E";
   }
 }

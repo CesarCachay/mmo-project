@@ -111,6 +111,8 @@ export {
   hasPokemonInstance,
   addPokemonToParty,
   removePokemonFromParty,
+  hasPokemonPartyUsablePokemon,
+  isPokemonPartyWiped,
 } from "./pokemon/pokemon-party.js";
 export {
   POKEMON_EVENTS,

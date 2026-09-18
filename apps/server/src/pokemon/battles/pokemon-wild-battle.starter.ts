@@ -1,6 +1,6 @@
 import type { Socket } from 'socket.io';
 
-import { POKEMON_EVENTS } from '@cesar-mmo/shared';
+import { POKEMON_EVENTS, isPokemonPartyWiped } from '@cesar-mmo/shared';
 
 import type { PokemonBattleStartedPayload } from '@cesar-mmo/shared';
 
@@ -59,14 +59,33 @@ export class PokemonWildBattleStarter {
     }
 
     if (trainerState.party.pokemon.length === 0) {
-      throw new Error(
-        `Trainer "${encounterSession.trainerId}" cannot start battle without Pokémon`,
+      this.wildEncounterSessionStore.remove(encounterSession.playerId);
+      console.warn(
+        '[WildBattle] start rejected because Trainer has no Pokémon',
+        {
+          playerId: encounterSession.playerId,
+          trainerId: encounterSession.trainerId,
+          encounterId: encounterSession.encounterId,
+        },
       );
+      return;
+    }
+
+    if (isPokemonPartyWiped(trainerState.party)) {
+      this.wildEncounterSessionStore.remove(encounterSession.playerId);
+      console.warn(
+        '[WildBattle] start rejected because Trainer Party is wiped',
+        {
+          playerId: encounterSession.playerId,
+          trainerId: encounterSession.trainerId,
+          encounterId: encounterSession.encounterId,
+        },
+      );
+      return;
     }
 
     const battle = createWildBattleInstance({
       encounterSession,
-
       trainerPokemon: trainerState.party.pokemon,
     });
 

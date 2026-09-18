@@ -122,6 +122,10 @@ export const PokemonTrainerScalarFieldEnum = {
   worldX: 'worldX',
   worldY: 'worldY',
   worldDirection: 'worldDirection',
+  recoveryMapId: 'recoveryMapId',
+  recoveryX: 'recoveryX',
+  recoveryY: 'recoveryY',
+  recoveryDirection: 'recoveryDirection',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

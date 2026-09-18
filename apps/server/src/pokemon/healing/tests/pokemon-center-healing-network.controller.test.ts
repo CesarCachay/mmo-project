@@ -22,6 +22,8 @@ import { PokemonCenterHealingError } from '../pokemon-center-healing.service';
 
 import type { PokemonCenterHealingService } from '../pokemon-center-healing.service';
 
+import type { PlayerRecoveryCheckpointService } from '../../../game/world/player-recovery-checkpoint.service';
+
 import { PokemonCenterHealingNetworkController } from '../pokemon-center-healing-network.controller';
 
 const playerId = 'player-healing-test';
@@ -68,6 +70,17 @@ function createHarness(
   const healingService = {
     healParty,
   } as unknown as PokemonCenterHealingService;
+
+  const saveMapSpawnRecoveryCheckpoint = vi.fn(async () => ({
+    mapId: 'poke-center' as const,
+    x: 256,
+    y: 344,
+    direction: 'up' as const,
+  }));
+
+  const recoveryCheckpointService = {
+    saveMapSpawnRecoveryCheckpoint,
+  } as unknown as PlayerRecoveryCheckpointService;
 
   const publishTrainerState = vi.fn();
 
@@ -127,6 +140,7 @@ function createHarness(
 
   const controller = new PokemonCenterHealingNetworkController({
     healingService,
+    recoveryCheckpointService,
     trainerStatePresenter,
     playerWorldRuntimeStore,
     dialogueSessionStore,
@@ -140,6 +154,8 @@ function createHarness(
 
   return {
     controller,
+
+    saveMapSpawnRecoveryCheckpoint,
 
     client,
 

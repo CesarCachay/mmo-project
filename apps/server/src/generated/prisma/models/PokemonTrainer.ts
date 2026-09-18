@@ -29,11 +29,15 @@ export type AggregatePokemonTrainer = {
 export type PokemonTrainerAvgAggregateOutputType = {
   worldX: number | null
   worldY: number | null
+  recoveryX: number | null
+  recoveryY: number | null
 }
 
 export type PokemonTrainerSumAggregateOutputType = {
   worldX: number | null
   worldY: number | null
+  recoveryX: number | null
+  recoveryY: number | null
 }
 
 export type PokemonTrainerMinAggregateOutputType = {
@@ -45,6 +49,10 @@ export type PokemonTrainerMinAggregateOutputType = {
   worldX: number | null
   worldY: number | null
   worldDirection: string | null
+  recoveryMapId: string | null
+  recoveryX: number | null
+  recoveryY: number | null
+  recoveryDirection: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -58,6 +66,10 @@ export type PokemonTrainerMaxAggregateOutputType = {
   worldX: number | null
   worldY: number | null
   worldDirection: string | null
+  recoveryMapId: string | null
+  recoveryX: number | null
+  recoveryY: number | null
+  recoveryDirection: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -71,6 +83,10 @@ export type PokemonTrainerCountAggregateOutputType = {
   worldX: number
   worldY: number
   worldDirection: number
+  recoveryMapId: number
+  recoveryX: number
+  recoveryY: number
+  recoveryDirection: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -80,11 +96,15 @@ export type PokemonTrainerCountAggregateOutputType = {
 export type PokemonTrainerAvgAggregateInputType = {
   worldX?: true
   worldY?: true
+  recoveryX?: true
+  recoveryY?: true
 }
 
 export type PokemonTrainerSumAggregateInputType = {
   worldX?: true
   worldY?: true
+  recoveryX?: true
+  recoveryY?: true
 }
 
 export type PokemonTrainerMinAggregateInputType = {
@@ -96,6 +116,10 @@ export type PokemonTrainerMinAggregateInputType = {
   worldX?: true
   worldY?: true
   worldDirection?: true
+  recoveryMapId?: true
+  recoveryX?: true
+  recoveryY?: true
+  recoveryDirection?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -109,6 +133,10 @@ export type PokemonTrainerMaxAggregateInputType = {
   worldX?: true
   worldY?: true
   worldDirection?: true
+  recoveryMapId?: true
+  recoveryX?: true
+  recoveryY?: true
+  recoveryDirection?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -122,6 +150,10 @@ export type PokemonTrainerCountAggregateInputType = {
   worldX?: true
   worldY?: true
   worldDirection?: true
+  recoveryMapId?: true
+  recoveryX?: true
+  recoveryY?: true
+  recoveryDirection?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -222,6 +254,10 @@ export type PokemonTrainerGroupByOutputType = {
   worldX: number | null
   worldY: number | null
   worldDirection: string | null
+  recoveryMapId: string | null
+  recoveryX: number | null
+  recoveryY: number | null
+  recoveryDirection: string | null
   createdAt: Date
   updatedAt: Date
   _count: PokemonTrainerCountAggregateOutputType | null
@@ -258,6 +294,10 @@ export type PokemonTrainerWhereInput = {
   worldX?: Prisma.FloatNullableFilter<"PokemonTrainer"> | number | null
   worldY?: Prisma.FloatNullableFilter<"PokemonTrainer"> | number | null
   worldDirection?: Prisma.StringNullableFilter<"PokemonTrainer"> | string | null
+  recoveryMapId?: Prisma.StringNullableFilter<"PokemonTrainer"> | string | null
+  recoveryX?: Prisma.FloatNullableFilter<"PokemonTrainer"> | number | null
+  recoveryY?: Prisma.FloatNullableFilter<"PokemonTrainer"> | number | null
+  recoveryDirection?: Prisma.StringNullableFilter<"PokemonTrainer"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PokemonTrainer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PokemonTrainer"> | Date | string
   account?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
@@ -276,6 +316,10 @@ export type PokemonTrainerOrderByWithRelationInput = {
   worldX?: Prisma.SortOrderInput | Prisma.SortOrder
   worldY?: Prisma.SortOrderInput | Prisma.SortOrder
   worldDirection?: Prisma.SortOrderInput | Prisma.SortOrder
+  recoveryMapId?: Prisma.SortOrderInput | Prisma.SortOrder
+  recoveryX?: Prisma.SortOrderInput | Prisma.SortOrder
+  recoveryY?: Prisma.SortOrderInput | Prisma.SortOrder
+  recoveryDirection?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   account?: Prisma.AccountOrderByWithRelationInput
@@ -297,6 +341,10 @@ export type PokemonTrainerWhereUniqueInput = Prisma.AtLeast<{
   worldX?: Prisma.FloatNullableFilter<"PokemonTrainer"> | number | null
   worldY?: Prisma.FloatNullableFilter<"PokemonTrainer"> | number | null
   worldDirection?: Prisma.StringNullableFilter<"PokemonTrainer"> | string | null
+  recoveryMapId?: Prisma.StringNullableFilter<"PokemonTrainer"> | string | null
+  recoveryX?: Prisma.FloatNullableFilter<"PokemonTrainer"> | number | null
+  recoveryY?: Prisma.FloatNullableFilter<"PokemonTrainer"> | number | null
+  recoveryDirection?: Prisma.StringNullableFilter<"PokemonTrainer"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PokemonTrainer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PokemonTrainer"> | Date | string
   account?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
@@ -315,6 +363,10 @@ export type PokemonTrainerOrderByWithAggregationInput = {
   worldX?: Prisma.SortOrderInput | Prisma.SortOrder
   worldY?: Prisma.SortOrderInput | Prisma.SortOrder
   worldDirection?: Prisma.SortOrderInput | Prisma.SortOrder
+  recoveryMapId?: Prisma.SortOrderInput | Prisma.SortOrder
+  recoveryX?: Prisma.SortOrderInput | Prisma.SortOrder
+  recoveryY?: Prisma.SortOrderInput | Prisma.SortOrder
+  recoveryDirection?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.PokemonTrainerCountOrderByAggregateInput
@@ -336,6 +388,10 @@ export type PokemonTrainerScalarWhereWithAggregatesInput = {
   worldX?: Prisma.FloatNullableWithAggregatesFilter<"PokemonTrainer"> | number | null
   worldY?: Prisma.FloatNullableWithAggregatesFilter<"PokemonTrainer"> | number | null
   worldDirection?: Prisma.StringNullableWithAggregatesFilter<"PokemonTrainer"> | string | null
+  recoveryMapId?: Prisma.StringNullableWithAggregatesFilter<"PokemonTrainer"> | string | null
+  recoveryX?: Prisma.FloatNullableWithAggregatesFilter<"PokemonTrainer"> | number | null
+  recoveryY?: Prisma.FloatNullableWithAggregatesFilter<"PokemonTrainer"> | number | null
+  recoveryDirection?: Prisma.StringNullableWithAggregatesFilter<"PokemonTrainer"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PokemonTrainer"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PokemonTrainer"> | Date | string
 }
@@ -348,6 +404,10 @@ export type PokemonTrainerCreateInput = {
   worldX?: number | null
   worldY?: number | null
   worldDirection?: string | null
+  recoveryMapId?: string | null
+  recoveryX?: number | null
+  recoveryY?: number | null
+  recoveryDirection?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   account: Prisma.AccountCreateNestedOneWithoutTrainersInput
@@ -366,6 +426,10 @@ export type PokemonTrainerUncheckedCreateInput = {
   worldX?: number | null
   worldY?: number | null
   worldDirection?: string | null
+  recoveryMapId?: string | null
+  recoveryX?: number | null
+  recoveryY?: number | null
+  recoveryDirection?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   pokemonInstances?: Prisma.PokemonInstanceUncheckedCreateNestedManyWithoutTrainerInput
@@ -382,6 +446,10 @@ export type PokemonTrainerUpdateInput = {
   worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   account?: Prisma.AccountUpdateOneRequiredWithoutTrainersNestedInput
@@ -400,6 +468,10 @@ export type PokemonTrainerUncheckedUpdateInput = {
   worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pokemonInstances?: Prisma.PokemonInstanceUncheckedUpdateManyWithoutTrainerNestedInput
@@ -417,6 +489,10 @@ export type PokemonTrainerCreateManyInput = {
   worldX?: number | null
   worldY?: number | null
   worldDirection?: string | null
+  recoveryMapId?: string | null
+  recoveryX?: number | null
+  recoveryY?: number | null
+  recoveryDirection?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -429,6 +505,10 @@ export type PokemonTrainerUpdateManyMutationInput = {
   worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -442,6 +522,10 @@ export type PokemonTrainerUncheckedUpdateManyInput = {
   worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -465,6 +549,10 @@ export type PokemonTrainerCountOrderByAggregateInput = {
   worldX?: Prisma.SortOrder
   worldY?: Prisma.SortOrder
   worldDirection?: Prisma.SortOrder
+  recoveryMapId?: Prisma.SortOrder
+  recoveryX?: Prisma.SortOrder
+  recoveryY?: Prisma.SortOrder
+  recoveryDirection?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -472,6 +560,8 @@ export type PokemonTrainerCountOrderByAggregateInput = {
 export type PokemonTrainerAvgOrderByAggregateInput = {
   worldX?: Prisma.SortOrder
   worldY?: Prisma.SortOrder
+  recoveryX?: Prisma.SortOrder
+  recoveryY?: Prisma.SortOrder
 }
 
 export type PokemonTrainerMaxOrderByAggregateInput = {
@@ -483,6 +573,10 @@ export type PokemonTrainerMaxOrderByAggregateInput = {
   worldX?: Prisma.SortOrder
   worldY?: Prisma.SortOrder
   worldDirection?: Prisma.SortOrder
+  recoveryMapId?: Prisma.SortOrder
+  recoveryX?: Prisma.SortOrder
+  recoveryY?: Prisma.SortOrder
+  recoveryDirection?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -496,6 +590,10 @@ export type PokemonTrainerMinOrderByAggregateInput = {
   worldX?: Prisma.SortOrder
   worldY?: Prisma.SortOrder
   worldDirection?: Prisma.SortOrder
+  recoveryMapId?: Prisma.SortOrder
+  recoveryX?: Prisma.SortOrder
+  recoveryY?: Prisma.SortOrder
+  recoveryDirection?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -503,6 +601,8 @@ export type PokemonTrainerMinOrderByAggregateInput = {
 export type PokemonTrainerSumOrderByAggregateInput = {
   worldX?: Prisma.SortOrder
   worldY?: Prisma.SortOrder
+  recoveryX?: Prisma.SortOrder
+  recoveryY?: Prisma.SortOrder
 }
 
 export type PokemonTrainerScalarRelationFilter = {
@@ -624,6 +724,10 @@ export type PokemonTrainerCreateWithoutAccountInput = {
   worldX?: number | null
   worldY?: number | null
   worldDirection?: string | null
+  recoveryMapId?: string | null
+  recoveryX?: number | null
+  recoveryY?: number | null
+  recoveryDirection?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   pokemonInstances?: Prisma.PokemonInstanceCreateNestedManyWithoutTrainerInput
@@ -640,6 +744,10 @@ export type PokemonTrainerUncheckedCreateWithoutAccountInput = {
   worldX?: number | null
   worldY?: number | null
   worldDirection?: string | null
+  recoveryMapId?: string | null
+  recoveryX?: number | null
+  recoveryY?: number | null
+  recoveryDirection?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   pokemonInstances?: Prisma.PokemonInstanceUncheckedCreateNestedManyWithoutTrainerInput
@@ -686,6 +794,10 @@ export type PokemonTrainerScalarWhereInput = {
   worldX?: Prisma.FloatNullableFilter<"PokemonTrainer"> | number | null
   worldY?: Prisma.FloatNullableFilter<"PokemonTrainer"> | number | null
   worldDirection?: Prisma.StringNullableFilter<"PokemonTrainer"> | string | null
+  recoveryMapId?: Prisma.StringNullableFilter<"PokemonTrainer"> | string | null
+  recoveryX?: Prisma.FloatNullableFilter<"PokemonTrainer"> | number | null
+  recoveryY?: Prisma.FloatNullableFilter<"PokemonTrainer"> | number | null
+  recoveryDirection?: Prisma.StringNullableFilter<"PokemonTrainer"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PokemonTrainer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PokemonTrainer"> | Date | string
 }
@@ -698,6 +810,10 @@ export type PokemonTrainerCreateWithoutPokemonInstancesInput = {
   worldX?: number | null
   worldY?: number | null
   worldDirection?: string | null
+  recoveryMapId?: string | null
+  recoveryX?: number | null
+  recoveryY?: number | null
+  recoveryDirection?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   account: Prisma.AccountCreateNestedOneWithoutTrainersInput
@@ -715,6 +831,10 @@ export type PokemonTrainerUncheckedCreateWithoutPokemonInstancesInput = {
   worldX?: number | null
   worldY?: number | null
   worldDirection?: string | null
+  recoveryMapId?: string | null
+  recoveryX?: number | null
+  recoveryY?: number | null
+  recoveryDirection?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   inventoryItems?: Prisma.PokemonTrainerInventoryItemUncheckedCreateNestedManyWithoutTrainerInput
@@ -746,6 +866,10 @@ export type PokemonTrainerUpdateWithoutPokemonInstancesInput = {
   worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   account?: Prisma.AccountUpdateOneRequiredWithoutTrainersNestedInput
@@ -763,6 +887,10 @@ export type PokemonTrainerUncheckedUpdateWithoutPokemonInstancesInput = {
   worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inventoryItems?: Prisma.PokemonTrainerInventoryItemUncheckedUpdateManyWithoutTrainerNestedInput
@@ -778,6 +906,10 @@ export type PokemonTrainerCreateWithoutPendingMoveLearningInput = {
   worldX?: number | null
   worldY?: number | null
   worldDirection?: string | null
+  recoveryMapId?: string | null
+  recoveryX?: number | null
+  recoveryY?: number | null
+  recoveryDirection?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   account: Prisma.AccountCreateNestedOneWithoutTrainersInput
@@ -795,6 +927,10 @@ export type PokemonTrainerUncheckedCreateWithoutPendingMoveLearningInput = {
   worldX?: number | null
   worldY?: number | null
   worldDirection?: string | null
+  recoveryMapId?: string | null
+  recoveryX?: number | null
+  recoveryY?: number | null
+  recoveryDirection?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   pokemonInstances?: Prisma.PokemonInstanceUncheckedCreateNestedManyWithoutTrainerInput
@@ -826,6 +962,10 @@ export type PokemonTrainerUpdateWithoutPendingMoveLearningInput = {
   worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   account?: Prisma.AccountUpdateOneRequiredWithoutTrainersNestedInput
@@ -843,6 +983,10 @@ export type PokemonTrainerUncheckedUpdateWithoutPendingMoveLearningInput = {
   worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pokemonInstances?: Prisma.PokemonInstanceUncheckedUpdateManyWithoutTrainerNestedInput
@@ -858,6 +1002,10 @@ export type PokemonTrainerCreateWithoutInventoryItemsInput = {
   worldX?: number | null
   worldY?: number | null
   worldDirection?: string | null
+  recoveryMapId?: string | null
+  recoveryX?: number | null
+  recoveryY?: number | null
+  recoveryDirection?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   account: Prisma.AccountCreateNestedOneWithoutTrainersInput
@@ -875,6 +1023,10 @@ export type PokemonTrainerUncheckedCreateWithoutInventoryItemsInput = {
   worldX?: number | null
   worldY?: number | null
   worldDirection?: string | null
+  recoveryMapId?: string | null
+  recoveryX?: number | null
+  recoveryY?: number | null
+  recoveryDirection?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   pokemonInstances?: Prisma.PokemonInstanceUncheckedCreateNestedManyWithoutTrainerInput
@@ -906,6 +1058,10 @@ export type PokemonTrainerUpdateWithoutInventoryItemsInput = {
   worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   account?: Prisma.AccountUpdateOneRequiredWithoutTrainersNestedInput
@@ -923,6 +1079,10 @@ export type PokemonTrainerUncheckedUpdateWithoutInventoryItemsInput = {
   worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pokemonInstances?: Prisma.PokemonInstanceUncheckedUpdateManyWithoutTrainerNestedInput
@@ -938,6 +1098,10 @@ export type PokemonTrainerCreateWithoutPendingEvolutionsInput = {
   worldX?: number | null
   worldY?: number | null
   worldDirection?: string | null
+  recoveryMapId?: string | null
+  recoveryX?: number | null
+  recoveryY?: number | null
+  recoveryDirection?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   account: Prisma.AccountCreateNestedOneWithoutTrainersInput
@@ -955,6 +1119,10 @@ export type PokemonTrainerUncheckedCreateWithoutPendingEvolutionsInput = {
   worldX?: number | null
   worldY?: number | null
   worldDirection?: string | null
+  recoveryMapId?: string | null
+  recoveryX?: number | null
+  recoveryY?: number | null
+  recoveryDirection?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   pokemonInstances?: Prisma.PokemonInstanceUncheckedCreateNestedManyWithoutTrainerInput
@@ -986,6 +1154,10 @@ export type PokemonTrainerUpdateWithoutPendingEvolutionsInput = {
   worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   account?: Prisma.AccountUpdateOneRequiredWithoutTrainersNestedInput
@@ -1003,6 +1175,10 @@ export type PokemonTrainerUncheckedUpdateWithoutPendingEvolutionsInput = {
   worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pokemonInstances?: Prisma.PokemonInstanceUncheckedUpdateManyWithoutTrainerNestedInput
@@ -1018,6 +1194,10 @@ export type PokemonTrainerCreateManyAccountInput = {
   worldX?: number | null
   worldY?: number | null
   worldDirection?: string | null
+  recoveryMapId?: string | null
+  recoveryX?: number | null
+  recoveryY?: number | null
+  recoveryDirection?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1030,6 +1210,10 @@ export type PokemonTrainerUpdateWithoutAccountInput = {
   worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pokemonInstances?: Prisma.PokemonInstanceUpdateManyWithoutTrainerNestedInput
@@ -1046,6 +1230,10 @@ export type PokemonTrainerUncheckedUpdateWithoutAccountInput = {
   worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pokemonInstances?: Prisma.PokemonInstanceUncheckedUpdateManyWithoutTrainerNestedInput
@@ -1062,6 +1250,10 @@ export type PokemonTrainerUncheckedUpdateManyWithoutAccountInput = {
   worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1133,6 +1325,10 @@ export type PokemonTrainerSelect<ExtArgs extends runtime.Types.Extensions.Intern
   worldX?: boolean
   worldY?: boolean
   worldDirection?: boolean
+  recoveryMapId?: boolean
+  recoveryX?: boolean
+  recoveryY?: boolean
+  recoveryDirection?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
@@ -1152,6 +1348,10 @@ export type PokemonTrainerSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   worldX?: boolean
   worldY?: boolean
   worldDirection?: boolean
+  recoveryMapId?: boolean
+  recoveryX?: boolean
+  recoveryY?: boolean
+  recoveryDirection?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
@@ -1166,6 +1366,10 @@ export type PokemonTrainerSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   worldX?: boolean
   worldY?: boolean
   worldDirection?: boolean
+  recoveryMapId?: boolean
+  recoveryX?: boolean
+  recoveryY?: boolean
+  recoveryDirection?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
@@ -1180,11 +1384,15 @@ export type PokemonTrainerSelectScalar = {
   worldX?: boolean
   worldY?: boolean
   worldDirection?: boolean
+  recoveryMapId?: boolean
+  recoveryX?: boolean
+  recoveryY?: boolean
+  recoveryDirection?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PokemonTrainerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "accountId" | "displayName" | "avatarId" | "worldMapId" | "worldX" | "worldY" | "worldDirection" | "createdAt" | "updatedAt", ExtArgs["result"]["pokemonTrainer"]>
+export type PokemonTrainerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "accountId" | "displayName" | "avatarId" | "worldMapId" | "worldX" | "worldY" | "worldDirection" | "recoveryMapId" | "recoveryX" | "recoveryY" | "recoveryDirection" | "createdAt" | "updatedAt", ExtArgs["result"]["pokemonTrainer"]>
 export type PokemonTrainerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   pokemonInstances?: boolean | Prisma.PokemonTrainer$pokemonInstancesArgs<ExtArgs>
@@ -1218,6 +1426,10 @@ export type $PokemonTrainerPayload<ExtArgs extends runtime.Types.Extensions.Inte
     worldX: number | null
     worldY: number | null
     worldDirection: string | null
+    recoveryMapId: string | null
+    recoveryX: number | null
+    recoveryY: number | null
+    recoveryDirection: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["pokemonTrainer"]>
@@ -1656,6 +1868,10 @@ export interface PokemonTrainerFieldRefs {
   readonly worldX: Prisma.FieldRef<"PokemonTrainer", 'Float'>
   readonly worldY: Prisma.FieldRef<"PokemonTrainer", 'Float'>
   readonly worldDirection: Prisma.FieldRef<"PokemonTrainer", 'String'>
+  readonly recoveryMapId: Prisma.FieldRef<"PokemonTrainer", 'String'>
+  readonly recoveryX: Prisma.FieldRef<"PokemonTrainer", 'Float'>
+  readonly recoveryY: Prisma.FieldRef<"PokemonTrainer", 'Float'>
+  readonly recoveryDirection: Prisma.FieldRef<"PokemonTrainer", 'String'>
   readonly createdAt: Prisma.FieldRef<"PokemonTrainer", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"PokemonTrainer", 'DateTime'>
 }

@@ -1,11 +1,10 @@
 import Phaser from "phaser";
 
-import { POKEMON_STARTERS } from "@cesar-mmo/shared";
-import { type PokemonStarterId } from "@cesar-mmo/shared";
+import { POKEMON_STARTERS, type PokemonStarterId } from "@cesar-mmo/shared";
 
 import { POKEMON_STARTER_ASSETS } from "../pokemon/pokemon-starter-assets";
 
-import { UI_DEPTHS } from "./uiDepths";
+import { GameViewportOverlay } from "../../shell/GameViewportOverlay";
 
 type StarterSelectionPanelOptions = {
   onSelect: (starterId: PokemonStarterId) => void;
@@ -15,273 +14,190 @@ type StarterRegion = "KANTO" | "JOHTO" | "HOENN" | "SINNOH";
 
 const STARTERS_BY_REGION: Record<StarterRegion, PokemonStarterId[]> = {
   KANTO: ["BULBASAUR", "CHARMANDER", "SQUIRTLE"],
-
   JOHTO: ["CHIKORITA", "CYNDAQUIL", "TOTODILE"],
-
   HOENN: ["TREECKO", "TORCHIC", "MUDKIP"],
-
   SINNOH: ["TURTWIG", "CHIMCHAR", "PIPLUP"],
 };
 
+const REGIONS: readonly StarterRegion[] = ["KANTO", "JOHTO", "HOENN", "SINNOH"];
+
 export class StarterSelectionPanel {
-  private readonly scene: Phaser.Scene;
+  private readonly overlay: GameViewportOverlay;
+  private readonly panel: HTMLDivElement;
+  private readonly title: HTMLHeadingElement;
+  private readonly subtitle: HTMLParagraphElement;
+  private readonly content: HTMLDivElement;
   private readonly onSelect: (starterId: PokemonStarterId) => void;
-
-  private readonly root: Phaser.GameObjects.Container;
-  private readonly background: Phaser.GameObjects.Rectangle;
-  private readonly panel: Phaser.GameObjects.Rectangle;
-  private readonly title: Phaser.GameObjects.Text;
-  private readonly subtitle: Phaser.GameObjects.Text;
-
-  private readonly content: Phaser.GameObjects.Container;
 
   private selectionPending = false;
 
   constructor(scene: Phaser.Scene, options: StarterSelectionPanelOptions) {
-    this.scene = scene;
     this.onSelect = options.onSelect;
 
-    const { width, height } = scene.scale;
+    this.overlay = new GameViewportOverlay("starter-selection-overlay");
 
-    this.background = scene.add
-      .rectangle(0, 0, width, height, 0x000000, 0.55)
-      .setOrigin(0)
-      .setScrollFactor(0);
+    this.panel = document.createElement("div");
+    this.panel.className = "starter-selection-panel";
 
-    this.panel = scene.add
-      .rectangle(width / 2, height / 2, 520, 320, 0x1f2937, 0.95)
-      .setStrokeStyle(2, 0xffffff)
-      .setScrollFactor(0);
+    this.title = document.createElement("h2");
+    this.title.className = "starter-selection-panel__title";
 
-    this.title = scene.add
-      .text(width / 2, height / 2 - 135, "Choose your starter", {
-        fontFamily: "Arial",
-        fontSize: "22px",
-        color: "#ffffff",
-        fontStyle: "bold",
-      })
-      .setOrigin(0.5)
-      .setScrollFactor(0);
+    this.subtitle = document.createElement("p");
+    this.subtitle.className = "starter-selection-panel__subtitle";
 
-    this.subtitle = scene.add
-      .text(width / 2, height / 2 - 108, "Select one Pokémon to begin your journey", {
-        fontFamily: "Arial",
-        fontSize: "12px",
-        color: "#d1d5db",
-      })
-      .setOrigin(0.5)
-      .setScrollFactor(0);
+    this.content = document.createElement("div");
+    this.content.className = "starter-selection-panel__content";
 
-    this.root = scene.add
-      .container(0, 0, [this.background, this.panel, this.title, this.subtitle])
-      .setDepth(UI_DEPTHS.MODAL)
-      .setVisible(false);
+    const header = document.createElement("header");
+    header.className = "starter-selection-panel__header";
+    header.append(this.title, this.subtitle);
 
-    this.content = scene.add.container(0, 0);
-    this.root.add(this.content);
+    this.panel.append(header, this.content);
+    this.overlay.mount(this.panel);
+    this.overlay.setVisible(false);
+
+    scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.destroy();
+    });
+
     this.showRegionSelection();
   }
 
   public show(): void {
+    this.selectionPending = false;
     this.showRegionSelection();
-    this.root.setVisible(true);
+    this.overlay.setVisible(true);
   }
 
   public hide(): void {
-    this.root.setVisible(false);
+    this.overlay.setVisible(false);
   }
 
   public isVisible(): boolean {
-    return this.root.visible;
-  }
-
-  private getStarterDisplayName(starterId: PokemonStarterId): string {
-    const normalized = starterId.toLowerCase();
-
-    return normalized.charAt(0).toUpperCase() + normalized.slice(1);
-  }
-
-  private showStarterSelection(region: StarterRegion): void {
-    this.content.removeAll(true);
-
-    this.title.setText(`${region} starters`);
-
-    this.subtitle.setText("Choose your first Pokémon");
-
-    const starters = STARTERS_BY_REGION[region];
-
-    const { width, height } = this.scene.scale;
-
-    const cardWidth = 150;
-    const cardHeight = 150;
-    const gap = 20;
-
-    const totalWidth = cardWidth * starters.length + gap * (starters.length - 1);
-
-    const startX = width / 2 - totalWidth / 2 + cardWidth / 2;
-
-    starters.forEach((starterId, index) => {
-      const x = startX + index * (cardWidth + gap);
-      const y = height / 2;
-
-      const asset = POKEMON_STARTER_ASSETS[starterId];
-      const starter = POKEMON_STARTERS[starterId];
-      const displayName = this.getStarterDisplayName(starterId);
-
-      const cardBg = this.scene.add
-        .rectangle(x, y, cardWidth, cardHeight, 0x374151, 1)
-        .setStrokeStyle(1, 0xffffff)
-        .setScrollFactor(0)
-        .setInteractive({
-          useHandCursor: true,
-        });
-
-      const sprite = this.scene.add
-        .image(x, y - 25, asset.textureKey)
-        .setDisplaySize(72, 72)
-        .setScrollFactor(0)
-        .setScale(1.5);
-      const baseScaleX = sprite.scaleX;
-      const baseScaleY = sprite.scaleY;
-
-      const nameLabel = this.scene.add
-        .text(x, y + 42, displayName, {
-          fontFamily: "Arial",
-          fontSize: "14px",
-          color: "#ffffff",
-          fontStyle: "bold",
-        })
-        .setOrigin(0.5)
-        .setScrollFactor(0);
-
-      const levelLabel = this.scene.add
-        .text(x, y + 60, `Lv. ${starter.level}`, {
-          fontFamily: "Arial",
-          fontSize: "11px",
-          color: "#d1d5db",
-        })
-        .setOrigin(0.5)
-        .setScrollFactor(0);
-
-      cardBg.on("pointerover", () => {
-        cardBg.setFillStyle(0x4b5563, 1);
-        sprite.setScale(baseScaleX * 1.08, baseScaleY * 1.08);
-      });
-
-      cardBg.on("pointerout", () => {
-        cardBg.setFillStyle(0x374151, 1);
-        sprite.setScale(baseScaleX, baseScaleY);
-      });
-
-      cardBg.on("pointerdown", () => {
-        if (this.selectionPending) {
-          return;
-        }
-        this.setSelectionPending(true);
-        this.onSelect(starterId);
-      });
-
-      this.content.add([cardBg, sprite, nameLabel, levelLabel]);
-    });
-
-    this.createBackButton(width / 2, height / 2 + 105);
-  }
-
-  private showRegionSelection(): void {
-    this.content.removeAll(true);
-    this.title.setText("Choose your region");
-    this.subtitle.setText("Select the region of your first Pokémon");
-
-    const regions: StarterRegion[] = ["KANTO", "JOHTO", "HOENN", "SINNOH"];
-
-    const { width, height } = this.scene.scale;
-
-    const buttonWidth = 180;
-    const buttonHeight = 70;
-
-    const horizontalGap = 24;
-    const verticalGap = 20;
-
-    regions.forEach((region, index) => {
-      const row = Math.floor(index / 2);
-      const col = index % 2;
-
-      const x =
-        width / 2 +
-        (col === 0
-          ? -(buttonWidth / 2 + horizontalGap / 2)
-          : buttonWidth / 2 + horizontalGap / 2);
-
-      const y = height / 2 - 20 + row * (buttonHeight + verticalGap);
-
-      const background = this.scene.add
-        .rectangle(x, y, buttonWidth, buttonHeight, 0x374151, 1)
-        .setStrokeStyle(1, 0xffffff)
-        .setScrollFactor(0)
-        .setInteractive({
-          useHandCursor: true,
-        });
-
-      const label = this.scene.add
-        .text(x, y, region, {
-          fontFamily: "Arial",
-          fontSize: "18px",
-          color: "#ffffff",
-          fontStyle: "bold",
-        })
-        .setOrigin(0.5)
-        .setScrollFactor(0);
-
-      background.on("pointerover", () => {
-        background.setFillStyle(0x4b5563, 1);
-      });
-
-      background.on("pointerout", () => {
-        background.setFillStyle(0x374151, 1);
-      });
-
-      background.on("pointerdown", () => {
-        this.showStarterSelection(region);
-      });
-
-      this.content.add([background, label]);
-    });
-  }
-
-  private createBackButton(x: number, y: number): void {
-    const background = this.scene.add
-      .rectangle(x, y, 100, 32, 0x1f2937, 1)
-      .setStrokeStyle(1, 0xffffff)
-      .setScrollFactor(0)
-      .setInteractive({
-        useHandCursor: true,
-      });
-
-    const label = this.scene.add
-      .text(x, y, "← Back", {
-        fontFamily: "Arial",
-        fontSize: "12px",
-        color: "#ffffff",
-      })
-      .setOrigin(0.5)
-      .setScrollFactor(0);
-
-    background.on("pointerdown", () => {
-      if (this.selectionPending) {
-        return;
-      }
-      this.showRegionSelection();
-    });
-
-    this.content.add([background, label]);
+    return this.overlay.isVisible;
   }
 
   public setSelectionPending(pending: boolean): void {
     this.selectionPending = pending;
-    this.content.setAlpha(pending ? 0.6 : 1);
+
+    this.panel.classList.toggle("starter-selection-panel--pending", pending);
+
+    this.panel.querySelectorAll<HTMLButtonElement>("button").forEach((button) => {
+      button.disabled = pending;
+    });
 
     if (pending) {
-      this.subtitle.setText("Confirming selection...");
+      this.subtitle.textContent = "Confirming selection...";
     }
+  }
+
+  public destroy(): void {
+    this.overlay.destroy();
+  }
+
+  private showRegionSelection(): void {
+    this.selectionPending = false;
+
+    this.title.textContent = "Choose your region";
+    this.subtitle.textContent = "Select the region of your first Pokémon";
+    this.content.replaceChildren();
+
+    const grid = document.createElement("div");
+
+    grid.className = "starter-region-grid";
+
+    for (const region of REGIONS) {
+      const button = document.createElement("button");
+
+      button.type = "button";
+      button.className = "starter-region-card";
+      button.textContent = region;
+
+      button.addEventListener("click", () => {
+        if (this.selectionPending) {
+          return;
+        }
+
+        this.showStarterSelection(region);
+      });
+
+      grid.append(button);
+    }
+
+    this.content.append(grid);
+  }
+
+  private showStarterSelection(region: StarterRegion): void {
+    this.selectionPending = false;
+
+    this.title.textContent = `${region} starters`;
+    this.subtitle.textContent = "Choose your first Pokémon";
+    this.content.replaceChildren();
+
+    const grid = document.createElement("div");
+
+    grid.className = "starter-pokemon-grid";
+
+    for (const starterId of STARTERS_BY_REGION[region]) {
+      const starter = POKEMON_STARTERS[starterId];
+      const asset = POKEMON_STARTER_ASSETS[starterId];
+      const button = document.createElement("button");
+
+      button.type = "button";
+      button.className = "starter-pokemon-card";
+
+      const image = document.createElement("img");
+      image.className = "starter-pokemon-card__sprite";
+
+      image.src = asset.path;
+      image.alt = this.getStarterDisplayName(starterId);
+
+      image.draggable = false;
+
+      const name = document.createElement("span");
+      name.className = "starter-pokemon-card__name";
+      name.textContent = this.getStarterDisplayName(starterId);
+
+      const level = document.createElement("span");
+      level.className = "starter-pokemon-card__level";
+      level.textContent = `Lv. ${starter.level}`;
+
+      button.append(image, name, level);
+
+      button.addEventListener("click", () => {
+        if (this.selectionPending) {
+          return;
+        }
+
+        this.setSelectionPending(true);
+
+        this.onSelect(starterId);
+      });
+
+      grid.append(button);
+    }
+
+    const back = document.createElement("button");
+
+    back.type = "button";
+
+    back.className = "starter-selection-panel__back";
+
+    back.textContent = "← Back";
+
+    back.addEventListener("click", () => {
+      if (this.selectionPending) {
+        return;
+      }
+
+      this.showRegionSelection();
+    });
+
+    this.content.append(grid, back);
+  }
+
+  private getStarterDisplayName(starterId: PokemonStarterId): string {
+    const normalized = starterId.toLowerCase();
+    return normalized.charAt(0).toUpperCase() + normalized.slice(1);
   }
 }

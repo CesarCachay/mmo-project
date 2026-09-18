@@ -9,6 +9,9 @@ import { PokemonStorageRepository } from '#app/pokemon/storage/pokemon-storage.r
 import { PlayerWorldRuntimeStore } from './world/player-world-runtime.store';
 import { PlayerWorldLocationRepository } from './world/player-world-location.repository';
 import { PlayerWorldStateService } from './world/player-world-state.service';
+import { PokemonBlackoutRecoveryService } from '#app/pokemon/blackout/pokemon-blackout-recovery.service';
+import { PlayerRecoveryCheckpointRepository } from './world/player-recovery-checkpoint.repository';
+import { PlayerRecoveryCheckpointService } from './world/player-recovery-checkpoint.service';
 import { PokemonOverworldItemRepository } from '#app/pokemon/items/pokemon-overworld-item.repository';
 import { PokemonProgressionManager } from '../pokemon/progression/pokemon-progression.manager';
 import { PokemonPartyProgressionRepository } from '../pokemon/progression/pokemon-party-progression.repository';
@@ -79,6 +82,9 @@ import { GameGateway } from './game.gateway';
     PlayerWorldRuntimeStore,
     PlayerWorldLocationRepository,
     PlayerWorldStateService,
+    PokemonBlackoutRecoveryService,
+    PlayerRecoveryCheckpointRepository,
+    PlayerRecoveryCheckpointService,
     PokemonOverworldItemRepository,
     PokemonProgressionManager,
     PokemonPartyProgressionRepository,

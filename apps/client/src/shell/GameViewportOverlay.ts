@@ -11,6 +11,7 @@ export class GameViewportOverlay {
     }
 
     this.root = document.createElement("div");
+
     this.root.className = "game-viewport-overlay";
 
     if (className) {
@@ -22,6 +23,14 @@ export class GameViewportOverlay {
 
   public mount(element: HTMLElement): void {
     this.root.replaceChildren(element);
+  }
+
+  public setVisible(visible: boolean): void {
+    this.root.hidden = !visible;
+  }
+
+  public get isVisible(): boolean {
+    return !this.root.hidden;
   }
 
   public destroy(): void {

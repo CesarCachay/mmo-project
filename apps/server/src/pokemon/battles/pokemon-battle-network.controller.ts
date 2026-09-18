@@ -61,6 +61,10 @@ export interface PokemonBattleNetworkControllerOptions {
   readonly turnExecutor: PokemonBattleTurnExecutor;
   readonly wildBattleProgressionService: PokemonWildBattleProgressionService;
   readonly trainerStatePresenter: PokemonTrainerStateNetworkPresenter;
+  readonly onTrainerDefeated: (
+    playerId: string,
+    trainerId: PokemonTrainerId,
+  ) => Promise<void>;
 }
 
 export class PokemonBattleNetworkController {
@@ -71,6 +75,7 @@ export class PokemonBattleNetworkController {
   private readonly turnExecutor: PokemonBattleTurnExecutor;
   private readonly wildBattleProgressionService: PokemonWildBattleProgressionService;
   private readonly trainerStatePresenter: PokemonTrainerStateNetworkPresenter;
+  private readonly onTrainerDefeated: PokemonBattleNetworkControllerOptions['onTrainerDefeated'];
 
   constructor(options: PokemonBattleNetworkControllerOptions) {
     this.trainerStateStore = options.trainerStateStore;
@@ -80,6 +85,7 @@ export class PokemonBattleNetworkController {
     this.turnExecutor = options.turnExecutor;
     this.wildBattleProgressionService = options.wildBattleProgressionService;
     this.trainerStatePresenter = options.trainerStatePresenter;
+    this.onTrainerDefeated = options.onTrainerDefeated;
   }
 
   public async handleCommand(client: Socket, payload: unknown): Promise<void> {
@@ -367,12 +373,22 @@ export class PokemonBattleNetworkController {
         );
       }
 
+      /* 1. Publish the final Battle Party state */
+
       this.trainerStatePresenter.emitTrainerState(client, updatedTrainerState);
+
+      /* 2. Complete Battle presentation FIRST */
 
       client.emit(POKEMON_EVENTS.BATTLE_COMPLETED, {
         battleId: session.battle.battleId,
         outcome: outcomeRuntime.type,
-      });
+      } satisfies PokemonBattleCompletedPayload);
+
+      /* 3. Trainer defeat → Blackout recovery */
+
+      if (outcomeRuntime.type === 'trainer-defeated') {
+        await this.onTrainerDefeated(client.id, trainerBinding.trainerId);
+      }
     } catch (error: unknown) {
       console.warn(`[BattleCommand] rejected for player ${client.id}`, error);
     }
