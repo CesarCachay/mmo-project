@@ -10,7 +10,8 @@ const CAMERA_DEADZONE_HEIGHT = 24;
 
 const CAMERA_LOOK_AHEAD_X = 24;
 const CAMERA_LOOK_AHEAD_Y = 16;
-const TOUCH_LANDSCAPE_LOOK_AHEAD_SCALE = 0.5;
+const TOUCH_LANDSCAPE_LOOK_AHEAD_X_SCALE = 0.5;
+const TOUCH_LANDSCAPE_LOOK_AHEAD_Y_SCALE = 0;
 
 const CAMERA_LOOK_AHEAD_RATE = 7;
 
@@ -29,6 +30,21 @@ const TOUCH_SAFE_DEADZONE_MIN_WIDTH = 20;
 const TOUCH_SAFE_DEADZONE_MAX_WIDTH = 32;
 const TOUCH_SAFE_DEADZONE_MIN_HEIGHT = 16;
 const TOUCH_SAFE_DEADZONE_MAX_HEIGHT = 24;
+
+/*
+ * Camera edge overscan is expressed in SCREEN pixels so the UX remains stable
+ * across zoom levels. It is converted to world units when bounds are applied.
+ *
+ * Bottom gets a larger budget because mobile browser/home-indicator chrome and
+ * thumb controls make that edge more likely to hide the player visually.
+ */
+const TOUCH_EDGE_TOP_SCREEN_RATIO = 0.06;
+const TOUCH_EDGE_TOP_SCREEN_MIN = 20;
+const TOUCH_EDGE_TOP_SCREEN_MAX = 32;
+
+const TOUCH_EDGE_BOTTOM_SCREEN_RATIO = 0.12;
+const TOUCH_EDGE_BOTTOM_SCREEN_MIN = 40;
+const TOUCH_EDGE_BOTTOM_SCREEN_MAX = 64;
 
 export class OverworldCameraController {
   private readonly camera: Phaser.Cameras.Scene2D.Camera;
@@ -96,13 +112,40 @@ export class OverworldCameraController {
     const viewportHeight = this.camera.height / this.camera.zoom;
 
     const horizontalPadding = Math.max(0, (viewportWidth - mapWidth) / 2);
-    const verticalPadding = Math.max(0, (viewportHeight - mapHeight) / 2);
+    const centeredVerticalPadding = Math.max(0, (viewportHeight - mapHeight) / 2);
+
+    let topEdgePadding = 0;
+    let bottomEdgePadding = 0;
+
+    if (this.isTouchLandscapeViewport()) {
+      const topScreenPadding = Phaser.Math.Clamp(
+        this.camera.height * TOUCH_EDGE_TOP_SCREEN_RATIO,
+        TOUCH_EDGE_TOP_SCREEN_MIN,
+        TOUCH_EDGE_TOP_SCREEN_MAX
+      );
+
+      const bottomScreenPadding = Phaser.Math.Clamp(
+        this.camera.height * TOUCH_EDGE_BOTTOM_SCREEN_RATIO,
+        TOUCH_EDGE_BOTTOM_SCREEN_MIN,
+        TOUCH_EDGE_BOTTOM_SCREEN_MAX
+      );
+
+      /*
+       * Camera bounds use world units. Divide screen-space safety budgets by the
+       * current zoom so the visible margin stays approximately constant on-screen.
+       */
+      topEdgePadding = topScreenPadding / this.camera.zoom;
+      bottomEdgePadding = bottomScreenPadding / this.camera.zoom;
+    }
+
+    const topPadding = centeredVerticalPadding + topEdgePadding;
+    const bottomPadding = centeredVerticalPadding + bottomEdgePadding;
 
     this.camera.setBounds(
       -horizontalPadding,
-      -verticalPadding,
+      -topPadding,
       mapWidth + horizontalPadding * 2,
-      mapHeight + verticalPadding * 2
+      mapHeight + topPadding + bottomPadding
     );
   }
 
@@ -158,12 +201,18 @@ export class OverworldCameraController {
       };
     }
 
-    const lookAheadScale = this.isTouchLandscapeViewport()
-      ? TOUCH_LANDSCAPE_LOOK_AHEAD_SCALE
-      : 1;
+    const touchLandscape = this.isTouchLandscapeViewport();
 
-    const lookAheadX = CAMERA_LOOK_AHEAD_X * lookAheadScale;
-    const lookAheadY = CAMERA_LOOK_AHEAD_Y * lookAheadScale;
+    const lookAheadX =
+      CAMERA_LOOK_AHEAD_X * (touchLandscape ? TOUCH_LANDSCAPE_LOOK_AHEAD_X_SCALE : 1);
+
+    /*
+     * Keep vertical look-ahead disabled on touch landscape. Vertical screen space
+     * is the scarce axis on phones, so centering the player is more valuable than
+     * looking ahead a few pixels while walking up/down.
+     */
+    const lookAheadY =
+      CAMERA_LOOK_AHEAD_Y * (touchLandscape ? TOUCH_LANDSCAPE_LOOK_AHEAD_Y_SCALE : 1);
 
     switch (direction) {
       case "left":

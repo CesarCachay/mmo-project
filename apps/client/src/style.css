@@ -472,3 +472,87 @@ canvas {
     border-radius: 7px;
   }
 }
+
+
+/* =========================================================
+   Touch landscape — compact TopBar
+
+   Do not key mobile-landscape chrome only from viewport width:
+   modern phones can be wider than 700 CSS px when rotated.
+   Keep the game row taller while preserving usable account controls.
+========================================================= */
+
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) {
+  :root {
+    --game-topbar-height: 40px;
+    --game-viewport-padding: 0px;
+  }
+
+  .game-shell__topbar {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 6px;
+    padding-left: max(8px, env(safe-area-inset-left));
+    padding-right: max(8px, env(safe-area-inset-right));
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.18);
+  }
+
+  .game-shell__brand {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+
+  .game-topbar-location {
+    gap: 0;
+  }
+
+  .game-topbar-location__label {
+    display: none;
+  }
+
+  .game-topbar-location__value {
+    max-width: 32vw;
+    font-size: 10px;
+    line-height: 1;
+  }
+
+  .account-menu-trigger {
+    height: 32px;
+    gap: 5px;
+    padding: 3px 7px 3px 3px;
+  }
+
+  .account-menu-trigger__avatar {
+    width: 24px;
+    height: 24px;
+    flex-basis: 24px;
+  }
+
+  .account-menu-trigger__name {
+    max-width: 88px;
+    font-size: 10px;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 460px) {
+  :root {
+    --game-topbar-height: 38px;
+  }
+
+  .game-shell__brand {
+    font-size: 9px;
+  }
+
+  .game-topbar-location__value {
+    font-size: 9px;
+  }
+
+  .account-menu-trigger {
+    height: 30px;
+  }
+
+  .account-menu-trigger__avatar {
+    width: 22px;
+    height: 22px;
+    flex-basis: 22px;
+  }
+}
