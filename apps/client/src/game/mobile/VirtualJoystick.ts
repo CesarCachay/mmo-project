@@ -16,7 +16,10 @@ type PointerPosition = {
   clientY: number;
 };
 
-const DEADZONE_RATIO = 0.3;
+const MOVEMENT_START_RATIO = 0.24;
+const MOVEMENT_STOP_RATIO = 0.16;
+const DIRECTION_SECTOR_RADIANS = Math.PI / 4;
+const DIRECTION_HYSTERESIS_RADIANS = (7 * Math.PI) / 180;
 
 export class VirtualJoystick {
   private readonly root: HTMLDivElement;
@@ -45,6 +48,8 @@ export class VirtualJoystick {
     left: false,
     right: false,
   };
+
+  private lastDirectionIndex: number | undefined;
 
   constructor(options: VirtualJoystickOptions) {
     this.onChange = options.onChange;
@@ -121,6 +126,8 @@ export class VirtualJoystick {
     }
 
     this.setKnobPosition(0, 0);
+
+    this.lastDirectionIndex = undefined;
 
     this.emitMovementState({
       up: false,
@@ -327,12 +334,124 @@ export class VirtualJoystick {
   }
 
   private emitMovement(x: number, y: number): void {
+    const magnitude = Math.hypot(x, y);
+
+    /*
+     * Use a radial deadzone rather than independent X/Y thresholds.
+     * This makes diagonals and cardinals feel symmetrical around the
+     * center of the stick. Two thresholds add hysteresis so tiny finger
+     * movements near the center do not rapidly start/stop movement.
+     */
+    if (this.lastDirectionIndex === undefined) {
+      if (magnitude < MOVEMENT_START_RATIO) {
+        this.emitNeutralMovement();
+        return;
+      }
+    } else if (magnitude < MOVEMENT_STOP_RATIO) {
+      this.lastDirectionIndex = undefined;
+      this.emitNeutralMovement();
+      return;
+    }
+
+    const candidateDirection = this.resolveDirectionIndex(x, y);
+
+    const directionIndex = this.applyDirectionHysteresis(
+      candidateDirection,
+      x,
+      y
+    );
+
+    this.lastDirectionIndex = directionIndex;
+
+    this.emitMovementState(this.directionIndexToState(directionIndex));
+  }
+
+  private emitNeutralMovement(): void {
     this.emitMovementState({
-      left: x < -DEADZONE_RATIO,
-      right: x > DEADZONE_RATIO,
-      up: y < -DEADZONE_RATIO,
-      down: y > DEADZONE_RATIO,
+      up: false,
+      down: false,
+      left: false,
+      right: false,
     });
+  }
+
+  /**
+   * Quantize the stick to the nearest of 8 evenly-sized direction sectors.
+   * Indexes rotate clockwise because browser Y coordinates grow downward:
+   *
+   * 0 right, 1 down-right, 2 down, 3 down-left,
+   * 4 left,  5 up-left,    6 up,   7 up-right.
+   */
+  private resolveDirectionIndex(x: number, y: number): number {
+    const angle = this.normalizeAngle(Math.atan2(y, x));
+
+    return Math.round(angle / DIRECTION_SECTOR_RADIANS) % 8;
+  }
+
+  private applyDirectionHysteresis(
+    candidateDirection: number,
+    x: number,
+    y: number
+  ): number {
+    const previousDirection = this.lastDirectionIndex;
+
+    if (
+      previousDirection === undefined ||
+      previousDirection === candidateDirection
+    ) {
+      return candidateDirection;
+    }
+
+    const angle = this.normalizeAngle(Math.atan2(y, x));
+    const previousCenterAngle = previousDirection * DIRECTION_SECTOR_RADIANS;
+
+    const distanceFromPreviousCenter = this.angularDistance(
+      angle,
+      previousCenterAngle
+    );
+
+    const previousSectorRetention =
+      DIRECTION_SECTOR_RADIANS / 2 + DIRECTION_HYSTERESIS_RADIANS;
+
+    return distanceFromPreviousCenter <= previousSectorRetention
+      ? previousDirection
+      : candidateDirection;
+  }
+
+  private directionIndexToState(directionIndex: number): MovementInputState {
+    switch (directionIndex) {
+      case 0:
+        return { up: false, down: false, left: false, right: true };
+      case 1:
+        return { up: false, down: true, left: false, right: true };
+      case 2:
+        return { up: false, down: true, left: false, right: false };
+      case 3:
+        return { up: false, down: true, left: true, right: false };
+      case 4:
+        return { up: false, down: false, left: true, right: false };
+      case 5:
+        return { up: true, down: false, left: true, right: false };
+      case 6:
+        return { up: true, down: false, left: false, right: false };
+      case 7:
+        return { up: true, down: false, left: false, right: true };
+      default:
+        return { up: false, down: false, left: false, right: false };
+    }
+  }
+
+  private normalizeAngle(angle: number): number {
+    const fullCircle = Math.PI * 2;
+
+    return ((angle % fullCircle) + fullCircle) % fullCircle;
+  }
+
+  private angularDistance(angleA: number, angleB: number): number {
+    const fullCircle = Math.PI * 2;
+    const rawDistance = Math.abs(angleA - angleB) % fullCircle;
+
+    return Math.min(rawDistance, fullCircle - rawDistance);
   }
 
   private emitMovementState(state: MovementInputState): void {

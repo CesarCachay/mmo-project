@@ -5,6 +5,8 @@ import type {
   PokemonCenterHealingErrorPayload,
 } from "@cesar-mmo/shared";
 
+import "./pokemon-center-healing-presentation.css";
+
 const INTRO_DURATION_MS = 350;
 const DOT_STEP_DURATION_MS = 180;
 const ALL_DOTS_COMPLETE_DURATION_MS = 300;
@@ -12,7 +14,6 @@ const ALL_DOTS_COMPLETE_DURATION_MS = 300;
 const SUCCESS_MESSAGE_DURATION_MS = 1200;
 const ERROR_MESSAGE_DURATION_MS = 1500;
 
-const PANEL_IN_DURATION_MS = 180;
 const PANEL_OUT_DURATION_MS = 170;
 
 export interface PokemonCenterHealingPresentationControllerOptions {
@@ -22,15 +23,18 @@ export interface PokemonCenterHealingPresentationControllerOptions {
 
 export class PokemonCenterHealingPresentationController {
   private readonly scene: Phaser.Scene;
-  private readonly container: Phaser.GameObjects.Container;
-  private readonly messageText: Phaser.GameObjects.Text;
-  private readonly statusDots: Phaser.GameObjects.Arc[];
+
+  private readonly root: HTMLDivElement;
+  private readonly panel: HTMLDivElement;
+  private readonly messageElement: HTMLDivElement;
+  private readonly statusDots: HTMLSpanElement[];
 
   private readonly onHealingStep?: PokemonCenterHealingPresentationControllerOptions["onHealingStep"];
   private readonly onHealingSuccessReveal?: PokemonCenterHealingPresentationControllerOptions["onHealingSuccessReveal"];
 
   private sequenceTimer?: Phaser.Time.TimerEvent;
   private finishTimer?: Phaser.Time.TimerEvent;
+  private panelTransitionTimer?: Phaser.Time.TimerEvent;
 
   private active = false;
   private currentDotIndex = 0;
@@ -43,79 +47,61 @@ export class PokemonCenterHealingPresentationController {
     options: PokemonCenterHealingPresentationControllerOptions = {}
   ) {
     this.scene = scene;
-
     this.onHealingStep = options.onHealingStep;
-
     this.onHealingSuccessReveal = options.onHealingSuccessReveal;
 
-    const boxWidth = Math.min(scene.scale.width - 40, 360);
+    const app = document.getElementById("app");
 
-    const boxHeight = 100;
+    if (!(app instanceof HTMLElement)) {
+      throw new Error('PokemonCenterHealingPresentationController requires "#app"');
+    }
 
-    const background = scene.add
-      .rectangle(0, 0, boxWidth, boxHeight, 0x111827, 0.98)
-      .setStrokeStyle(2, 0xffffff, 1);
+    this.root = document.createElement("div");
+    this.root.className = "pokemon-center-healing-presentation";
+    this.root.hidden = true;
 
-    const header = scene.add.rectangle(
-      0,
-      -boxHeight / 2 + 11,
-      boxWidth - 4,
-      20,
-      0xb4232c,
-      1
+    this.root.innerHTML = `
+      <div class="pokemon-center-healing-presentation__panel" role="status" aria-live="polite">
+        <div class="pokemon-center-healing-presentation__header">
+          CENTRO POKÉMON
+        </div>
+
+        <div
+          class="pokemon-center-healing-presentation__message"
+          data-pokemon-center-healing-message
+        ></div>
+
+        <div
+          class="pokemon-center-healing-presentation__dots"
+          aria-hidden="true"
+          data-pokemon-center-healing-dots
+        >
+          ${Array.from({ length: 6 }, () => '<span class="pokemon-center-healing-presentation__dot"></span>').join("")}
+        </div>
+      </div>
+    `;
+
+    const panel = this.root.querySelector<HTMLDivElement>(
+      ".pokemon-center-healing-presentation__panel"
+    );
+    const messageElement = this.root.querySelector<HTMLDivElement>(
+      "[data-pokemon-center-healing-message]"
+    );
+    const statusDots = Array.from(
+      this.root.querySelectorAll<HTMLSpanElement>(
+        ".pokemon-center-healing-presentation__dot"
+      )
     );
 
-    const titleText = scene.add
-      .text(0, -boxHeight / 2 + 11, "CENTRO POKÉMON", {
-        fontFamily: "Arial",
-        fontSize: "11px",
-        fontStyle: "bold",
-        color: "#ffffff",
-      })
-      .setOrigin(0.5);
+    if (!panel || !messageElement || statusDots.length !== 6) {
+      throw new Error("Could not create Pokémon Center healing presentation");
+    }
 
-    this.messageText = scene.add
-      .text(0, -14, "", {
-        fontFamily: "Arial",
-        fontSize: "11px",
-        color: "#ffffff",
-        align: "center",
+    this.panel = panel;
+    this.messageElement = messageElement;
+    this.statusDots = statusDots;
 
-        wordWrap: {
-          width: boxWidth - 30,
-        },
-      })
-      .setOrigin(0.5);
-
-    const dotCount = 6;
-    const spacing = 22;
-
-    const startX = -((dotCount - 1) * spacing) / 2;
-
-    this.statusDots = Array.from(
-      {
-        length: dotCount,
-      },
-      (_, index) => {
-        return scene.add
-          .circle(startX + index * spacing, 20, 6, 0x374151, 1)
-          .setStrokeStyle(2, 0xffffff, 0.8)
-          .setVisible(false);
-      }
-    );
-
-    this.container = scene.add.container(
-      scene.scale.width / 2,
-      scene.scale.height - 105,
-      [background, header, titleText, this.messageText, ...this.statusDots]
-    );
-
-    this.container
-      .setScrollFactor(0)
-      .setDepth(2300)
-      .setVisible(false)
-      .setAlpha(0)
-      .setScale(0.92);
+    app.append(this.root);
   }
 
   public get isBlockingGameplay(): boolean {
@@ -126,23 +112,15 @@ export class PokemonCenterHealingPresentationController {
     this.clearRuntimeEffects();
 
     this.active = true;
-
     this.pendingSuccess = undefined;
     this.visualSequenceComplete = false;
     this.currentDotIndex = 0;
 
     this.resetDots();
+    this.messageElement.textContent = "Un momento, por favor...";
 
-    this.messageText.setText("Un momento, por favor...");
+    this.showPanel();
 
-    this.container.setVisible(true).setAlpha(0).setScale(0.92);
-
-    this.animatePanelIn();
-
-    /*
-     * La animación ahora tiene su propio timeline.
-     * No depende de cuándo responda el backend.
-     */
     this.sequenceTimer = this.scene.time.delayedCall(INTRO_DURATION_MS, () => {
       this.sequenceTimer = undefined;
 
@@ -150,10 +128,8 @@ export class PokemonCenterHealingPresentationController {
         return;
       }
 
-      this.messageText.setText("Restaurando a tus Pokémon...");
-
+      this.messageElement.textContent = "Restaurando a tus Pokémon...";
       this.showDots();
-
       this.animateNextDot();
     });
   }
@@ -162,6 +138,7 @@ export class PokemonCenterHealingPresentationController {
     if (!this.active) {
       return;
     }
+
     this.pendingSuccess = payload;
     this.tryPresentSuccess();
   }
@@ -169,28 +146,57 @@ export class PokemonCenterHealingPresentationController {
   public presentError(payload: PokemonCenterHealingErrorPayload): void {
     if (!this.active) {
       this.active = true;
-      this.container.setVisible(true).setAlpha(1).setScale(1);
+      this.showPanel();
     }
 
     this.clearRuntimeEffects();
     this.active = true;
     this.hideDots();
-    this.messageText.setText(this.getErrorMessage(payload.code));
+    this.panel.classList.add("pokemon-center-healing-presentation__panel--error");
+    this.messageElement.textContent = this.getErrorMessage(payload.code);
     this.schedulePanelClose(ERROR_MESSAGE_DURATION_MS);
   }
 
   public cancel(): void {
     this.clearRuntimeEffects();
+
     this.active = false;
     this.pendingSuccess = undefined;
     this.visualSequenceComplete = false;
-    this.container.setVisible(false).setAlpha(0).setScale(0.92);
+
+    this.root.hidden = true;
+    this.panel.classList.remove(
+      "pokemon-center-healing-presentation__panel--visible",
+      "pokemon-center-healing-presentation__panel--leaving",
+      "pokemon-center-healing-presentation__panel--success",
+      "pokemon-center-healing-presentation__panel--error"
+    );
+
     this.resetDots();
   }
 
   public destroy(): void {
     this.cancel();
-    this.container.destroy(true);
+    this.root.remove();
+  }
+
+  private showPanel(): void {
+    this.panel.classList.remove(
+      "pokemon-center-healing-presentation__panel--visible",
+      "pokemon-center-healing-presentation__panel--leaving",
+      "pokemon-center-healing-presentation__panel--success",
+      "pokemon-center-healing-presentation__panel--error"
+    );
+
+    this.root.hidden = false;
+
+    requestAnimationFrame(() => {
+      if (!this.active) {
+        return;
+      }
+
+      this.panel.classList.add("pokemon-center-healing-presentation__panel--visible");
+    });
   }
 
   private animateNextDot(): void {
@@ -209,32 +215,17 @@ export class PokemonCenterHealingPresentationController {
 
     this.onHealingStep?.(stepNumber, this.statusDots.length);
 
-    dot.setVisible(true).setFillStyle(0xf8fafc, 1).setAlpha(1).setScale(0.7);
+    dot.classList.remove("pokemon-center-healing-presentation__dot--pulse");
+    dot.classList.add("pokemon-center-healing-presentation__dot--active");
 
-    this.scene.tweens.killTweensOf(dot);
+    void dot.offsetWidth;
 
-    this.scene.tweens.add({
-      targets: dot,
-      scaleX: 1.45,
-      scaleY: 1.45,
-      duration: 90,
-      ease: "Back.easeOut",
-      onComplete: () => {
-        this.scene.tweens.add({
-          targets: dot,
-          scaleX: 1,
-          scaleY: 1,
-          duration: 90,
-          ease: "Quad.easeInOut",
-        });
-      },
-    });
+    dot.classList.add("pokemon-center-healing-presentation__dot--pulse");
 
     this.currentDotIndex += 1;
 
     this.sequenceTimer = this.scene.time.delayedCall(DOT_STEP_DURATION_MS, () => {
       this.sequenceTimer = undefined;
-
       this.animateNextDot();
     });
   }
@@ -244,10 +235,6 @@ export class PokemonCenterHealingPresentationController {
       return;
     }
 
-    /*
-     * Los seis indicadores permanecen encendidos
-     * durante una pausa visible.
-     */
     this.sequenceTimer = this.scene.time.delayedCall(
       ALL_DOTS_COMPLETE_DURATION_MS,
       () => {
@@ -258,9 +245,7 @@ export class PokemonCenterHealingPresentationController {
         }
 
         this.visualSequenceComplete = true;
-
         this.pulseCompletedDots();
-
         this.tryPresentSuccess();
       }
     );
@@ -272,105 +257,73 @@ export class PokemonCenterHealingPresentationController {
     }
 
     const payload = this.pendingSuccess;
-
     this.pendingSuccess = undefined;
 
     this.onHealingSuccessReveal?.();
 
-    if (payload.restoredPokemonCount === 0) {
-      this.messageText.setText("Tu equipo ya está completamente recuperado.");
-    } else {
-      this.messageText.setText("¡Tus Pokémon están completamente recuperados!");
-    }
+    this.messageElement.textContent =
+      payload.restoredPokemonCount === 0
+        ? "Tu equipo ya está completamente recuperado."
+        : "¡Tus Pokémon están completamente recuperados!";
 
     this.pulseCompletedDots();
-
     this.playHealingCompletionFlash();
 
-    this.scene.tweens.killTweensOf(this.container);
-
-    this.scene.tweens.add({
-      targets: this.container,
-      scaleX: 1.045,
-      scaleY: 1.045,
-      duration: 140,
-      yoyo: true,
-      ease: "Quad.easeOut",
-    });
+    this.panel.classList.remove("pokemon-center-healing-presentation__panel--success");
+    void this.panel.offsetWidth;
+    this.panel.classList.add("pokemon-center-healing-presentation__panel--success");
 
     this.schedulePanelClose(SUCCESS_MESSAGE_DURATION_MS);
   }
 
   private showDots(): void {
     for (const dot of this.statusDots) {
-      dot.setVisible(true).setFillStyle(0x374151, 1).setAlpha(0.55).setScale(0.9);
+      dot.classList.add("pokemon-center-healing-presentation__dot--visible");
     }
   }
 
   private resetDots(): void {
     for (const dot of this.statusDots) {
-      this.scene.tweens.killTweensOf(dot);
-
-      dot.setVisible(false).setFillStyle(0x374151, 1).setAlpha(1).setScale(1);
+      dot.classList.remove(
+        "pokemon-center-healing-presentation__dot--visible",
+        "pokemon-center-healing-presentation__dot--active",
+        "pokemon-center-healing-presentation__dot--pulse"
+      );
     }
   }
 
   private hideDots(): void {
     for (const dot of this.statusDots) {
-      this.scene.tweens.killTweensOf(dot);
-
-      dot.setVisible(false);
+      dot.classList.remove(
+        "pokemon-center-healing-presentation__dot--visible",
+        "pokemon-center-healing-presentation__dot--active",
+        "pokemon-center-healing-presentation__dot--pulse"
+      );
     }
   }
 
   private pulseCompletedDots(): void {
     this.statusDots.forEach((dot, index) => {
-      dot.setVisible(true).setFillStyle(0xf8fafc, 1).setAlpha(1).setScale(1);
+      dot.classList.add(
+        "pokemon-center-healing-presentation__dot--visible",
+        "pokemon-center-healing-presentation__dot--active"
+      );
 
-      this.scene.tweens.killTweensOf(dot);
+      dot.classList.remove("pokemon-center-healing-presentation__dot--pulse");
+      void dot.offsetWidth;
 
-      this.scene.tweens.add({
-        targets: dot,
-        scaleX: 1.25,
-        scaleY: 1.25,
-        duration: 100,
-        delay: index * 40,
-        yoyo: true,
-        ease: "Quad.easeOut",
-      });
+      window.setTimeout(() => {
+        if (!this.active) {
+          return;
+        }
+
+        dot.classList.add("pokemon-center-healing-presentation__dot--pulse");
+      }, index * 40);
     });
   }
 
   private playHealingCompletionFlash(): void {
-    const camera = this.scene.cameras.main;
-    camera.flash(220, 255, 255, 255, false);
-  }
-
-  private animatePanelIn(): void {
-    this.scene.tweens.killTweensOf(this.container);
-
-    this.scene.tweens.add({
-      targets: this.container,
-      alpha: 1,
-      scaleX: 1,
-      scaleY: 1,
-      duration: PANEL_IN_DURATION_MS,
-      ease: "Back.easeOut",
-    });
-  }
-
-  private animatePanelOut(onComplete: () => void): void {
-    this.scene.tweens.killTweensOf(this.container);
-
-    this.scene.tweens.add({
-      targets: this.container,
-      alpha: 0,
-      scaleX: 0.96,
-      scaleY: 0.96,
-      duration: PANEL_OUT_DURATION_MS,
-      ease: "Quad.easeIn",
-      onComplete,
-    });
+    this.scene.cameras.main.flash(220, 255, 255, 255, false);
   }
 
   private schedulePanelClose(durationMs: number): void {
@@ -378,26 +331,41 @@ export class PokemonCenterHealingPresentationController {
 
     this.finishTimer = this.scene.time.delayedCall(durationMs, () => {
       this.finishTimer = undefined;
+      this.animatePanelOut();
+    });
+  }
 
-      this.animatePanelOut(() => {
-        this.active = false;
-        this.container.setVisible(false).setScale(0.92);
-        this.resetDots();
-      });
+  private animatePanelOut(): void {
+    this.panelTransitionTimer?.remove(false);
+
+    this.panel.classList.remove("pokemon-center-healing-presentation__panel--visible");
+    this.panel.classList.add("pokemon-center-healing-presentation__panel--leaving");
+
+    this.panelTransitionTimer = this.scene.time.delayedCall(PANEL_OUT_DURATION_MS, () => {
+      this.panelTransitionTimer = undefined;
+
+      this.active = false;
+      this.root.hidden = true;
+
+      this.panel.classList.remove(
+        "pokemon-center-healing-presentation__panel--leaving",
+        "pokemon-center-healing-presentation__panel--success",
+        "pokemon-center-healing-presentation__panel--error"
+      );
+
+      this.resetDots();
     });
   }
 
   private clearRuntimeEffects(): void {
     this.sequenceTimer?.remove(false);
     this.sequenceTimer = undefined;
+
     this.finishTimer?.remove(false);
     this.finishTimer = undefined;
 
-    this.scene.tweens.killTweensOf(this.container);
-
-    for (const dot of this.statusDots) {
-      this.scene.tweens.killTweensOf(dot);
-    }
+    this.panelTransitionTimer?.remove(false);
+    this.panelTransitionTimer = undefined;
   }
 
   private getErrorMessage(code: PokemonCenterHealingErrorPayload["code"]): string {

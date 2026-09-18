@@ -16,6 +16,7 @@ const HP_DANGER_RATIO = 0.2;
 export interface PartyDrawerOptions {
   readonly onPokemonSelected?: (pokemon: PokemonInstance, index: number) => void;
   readonly onChangeRequested?: (pokemon: PokemonInstance, index: number) => void;
+  readonly onReorderRequested?: () => void;
   readonly onCloseRequested?: () => void;
 }
 
@@ -38,12 +39,14 @@ export class PartyDrawer {
   private readonly root: HTMLElement;
   private readonly title: HTMLHeadingElement;
   private readonly subtitle: HTMLSpanElement;
+  private readonly reorderButton: HTMLButtonElement;
   private readonly closeButton: HTMLButtonElement;
   private readonly list: HTMLDivElement;
   private readonly footer: HTMLDivElement;
 
   private readonly onPokemonSelected?: PartyDrawerOptions["onPokemonSelected"];
   private readonly onChangeRequested?: PartyDrawerOptions["onChangeRequested"];
+  private readonly onReorderRequested?: PartyDrawerOptions["onReorderRequested"];
   private readonly onCloseRequested?: PartyDrawerOptions["onCloseRequested"];
 
   private party: readonly PokemonInstance[] = [];
@@ -72,6 +75,7 @@ export class PartyDrawer {
 
     this.onPokemonSelected = options.onPokemonSelected;
     this.onChangeRequested = options.onChangeRequested;
+    this.onReorderRequested = options.onReorderRequested;
     this.onCloseRequested = options.onCloseRequested;
 
     this.root = document.createElement("aside");
@@ -96,6 +100,29 @@ export class PartyDrawer {
 
     heading.append(this.subtitle, this.title);
 
+    const headerActions = document.createElement("div");
+    headerActions.className = "party-drawer__header-actions";
+
+    this.reorderButton = document.createElement("button");
+    this.reorderButton.type = "button";
+    this.reorderButton.className = "party-drawer__reorder";
+    this.reorderButton.textContent = "Ordenar";
+    this.reorderButton.setAttribute("aria-label", "Ordenar equipo Pokémon");
+
+    this.reorderButton.addEventListener("click", () => {
+      if (this.reorderPending) {
+        return;
+      }
+
+      if (this.reorderMode) {
+        this.onCloseRequested?.();
+      } else {
+        this.onReorderRequested?.();
+      }
+
+      this.reorderButton.blur();
+    });
+
     this.closeButton = document.createElement("button");
     this.closeButton.type = "button";
     this.closeButton.className = "party-drawer__close";
@@ -107,7 +134,8 @@ export class PartyDrawer {
       this.closeButton.blur();
     });
 
-    header.append(heading, this.closeButton);
+    headerActions.append(this.reorderButton, this.closeButton);
+    header.append(heading, headerActions);
 
     this.list = document.createElement("div");
     this.list.className = "party-drawer__list";
@@ -358,6 +386,15 @@ export class PartyDrawer {
     this.title.textContent = this.getTitleText();
     this.subtitle.textContent = this.getSubtitleText();
     this.footer.textContent = this.getFooterText();
+
+    this.reorderButton.disabled = this.reorderPending;
+    this.reorderButton.hidden =
+      this.targetSelectionMode || !this.onReorderRequested;
+    this.reorderButton.textContent = this.reorderMode ? "Cancelar" : "Ordenar";
+    this.reorderButton.setAttribute(
+      "aria-label",
+      this.reorderMode ? "Cancelar cambio de orden" : "Ordenar equipo Pokémon"
+    );
 
     this.closeButton.disabled = this.reorderPending;
     this.closeButton.setAttribute(
@@ -627,7 +664,9 @@ export class PartyDrawer {
     }
 
     if (this.reorderMode) {
-      return "Elige destino";
+      return this.reorderSourcePokemonInstanceId
+        ? "Elige destino"
+        : "Elige Pokémon";
     }
 
     return "Equipo Pokémon";
@@ -639,7 +678,9 @@ export class PartyDrawer {
     }
 
     if (this.reorderMode) {
-      return "Cambiar posición";
+      return this.reorderSourcePokemonInstanceId
+        ? "Cambiar posición"
+        : "Ordenar equipo";
     }
 
     return `${this.party.length} / 6`;
@@ -655,7 +696,9 @@ export class PartyDrawer {
     }
 
     if (this.reorderMode) {
-      return "[ESC] Cancelar cambio";
+      return this.reorderSourcePokemonInstanceId
+        ? "Toca la nueva posición · [ESC] Cancelar"
+        : "Toca el Pokémon que quieres mover · [ESC] Cancelar";
     }
 
     return "[P] Cerrar  ·  [I] Bag";

@@ -91,6 +91,10 @@ export class TrainerPanelController {
         this.handlePartyChangeRequested(pokemon);
       },
 
+      onReorderRequested: () => {
+        this.handlePartyReorderRequested();
+      },
+
       onCloseRequested: () => {
         this.handlePartyDrawerCloseRequested();
       },
@@ -522,6 +526,40 @@ export class TrainerPanelController {
     }
   }
 
+  private handlePartyReorderRequested(): void {
+    if (
+      this.selectedOverworldItemId ||
+      this.isOverworldItemUsePending ||
+      this.isPartyReorderPending
+    ) {
+      return;
+    }
+
+    if (!this.partyDrawer.isVisible()) {
+      return;
+    }
+
+    if (this.isInteractionBlocked()) {
+      return;
+    }
+
+    /*
+     * Mobile/touch explicit reorder flow:
+     * 1. enter reorder mode without a source;
+     * 2. first Pokémon tap chooses the source;
+     * 3. second Pokémon tap chooses the destination.
+     *
+     * Desktop keeps the existing contextual "Cambiar posición" flow.
+     */
+    this.partyReorderSourceInstanceId = undefined;
+
+    this.partyDrawer.setReorderState({
+      active: true,
+      sourcePokemonInstanceId: undefined,
+      pending: false,
+    });
+  }
+
   private handlePartyChangeRequested(pokemon: PokemonInstance): void {
     if (
       this.selectedOverworldItemId ||
@@ -573,12 +611,20 @@ export class TrainerPanelController {
 
     const sourcePokemonInstanceId = this.partyReorderSourceInstanceId;
 
+    /*
+     * Explicit mobile reorder can enter the mode before choosing a source.
+     * The first Pokémon tap becomes the source.
+     */
     if (!sourcePokemonInstanceId) {
-      this.exitPartyReorderMode();
+      this.partyReorderSourceInstanceId = pokemon.instanceId;
+      this.refreshPartyReorderUi();
       return;
     }
 
+    /* Tapping the source again deselects it instead of sending a no-op. */
     if (sourcePokemonInstanceId === pokemon.instanceId) {
+      this.partyReorderSourceInstanceId = undefined;
+      this.refreshPartyReorderUi();
       return;
     }
 

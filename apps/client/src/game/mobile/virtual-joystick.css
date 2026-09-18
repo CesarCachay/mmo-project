@@ -56,3 +56,34 @@
     display: block;
   }
 }
+
+
+/* =========================================================
+   Touch landscape ergonomics
+
+   Keep the stick away from Chat and slightly inward from the
+   left edge. Vertical positioning uses viewport percentage so
+   it stays thumb-reachable across short and tall landscape
+   devices without hugging the bottom safe area.
+========================================================= */
+
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) {
+  .virtual-joystick {
+    left: max(
+      clamp(44px, 7vw, 96px),
+      env(safe-area-inset-left, 0px)
+    );
+
+    top: 62%;
+    bottom: auto;
+
+    transform: translateY(-50%);
+  }
+}
+
+/* Very short landscape viewports need the stick a little higher. */
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 480px) {
+  .virtual-joystick {
+    top: 58%;
+  }
+}

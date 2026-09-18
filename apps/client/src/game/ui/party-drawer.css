@@ -61,6 +61,45 @@
   gap: 3px;
 }
 
+.party-drawer__header-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+/*
+ * Reorder receives an explicit button on touch devices only.
+ * Desktop keeps the existing contextual "Cambiar posición" UX.
+ */
+.party-drawer__reorder {
+  display: none;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid rgba(96, 165, 250, 0.34);
+  border-radius: 9px;
+  background: rgba(30, 64, 175, 0.2);
+  color: #bfdbfe;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.party-drawer__reorder[hidden] {
+  display: none !important;
+}
+
+.party-drawer__reorder:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}
+
+.party-drawer__reorder:disabled {
+  cursor: progress;
+  opacity: 0.45;
+}
+
 .party-drawer__eyebrow {
   color: #64748b;
   font-size: 9px;
@@ -155,6 +194,13 @@
 
 .party-drawer__pokemon {
   position: relative;
+
+  /*
+   * Party slots must never shrink inside the scroll container.
+   * On short mobile landscape viewports, flex-shrink used to compress
+   * the cards and clip HP / sprite content instead of scrolling.
+   */
+  flex: 0 0 auto;
 
   border: 1px solid rgba(148, 163, 184, 0.16);
 

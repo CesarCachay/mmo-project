@@ -6,69 +6,89 @@ type LockableScreenOrientation = ScreenOrientation & {
 
 export class MobileOrientationHint {
   private readonly root: HTMLDivElement;
-
   private readonly actionButton: HTMLButtonElement;
-
+  private readonly closeButton: HTMLButtonElement;
   private readonly messageElement: HTMLSpanElement;
+
+  private dismissed = false;
 
   constructor(parent: HTMLElement) {
     this.root = document.createElement("div");
-
     this.root.className = "mobile-orientation-hint";
 
     this.root.innerHTML = `
-      <button
-        type="button"
+      <div
         class="mobile-orientation-hint__card"
-        data-orientation-action
-        aria-label="Cambiar a orientación horizontal"
+        role="status"
+        aria-live="polite"
       >
-        <div
-          class="mobile-orientation-hint__icon"
-          aria-hidden="true"
+        <button
+          type="button"
+          class="mobile-orientation-hint__action"
+          data-orientation-action
+          aria-label="Cambiar a orientación horizontal"
         >
-          ↻
-        </div>
-
-        <div
-          class="mobile-orientation-hint__content"
-        >
-          <strong>
-            Gira tu dispositivo
-          </strong>
-
-          <span data-orientation-message>
-            Toca aquí para cambiar a horizontal.
+          <span
+            class="mobile-orientation-hint__icon"
+            aria-hidden="true"
+          >
+            ↻
           </span>
-        </div>
-      </button>
+
+          <span class="mobile-orientation-hint__content">
+            <strong>Gira tu dispositivo</strong>
+
+            <span data-orientation-message>
+              Toca aquí para cambiar a horizontal.
+            </span>
+          </span>
+        </button>
+
+        <button
+          type="button"
+          class="mobile-orientation-hint__close"
+          data-orientation-close
+          aria-label="Cerrar aviso de orientación"
+        >
+          ×
+        </button>
+      </div>
     `;
 
     const actionButton = this.root.querySelector<HTMLButtonElement>(
       "[data-orientation-action]"
     );
-
+    const closeButton = this.root.querySelector<HTMLButtonElement>(
+      "[data-orientation-close]"
+    );
     const messageElement = this.root.querySelector<HTMLSpanElement>(
       "[data-orientation-message]"
     );
 
-    if (!actionButton || !messageElement) {
+    if (!actionButton || !closeButton || !messageElement) {
       throw new Error("Could not create MobileOrientationHint");
     }
 
     this.actionButton = actionButton;
+    this.closeButton = closeButton;
     this.messageElement = messageElement;
 
     this.actionButton.addEventListener("click", this.handleOrientationRequest);
+    this.closeButton.addEventListener("click", this.handleDismiss);
 
     parent.append(this.root);
   }
 
   public destroy(): void {
     this.actionButton.removeEventListener("click", this.handleOrientationRequest);
-
+    this.closeButton.removeEventListener("click", this.handleDismiss);
     this.root.remove();
   }
+
+  private readonly handleDismiss = (): void => {
+    this.dismissed = true;
+    this.root.classList.add("mobile-orientation-hint--dismissed");
+  };
 
   private readonly handleOrientationRequest = (): void => {
     void this.requestLandscape();
@@ -80,7 +100,6 @@ export class MobileOrientationHint {
     }
 
     this.actionButton.disabled = true;
-
     this.setMessage("Intentando activar el modo horizontal...");
 
     const orientation = (
@@ -95,13 +114,6 @@ export class MobileOrientationHint {
     }
 
     try {
-      /*
-       * Algunos navegadores permiten orientation.lock()
-       * únicamente desde fullscreen.
-       *
-       * Si fullscreen no está disponible o falla,
-       * todavía intentamos el lock directamente.
-       */
       if (
         !document.fullscreenElement &&
         typeof document.documentElement.requestFullscreen === "function"
@@ -116,7 +128,6 @@ export class MobileOrientationHint {
       }
 
       await orientation.lock("landscape");
-
       this.setMessage("Modo horizontal activado.");
     } catch {
       this.handleUnsupportedOrientationLock();
@@ -134,6 +145,10 @@ export class MobileOrientationHint {
   }
 
   private setMessage(message: string): void {
+    if (this.dismissed) {
+      return;
+    }
+
     this.messageElement.textContent = message;
   }
 }

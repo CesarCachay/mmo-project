@@ -50,13 +50,26 @@ import {
 const CAPTURE_TARGET_HEAD_OFFSET_PX = 44;
 const BATTLE_TOUCH_QUERY = "(hover: none) and (pointer: coarse)";
 
+type BattleCommandLayoutMode = "action" | "moves" | "dense";
+
 const DESKTOP_COMMAND_AREA_RATIO = 0.28;
-const TOUCH_COMMAND_AREA_RATIO = 0.42;
-
 const DESKTOP_COMMAND_AREA_MIN = 110;
-const TOUCH_COMMAND_AREA_MIN = 160;
 
-const MAX_COMMAND_AREA_RATIO = 0.44;
+/*
+ * Touch landscape should not dedicate the same amount of vertical space
+ * to every command panel. Action Menu only needs two rows of buttons,
+ * while Party / Bag / target selection genuinely need more room.
+ */
+const TOUCH_ACTION_COMMAND_AREA_RATIO = 0.30;
+const TOUCH_ACTION_COMMAND_AREA_MIN = 128;
+
+const TOUCH_MOVE_COMMAND_AREA_RATIO = 0.44;
+const TOUCH_MOVE_COMMAND_AREA_MIN = 190;
+
+const TOUCH_DENSE_COMMAND_AREA_RATIO = 0.44;
+const TOUCH_DENSE_COMMAND_AREA_MIN = 172;
+
+const MAX_COMMAND_AREA_RATIO = 0.46;
 
 type BattleExperienceGainedPresentationEvent = Extract<
   BattlePresentationEvent,
@@ -88,6 +101,8 @@ export class BattleOverlay {
   private readonly evolutionAnimator: PokemonEvolutionAnimator;
 
   private readonly partyExperiencePanel: ModernBattlePartyExperiencePanel;
+
+  private commandLayoutMode: BattleCommandLayoutMode = "action";
 
   constructor(
     scene: Phaser.Scene,
@@ -257,17 +272,9 @@ export class BattleOverlay {
 
     const isTouchPrimary = window.matchMedia(BATTLE_TOUCH_QUERY).matches;
 
-    const commandAreaRatio = isTouchPrimary
-      ? TOUCH_COMMAND_AREA_RATIO
-      : DESKTOP_COMMAND_AREA_RATIO;
-
-    const commandAreaMin = isTouchPrimary
-      ? TOUCH_COMMAND_AREA_MIN
-      : DESKTOP_COMMAND_AREA_MIN;
-
-    const commandAreaHeight = Math.min(
-      height * MAX_COMMAND_AREA_RATIO,
-      Math.max(commandAreaMin, height * commandAreaRatio)
+    const commandAreaHeight = this.resolveCommandAreaHeight(
+      height,
+      isTouchPrimary
     );
 
     const battleFieldHeight = height - commandAreaHeight;
@@ -341,6 +348,74 @@ export class BattleOverlay {
     });
   }
 
+  private resolveCommandAreaHeight(
+    height: number,
+    isTouchPrimary: boolean
+  ): number {
+    if (!isTouchPrimary) {
+      return Math.min(
+        height * MAX_COMMAND_AREA_RATIO,
+        Math.max(DESKTOP_COMMAND_AREA_MIN, height * DESKTOP_COMMAND_AREA_RATIO)
+      );
+    }
+
+    const metrics = (() => {
+      switch (this.commandLayoutMode) {
+        case "action":
+          return {
+            ratio: TOUCH_ACTION_COMMAND_AREA_RATIO,
+            min: TOUCH_ACTION_COMMAND_AREA_MIN,
+          };
+
+        case "moves":
+          return {
+            ratio: TOUCH_MOVE_COMMAND_AREA_RATIO,
+            min: TOUCH_MOVE_COMMAND_AREA_MIN,
+          };
+
+        case "dense":
+          return {
+            ratio: TOUCH_DENSE_COMMAND_AREA_RATIO,
+            min: TOUCH_DENSE_COMMAND_AREA_MIN,
+          };
+      }
+    })();
+
+    return Math.min(
+      height * MAX_COMMAND_AREA_RATIO,
+      Math.max(metrics.min, height * metrics.ratio)
+    );
+  }
+
+  private updateCommandLayoutMode(state: BattleClientInteractionState): void {
+    switch (state) {
+      case "action-menu":
+        this.commandLayoutMode = "action";
+        break;
+
+      case "move-selection":
+        this.commandLayoutMode = "moves";
+        break;
+
+      case "pokemon-selection":
+      case "replacement-required":
+      case "item-selection":
+      case "item-target-selection":
+        this.commandLayoutMode = "dense";
+        break;
+
+      case "waiting-for-server":
+        /*
+         * Keep the previous layout. Waiting intentionally preserves the
+         * panel that submitted the server-authoritative command.
+         */
+        break;
+
+      case "completed":
+        break;
+    }
+  }
+
   public async animatePokemonEvolution(
     input: PokemonEvolutionAnimationInput
   ): Promise<void> {
@@ -388,6 +463,9 @@ export class BattleOverlay {
   }
 
   public setInteractionState(state: BattleClientInteractionState): void {
+    this.updateCommandLayoutMode(state);
+    this.layout();
+
     if (state !== "waiting-for-server") {
       this.messagePanel.clear();
     }

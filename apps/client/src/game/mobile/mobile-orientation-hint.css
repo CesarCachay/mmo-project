@@ -9,34 +9,85 @@
   pointer-events: none;
 }
 
+.mobile-orientation-hint--dismissed {
+  display: none !important;
+}
+
 .mobile-orientation-hint__card {
-  appearance: none;
+  position: relative;
   display: flex;
-  align-items: center;
-  gap: 12px;
-  width: min(100%, 330px);
-  padding: 12px 14px;
+  align-items: stretch;
+  width: min(100%, 360px);
   border: 1px solid rgba(148, 163, 184, 0.34);
   border-radius: 14px;
   background: rgba(15, 23, 42, 0.94);
   color: #ffffff;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(8px);
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.mobile-orientation-hint__action {
+  appearance: none;
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 42px 12px 14px;
+  border: 0;
+  background: transparent;
+  color: inherit;
   font: inherit;
   text-align: left;
   cursor: pointer;
-  pointer-events: auto;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
-.mobile-orientation-hint__card:active {
-  transform: scale(0.985);
+.mobile-orientation-hint__action:active {
+  background: rgba(148, 163, 184, 0.08);
 }
 
-.mobile-orientation-hint__card:disabled {
+.mobile-orientation-hint__action:disabled {
   opacity: 0.78;
   cursor: default;
+}
+
+.mobile-orientation-hint__action:focus-visible,
+.mobile-orientation-hint__close:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: -2px;
+}
+
+.mobile-orientation-hint__close {
+  appearance: none;
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 32px;
+  height: 32px;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #cbd5e1;
+  font: inherit;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-orientation-hint__close:active {
+  background: rgba(148, 163, 184, 0.14);
+  color: #ffffff;
 }
 
 .mobile-orientation-hint__icon {
@@ -65,7 +116,6 @@
 
 .mobile-orientation-hint__content span {
   color: #94a3b8;
-
   font-size: 11px;
   line-height: 1.35;
 }

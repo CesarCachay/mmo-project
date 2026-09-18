@@ -3,15 +3,38 @@ import { MAP_IDS } from "@cesar-mmo/shared";
 import type { MapId } from "@cesar-mmo/shared";
 
 export type OverworldCameraProfile = {
+  /** Desktop / 16:9 baseline zoom. */
   readonly zoom: number;
+
+  /**
+   * Lower zoom bound used only on touch-first landscape viewports wider than 16:9.
+   *
+   * Scale.EXPAND can expose a very wide but short viewport on phones. Reducing the
+   * zoom for those aspect ratios keeps enough vertical world space visible without
+   * changing the desktop framing.
+   */
+  readonly touchLandscapeMinZoom: number;
+
+  /**
+   * Maximum relative zoom increase allowed when the current map is narrower than
+   * the responsive camera viewport. This reduces visible side gutters without
+   * sacrificing the vertical framing gains from the responsive zoom.
+   *
+   * Example: 0.12 allows at most a 12% increase over the responsive zoom.
+   */
+  readonly touchLandscapeMaxMapFillAdjustment: number;
 };
 
 const OUTDOOR_CAMERA_PROFILE: OverworldCameraProfile = {
   zoom: 1.5,
+  touchLandscapeMinZoom: 1.2,
+  touchLandscapeMaxMapFillAdjustment: 0.12,
 };
 
 const INTERIOR_CAMERA_PROFILE: OverworldCameraProfile = {
   zoom: 1.75,
+  touchLandscapeMinZoom: 1.4,
+  touchLandscapeMaxMapFillAdjustment: 0.12,
 };
 
 export const OVERWORLD_CAMERA_PROFILES: Record<MapId, OverworldCameraProfile> = {

@@ -82,12 +82,36 @@
 
 @media (hover: none) and (pointer: coarse) and (orientation: landscape) {
   .mobile-trainer-hud-dock {
+    /*
+     * Keep utility navigation away from the primary A action zone.
+     * The dock lives at the upper-right; A remains lower-right where
+     * it is easier to reach with the right thumb.
+     */
     left: auto;
     right: max(12px, env(safe-area-inset-right));
-    top: 50%;
+    top: max(14px, env(safe-area-inset-top));
     bottom: auto;
     flex-direction: column;
-    transform: translateY(-50%);
+    transform: none;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 480px) {
+  .mobile-trainer-hud-dock {
+    top: max(8px, env(safe-area-inset-top));
+    gap: 2px;
+    padding: 4px;
+  }
+
+  .mobile-trainer-hud-dock__button {
+    width: 50px;
+    height: 44px;
+    grid-template-rows: 22px auto;
+  }
+
+  .mobile-trainer-hud-dock__icon {
+    width: 22px;
+    height: 22px;
   }
 }
 

@@ -289,3 +289,281 @@
   border-color: rgba(203, 213, 225, 0.38);
   background: linear-gradient(180deg, #475569, #334155);
 }
+
+/* =========================================================
+   Mobile Storage V2
+
+   Desktop rules above remain unchanged.
+   Touch layouts use the whole game viewport and reserve the screen
+   for storage while it is open.
+========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+  /* Storage is a modal gameplay surface: do not let overworld HUD
+     controls compete visually or intercept touch behind it. */
+  #app:has(.pokemon-storage-ui:not([hidden])) .virtual-joystick,
+  #app:has(.pokemon-storage-ui:not([hidden])) .mobile-action-control,
+  #app:has(.pokemon-storage-ui:not([hidden])) .mobile-trainer-hud-dock,
+  #app:has(.pokemon-storage-ui:not([hidden])) .interaction-prompt,
+  #app:has(.pokemon-storage-ui:not([hidden])) .game-chat-dock {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .pokemon-storage-ui {
+    place-items: stretch;
+    padding:
+      max(8px, env(safe-area-inset-top))
+      max(8px, env(safe-area-inset-right))
+      max(8px, env(safe-area-inset-bottom))
+      max(8px, env(safe-area-inset-left));
+  }
+
+  .pokemon-storage-ui__shell {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+  }
+
+  .pokemon-storage-card:hover:not(:disabled) {
+    transform: none;
+  }
+
+  .pokemon-storage-card {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .pokemon-storage-ui__action {
+    min-height: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* ---------------------------------------------------------
+   Touch landscape
+   Party and Storage stay side-by-side because landscape has width,
+   but the Party uses a 2 x 3 grid instead of six vertical rows.
+--------------------------------------------------------- */
+
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) {
+  .pokemon-storage-ui__shell {
+    border-radius: 12px;
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+  }
+
+  .pokemon-storage-ui__header {
+    padding: 8px 12px;
+  }
+
+  .pokemon-storage-ui__title {
+    font-size: clamp(14px, 2.1vw, 18px);
+  }
+
+  .pokemon-storage-ui__subtitle {
+    margin-top: 2px;
+    font-size: 9px;
+  }
+
+  .pokemon-storage-ui__content {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.45fr);
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .pokemon-storage-ui__section-header {
+    padding: 6px 8px;
+    font-size: 10px;
+  }
+
+  .pokemon-storage-ui__party-grid,
+  .pokemon-storage-ui__storage-grid {
+    padding: 6px;
+    gap: 6px;
+  }
+
+  .pokemon-storage-ui__party-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+  }
+
+  .pokemon-storage-ui__storage-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-content: start;
+  }
+
+  .pokemon-storage-card {
+    grid-template-columns: 38px minmax(0, 1fr);
+    min-height: 54px;
+    gap: 6px;
+    padding: 5px;
+  }
+
+  .pokemon-storage-card__sprite {
+    width: 36px;
+    height: 36px;
+  }
+
+  .pokemon-storage-card__name {
+    font-size: 10px;
+  }
+
+  .pokemon-storage-card__level {
+    font-size: 8px;
+  }
+
+  .pokemon-storage-card__hp-text {
+    margin-top: 2px;
+    font-size: 7px;
+  }
+
+  .pokemon-storage-card__hp-track {
+    margin-top: 2px;
+  }
+
+  .pokemon-storage-ui__feedback {
+    min-height: 24px;
+    padding: 2px 10px;
+  }
+
+  .pokemon-storage-ui__actions {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    padding: 6px 8px 8px;
+  }
+
+  .pokemon-storage-ui__action {
+    min-height: 42px;
+    font-size: 9px;
+  }
+}
+
+/* Short landscape such as iPhone browser viewports. */
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 520px) {
+  .pokemon-storage-ui {
+    padding:
+      max(4px, env(safe-area-inset-top))
+      max(6px, env(safe-area-inset-right))
+      max(4px, env(safe-area-inset-bottom))
+      max(6px, env(safe-area-inset-left));
+  }
+
+  .pokemon-storage-ui__header {
+    padding: 6px 10px;
+  }
+
+  .pokemon-storage-ui__subtitle {
+    display: none;
+  }
+
+  .pokemon-storage-ui__content {
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .pokemon-storage-ui__party-grid,
+  .pokemon-storage-ui__storage-grid {
+    padding: 5px;
+    gap: 5px;
+  }
+
+  .pokemon-storage-card {
+    grid-template-columns: 34px minmax(0, 1fr);
+    min-height: 48px;
+    padding: 4px;
+  }
+
+  .pokemon-storage-card__sprite {
+    width: 32px;
+    height: 32px;
+  }
+
+  .pokemon-storage-ui__feedback {
+    min-height: 20px;
+  }
+
+  .pokemon-storage-ui__actions {
+    padding: 5px 6px 6px;
+  }
+
+  .pokemon-storage-ui__action {
+    min-height: 38px;
+  }
+}
+
+/* Narrow landscape: reduce Storage from three columns to two. */
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-width: 760px) {
+  .pokemon-storage-ui__content {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  }
+
+  .pokemon-storage-ui__storage-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ---------------------------------------------------------
+   Touch portrait
+   Sections stack vertically. Party still uses two columns to avoid
+   wasting vertical space, while actions become a 2 x 2 grid.
+--------------------------------------------------------- */
+
+@media (hover: none) and (pointer: coarse) and (orientation: portrait) {
+  .pokemon-storage-ui__shell {
+    border-radius: 12px;
+  }
+
+  .pokemon-storage-ui__header {
+    padding: 10px 12px;
+  }
+
+  .pokemon-storage-ui__title {
+    font-size: 15px;
+  }
+
+  .pokemon-storage-ui__subtitle {
+    font-size: 9px;
+  }
+
+  .pokemon-storage-ui__content {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .pokemon-storage-ui__party-grid,
+  .pokemon-storage-ui__storage-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .pokemon-storage-card {
+    grid-template-columns: 38px minmax(0, 1fr);
+    min-height: 54px;
+    padding: 5px;
+  }
+
+  .pokemon-storage-card__sprite {
+    width: 36px;
+    height: 36px;
+  }
+
+  .pokemon-storage-ui__feedback {
+    min-height: 24px;
+    padding: 2px 10px;
+  }
+
+  .pokemon-storage-ui__actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+    padding: 7px 8px 8px;
+  }
+}

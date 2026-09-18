@@ -1,53 +1,64 @@
+/* =========================================================
+   Mobile Trainer Sheets
+
+   Important:
+   PartyDrawer / InventoryDrawer / TrainerDrawer import their
+   component CSS from their own modules. These rules intentionally
+   use #app direct-child selectors so the mobile presentation wins
+   regardless of CSS module evaluation order.
+========================================================= */
+
 @media (hover: none) and (pointer: coarse) {
-  .party-drawer__content,
-  .party-drawer__list,
-  .inventory-drawer__content,
-  .inventory-drawer__list,
-  .trainer-drawer__content {
+  #app > .party-drawer .party-drawer__content,
+  #app > .party-drawer .party-drawer__list,
+  #app > .inventory-drawer .inventory-drawer__content,
+  #app > .inventory-drawer .inventory-drawer__list,
+  #app > .trainer-drawer .trainer-drawer__content {
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
   }
 
-  .party-drawer,
-  .inventory-drawer,
-  .trainer-drawer {
+  #app > .party-drawer,
+  #app > .inventory-drawer,
+  #app > .trainer-drawer {
     top: auto;
-    left: max(8px, env(safe-area-inset-left));
-    right: max(8px, env(safe-area-inset-right));
-    bottom: max(8px, env(safe-area-inset-bottom));
+    left: max(8px, env(safe-area-inset-left, 0px));
+    right: max(8px, env(safe-area-inset-right, 0px));
+    bottom: max(8px, env(safe-area-inset-bottom, 0px));
+
     width: auto;
     height: min(82%, 440px);
     max-height: calc(100% - 16px);
+
     z-index: 180;
+
     border-radius: 16px;
 
-    /*
-       * Desktop drawers enter from the right.
-       * Mobile sheets enter from the bottom.
-       */
+    /* Desktop drawers enter from the right; touch sheets from bottom. */
     transform: translateY(calc(100% + 28px));
     transform-origin: center bottom;
+
     transition:
       transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
       opacity 140ms ease;
   }
 
-  .party-drawer--open,
-  .inventory-drawer--open,
-  .trainer-drawer--open {
+  #app > .party-drawer.party-drawer--open,
+  #app > .inventory-drawer.inventory-drawer--open,
+  #app > .trainer-drawer.trainer-drawer--open {
     transform: translateY(0);
   }
 
-  .party-drawer__header,
-  .inventory-drawer__header,
-  .trainer-drawer__header {
+  #app > .party-drawer .party-drawer__header,
+  #app > .inventory-drawer .inventory-drawer__header,
+  #app > .trainer-drawer .trainer-drawer__header {
     min-height: 54px;
     padding: 8px 10px 8px 14px;
   }
 
-  .party-drawer__close,
-  .inventory-drawer__close,
-  .trainer-drawer__close {
+  #app > .party-drawer .party-drawer__close,
+  #app > .inventory-drawer .inventory-drawer__close,
+  #app > .trainer-drawer .trainer-drawer__close {
     width: 38px;
     height: 38px;
     flex-basis: 38px;
@@ -56,45 +67,120 @@
     touch-action: manipulation;
   }
 
-  .party-drawer__footer,
-  .inventory-drawer__footer,
-  .trainer-drawer__footer {
-    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  #app > .party-drawer .party-drawer__reorder:not([hidden]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding-inline: 12px;
+    border-radius: 11px;
+    font-size: 10px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #app > .party-drawer.party-drawer--special-mode
+    .party-drawer__pokemon-button {
+    touch-action: manipulation;
+  }
+
+  #app > .party-drawer .party-drawer__pokemon--source {
+    border-color: rgba(250, 204, 21, 0.9);
+    box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.16) inset;
+  }
+
+  #app > .party-drawer .party-drawer__footer,
+  #app > .inventory-drawer .inventory-drawer__footer,
+  #app > .trainer-drawer .trainer-drawer__footer {
+    padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Never allow flex layouts to squeeze party cards vertically. */
+  #app > .party-drawer .party-drawer__pokemon {
+    flex: 0 0 auto;
+    min-width: 0;
   }
 }
 
-/* Party drawer */
+/* =========================================================
+   Landscape touch
+
+   Leave a narrow rail on the right for Party / Bag / Trainer.
+   Six Pokémon fit as a 2 x 3 grid instead of being compressed
+   into one desktop column.
+========================================================= */
 
 @media (hover: none) and (pointer: coarse) and (orientation: landscape) {
-  .party-drawer__list {
+  #app > .party-drawer,
+  #app > .inventory-drawer,
+  #app > .trainer-drawer {
+    left: max(8px, env(safe-area-inset-left, 0px));
+    right: max(84px, calc(env(safe-area-inset-right, 0px) + 76px));
+    bottom: max(8px, env(safe-area-inset-bottom, 0px));
+
+    height: min(78%, 350px);
+    max-height: calc(100% - 16px);
+  }
+
+  #app > .party-drawer .party-drawer__list {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: minmax(68px, auto);
     align-content: start;
+
     gap: 7px;
     padding: 8px;
+
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
-  .party-drawer__pokemon {
-    min-width: 0;
-  }
-
-  .party-drawer__pokemon-button {
-    grid-template-columns:
-      42px
-      minmax(0, 1fr);
-    min-height: 58px;
+  #app > .party-drawer .party-drawer__pokemon-button {
+    grid-template-columns: 42px minmax(0, 1fr);
+    min-height: 68px;
+    gap: 8px;
     padding: 6px 8px;
   }
 
-  .party-drawer__actions {
+  #app > .party-drawer .party-drawer__pokemon-content {
+    gap: 2px;
+  }
+
+  #app > .party-drawer .party-drawer__sprite-frame {
+    width: 40px;
+    height: 40px;
+  }
+
+  #app > .party-drawer .party-drawer__sprite {
+    width: 35px;
+    height: 35px;
+  }
+
+  #app > .party-drawer .party-drawer__pokemon-name {
+    font-size: 11px;
+  }
+
+  #app > .party-drawer .party-drawer__pokemon-level {
+    font-size: 9px;
+  }
+
+  #app > .party-drawer .party-drawer__hp-track {
+    height: 5px;
+  }
+
+  #app > .party-drawer .party-drawer__actions {
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 8px 7px;
+  }
+
+  #app > .party-drawer .party-drawer__actions-buttons {
     gap: 5px;
   }
-}
 
-/* Inventory drawer */
-
-@media (hover: none) and (pointer: coarse) and (orientation: landscape) {
-  .inventory-drawer__list {
+  /* Inventory keeps the same responsive 2-column concept. */
+  #app > .inventory-drawer .inventory-drawer__list {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-content: start;
@@ -102,69 +188,99 @@
     padding: 8px;
   }
 
-  .inventory-drawer__item {
+  #app > .inventory-drawer .inventory-drawer__item {
     min-width: 0;
     min-height: 56px;
-    grid-template-columns:
-      40px
-      minmax(0, 1fr)
-      auto;
+    grid-template-columns: 40px minmax(0, 1fr) auto;
     gap: 7px;
     padding: 6px 8px;
   }
-}
 
-/* Trainer drawer */
-
-@media (hover: none) and (pointer: coarse) and (orientation: landscape) {
-  .trainer-drawer__content {
+  #app > .trainer-drawer .trainer-drawer__content {
     padding: 10px;
     gap: 9px;
   }
 
-  .trainer-drawer__identity {
+  #app > .trainer-drawer .trainer-drawer__identity {
     padding: 9px 11px;
   }
 
-  .trainer-drawer__summary {
+  #app > .trainer-drawer .trainer-drawer__summary {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .trainer-drawer__stat {
+  #app > .trainer-drawer .trainer-drawer__stat {
     min-height: 62px;
     padding: 8px 10px;
   }
 
-  .trainer-drawer__metadata-row {
+  #app > .trainer-drawer .trainer-drawer__metadata-row {
     min-height: 36px;
     padding: 6px 10px;
   }
 }
 
-/* Portrait fallback */
-@media (hover: none) and (pointer: coarse) and (orientation: portrait) {
-  .party-drawer,
-  .inventory-drawer,
-  .trainer-drawer {
-    height: min(78%, 620px);
-    left: max(8px, env(safe-area-inset-left));
-    right: max(8px, env(safe-area-inset-right));
+/* Short landscape: preserve readable cards; list scrolls if needed. */
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 520px) {
+  #app > .party-drawer,
+  #app > .inventory-drawer,
+  #app > .trainer-drawer {
+    height: min(80%, 330px);
   }
 
-  .party-drawer__list,
-  .inventory-drawer__list {
+  #app > .party-drawer .party-drawer__header {
+    min-height: 48px;
+    padding-block: 6px;
+  }
+
+  #app > .party-drawer .party-drawer__list {
+    grid-auto-rows: minmax(64px, auto);
+    gap: 6px;
+    padding: 6px;
+  }
+
+  #app > .party-drawer .party-drawer__pokemon-button {
+    min-height: 64px;
+    padding-block: 5px;
+  }
+
+  #app > .party-drawer .party-drawer__footer {
+    min-height: 28px;
+    padding-top: 5px;
+    padding-bottom: max(5px, env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* =========================================================
+   Portrait fallback
+========================================================= */
+
+@media (hover: none) and (pointer: coarse) and (orientation: portrait) {
+  #app > .party-drawer,
+  #app > .inventory-drawer,
+  #app > .trainer-drawer {
+    height: min(78%, 620px);
+    left: max(8px, env(safe-area-inset-left, 0px));
+    right: max(8px, env(safe-area-inset-right, 0px));
+  }
+
+  #app > .party-drawer .party-drawer__list,
+  #app > .inventory-drawer .inventory-drawer__list {
     display: flex;
     flex-direction: column;
   }
 }
 
-/* Touch hover cleanup */
+/* =========================================================
+   Touch hover cleanup
+========================================================= */
+
 @media (hover: none) and (pointer: coarse) {
-  .inventory-drawer__item:hover:not(:disabled) {
+  #app > .inventory-drawer .inventory-drawer__item:hover:not(:disabled) {
     transform: none;
   }
 
-  .party-drawer__pokemon:hover {
+  #app > .party-drawer .party-drawer__pokemon:hover {
     border-color: rgba(148, 163, 184, 0.16);
   }
 }

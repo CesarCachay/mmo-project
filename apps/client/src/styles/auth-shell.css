@@ -1,3 +1,7 @@
+/* =========================================================
+   Shared account / join shell
+========================================================= */
+
 .join-panel {
   box-sizing: border-box;
   width: 320px;
@@ -37,10 +41,58 @@
   text-align: center;
 }
 
+/* =========================================================
+   Account scenes — browser viewport-owned layout
+
+   Authentication is DOM UI, not Phaser gameplay. The account
+   overlay therefore owns the complete browser viewport and is
+   intentionally independent from GameStage sizing/aspect ratio.
+========================================================= */
+
+.account-scene-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+
+  min-width: 0;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding:
+    max(16px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+
+  background: #0f172a;
+}
+
 .account-scene-overlay .join-panel {
+  flex: 0 0 auto;
+
   width: min(100%, 380px);
   padding: 28px;
   border-radius: 14px;
+
+  /*
+   * Center the card when it fits. If it becomes taller than the
+   * available viewport, the auto margins collapse and the overlay
+   * remains naturally scrollable instead of clipping the card.
+   */
+  margin-block: auto;
 }
 
 .account-scene-overlay .join-title {
@@ -62,55 +114,56 @@
   min-height: 44px;
 }
 
+/* =========================================================
+   Portrait / narrow screens
+========================================================= */
+
 @media (max-width: 480px) {
   .account-scene-overlay {
-    place-items: center;
-    padding: max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right))
-      max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+    padding:
+      max(12px, env(safe-area-inset-top))
+      max(12px, env(safe-area-inset-right))
+      max(12px, env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
   }
 
   .account-scene-overlay .join-panel {
     width: 100%;
     max-width: 370px;
-    padding: 24px 20px;
+    padding: 20px 18px;
+    border-radius: 12px;
   }
 
   .account-scene-overlay .join-header {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
+  }
+
+  .account-scene-overlay .join-title {
+    font-size: clamp(28px, 8vw, 34px);
+    line-height: 1.05;
+    letter-spacing: 0.5px;
   }
 
   .account-scene-overlay .account-login-copy {
-    margin-bottom: 18px;
+    margin-bottom: 16px;
+  }
+
+  .account-scene-overlay .account-local-form {
+    gap: 10px;
+  }
+
+  .account-scene-overlay .account-register-prompt {
+    margin-top: 12px;
+  }
+
+  .account-scene-overlay .account-auth-divider {
+    margin: 12px 0;
   }
 }
 
 /* =========================================================
-   Account overlay — scroll-safe portrait + landscape
+   Short browser viewport
 ========================================================= */
-
-.account-scene-overlay {
-  /*
-   * A centered CSS grid can clip an element taller
-   * than its scroll container.
-   *
-   * Flex + auto block margins gives us:
-   *
-   * - centered card when it fits
-   * - top-aligned scrollable card when it does not
-   */
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: touch;
-}
-
-.account-scene-overlay .join-panel {
-  flex: 0 0 auto;
-  margin-block: auto;
-}
 
 @media (max-height: 620px) {
   .account-scene-overlay {
@@ -148,5 +201,99 @@
 
   .account-scene-overlay .join-hint {
     margin-top: 6px;
+  }
+}
+
+/* =========================================================
+   Mobile / tablet landscape with limited vertical space
+========================================================= */
+
+@media (orientation: landscape) and (max-height: 700px) {
+  .account-scene-overlay {
+    padding:
+      max(8px, env(safe-area-inset-top))
+      max(12px, env(safe-area-inset-right))
+      max(8px, env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
+  }
+
+  .account-scene-overlay .join-panel {
+    width: min(100%, 360px);
+    padding: 14px 20px;
+    border-radius: 10px;
+  }
+
+  .account-scene-overlay .join-header {
+    margin-bottom: 8px;
+  }
+
+  .account-scene-overlay .join-title {
+    font-size: 26px;
+    line-height: 1;
+  }
+
+  .account-scene-overlay .account-login-copy {
+    margin-bottom: 8px;
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .account-scene-overlay .account-local-form {
+    gap: 7px;
+  }
+
+  .account-scene-overlay .account-local-field {
+    gap: 4px;
+  }
+
+  .account-scene-overlay .account-local-input {
+    height: 40px;
+    min-height: 40px;
+  }
+
+  .account-scene-overlay .account-local-button {
+    min-height: 40px;
+  }
+
+  .account-scene-overlay .account-register-prompt {
+    margin-top: 8px;
+  }
+
+  .account-scene-overlay .account-text-button {
+    min-height: 32px;
+  }
+
+  .account-scene-overlay .account-auth-divider {
+    margin: 8px 0;
+  }
+
+  .account-scene-overlay .account-google-button {
+    min-height: 40px;
+  }
+
+  .account-scene-overlay .account-login-status {
+    margin-top: 6px;
+  }
+
+  .account-scene-overlay .join-hint {
+    margin-top: 4px;
+  }
+}
+
+/* =========================================================
+   Extremely short landscape viewport
+========================================================= */
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .account-scene-overlay .join-panel {
+    padding-block: 12px;
+  }
+
+  .account-scene-overlay .join-title {
+    font-size: 24px;
+  }
+
+  .account-scene-overlay .join-hint {
+    display: none;
   }
 }

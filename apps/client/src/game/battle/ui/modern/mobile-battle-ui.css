@@ -27,28 +27,30 @@
 
 @media (hover: none) and (pointer: coarse) {
   .battle-action-menu {
-    gap: 14px;
-    padding: 10px max(14px, var(--game-safe-right));
+    gap: 12px;
+    padding: 8px max(14px, var(--game-safe-right));
   }
 
   .battle-action-menu__prompt {
-    flex: 0 1 42%;
-    font-size: 14px;
+    flex: 1 1 auto;
+    max-width: 420px;
+    font-size: 13px;
     line-height: 1.2;
   }
 
   .battle-action-menu__actions {
-    width: 56%;
+    width: min(62%, 620px);
     min-width: 0;
+    margin-left: auto;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
+    gap: 7px;
   }
 
   .battle-action-menu__button {
     min-width: 0;
-    min-height: 48px;
-    padding: 8px 10px;
-    font-size: 13px;
+    min-height: 44px;
+    padding: 7px 10px;
+    font-size: 12px;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
@@ -59,39 +61,69 @@
 }
 
 /* =========================================================
-     Move Selection
-  ========================================================= */
+   Move Selection
+
+   Mobile principle:
+   - reserve enough vertical space for two real touch rows;
+   - keep the content width bounded on wide landscape screens;
+   - let Grid distribute the remaining height instead of
+     shrinking cards below a usable touch target.
+========================================================= */
 
 @media (hover: none) and (pointer: coarse) {
   .battle-modern-moves {
-    padding: 8px 12px 10px;
+    padding: clamp(6px, 1.4vh, 10px) max(12px, var(--game-safe-right))
+      max(8px, var(--game-safe-bottom)) max(12px, var(--game-safe-left));
+  }
+
+  .battle-modern-moves__header,
+  .battle-modern-moves__grid {
+    width: min(96%, 980px);
+    margin-inline: auto;
   }
 
   .battle-modern-moves__header {
-    min-height: 44px;
+    flex: 0 0 auto;
+    min-height: 40px;
     gap: 8px;
-    margin-bottom: 6px;
+    margin-bottom: clamp(5px, 1vh, 8px);
   }
 
   .battle-modern-moves__header-left {
+    min-width: 0;
     gap: 8px;
   }
 
+  .battle-modern-moves__title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: clamp(12px, 2.6vw, 15px);
+  }
+
   .battle-move-panel__back {
-    min-width: 72px;
-    min-height: 44px;
+    min-width: 68px;
+    min-height: 40px;
     padding: 6px 12px;
     font-size: 11px;
     touch-action: manipulation;
   }
 
   .battle-modern-moves__grid {
-    gap: 6px;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(56px, 1fr));
+    gap: clamp(6px, 1.2vh, 10px);
+    align-content: stretch;
   }
 
   .battle-modern-move-card {
-    min-height: 44px;
-    padding: 7px 9px;
+    min-width: 0;
+    min-height: 56px;
+    padding: clamp(7px, 1.2vh, 10px) clamp(9px, 1.8vw, 14px);
     border-radius: 11px;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
@@ -101,17 +133,72 @@
     transform: none;
   }
 
+  .battle-modern-move-card__top,
+  .battle-modern-move-card__bottom {
+    gap: 6px;
+  }
+
   .battle-modern-move-card__name {
-    font-size: 12px;
+    font-size: clamp(12px, 2.4vw, 15px);
   }
 
   .battle-modern-move-card__type {
+    flex: 0 0 auto;
     padding: 2px 6px;
-    font-size: 8px;
+    font-size: clamp(8px, 1.8vw, 10px);
   }
 
   .battle-modern-move-card__bottom {
-    margin-top: 3px;
+    margin-top: 4px;
+  }
+
+  .battle-modern-move-card__pp-label,
+  .battle-modern-move-card__pp {
+    font-size: clamp(9px, 1.9vw, 11px);
+  }
+}
+
+/* Short landscape phones: keep two readable touch rows without
+   allowing the header to consume too much of the command area. */
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 520px) {
+  .battle-modern-moves {
+    padding-top: 6px;
+    padding-bottom: max(6px, var(--game-safe-bottom));
+  }
+
+  .battle-modern-moves__header {
+    min-height: 36px;
+    margin-bottom: 5px;
+  }
+
+  .battle-move-panel__back {
+    min-height: 36px;
+  }
+
+  .battle-modern-moves__grid {
+    grid-template-rows: repeat(2, minmax(54px, 1fr));
+    gap: 6px;
+  }
+
+  .battle-modern-move-card {
+    min-height: 54px;
+    padding-block: 6px;
+  }
+}
+
+/* Extremely short landscape viewport (browser chrome / small phones).
+   Preserve usability first; the command panel may scroll instead of
+   clipping the second row. */
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 440px) {
+  .battle-modern-moves {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .battle-modern-moves__grid {
+    flex: 0 0 auto;
+    grid-auto-rows: 54px;
   }
 }
 
