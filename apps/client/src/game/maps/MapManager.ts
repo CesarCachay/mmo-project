@@ -22,6 +22,7 @@ export class MapManager {
     if (!this.activeMap) {
       throw new Error("Map is not currently created");
     }
+
     return this.activeMap;
   }
 
@@ -31,6 +32,20 @@ export class MapManager {
     }
 
     const mapConfig = MAP_REGISTRY[mapId];
+
+    if (!this.scene.cache.tilemap.exists(mapConfig.key)) {
+      throw new Error(
+        `Cannot create map "${mapId}" because its tilemap JSON is not loaded`
+      );
+    }
+
+    for (const tilesetConfig of mapConfig.tilesets) {
+      if (!this.scene.textures.exists(tilesetConfig.key)) {
+        throw new Error(
+          `Cannot create map "${mapId}" because tileset "${tilesetConfig.key}" is not loaded`
+        );
+      }
+    }
 
     const map = this.scene.make.tilemap({
       key: mapConfig.key,
@@ -49,8 +64,11 @@ export class MapManager {
     });
 
     const groundLayer = map.createLayer("Ground", mapTilesets, 0, 0);
+
     const groundDetailsLayer = map.createLayer("GroundDetails", mapTilesets, 0, 0);
+
     const buildingsLayer = map.createLayer("Buildings", mapTilesets, 0, 0);
+
     const abovePlayerLayer = map.createLayer("AbovePlayer", mapTilesets, 0, 0);
 
     groundLayer?.setDepth(0);
@@ -61,12 +79,15 @@ export class MapManager {
     if (groundLayer) {
       this.layers.push(groundLayer);
     }
+
     if (groundDetailsLayer) {
       this.layers.push(groundDetailsLayer);
     }
+
     if (buildingsLayer) {
       this.layers.push(buildingsLayer);
     }
+
     if (abovePlayerLayer) {
       this.layers.push(abovePlayerLayer);
     }

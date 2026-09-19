@@ -5,7 +5,14 @@ import {
   getDialogue,
   isPlayerMoving,
   POKEMON_ITEM_REGISTRY,
+  MAP_DATA_REGISTRY,
 } from "@cesar-mmo/shared";
+import {
+  GAME_SCENE_KEY,
+  WORLD_BOOT_ABORTED_EVENT,
+  WORLD_READY_EVENT,
+} from "./world/world-loading.contract";
+import type { WorldEntryData, WorldReadyPayload } from "./world/world-loading.contract";
 
 // assets
 import {
@@ -20,10 +27,6 @@ import {
   getPlayerTextureKey,
   getPlayerAnimationKey,
 } from "./config/playerAssets";
-import {
-  WILD_BATTLE_AUDIO_ASSETS,
-  WILD_BATTLE_AUDIO_KEYS,
-} from "./battle/audio/WildBattleAudioController";
 import { POKEMON_STARTER_ASSETS } from "./pokemon/pokemon-starter-assets";
 import { PokemonSpriteLoader } from "./pokemon/PokemonSpriteLoader";
 import { PokemonOverworldSpriteLoader } from "./pokemon/PokemonOverworldSpriteLoader";
@@ -38,7 +41,7 @@ import { TrainerHudNavigationController } from "./ui/TrainerHudNavigationControl
 import { MobileGameplayUxController } from "./mobile/MobileGameplayUxController";
 
 // helpers
-import { MAP_REGISTRY } from "./maps/mapRegistry";
+import { MapAssetLoader } from "./maps/MapAssetLoader";
 
 // movement (touch and keyboard)
 import { MovementInputController } from "./player/MovementInputController";
@@ -61,7 +64,7 @@ import { TrainerPanelController } from "./ui/TrainerPanelController";
 import { PokemonTrainerPresentationController } from "./pokemon/PokemonTrainerPresentationController";
 
 // controllers
-import { BattleController } from "./battle/BattleController";
+import { LazyBattleController } from "./battle/LazyBattleController";
 import { PokemonStorageController } from "./storage/PokemonStorageController";
 import { PokemonStorageTerminalInteractionController } from "./storage/PokemonStorageTerminalInteractionController";
 import { PokemonCenterHealingInteractionController } from "./pokemon-center/PokemonCenterHealingInteractionController";
@@ -91,11 +94,17 @@ import type {
   PokemonWildEncounterStartedPayload,
 } from "@cesar-mmo/shared";
 
+type MapTransitionDefinition = Readonly<{
+  targetMapId: MapId;
+}>;
+
 export class GameScene extends Phaser.Scene {
   private currentMapId: MapId = DEFAULT_MAP_ID;
   private hasAppliedInitialWorldState = false;
 
   private mapManager!: MapManager;
+  private mapAssetLoader!: MapAssetLoader;
+  private mapTransitionRequestPromise?: Promise<void>;
   private player!: Phaser.GameObjects.Sprite;
   private localPlayerController!: LocalPlayerController;
   private movementInputController!: MovementInputController;
@@ -128,7 +137,7 @@ export class GameScene extends Phaser.Scene {
 
   private pokemonOverworldSpriteLoader!: PokemonOverworldSpriteLoader;
 
-  private battleController!: BattleController;
+  private battleController!: LazyBattleController;
 
   private pokemonStorageController!: PokemonStorageController;
   private pokemonStorageTerminalInteraction!: PokemonStorageTerminalInteractionController;
@@ -148,25 +157,19 @@ export class GameScene extends Phaser.Scene {
   private avatarId: PlayerAvatarId = "male-01";
 
   constructor() {
-    super("GameScene");
+    super(GAME_SCENE_KEY);
   }
 
-  init(data: { displayName: string; avatarId: PlayerAvatarId }) {
+  init(data: WorldEntryData): void {
+    this.currentMapId = DEFAULT_MAP_ID;
     this.avatarId = data.avatarId;
     this.hasAppliedInitialWorldState = false;
   }
 
-  preload() {
-    // Assets and tilesets
-    for (const mapConfig of Object.values(MAP_REGISTRY)) {
-      this.load.tilemapTiledJSON(mapConfig.key, mapConfig.path);
+  preload(): void {
+    this.mapAssetLoader = new MapAssetLoader(this);
 
-      for (const tileset of mapConfig.tilesets) {
-        if (!this.textures.exists(tileset.key)) {
-          this.load.image(tileset.key, tileset.path);
-        }
-      }
-    }
+    this.mapAssetLoader.queueForScenePreload(this.currentMapId);
 
     // Items icons
     for (const item of Object.values(POKEMON_ITEM_REGISTRY)) {
@@ -196,20 +199,6 @@ export class GameScene extends Phaser.Scene {
 
     // audio - pokecenter
     this.load.audio(
-      WILD_BATTLE_AUDIO_KEYS.CAPTURE_CONTAINED,
-      WILD_BATTLE_AUDIO_ASSETS.CAPTURE_CONTAINED
-    );
-    this.load.audio(
-      WILD_BATTLE_AUDIO_KEYS.CAPTURE_SUCCESS,
-      WILD_BATTLE_AUDIO_ASSETS.CAPTURE_SUCCESS
-    );
-    this.load.audio(
-      WILD_BATTLE_AUDIO_KEYS.CAPTURE_FAILED,
-      WILD_BATTLE_AUDIO_ASSETS.CAPTURE_FAILED
-    );
-    this.load.audio(WILD_BATTLE_AUDIO_KEYS.VICTORY, WILD_BATTLE_AUDIO_ASSETS.VICTORY);
-    this.load.audio(WILD_BATTLE_AUDIO_KEYS.DEFEAT, WILD_BATTLE_AUDIO_ASSETS.DEFEAT);
-    this.load.audio(
       POKEMON_CENTER_HEALING_AUDIO_KEYS.STEP,
       "/assets/audio/pokemon-center/heal-step.wav"
     );
@@ -225,6 +214,12 @@ export class GameScene extends Phaser.Scene {
   }
 
   create() {
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      if (!this.hasAppliedInitialWorldState) {
+        this.game.events.emit(WORLD_BOOT_ABORTED_EVENT);
+      }
+    });
+
     this.mapManager = new MapManager(this);
     this.mapManager.create(this.currentMapId);
 
@@ -244,7 +239,8 @@ export class GameScene extends Phaser.Scene {
       this,
       (transitionId) => this.requestMapTransition(transitionId),
       (transition) => this.handleMapTransitionResolved(transition),
-      () => this.localPlayerController.setIdle()
+      () => this.localPlayerController.setIdle(),
+      (transitionId) => this.prefetchMapTransitionDestination(transitionId)
     );
     this.mapTransitionController.loadZones(this.mapManager.map);
 
@@ -383,7 +379,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createBattleUi(): void {
-    this.battleController = new BattleController(
+    this.battleController = new LazyBattleController(
       this,
       this.pokemonSpriteLoader,
       (input) => {
@@ -878,28 +874,7 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.network.onCurrentPlayers((players) => {
-      const playerStates = Object.values(players);
-      const localPlayer = playerStates.find((player) => player.id === this.network.id);
-      if (!localPlayer) {
-        console.warn("[PlayerWorld] Local player missing from currentPlayers", {
-          networkId: this.network.id,
-          playerIds: Object.keys(players),
-        });
-        return;
-      }
-
-      this.applyInitialAuthoritativePlayerState(localPlayer);
-
-      for (const player of playerStates) {
-        if (player.id === this.network.id) {
-          continue;
-        }
-        if (player.mapId !== this.currentMapId) {
-          continue;
-        }
-        this.remotePlayerManager.add(player);
-        this.remotePokemonFollowerManager.sync(player);
-      }
+      void this.handleCurrentPlayers(players);
     });
 
     this.network.onPlayerJoined((player) => {
@@ -948,12 +923,15 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  private applyInitialAuthoritativePlayerState(player: Player): void {
+  private async applyInitialAuthoritativePlayerState(player: Player): Promise<void> {
     if (player.mapId !== this.currentMapId) {
+      await this.mapAssetLoader.ensureMapLoaded(player.mapId);
+
       this.changeCurrentMap(player.mapId);
     }
 
     this.localPlayerController.setDirection(player.direction);
+
     this.localPlayerController.snapToPosition(player.x, player.y);
 
     this.pokemonTrainerPresentationController.resetFollowerToPlayerPosition(
@@ -963,25 +941,38 @@ export class GameScene extends Phaser.Scene {
     );
 
     this.mapTransitionController.resetExitTracking();
+
     this.overworldCameraController.resetForMap(this.currentMapId, this.mapManager.map);
+
     this.movementInputController.resetLastInputToNeutral();
+
     this.localPlayerController.setIdle();
 
     if (!this.hasAppliedInitialWorldState) {
       this.hasAppliedInitialWorldState = true;
+
       const camera = this.cameras.main;
+
       this.tweens.killTweensOf(camera);
+
       camera.setAlpha(0);
+
       this.tweens.add({
         targets: camera,
         alpha: 1,
         duration: 180,
         ease: "Linear",
       });
+
+      this.game.events.emit(WORLD_READY_EVENT, {
+        mapId: this.currentMapId,
+      } satisfies WorldReadyPayload);
     }
   }
 
-  private handleMapTransitionResolved(transition: MapTransitionResolved): void {
+  private async handleMapTransitionResolved(
+    transition: MapTransitionResolved
+  ): Promise<void> {
     if (transition.fromMapId !== this.currentMapId) {
       return;
     }
@@ -989,15 +980,23 @@ export class GameScene extends Phaser.Scene {
     this.trainerPanelController.close();
 
     this.mapTransitionController.resetExitTracking();
+
+    await this.mapAssetLoader.ensureMapLoaded(transition.targetMapId);
+
     this.changeCurrentMap(transition.targetMapId);
+
     this.localPlayerController.snapToPosition(transition.x, transition.y);
+
     this.pokemonTrainerPresentationController.resetFollowerToPlayerPosition(
       transition.x,
       transition.y,
       this.localPlayerController.direction
     );
+
     this.overworldCameraController.resetForMap(this.currentMapId, this.mapManager.map);
+
     this.movementInputController.resetLastInputToNeutral();
+
     this.localPlayerController.setIdle();
   }
 
@@ -1248,6 +1247,7 @@ export class GameScene extends Phaser.Scene {
 
   private requestMapTransition(transitionId: string): void {
     if (
+      this.mapTransitionRequestPromise ||
       this.isMapTransitioning ||
       this.dialogueBox.isOpen() ||
       this.chatBox.isTyping() ||
@@ -1260,9 +1260,72 @@ export class GameScene extends Phaser.Scene {
     ) {
       return;
     }
+
+    const sourceMapId = this.currentMapId;
+
+    this.mapTransitionRequestPromise = this.prepareAndRequestMapTransition(
+      sourceMapId,
+      transitionId
+    )
+      .catch((error: unknown) => {
+        console.error("[MapTransition] Could not prepare destination", {
+          sourceMapId,
+          transitionId,
+          error,
+        });
+      })
+      .finally(() => {
+        this.mapTransitionRequestPromise = undefined;
+      });
+  }
+
+  private prefetchMapTransitionDestination(transitionId: string): void {
+    const transition = this.getMapTransitionDefinition(this.currentMapId, transitionId);
+
+    if (!transition) {
+      return;
+    }
+    if (transition.targetMapId === this.currentMapId) {
+      return;
+    }
+
+    this.mapAssetLoader.prefetchMap(transition.targetMapId);
+  }
+
+  private getMapTransitionDefinition(
+    mapId: MapId,
+    transitionId: string
+  ): MapTransitionDefinition | undefined {
+    const transitions = MAP_DATA_REGISTRY[mapId].transitions;
+
+    return Reflect.get(transitions, transitionId.trim()) as
+      MapTransitionDefinition | undefined;
+  }
+
+  private async prepareAndRequestMapTransition(
+    sourceMapId: MapId,
+    transitionId: string
+  ): Promise<void> {
+    const transition = this.getMapTransitionDefinition(sourceMapId, transitionId);
+
+    if (!transition) {
+      console.warn("[MapTransition] Unknown transition", {
+        sourceMapId,
+        transitionId,
+      });
+      return;
+    }
+
+    await this.mapAssetLoader.ensureMapLoaded(transition.targetMapId);
+
+    if (this.currentMapId !== sourceMapId || this.isMapTransitioning) {
+      return;
+    }
+
     const payload: MapTransitionInput = {
       transitionId,
     };
+
     this.network.requestMapTransition(payload);
   }
 
@@ -1274,6 +1337,44 @@ export class GameScene extends Phaser.Scene {
       return;
     }
     initializeGameTopBar().setMap(this.currentMapId);
+  }
+
+  private async handleCurrentPlayers(players: Record<string, Player>): Promise<void> {
+    const playerStates = Object.values(players);
+
+    const localPlayer = playerStates.find((player) => player.id === this.network.id);
+
+    if (!localPlayer) {
+      console.warn("[PlayerWorld] Local player missing from currentPlayers", {
+        networkId: this.network.id,
+
+        playerIds: Object.keys(players),
+      });
+
+      return;
+    }
+
+    try {
+      await this.applyInitialAuthoritativePlayerState(localPlayer);
+    } catch (error: unknown) {
+      console.error("[PlayerWorld] Could not load authoritative map", error);
+      this.scene.start("TrainerSelectionScene", {
+        errorMessage: "No se pudo cargar el mapa del Trainer. Inténtalo nuevamente.",
+      });
+      return;
+    }
+
+    for (const player of playerStates) {
+      if (player.id === this.network.id) {
+        continue;
+      }
+      if (player.mapId !== this.currentMapId) {
+        continue;
+      }
+
+      this.remotePlayerManager.add(player);
+      this.remotePokemonFollowerManager.sync(player);
+    }
   }
 
   private destroyCurrentMap(): void {
@@ -1309,6 +1410,8 @@ export class GameScene extends Phaser.Scene {
 
   private isMovementInputBlocked(): boolean {
     return (
+      !this.hasAppliedInitialWorldState ||
+      Boolean(this.mapTransitionRequestPromise) ||
       this.isMapTransitioning ||
       this.pokemonStorageController?.isBlockingGameplay ||
       this.pokemonCenterHealingInteraction?.isPending ||

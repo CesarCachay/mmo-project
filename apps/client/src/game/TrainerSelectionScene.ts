@@ -12,6 +12,8 @@ import { selectedTrainerStore } from "../account/selected-trainer.store";
 
 import { GameViewportOverlay } from "../shell/GameViewportOverlay";
 
+import { WORLD_LOADING_SCENE_KEY } from "./world/world-loading.contract";
+
 const MAX_TRAINERS = 3;
 
 function escapeHtml(value: string): string {
@@ -517,7 +519,7 @@ export class TrainerSelectionScene extends Phaser.Scene {
   private enterWorld(trainer: AccountTrainer): void {
     selectedTrainerStore.select(trainer);
 
-    this.scene.start("GameScene", {
+    this.scene.start(WORLD_LOADING_SCENE_KEY, {
       avatarId: trainer.avatarId,
     });
   }

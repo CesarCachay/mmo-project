@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "bundle:audit": "node scripts/audit-bundle.mjs",
+    "build:audit": "pnpm run build && pnpm run bundle:audit",
     "preview": "vite preview"
   },
   "devDependencies": {
