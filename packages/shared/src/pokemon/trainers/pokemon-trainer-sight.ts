@@ -11,6 +11,13 @@ export type PokemonTrainerSightCheckInput = Readonly<{
   trainer: PokemonTrainerSightSource;
   target: Position;
   map: CollisionMap;
+  /**
+   * Extra lateral tolerance used by authoritative interaction validation.
+   * Client detection should normally keep this at 0 so sight remains crisp,
+   * while the server may allow a few pixels to absorb prediction/reconciliation
+   * differences from analog/mobile movement.
+   */
+  lateralTolerancePixels?: number;
 }>;
 
 export type PokemonTrainerSightResult = Readonly<{
@@ -34,8 +41,9 @@ export function checkPokemonTrainerSight(
   const tileSize = horizontal ? map.tileWidth : map.tileHeight;
   const laneSize = horizontal ? map.tileHeight : map.tileWidth;
   const lateralDistance = horizontal ? Math.abs(deltaY) : Math.abs(deltaX);
+  const lateralTolerancePixels = Math.max(0, input.lateralTolerancePixels ?? 0);
 
-  if (lateralDistance > laneSize / 2) {
+  if (lateralDistance > laneSize / 2 + lateralTolerancePixels) {
     return noDetection();
   }
 

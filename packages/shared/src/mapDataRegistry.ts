@@ -83,7 +83,7 @@ export type SharedMapHealingStation = {
   readonly y: number;
 };
 
-export const MAP_DATA_REGISTRY = {
+export const MAP_DATA_REGISTRY: Readonly<Record<MapId, SharedMapData>> = {
   [MAP_IDS.TOWN_01]: TOWN_01_MAP,
   [MAP_IDS.HOUSE_01]: HOUSE_01_MAP,
 

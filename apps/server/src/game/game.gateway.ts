@@ -269,10 +269,11 @@ export class GameGateway
       onTrainerDefeated: (playerId, trainerId) =>
         this.handleBlackoutRecovery(playerId, trainerId),
       onTrainerBattleVictory: async (trainerId, trainerBattleId) => {
-        const result = await this.pokemonTrainerBattleVictoryService.recordVictory(
-          trainerId,
-          trainerBattleId,
-        );
+        const result =
+          await this.pokemonTrainerBattleVictoryService.recordVictory(
+            trainerId,
+            trainerBattleId,
+          );
 
         return result.trainerState;
       },
@@ -458,17 +459,14 @@ export class GameGateway
       if (existingTrainerState) {
         trainerState = existingTrainerState;
       } else {
-        const [
-          persistedParty,
-          persistedInventory,
-          defeatedTrainerBattleIds,
-        ] = await Promise.all([
-          this.pokemonPartyRepository.loadParty(trainerId),
-          this.pokemonInventoryRepository.loadInventory(trainerId),
-          this.pokemonTrainerBattleVictoryService.loadDefeatedTrainerBattleIds(
-            trainerId,
-          ),
-        ]);
+        const [persistedParty, persistedInventory, defeatedTrainerBattleIds] =
+          await Promise.all([
+            this.pokemonPartyRepository.loadParty(trainerId),
+            this.pokemonInventoryRepository.loadInventory(trainerId),
+            this.pokemonTrainerBattleVictoryService.loadDefeatedTrainerBattleIds(
+              trainerId,
+            ),
+          ]);
 
         trainerState = this.pokemonTrainerStateStore.create(
           trainerId,
@@ -589,7 +587,9 @@ export class GameGateway
      * them behind would make a reconnect fail with an orphaned active battle.
      * Persist what we can, then release the runtime session.
      */
-    await this.pokemonBattleNetworkController.handlePlayerDisconnected(client.id);
+    await this.pokemonBattleNetworkController.handlePlayerDisconnected(
+      client.id,
+    );
 
     /*
      * If the socket vanished on the terminal faint frame, there is no client
@@ -920,7 +920,7 @@ export class GameGateway
     if (
       !npc ||
       npc.trainerBattleId !== authorization.trainerBattleId ||
-      !isPlayerInsideTrainerNpcSight(
+      !this.isPlayerInsideTrainerNpcSightForInteraction(
         player.mapId,
         player.x,
         player.y,
@@ -936,10 +936,7 @@ export class GameGateway
     }
 
     if (
-      this.isTrainerBattleDefeated(
-        trainerId,
-        authorization.trainerBattleId,
-      )
+      this.isTrainerBattleDefeated(trainerId, authorization.trainerBattleId)
     ) {
       return;
     }
@@ -1171,7 +1168,7 @@ export class GameGateway
         return isPlayerNearMapNpc(playerX, playerY, npc);
       }
 
-      return isPlayerInsideTrainerNpcSight(
+      return this.isPlayerInsideTrainerNpcSightForInteraction(
         mapId,
         playerX,
         playerY,
@@ -1180,6 +1177,41 @@ export class GameGateway
     }
 
     return isPlayerNearMapNpc(playerX, playerY, npc);
+  }
+
+  private isPlayerInsideTrainerNpcSightForInteraction(
+    mapId: MapId,
+    playerX: number,
+    playerY: number,
+    npc: SharedMapNpc,
+  ): boolean {
+    if (isPlayerInsideTrainerNpcSight(mapId, playerX, playerY, npc)) {
+      return true;
+    }
+
+    if (!npc.trainerBattleId || !npc.direction || !npc.sightRangeTiles) {
+      return false;
+    }
+
+    const map = MAP_DATA_REGISTRY[mapId];
+    const horizontal = npc.direction === 'left' || npc.direction === 'right';
+    const laneSize = horizontal ? map.tileHeight : map.tileWidth;
+    const lateralDelta = horizontal
+      ? Math.abs(playerY - npc.y)
+      : Math.abs(playerX - npc.x);
+
+    // Mobile analogue movement and reconciliation can leave the player only a
+    // few pixels outside the exact Trainer lane. Allow half a tile laterally,
+    // then snap only the lateral coordinate and reuse the strict sight helper
+    // so forward range and collision blocking remain authoritative.
+    if (lateralDelta > laneSize * 0.5) {
+      return false;
+    }
+
+    const snappedX = horizontal ? playerX : npc.x;
+    const snappedY = horizontal ? npc.y : playerY;
+
+    return isPlayerInsideTrainerNpcSight(mapId, snappedX, snappedY, npc);
   }
 
   private isTrainerBattleDefeated(

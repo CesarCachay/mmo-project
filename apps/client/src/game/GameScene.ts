@@ -486,10 +486,24 @@ export class GameScene extends Phaser.Scene {
       this.pokemonCenterHealingInteraction?.isPending ||
       this.pokemonCenterHealingPresentation?.isBlockingGameplay;
 
+    /*
+     * Trainer sight is a server-authoritative gameplay gate. In mobile the
+     * virtual joystick can predict the local sprite a few pixels ahead of the
+     * server position. If sight uses the predicted sprite, the client may show
+     * the alert and request dialogue while the server still sees the player
+     * outside the lane/range, producing a dialogue-start-timeout.
+     *
+     * Use the latest server position for detection so the alert and the
+     * server's dialogue validation are based on the same coordinates. Visual
+     * movement continues to use prediction/reconciliation normally.
+     */
+    const trainerSightPosition =
+      this.localPlayerController.authoritativePosition;
+
     this.trainerSightController.update(
       this.currentMapId,
-      this.player.x,
-      this.player.y,
+      trainerSightPosition.x,
+      trainerSightPosition.y,
       Boolean(externallyBlocked),
     );
   }

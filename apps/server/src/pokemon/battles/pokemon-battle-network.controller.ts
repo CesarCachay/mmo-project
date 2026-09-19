@@ -441,10 +441,7 @@ export class PokemonBattleNetworkController {
        * turn-store mutation. This is intentionally shared-domain logic so a
        * modified client cannot bypass Trainer Battle restrictions.
        */
-      assertPokemonBattleCommandActionAllowed(
-        session.battle,
-        payload.action,
-      );
+      assertPokemonBattleCommandActionAllowed(session.battle, payload.action);
 
       if (payload.action.type === 'use-item') {
         const trainerState = this.trainerStateStore.get(
@@ -535,7 +532,8 @@ export class PokemonBattleNetworkController {
       );
 
       let nextTurnNumber: number | null = null;
-      let interactionState: PokemonBattleStateUpdatedPayload['interactionState'] | null = null;
+      let interactionState:
+        PokemonBattleStateUpdatedPayload['interactionState'] | null = null;
       let replacementPokemonIndexes: readonly number[] = [];
 
       if (continuationAfter.type === 'continue') {
@@ -551,12 +549,11 @@ export class PokemonBattleNetworkController {
          * Apply it before publishing the resolved turn so the switch event is
          * serialized immediately after the faint presentation for that turn.
          */
-        const replacementResult =
-          applyPokemonTrainerBattleOpponentReplacement({
-            session,
-            localParticipantId: trainerBinding.participantId,
-            battleTurnStore: this.battleTurnStore,
-          });
+        const replacementResult = applyPokemonTrainerBattleOpponentReplacement({
+          session,
+          localParticipantId: trainerBinding.participantId,
+          battleTurnStore: this.battleTurnStore,
+        });
 
         presentationEvents.push(replacementResult.presentationEvent);
         nextTurnNumber = replacementResult.nextTurnNumber;
@@ -642,7 +639,10 @@ export class PokemonBattleNetworkController {
         battleTurnStore: this.battleTurnStore,
       });
 
-      this.trainerStatePresenter.emitTrainerState(client, completionTrainerState);
+      this.trainerStatePresenter.emitTrainerState(
+        client,
+        completionTrainerState,
+      );
 
       client.emit(POKEMON_EVENTS.BATTLE_COMPLETED, {
         battleId: session.battle.battleId,

@@ -38,6 +38,18 @@ export class LocalPlayerController {
     return this.playerDirection;
   }
 
+  /**
+   * Last authoritative position received from the server.
+   *
+   * Overworld rendering still uses client prediction + reconciliation, but
+   * gameplay gates that must agree with server validation (Trainer sight,
+   * interaction authorization, etc.) can use this position to avoid a
+   * prediction/server race on touch controls.
+   */
+  get authoritativePosition(): Readonly<{ x: number; y: number }> {
+    return { ...this.serverPosition };
+  }
+
   setDirection(direction: Direction): void {
     this.playerDirection = direction;
   }

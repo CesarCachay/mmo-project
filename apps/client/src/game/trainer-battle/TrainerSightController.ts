@@ -1,8 +1,5 @@
 import Phaser from "phaser";
-import {
-  MAP_DATA_REGISTRY,
-  checkPokemonTrainerSight,
-} from "@cesar-mmo/shared";
+import { MAP_DATA_REGISTRY, checkPokemonTrainerSight } from "@cesar-mmo/shared";
 
 import type { MapId } from "@cesar-mmo/shared";
 import type { NpcInstance } from "../npc/types";
@@ -22,11 +19,14 @@ export class TrainerSightController {
   private alertTimer?: Phaser.Time.TimerEvent;
   private alertBlocking = false;
   private defeatedTrainerBattleIds = new Set<string>();
+  private latestMapId?: MapId;
+  private latestPlayerX = 0;
+  private latestPlayerY = 0;
 
   constructor(
     scene: Phaser.Scene,
     npcManager: NpcManager,
-    onTrainerAggroReady: TrainerSightReadyHandler,
+    onTrainerAggroReady: TrainerSightReadyHandler
   ) {
     this.scene = scene;
     this.npcManager = npcManager;
@@ -37,16 +37,12 @@ export class TrainerSightController {
     return this.alertBlocking;
   }
 
-  public setDefeatedTrainerBattleIds(
-    trainerBattleIds: readonly string[],
-  ): void {
+  public setDefeatedTrainerBattleIds(trainerBattleIds: readonly string[]): void {
     this.defeatedTrainerBattleIds = new Set(trainerBattleIds);
 
     if (
       this.activeNpc?.definition.trainerBattleId &&
-      this.defeatedTrainerBattleIds.has(
-        this.activeNpc.definition.trainerBattleId,
-      )
+      this.defeatedTrainerBattleIds.has(this.activeNpc.definition.trainerBattleId)
     ) {
       this.clear();
     }
@@ -56,8 +52,12 @@ export class TrainerSightController {
     mapId: MapId,
     playerX: number,
     playerY: number,
-    externallyBlocked: boolean,
+    externallyBlocked: boolean
   ): void {
+    this.latestMapId = mapId;
+    this.latestPlayerX = playerX;
+    this.latestPlayerY = playerY;
+
     if (this.activeNpc) {
       if (this.alertBlocking) {
         return;
@@ -77,10 +77,7 @@ export class TrainerSightController {
     for (const npc of this.npcManager.getTrainerBattleNpcs()) {
       const trainerBattleId = npc.definition.trainerBattleId;
 
-      if (
-        trainerBattleId &&
-        this.defeatedTrainerBattleIds.has(trainerBattleId)
-      ) {
+      if (trainerBattleId && this.defeatedTrainerBattleIds.has(trainerBattleId)) {
         continue;
       }
 
@@ -112,7 +109,7 @@ export class TrainerSightController {
     npc: NpcInstance,
     mapId: MapId,
     playerX: number,
-    playerY: number,
+    playerY: number
   ): boolean {
     const sightRangeTiles = npc.definition.sightRangeTiles;
 
@@ -167,22 +164,40 @@ export class TrainerSightController {
     });
 
     this.alertTimer?.remove(false);
-    this.alertTimer = this.scene.time.delayedCall(
-      TRAINER_ALERT_DURATION_MS,
-      () => {
-        const detectedNpc = this.activeNpc;
+    this.alertTimer = this.scene.time.delayedCall(TRAINER_ALERT_DURATION_MS, () => {
+      const detectedNpc = this.activeNpc;
 
-        this.alertText?.destroy();
-        this.alertText = undefined;
-        this.alertTimer = undefined;
-        this.alertBlocking = false;
+      this.alertText?.destroy();
+      this.alertText = undefined;
+      this.alertTimer = undefined;
+      this.alertBlocking = false;
 
-        if (!detectedNpc) {
-          return;
-        }
+      if (!detectedNpc) {
+        return;
+      }
 
-        this.onTrainerAggroReady(detectedNpc);
-      },
-    );
+      /*
+       * Mobile analog movement can briefly predict the player into the
+       * Trainer lane before server reconciliation settles. Re-check the
+       * latest local position after the alert animation so we do not start
+       * a dialogue from a stale/transient sight hit and then wait for the
+       * pre-battle timeout.
+       */
+      const latestMapId = this.latestMapId;
+      if (
+        !latestMapId ||
+        !this.canNpcSeePlayer(
+          detectedNpc,
+          latestMapId,
+          this.latestPlayerX,
+          this.latestPlayerY
+        )
+      ) {
+        this.activeNpc = undefined;
+        return;
+      }
+
+      this.onTrainerAggroReady(detectedNpc);
+    });
   }
 }
