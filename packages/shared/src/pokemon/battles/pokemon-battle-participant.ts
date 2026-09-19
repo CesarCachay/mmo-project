@@ -1,4 +1,5 @@
 import type {
+  BattleInstance,
   BattleParticipant,
   BattleParticipantId,
   BattleParticipantType,
@@ -46,6 +47,51 @@ export function createBattleParticipant(
     pokemon: [...input.pokemon],
     activePokemonIndex,
   };
+}
+
+
+export function getBattleParticipantById(
+  battle: BattleInstance,
+  participantId: BattleParticipantId
+): BattleParticipant {
+  const participant = battle.participants.find(
+    (candidate) => candidate.id === participantId
+  );
+
+  if (!participant) {
+    throw new Error(
+      `Battle participant "${participantId}" not found in battle "${battle.battleId}"`
+    );
+  }
+
+  return participant;
+}
+
+export function getOpposingBattleParticipant(
+  battle: BattleInstance,
+  participantId: BattleParticipantId
+): BattleParticipant {
+  const participant = getBattleParticipantById(battle, participantId);
+
+  const opponents = battle.participants.filter(
+    (candidate) => candidate.side !== participant.side
+  );
+
+  if (opponents.length !== 1) {
+    throw new Error(
+      `Battle "${battle.battleId}" must contain exactly one opponent for participant "${participantId}"`
+    );
+  }
+
+  const opponent = opponents[0];
+
+  if (!opponent) {
+    throw new Error(
+      `Opponent for participant "${participantId}" not found in battle "${battle.battleId}"`
+    );
+  }
+
+  return opponent;
 }
 
 export function getActiveBattlePokemon(

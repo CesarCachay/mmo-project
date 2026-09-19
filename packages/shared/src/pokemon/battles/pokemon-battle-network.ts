@@ -40,7 +40,7 @@ function isBattleInstance(value: unknown): value is BattleInstance {
     return false;
   }
 
-  if (value.type !== "wild") {
+  if (value.type !== "wild" && value.type !== "trainer") {
     return false;
   }
 
@@ -68,15 +68,33 @@ function isBattleInstance(value: unknown): value is BattleInstance {
     (participant) => participant.type === "wild"
   );
 
-  if (trainerParticipants.length !== 1 || wildParticipants.length !== 1) {
+  if (value.type === "wild") {
+    if (trainerParticipants.length !== 1 || wildParticipants.length !== 1) {
+      return false;
+    }
+  } else {
+    if (trainerParticipants.length !== 2 || wildParticipants.length !== 0) {
+      return false;
+    }
+  }
+
+  const sideA = value.participants.filter(
+    (participant) => participant.side === "side-a"
+  );
+
+  const sideB = value.participants.filter(
+    (participant) => participant.side === "side-b"
+  );
+
+  if (sideA.length !== 1 || sideB.length !== 1) {
     return false;
   }
 
-  const sideA = value.participants.filter((participant) => participant.side === "side-a");
+  const participantIds = new Set(
+    value.participants.map((participant) => participant.id)
+  );
 
-  const sideB = value.participants.filter((participant) => participant.side === "side-b");
-
-  return sideA.length === 1 && sideB.length === 1;
+  return participantIds.size === value.participants.length;
 }
 
 function isBattleParticipant(value: unknown): value is BattleParticipant {

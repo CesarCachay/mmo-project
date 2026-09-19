@@ -76,6 +76,28 @@ function getOptionalStringProperty(object, propertyName) {
   return property.value.trim();
 }
 
+function getOptionalPositiveIntegerProperty(object, propertyName) {
+  const property = object.properties?.find(
+    (candidate) => candidate.name === propertyName
+  );
+
+  if (!property) {
+    return undefined;
+  }
+
+  if (
+    typeof property.value !== "number" ||
+    !Number.isInteger(property.value) ||
+    property.value <= 0
+  ) {
+    throw new Error(
+      `Object "${object.name}" property "${propertyName}" must be a positive integer`
+    );
+  }
+
+  return property.value;
+}
+
 function parseMapSpawn(object, mapName) {
   if (typeof object.name !== "string" || object.name.trim().length === 0) {
     throw new Error(`Map "${mapName}" contains a mapSpawn without a name`);
@@ -105,13 +127,36 @@ function parseNpc(object, mapName) {
 
   const dialogueId = getOptionalStringProperty(object, "dialogueId");
 
+  const trainerBattleId = getOptionalStringProperty(object, "trainerBattleId");
+
+  const direction = getOptionalStringProperty(object, "direction");
+
+  const sightRangeTiles = getOptionalPositiveIntegerProperty(object, "sightRangeTiles");
+
   const postDialogueAction = getOptionalStringProperty(object, "postDialogueAction");
+
+  if (trainerBattleId) {
+    if (!direction || !["up", "down", "left", "right"].includes(direction)) {
+      throw new Error(
+        `Trainer NPC "${object.name}" in map "${mapName}" requires a valid direction`
+      );
+    }
+
+    if (sightRangeTiles === undefined || sightRangeTiles > 20) {
+      throw new Error(
+        `Trainer NPC "${object.name}" in map "${mapName}" requires sightRangeTiles between 1 and 20`
+      );
+    }
+  }
 
   return {
     id: object.name.trim(),
     x: object.x,
     y: object.y,
     dialogueId,
+    trainerBattleId,
+    direction: trainerBattleId ? direction : undefined,
+    sightRangeTiles,
     postDialogueAction,
   };
 }
@@ -347,6 +392,18 @@ function formatNpcs(npcs) {
 
     if (npc.dialogueId) {
       properties.push(`      dialogueId: ${JSON.stringify(npc.dialogueId)},`);
+    }
+
+    if (npc.trainerBattleId) {
+      properties.push(`      trainerBattleId: ${JSON.stringify(npc.trainerBattleId)},`);
+    }
+
+    if (npc.direction) {
+      properties.push(`      direction: ${JSON.stringify(npc.direction)},`);
+    }
+
+    if (npc.sightRangeTiles !== undefined) {
+      properties.push(`      sightRangeTiles: ${npc.sightRangeTiles},`);
     }
 
     if (npc.postDialogueAction) {

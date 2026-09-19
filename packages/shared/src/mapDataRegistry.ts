@@ -1,5 +1,6 @@
 import { MAP_IDS } from "./map.js";
 import type { MapId } from "./map.js";
+import type { Direction } from "./game.types.js";
 
 import { TOWN_01_MAP } from "./maps/generated/town-01.js";
 import { HOUSE_01_MAP } from "./maps/generated/house-01.js";
@@ -12,6 +13,7 @@ import { POKE_CENTER_MAP } from "./maps/generated/poke-center.js";
 import { POKE_SHOP_MAP } from "./maps/generated/poke-shop.js";
 
 import { PokemonEncounterTableId } from "./pokemon/encounters/pokemon-encounter-table.registry.js";
+import type { PokemonTrainerBattleId } from "./pokemon/trainers/pokemon-trainer-battle.registry.js";
 
 export type SharedMapSpawn = {
   readonly x: number;
@@ -22,6 +24,9 @@ export type SharedMapNpc = {
   readonly x: number;
   readonly y: number;
   readonly dialogueId?: string;
+  readonly trainerBattleId?: PokemonTrainerBattleId;
+  readonly direction?: Direction;
+  readonly sightRangeTiles?: number;
   readonly postDialogueAction?: string;
 };
 

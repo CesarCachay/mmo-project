@@ -17,6 +17,22 @@ export const DIALOGUES = {
       "It looks like this place is becoming quite popular.",
     ],
   },
+
+  "trainer-student-gary-pre-battle": {
+    id: "trainer-student-gary-pre-battle",
+    lines: [
+      "Hey! You look like a Trainer.",
+      "Let's see how strong your Pokémon are!",
+    ],
+  },
+
+  "trainer-student-francisca-pre-battle": {
+    id: "trainer-student-francisca-pre-battle",
+    lines: [
+      "You made it this far? Nice!",
+      "Show me what your Pokémon can do!",
+    ],
+  },
 } satisfies Record<string, DialogueDefinition>;
 
 export type DialogueId = keyof typeof DIALOGUES;

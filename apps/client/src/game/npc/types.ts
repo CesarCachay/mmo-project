@@ -1,6 +1,11 @@
 import type Phaser from "phaser";
+import type { PokemonTrainerBattleId } from "@cesar-mmo/shared";
 
-export type NpcInteractionType = "dialogue" | "shop" | "quest";
+export type NpcInteractionType =
+  | "dialogue"
+  | "shop"
+  | "quest"
+  | "trainer-battle";
 
 export type NpcDirection = "up" | "down" | "left" | "right";
 
@@ -13,6 +18,8 @@ export type NpcDefinition = {
   sprite: string;
   interactionType: NpcInteractionType;
   dialogueId?: string;
+  trainerBattleId?: PokemonTrainerBattleId;
+  sightRangeTiles?: number;
   postDialogueAction?: NpcPostDialogueAction;
 };
 

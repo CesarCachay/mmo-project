@@ -34,6 +34,7 @@ import {
   POKEMON_PARTY_REORDER_EVENTS,
   POKEMON_CENTER_HEALING_EVENTS,
   isPokemonPartyWiped,
+  getPokemonTrainerBattleDefinition,
 } from '@cesar-mmo/shared';
 import {
   getServerMapSpawn,
@@ -41,6 +42,7 @@ import {
   isPlayerInsideMapTransition,
   getServerMapNpc,
   isPlayerNearMapNpc,
+  isPlayerInsideTrainerNpcSight,
   getServerEncounterZoneAtPosition,
 } from './maps/serverMapRegistry';
 import { ChatService } from '#app/chat/chat.service';
@@ -615,10 +617,13 @@ export class GameGateway
     if (!npc) {
       return;
     }
-    if (!npc.dialogueId) {
+
+    const dialogueId = this.resolveNpcDialogueId(npc);
+    if (!dialogueId) {
       return;
     }
-    if (!isPlayerNearMapNpc(player.x, player.y, npc)) {
+
+    if (!this.canPlayerStartNpcDialogue(player.mapId, player.x, player.y, npc)) {
       return;
     }
 
@@ -626,7 +631,7 @@ export class GameGateway
       const state = this.dialogueSessionService.start(
         client.id,
         payload.npcId,
-        npc.dialogueId,
+        dialogueId,
       );
 
       client.emit(DIALOGUE_EVENTS.STATE, state);
@@ -668,11 +673,12 @@ export class GameGateway
       this.dialogueSessionStore.remove(client.id);
       return;
     }
-    if (npc.dialogueId !== session.dialogueId) {
+    const dialogueId = this.resolveNpcDialogueId(npc);
+    if (dialogueId !== session.dialogueId) {
       this.dialogueSessionStore.remove(client.id);
       return;
     }
-    if (!isPlayerNearMapNpc(player.x, player.y, npc)) {
+    if (!this.canPlayerStartNpcDialogue(player.mapId, player.x, player.y, npc)) {
       this.dialogueSessionStore.remove(client.id);
       return;
     }
@@ -689,6 +695,14 @@ export class GameGateway
         error,
       );
     }
+  }
+
+  @SubscribeMessage(DIALOGUE_EVENTS.CANCEL)
+  handleDialogueCancel(
+    @ConnectedSocket()
+    client: Socket,
+  ): void {
+    this.dialogueSessionStore.remove(client.id);
   }
 
   @SubscribeMessage(POKEMON_EVENTS.MOVE_LEARNING_DECISION)
@@ -936,6 +950,33 @@ export class GameGateway
     payload: unknown,
   ): Promise<void> {
     return this.pokemonStorageNetworkController.handleCommand(client, payload);
+  }
+
+  private resolveNpcDialogueId(npc: SharedMapNpc): string | undefined {
+    if (npc.trainerBattleId) {
+      return getPokemonTrainerBattleDefinition(npc.trainerBattleId)
+        .preBattleDialogueId;
+    }
+
+    return npc.dialogueId;
+  }
+
+  private canPlayerStartNpcDialogue(
+    mapId: MapId,
+    playerX: number,
+    playerY: number,
+    npc: SharedMapNpc,
+  ): boolean {
+    if (npc.trainerBattleId) {
+      return isPlayerInsideTrainerNpcSight(
+        mapId,
+        playerX,
+        playerY,
+        npc,
+      );
+    }
+
+    return isPlayerNearMapNpc(playerX, playerY, npc);
   }
 
   private handleDialoguePostAction(client: Socket, npc: SharedMapNpc): void {

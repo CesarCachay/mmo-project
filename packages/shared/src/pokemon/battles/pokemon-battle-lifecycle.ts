@@ -16,3 +16,15 @@ export function completeBattle(battle: BattleInstance): BattleInstance {
     status: "completed",
   };
 }
+
+export function isWildBattleInstance(
+  battle: BattleInstance
+): battle is Extract<BattleInstance, { readonly type: "wild" }> {
+  return battle.type === "wild";
+}
+
+export function isTrainerBattleInstance(
+  battle: BattleInstance
+): battle is Extract<BattleInstance, { readonly type: "trainer" }> {
+  return battle.type === "trainer";
+}

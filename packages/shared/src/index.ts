@@ -177,6 +177,29 @@ export {
 export { rollPokemonEncounterLevel } from "./pokemon/encounters/pokemon-encounter-level.js";
 export { createWildPokemonEncounter } from "./pokemon/encounters/pokemon-wild-encounter.factory.js";
 
+// Trainer Battles
+export {
+  POKEMON_TRAINER_BATTLE_REGISTRY,
+  isPokemonTrainerBattleId,
+  getPokemonTrainerBattleDefinition,
+  findPokemonTrainerBattleDefinition,
+  getAllPokemonTrainerBattleDefinitions,
+} from "./pokemon/trainers/pokemon-trainer-battle.registry.js";
+export type { PokemonTrainerBattleId } from "./pokemon/trainers/pokemon-trainer-battle.registry.js";
+export type {
+  PokemonTrainerBattleAiProfileId,
+  PokemonTrainerBattlePokemonDefinition,
+  PokemonTrainerBattleDefinition,
+} from "./pokemon/trainers/pokemon-trainer-battle.types.js";
+export { validatePokemonTrainerBattleDefinition } from "./pokemon/trainers/pokemon-trainer-battle.validation.js";
+export type { PokemonTrainerBattleValidationIssue } from "./pokemon/trainers/pokemon-trainer-battle.validation.js";
+export { checkPokemonTrainerSight } from "./pokemon/trainers/pokemon-trainer-sight.js";
+export type {
+  PokemonTrainerSightSource,
+  PokemonTrainerSightCheckInput,
+  PokemonTrainerSightResult,
+} from "./pokemon/trainers/pokemon-trainer-sight.js";
+
 // Battles
 export {
   BattleId,
@@ -188,16 +211,22 @@ export {
   BattlePokemonState,
   BattleParticipant,
   BattleInstance,
+  WildBattleInstance,
+  TrainerBattleInstance,
 } from "./pokemon/battles/pokemon-battle.types.js";
 export {
   createBattleParticipant,
   getActiveBattlePokemon,
+  getBattleParticipantById,
+  getOpposingBattleParticipant,
 } from "./pokemon/battles/pokemon-battle-participant.js";
 export type { CreateBattleParticipantInput } from "./pokemon/battles/pokemon-battle-participant.js";
 export { createBattlePokemonState } from "./pokemon/battles/pokemon-battle-pokemon-state.js";
 export {
   isBattleActive,
   completeBattle,
+  isWildBattleInstance,
+  isTrainerBattleInstance,
 } from "./pokemon/battles/pokemon-battle-lifecycle.js";
 export {
   isPokemonBattleStartedPayload,

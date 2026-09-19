@@ -30,7 +30,22 @@ export const ROUTE_01_MAP = {
     },
   },
 
-  npcs: {},
+  npcs: {
+    "studentGary": {
+      x: 400,
+      y: 240,
+      trainerBattleId: "student-gary",
+      direction: "down",
+      sightRangeTiles: 5,
+    },
+    "studentFrancisca": {
+      x: 560,
+      y: 240,
+      trainerBattleId: "student-francisca",
+      direction: "down",
+      sightRangeTiles: 5,
+    },
+  },
 
   storageTerminals: {},
 

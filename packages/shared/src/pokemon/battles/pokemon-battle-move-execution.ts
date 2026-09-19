@@ -2,7 +2,11 @@ import { getPokemonMove } from "../pokemon-move.registry.js";
 
 import type { PokemonInstanceMove, PokemonMove } from "../pokemon.types.js";
 
-import { getActiveBattlePokemon } from "./pokemon-battle-participant.js";
+import {
+  getActiveBattlePokemon,
+  getBattleParticipantById,
+  getOpposingBattleParticipant,
+} from "./pokemon-battle-participant.js";
 
 import { isBattleActive } from "./pokemon-battle-lifecycle.js";
 
@@ -53,15 +57,10 @@ export function createBattleMoveExecutionContext(
   // 3. Resolve actor.
   //
 
-  const actorParticipant = battle.participants.find(
-    (participant) => participant.id === entry.command.participantId
+  const actorParticipant = getBattleParticipantById(
+    battle,
+    entry.command.participantId
   );
-
-  if (!actorParticipant) {
-    throw new Error(
-      `Battle participant "${entry.command.participantId}" not found in battle "${battle.battleId}"`
-    );
-  }
 
   const actorPokemon = getActiveBattlePokemon(actorParticipant);
 
@@ -115,25 +114,15 @@ export function createBattleMoveExecutionContext(
   //
   // 7. Resolve target.
   //
-  // Current Battle foundation is strictly
-  // 1v1 Wild Battle.
+  // Current Battle foundation is 1v1.
+  // Participant type does not define targeting;
+  // opposition is resolved exclusively by side.
   //
 
-  const targetParticipants = battle.participants.filter(
-    (participant) => participant.side !== actorParticipant.side
+  const targetParticipant = getOpposingBattleParticipant(
+    battle,
+    actorParticipant.id
   );
-
-  if (targetParticipants.length !== 1) {
-    throw new Error(
-      `Battle "${battle.battleId}" must have exactly one opposing participant for move execution`
-    );
-  }
-
-  const targetParticipant = targetParticipants[0];
-
-  if (!targetParticipant) {
-    throw new Error(`Target participant not found in battle "${battle.battleId}"`);
-  }
 
   const targetPokemon = getActiveBattlePokemon(targetParticipant);
 

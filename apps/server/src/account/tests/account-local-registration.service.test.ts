@@ -1,8 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { AccountLocalRegistrationService } from '#app/account/local/account-local-registration.service';
-
-import { LocalAccountRegistrationError } from '#app/account/local/account-local-auth.errors';
+import { AccountLocalRegistrationService } from '../local/account-local-registration.service';
 
 const ACCOUNT_ID = '11111111-1111-4111-8111-111111111111';
 
@@ -96,7 +94,9 @@ describe('AccountLocalRegistrationService', () => {
         loginId: 'cesar',
         password: 'short',
       }),
-    ).rejects.toBeInstanceOf(LocalAccountRegistrationError);
+    ).rejects.toMatchObject({
+      code: 'INVALID_PASSWORD',
+    });
 
     expect(passwordHasherService.hash).not.toHaveBeenCalled();
   });

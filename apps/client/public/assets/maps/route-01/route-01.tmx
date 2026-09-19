@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="50" height="40" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="6">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="50" height="40" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="8">
  <editorsettings>
   <export target="route-01.json" format="json" />
  </editorsettings>
@@ -240,6 +240,24 @@
     <property name="targetMapId" value="town-02"/>
     <property name="targetSpawn" value="route01Entrance"/>
    </properties>
+  </object>
+  <object id="6" name="studentGary" type="npc" x="400" y="240">
+   <properties>
+    <property name="direction" value="down"/>
+    <property name="interactionType" value="trainer-battle"/>
+    <property name="trainerBattleId" value="student-gary"/>
+    <property name="sightRangeTiles" type="int" value="5"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="7" name="studentFrancisca" type="npc" x="560" y="240">
+   <properties>
+    <property name="direction" value="down"/>
+    <property name="interactionType" value="trainer-battle"/>
+    <property name="trainerBattleId" value="student-francisca"/>
+    <property name="sightRangeTiles" type="int" value="5"/>
+   </properties>
+   <point/>
   </object>
  </objectgroup>
  <objectgroup id="7" name="EncounterZones">

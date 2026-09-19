@@ -6,18 +6,18 @@ import request from 'supertest';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { AccountLocalAuthController } from '#app/account/local/account-local-auth.controller';
+import { AccountLocalAuthController } from '../local/account-local-auth.controller';
 
 import {
   LocalAccountLoginError,
   LocalAccountRegistrationError,
-} from '#app/account/local/account-local-auth.errors';
+} from '../local/account-local-auth.errors';
 
-import { AccountLocalLoginService } from '#app/account/local/account-local-login.service';
+import { AccountLocalLoginService } from '../local/account-local-login.service';
 
-import { AccountLocalRegistrationService } from '#app/account/local/account-local-registration.service';
+import { AccountLocalRegistrationService } from '../local/account-local-registration.service';
 
-import { ACCOUNT_SESSION_COOKIE_NAME } from '#app/account/account-session-cookie';
+import { ACCOUNT_SESSION_COOKIE_NAME } from '../account-session-cookie';
 
 const ACCOUNT_ID = '11111111-1111-4111-8111-111111111111';
 
@@ -50,7 +50,7 @@ function createAuthResult() {
 }
 
 describe('AccountLocalAuthController', () => {
-  let app: INestApplication;
+  let app: INestApplication | undefined;
 
   const registrationService = {
     register: vi.fn(),
@@ -60,8 +60,17 @@ describe('AccountLocalAuthController', () => {
     login: vi.fn(),
   };
 
+  function requireApp(): INestApplication {
+    if (!app) {
+      throw new Error('Nest application was not initialized');
+    }
+
+    return app;
+  }
+
   beforeEach(async () => {
     vi.clearAllMocks();
+    app = undefined;
 
     const moduleRef = await Test.createTestingModule({
       controllers: [AccountLocalAuthController],
@@ -85,13 +94,17 @@ describe('AccountLocalAuthController', () => {
   });
 
   afterEach(async () => {
-    await app.close();
+    if (app) {
+      await app.close();
+    }
+
+    app = undefined;
   });
 
   it('registers a local Account and sets the HttpOnly session cookie', async () => {
     registrationService.register.mockResolvedValue(createAuthResult());
 
-    const response = await request(app.getHttpServer())
+    const response = await request(requireApp().getHttpServer())
       .post('/auth/register')
       .send({
         loginId: 'Cesar.MMO',
@@ -132,7 +145,7 @@ describe('AccountLocalAuthController', () => {
   it('logs in a local Account and sets the same AccountSession cookie', async () => {
     loginService.login.mockResolvedValue(createAuthResult());
 
-    const response = await request(app.getHttpServer())
+    const response = await request(requireApp().getHttpServer())
       .post('/auth/login')
       .send({
         loginId: 'cesar.mmo',
@@ -158,7 +171,7 @@ describe('AccountLocalAuthController', () => {
       ),
     );
 
-    await request(app.getHttpServer())
+    await request(requireApp().getHttpServer())
       .post('/auth/register')
       .send({
         loginId: 'cesar',
@@ -172,7 +185,7 @@ describe('AccountLocalAuthController', () => {
       new LocalAccountRegistrationError('INVALID_LOGIN_ID', 'Invalid login id'),
     );
 
-    await request(app.getHttpServer())
+    await request(requireApp().getHttpServer())
       .post('/auth/register')
       .send({
         loginId: '??',
@@ -186,7 +199,7 @@ describe('AccountLocalAuthController', () => {
       new LocalAccountLoginError('INVALID_CREDENTIALS'),
     );
 
-    const response = await request(app.getHttpServer())
+    const response = await request(requireApp().getHttpServer())
       .post('/auth/login')
       .send({
         loginId: 'unknown',

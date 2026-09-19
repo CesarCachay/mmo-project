@@ -1,6 +1,7 @@
 export const DIALOGUE_EVENTS = {
   START: "dialogue:start",
   ADVANCE: "dialogue:advance",
+  CANCEL: "dialogue:cancel",
   STATE: "dialogue:state",
 } as const;
 

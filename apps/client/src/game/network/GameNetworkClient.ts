@@ -447,6 +447,10 @@ export class GameNetworkClient {
     this.socket.emit(DIALOGUE_EVENTS.ADVANCE, payload);
   }
 
+  public cancelDialogue(): void {
+    this.socket.emit(DIALOGUE_EVENTS.CANCEL);
+  }
+
   public onBattleStarted(
     callback: (payload: PokemonBattleStartedPayload) => void
   ): () => void {

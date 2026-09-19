@@ -18,6 +18,14 @@ export const NPC_ASSETS = {
     folder: "/assets/characters/npcs/dra-gianela",
     directions: ["down", "up", "left", "right"],
   },
+  "student-gary": {
+    folder: "/assets/characters/npcs/student-gary",
+    directions: ["down"],
+  },
+  "student-francisca": {
+    folder: "/assets/characters/npcs/student-francisca",
+    directions: ["down"],
+  },
 } satisfies Record<string, NpcAssetDefinition>;
 
 export const getNpcTextureKey = (sprite: string, direction: NpcDirection): string => {

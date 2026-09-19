@@ -1,4 +1,4 @@
-import { MAP_DATA_REGISTRY } from '@cesar-mmo/shared';
+import { MAP_DATA_REGISTRY, checkPokemonTrainerSight } from '@cesar-mmo/shared';
 
 import type {
   MapId,
@@ -94,6 +94,27 @@ export function isPlayerNearMapNpc(
     MAX_NPC_INTERACTION_DISTANCE * MAX_NPC_INTERACTION_DISTANCE;
 
   return distanceSquared <= maxDistanceSquared;
+}
+
+export function isPlayerInsideTrainerNpcSight(
+  mapId: MapId,
+  playerX: number,
+  playerY: number,
+  npc: SharedMapNpc,
+): boolean {
+  if (!npc.trainerBattleId || !npc.direction || !npc.sightRangeTiles) {
+    return false;
+  }
+
+  return checkPokemonTrainerSight({
+    trainer: {
+      position: { x: npc.x, y: npc.y },
+      direction: npc.direction,
+      sightRangeTiles: npc.sightRangeTiles,
+    },
+    target: { x: playerX, y: playerY },
+    map: MAP_DATA_REGISTRY[mapId],
+  }).detected;
 }
 
 export function isPositionInsideEncounterZone(

@@ -3,7 +3,7 @@ import {
   createBattlePokemonState,
 } from '@cesar-mmo/shared';
 
-import type { BattleInstance, PokemonInstance } from '@cesar-mmo/shared';
+import type { PokemonInstance, WildBattleInstance } from '@cesar-mmo/shared';
 import { PokemonWildEncounterSession } from '../encounters/pokemon-wild-encounter-session';
 
 export interface CreateWildBattleInstanceInput {
@@ -13,7 +13,7 @@ export interface CreateWildBattleInstanceInput {
 
 export function createWildBattleInstance(
   input: CreateWildBattleInstanceInput,
-): BattleInstance {
+): WildBattleInstance {
   const { encounterSession, trainerPokemon } = input;
 
   if (trainerPokemon.length === 0) {

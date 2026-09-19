@@ -2,7 +2,7 @@ import type { PokemonInstance } from "../pokemon.types.js";
 
 export type BattleId = string;
 
-export type BattleType = "wild";
+export type BattleType = "wild" | "trainer";
 
 export type BattleStatus = "active" | "completed";
 
@@ -29,11 +29,19 @@ export interface BattlePokemonState {
 /**
  * Represents one participant in a battle.
  *
- * In a wild battle:
+ * Participant `type` describes who owns the roster, not whether
+ * the participant is locally controlled.
+ *
+ * Wild Battle:
  * side-a -> trainer
  * side-b -> wild
- * The battle domain itself does not depend on
- * "player" / "enemy" client-relative terminology.
+ *
+ * Trainer Battle:
+ * side-a -> trainer
+ * side-b -> trainer
+ *
+ * `side` defines opposition. Local/player ownership is resolved by
+ * the server battle-session binding, never by participant type.
  */
 export interface BattleParticipant {
   readonly id: BattleParticipantId;
@@ -43,10 +51,19 @@ export interface BattleParticipant {
   activePokemonIndex: number;
 }
 
-/* Server-authoritative battle runtime instance */
-export interface BattleInstance {
+interface BattleInstanceBase {
   readonly battleId: BattleId;
-  readonly type: BattleType;
   readonly participants: readonly BattleParticipant[];
   readonly status: BattleStatus;
 }
+
+export interface WildBattleInstance extends BattleInstanceBase {
+  readonly type: "wild";
+}
+
+export interface TrainerBattleInstance extends BattleInstanceBase {
+  readonly type: "trainer";
+}
+
+/* Server-authoritative battle runtime instance */
+export type BattleInstance = WildBattleInstance | TrainerBattleInstance;

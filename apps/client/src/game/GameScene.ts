@@ -62,6 +62,8 @@ import { RemotePokemonFollowerManager } from "./pokemon/RemotePokemonFollowerMan
 import { OverworldCameraController } from "./camera/OverworldCameraController";
 import { TrainerPanelController } from "./ui/TrainerPanelController";
 import { PokemonTrainerPresentationController } from "./pokemon/PokemonTrainerPresentationController";
+import { TrainerSightController } from "./trainer-battle/TrainerSightController";
+import { TrainerPreBattleController } from "./trainer-battle/TrainerPreBattleController";
 
 // controllers
 import { LazyBattleController } from "./battle/LazyBattleController";
@@ -149,6 +151,8 @@ export class GameScene extends Phaser.Scene {
 
   // managers
   private npcManager!: NpcManager;
+  private trainerSightController!: TrainerSightController;
+  private trainerPreBattleController!: TrainerPreBattleController;
   private remotePlayerManager!: RemotePlayerManager;
   private mapTransitionController!: MapTransitionController;
   private remotePokemonFollowerManager!: RemotePokemonFollowerManager;
@@ -253,6 +257,25 @@ export class GameScene extends Phaser.Scene {
 
     this.npcManager.create(this.mapManager.map);
 
+    this.trainerSightController = new TrainerSightController(
+      this,
+      this.npcManager,
+      (npc) => this.handleTrainerAggroReady(npc),
+    );
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.trainerSightController.destroy();
+    });
+
+    this.trainerPreBattleController = new TrainerPreBattleController(this, {
+      requestDialogue: (npc) => this.startNpcDialogue(npc),
+      onReady: (npc) => this.handleTrainerPreBattleReady(npc),
+      onCancelled: (npc, reason) =>
+        this.handleTrainerPreBattleCancelled(npc, reason),
+    });
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.trainerPreBattleController.destroy();
+    });
+
     this.overworldCameraController = new OverworldCameraController(
       this.cameras.main,
       this.player,
@@ -320,6 +343,7 @@ export class GameScene extends Phaser.Scene {
 
     this.handleChatFocus();
 
+    this.updateTrainerSight();
     this.updateNearbyNpc();
 
     this.updatePokemonCenterHealingStation();
@@ -432,6 +456,72 @@ export class GameScene extends Phaser.Scene {
     this.player.setDepth(5);
   }
 
+  private updateTrainerSight(): void {
+    const externallyBlocked =
+      !this.hasAppliedInitialWorldState ||
+      Boolean(this.mapTransitionRequestPromise) ||
+      this.isMapTransitioning ||
+      this.trainerPreBattleController?.isBlockingGameplay ||
+      this.dialogueBox.isOpen() ||
+      this.chatBox.isTyping() ||
+      this.starterSelectionPanel.isVisible() ||
+      this.trainerPanelController.isOpen ||
+      this.battleController?.isBlockingGameplay ||
+      this.pokemonStorageController?.isBlockingGameplay ||
+      this.pokemonCenterHealingInteraction?.isPending ||
+      this.pokemonCenterHealingPresentation?.isBlockingGameplay;
+
+    this.trainerSightController.update(
+      this.currentMapId,
+      this.player.x,
+      this.player.y,
+      Boolean(externallyBlocked),
+    );
+  }
+
+  private handleTrainerAggroReady(npc: NpcInstance): void {
+    if (
+      this.trainerPreBattleController.isBlockingGameplay ||
+      this.pendingDialogueNpc ||
+      this.activeDialogueNpc ||
+      this.dialogueBox.isOpen()
+    ) {
+      return;
+    }
+
+    this.facePlayerAndNpc(npc);
+    this.chatBox.setVisible(false);
+
+    this.trainerPreBattleController.begin(npc);
+  }
+
+  private handleTrainerPreBattleReady(npc: NpcInstance): void {
+    console.log("[TrainerPreBattle] dialogue completed; battle start is ready", {
+      npcId: npc.definition.id,
+      trainerBattleId: npc.definition.trainerBattleId,
+    });
+  }
+
+  private handleTrainerPreBattleCancelled(
+    npc: NpcInstance,
+    reason: string,
+  ): void {
+    this.network.cancelDialogue();
+
+    if (this.pendingDialogueNpc?.definition.id === npc.definition.id) {
+      this.pendingDialogueNpc = undefined;
+    }
+
+    this.restoreNpcDirection(npc);
+    this.chatBox.setVisible(true);
+
+    console.warn("[TrainerPreBattle] cancelled", {
+      npcId: npc.definition.id,
+      trainerBattleId: npc.definition.trainerBattleId,
+      reason,
+    });
+  }
+
   private updateNearbyNpc() {
     const previousNpc = this.nearbyNpc;
 
@@ -459,16 +549,23 @@ export class GameScene extends Phaser.Scene {
       case "quest":
         console.warn("Quest interactions are not implemented yet");
         return;
+
+      case "trainer-battle":
+        console.warn(
+          `Trainer battle interaction is not implemented yet: ${npc.definition.trainerBattleId ?? npc.definition.id}`,
+        );
+        return;
     }
   }
 
-  private startNpcDialogue(npc: NpcInstance): void {
+  private startNpcDialogue(npc: NpcInstance): boolean {
     if (this.pendingDialogueNpc || this.activeDialogueNpc) {
-      return;
+      return false;
     }
 
     this.pendingDialogueNpc = npc;
     this.network.startDialogue(npc.definition.id);
+    return true;
   }
 
   private handleDialogueState(state: DialogueSessionState): void {
@@ -492,11 +589,19 @@ export class GameScene extends Phaser.Scene {
     this.isDialogueAdvancePending = false;
 
     if (state.completed) {
+      const isTrainerPreBattle =
+        this.trainerPreBattleController.isActiveFor(npc.definition.id);
+
       this.dialogueBox.hide();
       this.activeDialogueSessionId = undefined;
       this.pendingDialogueNpc = undefined;
       this.restoreActiveDialogueNpcDirection();
       this.chatBox.setVisible(true);
+
+      if (isTrainerPreBattle) {
+        this.trainerPreBattleController.complete(npc.definition.id);
+      }
+
       return;
     }
 
@@ -511,6 +616,8 @@ export class GameScene extends Phaser.Scene {
       console.warn(`Dialogue line ${state.lineIndex} not found for ${state.dialogueId}`);
       return;
     }
+
+    this.trainerPreBattleController.markDialogueStarted(npc.definition.id);
 
     if (!this.activeDialogueNpc) {
       this.activeDialogueNpc = npc;
@@ -572,12 +679,17 @@ export class GameScene extends Phaser.Scene {
     if (!npc) {
       return;
     }
+
+    this.restoreNpcDirection(npc);
+    this.activeDialogueNpc = undefined;
+  }
+
+  private restoreNpcDirection(npc: NpcInstance): void {
     npc.sprite.anims.stop();
     npc.sprite.setTexture(
       getNpcTextureKey(npc.definition.sprite, npc.definition.direction),
       0
     );
-    this.activeDialogueNpc = undefined;
   }
 
   private createControls(): void {
@@ -673,6 +785,7 @@ export class GameScene extends Phaser.Scene {
         Boolean(this.pokemonCenterHealingInteraction?.isPending) ||
         Boolean(this.pokemonCenterHealingPresentation?.isBlockingGameplay) ||
         Boolean(this.battleController?.isBlockingGameplay) ||
+        this.isTrainerInteractionBlocking ||
         this.isMapTransitioning ||
         this.dialogueBox.isOpen() ||
         this.chatBox.isTyping() ||
@@ -1050,6 +1163,9 @@ export class GameScene extends Phaser.Scene {
     if (this.isMapTransitioning) {
       return;
     }
+    if (this.isTrainerInteractionBlocking) {
+      return;
+    }
     if (this.chatBox.isTyping()) {
       return;
     }
@@ -1114,6 +1230,7 @@ export class GameScene extends Phaser.Scene {
     /* Blockers que también tienen prioridad sobre un diálogo */
     if (
       this.isMapTransitioning ||
+      this.isTrainerInteractionBlocking ||
       this.chatBox.isTyping() ||
       this.pokemonCenterHealingPresentation?.isBlockingGameplay
     ) {
@@ -1193,6 +1310,7 @@ export class GameScene extends Phaser.Scene {
 
       case "shop":
       case "quest":
+      case "trainer-battle":
         return undefined;
     }
   }
@@ -1226,6 +1344,9 @@ export class GameScene extends Phaser.Scene {
     if (this.isMapTransitioning) {
       return;
     }
+    if (this.isTrainerInteractionBlocking) {
+      return;
+    }
     if (this.starterSelectionPanel.isVisible()) {
       return;
     }
@@ -1249,6 +1370,7 @@ export class GameScene extends Phaser.Scene {
     if (
       this.mapTransitionRequestPromise ||
       this.isMapTransitioning ||
+      this.isTrainerInteractionBlocking ||
       this.dialogueBox.isOpen() ||
       this.chatBox.isTyping() ||
       this.starterSelectionPanel.isVisible() ||
@@ -1384,6 +1506,8 @@ export class GameScene extends Phaser.Scene {
     this.pokemonStorageTerminalInteraction?.clear();
     this.pokemonCenterHealingWorldFx?.cancel();
     this.pokemonCenterHealingAudio?.cancel();
+    this.trainerSightController?.clear();
+    this.trainerPreBattleController?.clear();
     this.npcManager.destroy();
     this.mapTransitionController.clearZones();
     this.mapManager.destroy();
@@ -1408,11 +1532,19 @@ export class GameScene extends Phaser.Scene {
     return this.mapTransitionController.isTransitioning;
   }
 
+  private get isTrainerInteractionBlocking(): boolean {
+    return Boolean(
+      this.trainerSightController?.isBlockingGameplay ||
+      this.trainerPreBattleController?.isBlockingGameplay
+    );
+  }
+
   private isMovementInputBlocked(): boolean {
     return (
       !this.hasAppliedInitialWorldState ||
       Boolean(this.mapTransitionRequestPromise) ||
       this.isMapTransitioning ||
+      this.isTrainerInteractionBlocking ||
       this.pokemonStorageController?.isBlockingGameplay ||
       this.pokemonCenterHealingInteraction?.isPending ||
       this.pokemonCenterHealingPresentation?.isBlockingGameplay ||
@@ -1436,6 +1568,7 @@ export class GameScene extends Phaser.Scene {
   private updatePokemonCenterHealingStation(): void {
     const blocked =
       this.isMapTransitioning ||
+      this.isTrainerInteractionBlocking ||
       this.dialogueBox.isOpen() ||
       this.chatBox.isTyping() ||
       this.starterSelectionPanel.isVisible() ||
@@ -1455,6 +1588,7 @@ export class GameScene extends Phaser.Scene {
   private updatePokemonStorageTerminal(): void {
     const blocked =
       this.isMapTransitioning ||
+      this.isTrainerInteractionBlocking ||
       this.dialogueBox.isOpen() ||
       this.chatBox.isTyping() ||
       this.starterSelectionPanel.isVisible() ||

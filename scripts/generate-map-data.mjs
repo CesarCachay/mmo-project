@@ -81,6 +81,8 @@ function parseNpc(object, mapName) {
 
   const dialogueId = getOptionalStringProperty(object, "dialogueId");
 
+  const trainerBattleId = getOptionalStringProperty(object, "trainerBattleId");
+
   const postDialogueAction = getOptionalStringProperty(object, "postDialogueAction");
 
   return {
@@ -88,6 +90,7 @@ function parseNpc(object, mapName) {
     x: object.x,
     y: object.y,
     dialogueId,
+    trainerBattleId,
     postDialogueAction,
   };
 }
@@ -234,6 +237,12 @@ function formatNpcs(npcs) {
 
     if (npc.dialogueId) {
       properties.push(`      dialogueId: ${JSON.stringify(npc.dialogueId)},`);
+    }
+
+    if (npc.trainerBattleId) {
+      properties.push(
+        `      trainerBattleId: ${JSON.stringify(npc.trainerBattleId)},`
+      );
     }
 
     if (npc.postDialogueAction) {

@@ -1,4 +1,9 @@
 import Phaser from "phaser";
+import {
+  getPokemonTrainerBattleDefinition,
+  isPokemonTrainerBattleId,
+} from "@cesar-mmo/shared";
+import type { PokemonTrainerBattleId } from "@cesar-mmo/shared";
 import { getNpcTextureKey } from "../config/npcAssets";
 
 import type {
@@ -57,6 +62,12 @@ export class NpcManager {
     this.npcs.clear();
   }
 
+  public getTrainerBattleNpcs(): readonly NpcInstance[] {
+    return Array.from(this.npcs.values()).filter(
+      (npc) => npc.definition.interactionType === "trainer-battle",
+    );
+  }
+
   public findNearby(
     playerX: number,
     playerY: number,
@@ -96,21 +107,20 @@ export class NpcManager {
         const getProperty = (name: string): unknown =>
           properties.find((property) => property.name === name)?.value;
 
-        const displayName = getProperty("displayName");
+        const rawDisplayName = getProperty("displayName");
         const direction = getProperty("direction");
-        const sprite = getProperty("sprite");
-        const dialogueId = getProperty("dialogueId");
+        const rawSprite = getProperty("sprite");
+        const rawDialogueId = getProperty("dialogueId");
         const interactionType = getProperty("interactionType");
+        const rawTrainerBattleId = getProperty("trainerBattleId");
+        const rawSightRangeTiles = getProperty("sightRangeTiles");
         const rawPostDialogueAction = getProperty("postDialogueAction");
 
         if (
           typeof object.x !== "number" ||
           typeof object.y !== "number" ||
           typeof object.name !== "string" ||
-          typeof displayName !== "string" ||
-          typeof direction !== "string" ||
-          typeof sprite !== "string" ||
-          typeof dialogueId !== "string"
+          typeof direction !== "string"
         ) {
           throw new Error(`Invalid NPC definition: ${object.name}`);
         }
@@ -122,6 +132,75 @@ export class NpcManager {
         if (!this.isNpcInteractionType(interactionType)) {
           throw new Error(
             `Invalid NPC interaction type: ${String(interactionType)}`,
+          );
+        }
+
+        const dialogueId = this.parseOptionalStringProperty(
+          rawDialogueId,
+          "dialogueId",
+          object.name,
+        );
+
+        const trainerBattleId = this.parseTrainerBattleId(
+          rawTrainerBattleId,
+          object.name,
+        );
+
+        const sightRangeTiles = this.parseSightRangeTiles(
+          rawSightRangeTiles,
+          object.name,
+        );
+
+        let displayName: string;
+        let sprite: string;
+
+        if (interactionType === "trainer-battle") {
+          if (!trainerBattleId) {
+            throw new Error(
+              `Trainer NPC "${object.name}" requires trainerBattleId`,
+            );
+          }
+
+          if (!sightRangeTiles) {
+            throw new Error(
+              `Trainer NPC "${object.name}" requires sightRangeTiles`,
+            );
+          }
+
+          const trainerDefinition =
+            getPokemonTrainerBattleDefinition(trainerBattleId);
+
+          displayName = trainerDefinition.displayName;
+          sprite = trainerDefinition.appearanceId;
+        } else {
+          if (trainerBattleId) {
+            throw new Error(
+              `NPC "${object.name}" cannot define trainerBattleId unless interactionType is "trainer-battle"`,
+            );
+          }
+
+          if (sightRangeTiles) {
+            throw new Error(
+              `NPC "${object.name}" cannot define sightRangeTiles unless interactionType is "trainer-battle"`,
+            );
+          }
+
+          if (
+            typeof rawDisplayName !== "string" ||
+            rawDisplayName.trim().length === 0 ||
+            typeof rawSprite !== "string" ||
+            rawSprite.trim().length === 0
+          ) {
+            throw new Error(`Invalid NPC definition: ${object.name}`);
+          }
+
+          displayName = rawDisplayName.trim();
+          sprite = rawSprite.trim();
+        }
+
+        if (interactionType === "dialogue" && !dialogueId) {
+          throw new Error(
+            `Dialogue NPC "${object.name}" requires dialogueId`,
           );
         }
 
@@ -148,9 +227,68 @@ export class NpcManager {
           sprite,
           interactionType,
           dialogueId,
+          trainerBattleId,
+          sightRangeTiles,
           postDialogueAction,
         };
       });
+  }
+
+  private parseOptionalStringProperty(
+    value: unknown,
+    propertyName: string,
+    npcId: string,
+  ): string | undefined {
+    if (value === undefined) {
+      return undefined;
+    }
+
+    if (typeof value !== "string" || value.trim().length === 0) {
+      throw new Error(
+        `NPC "${npcId}" property "${propertyName}" must be a non-empty string`,
+      );
+    }
+
+    return value.trim();
+  }
+
+  private parseTrainerBattleId(
+    value: unknown,
+    npcId: string,
+  ): PokemonTrainerBattleId | undefined {
+    if (value === undefined) {
+      return undefined;
+    }
+
+    if (!isPokemonTrainerBattleId(value)) {
+      throw new Error(
+        `NPC "${npcId}" references unknown trainerBattleId: ${String(value)}`,
+      );
+    }
+
+    return value;
+  }
+
+  private parseSightRangeTiles(
+    value: unknown,
+    npcId: string,
+  ): number | undefined {
+    if (value === undefined) {
+      return undefined;
+    }
+
+    if (
+      typeof value !== "number" ||
+      !Number.isInteger(value) ||
+      value <= 0 ||
+      value > 20
+    ) {
+      throw new Error(
+        `NPC "${npcId}" property "sightRangeTiles" must be an integer between 1 and 20`,
+      );
+    }
+
+    return value;
   }
 
   private isNpcDirection(value: string): value is NpcDirection {
@@ -163,6 +301,11 @@ export class NpcManager {
   }
 
   private isNpcInteractionType(value: unknown): value is NpcInteractionType {
-    return value === "dialogue" || value === "shop" || value === "quest";
+    return (
+      value === "dialogue" ||
+      value === "shop" ||
+      value === "quest" ||
+      value === "trainer-battle"
+    );
   }
 }
