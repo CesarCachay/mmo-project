@@ -1,4 +1,5 @@
 import {
+  resolveTrainerBattleContinuationOutcome,
   resolveWildBattleContinuationOutcome,
   type BattleTurnResolutionEntry,
 } from '@cesar-mmo/shared';
@@ -56,7 +57,13 @@ export function applyPokemonTrainerBattleSwitch(
    *
    * Forced replacement remains independent.
    */
-  const continuation = resolveWildBattleContinuationOutcome(battle);
+  const continuation =
+    battle.type === 'trainer'
+      ? resolveTrainerBattleContinuationOutcome(
+          battle,
+          entry.command.participantId,
+        )
+      : resolveWildBattleContinuationOutcome(battle);
 
   if (continuation.type !== 'continue') {
     throw new Error(

@@ -35,6 +35,7 @@ import {
   POKEMON_CENTER_HEALING_EVENTS,
   isPokemonPartyWiped,
   getPokemonTrainerBattleDefinition,
+  isPokemonTrainerBattleStartInput,
 } from '@cesar-mmo/shared';
 import {
   getServerMapSpawn,
@@ -90,6 +91,9 @@ import { PokemonTrainerStateNetworkPresenter } from '#app/pokemon/network/Pokemo
 import { PokemonBattleTurnExecutor } from '#app/pokemon/battles/pokemon-battle-turn.executor';
 import { PokemonBattleNetworkController } from '#app/pokemon/battles/pokemon-battle-network.controller';
 import { PokemonWildBattleStarter } from '#app/pokemon/battles/pokemon-wild-battle.starter';
+import { PokemonTrainerBattleStarter } from '#app/pokemon/battles/pokemon-trainer-battle.starter';
+import { PokemonTrainerBattleStartAuthorizationStore } from '#app/pokemon/battles/pokemon-trainer-battle-start-authorization.store';
+import { PokemonTrainerBattleVictoryService } from '#app/pokemon/battles/pokemon-trainer-battle-victory.service';
 import { PokemonProgressionNetworkController } from '#app/pokemon/progression/pokemon-progression-network.controller';
 import {
   PokemonEvolutionNetworkController,
@@ -171,6 +175,9 @@ export class GameGateway
   private readonly pokemonBattleNetworkController: PokemonBattleNetworkController;
 
   private readonly pokemonWildBattleStarter: PokemonWildBattleStarter;
+  private readonly pokemonTrainerBattleStarter: PokemonTrainerBattleStarter;
+  private readonly pokemonTrainerBattleStartAuthorizationStore =
+    new PokemonTrainerBattleStartAuthorizationStore();
 
   private readonly pokemonProgressionNetworkController: PokemonProgressionNetworkController;
   private readonly pokemonEvolutionNetworkController: PokemonEvolutionNetworkController;
@@ -190,6 +197,7 @@ export class GameGateway
     private readonly playerWorldStateService: PlayerWorldStateService,
     private readonly playerRecoveryCheckpointService: PlayerRecoveryCheckpointService,
     private readonly pokemonBlackoutRecoveryService: PokemonBlackoutRecoveryService,
+    private readonly pokemonTrainerBattleVictoryService: PokemonTrainerBattleVictoryService,
     private readonly pokemonOverworldItemRepository: PokemonOverworldItemRepository,
     private readonly wildBattleProgressionService: PokemonWildBattleProgressionService,
     private readonly pokemonCenterHealingService: PokemonCenterHealingService,
@@ -260,9 +268,27 @@ export class GameGateway
       trainerStatePresenter: this.pokemonTrainerStateNetworkPresenter,
       onTrainerDefeated: (playerId, trainerId) =>
         this.handleBlackoutRecovery(playerId, trainerId),
+      onTrainerBattleVictory: async (trainerId, trainerBattleId) => {
+        const result = await this.pokemonTrainerBattleVictoryService.recordVictory(
+          trainerId,
+          trainerBattleId,
+        );
+
+        return result.trainerState;
+      },
     });
 
     this.pokemonWildBattleStarter = new PokemonWildBattleStarter({
+      trainerStateStore: this.pokemonTrainerStateStore,
+      wildEncounterSessionStore: this.pokemonWildEncounterSessionStore,
+      battleSessionStore: this.pokemonBattleSessionStore,
+      battleTurnStore: this.pokemonBattleTurnStore,
+      storageAccessSessionStore: this.pokemonStorageAccessSessionStore,
+      resolvePlayerSocket: (playerId) =>
+        this.server.sockets.sockets.get(playerId),
+    });
+
+    this.pokemonTrainerBattleStarter = new PokemonTrainerBattleStarter({
       trainerStateStore: this.pokemonTrainerStateStore,
       wildEncounterSessionStore: this.pokemonWildEncounterSessionStore,
       battleSessionStore: this.pokemonBattleSessionStore,
@@ -432,16 +458,23 @@ export class GameGateway
       if (existingTrainerState) {
         trainerState = existingTrainerState;
       } else {
-        const [persistedParty, persistedInventory] = await Promise.all([
+        const [
+          persistedParty,
+          persistedInventory,
+          defeatedTrainerBattleIds,
+        ] = await Promise.all([
           this.pokemonPartyRepository.loadParty(trainerId),
-
           this.pokemonInventoryRepository.loadInventory(trainerId),
+          this.pokemonTrainerBattleVictoryService.loadDefeatedTrainerBattleIds(
+            trainerId,
+          ),
         ]);
 
         trainerState = this.pokemonTrainerStateStore.create(
           trainerId,
           persistedParty,
           persistedInventory,
+          defeatedTrainerBattleIds,
         );
       }
 
@@ -525,20 +558,50 @@ export class GameGateway
     client.to(mapRoom).emit('playerJoined', newPlayer);
   }
 
-  handleDisconnect(client: Socket) {
+  async handleDisconnect(client: Socket): Promise<void> {
     const player = this.playerWorldRuntimeStore.getPlayer(client.id);
     const trainerId = this.getTrainerId(client.id);
 
     if (player && trainerId) {
       this.playerWorldStateService.checkpointPlayer(trainerId, player);
     }
+
     if (trainerId) {
       this.pokemonTrainerStateStore.lockStarterSelection(trainerId);
     }
 
+    /*
+     * Release the socket/Trainer binding before any persistence await so a
+     * fast Socket.IO reconnect is not rejected as "already connected".
+     * trainerId was captured above and Battle cleanup owns its own binding.
+     */
     this.unbindTrainerConnection(client.id);
     this.dialogueSessionStore.remove(client.id);
+    this.pokemonTrainerBattleStartAuthorizationStore.remove(client.id);
     this.pokemonStorageAccessSessionStore.remove(client.id);
+
+    this.playerEncounterZoneIds.delete(client.id);
+    this.pokemonWildEncounterTriggerService.reset(client.id);
+    this.pokemonWildEncounterSessionStore.remove(client.id);
+
+    /*
+     * Battle sessions are keyed by both socket/player and Trainer. Leaving
+     * them behind would make a reconnect fail with an orphaned active battle.
+     * Persist what we can, then release the runtime session.
+     */
+    await this.pokemonBattleNetworkController.handlePlayerDisconnected(client.id);
+
+    /*
+     * If the socket vanished on the terminal faint frame, there is no client
+     * left to press Recover. The player is still in runtime at this point, so
+     * complete blackout recovery server-side and persist the safe checkpoint.
+     */
+    if (player && trainerId) {
+      const trainerState = this.pokemonTrainerStateStore.get(trainerId);
+      if (trainerState && isPokemonPartyWiped(trainerState.party)) {
+        await this.handleBlackoutRecovery(client.id, trainerId);
+      }
+    }
 
     if (!player) {
       return;
@@ -548,9 +611,6 @@ export class GameGateway
 
     const mapRoom = this.getMapRoom(player.mapId);
     this.playerWorldRuntimeStore.removePlayer(client.id);
-    this.playerEncounterZoneIds.delete(client.id);
-    this.pokemonWildEncounterTriggerService.reset(client.id);
-    this.pokemonWildEncounterSessionStore.remove(client.id);
     this.server.to(mapRoom).emit('playerDisconnected', client.id);
   }
 
@@ -618,12 +678,25 @@ export class GameGateway
       return;
     }
 
-    const dialogueId = this.resolveNpcDialogueId(npc);
+    const trainerId = this.getTrainerId(client.id);
+    if (!trainerId) {
+      return;
+    }
+
+    const dialogueId = this.resolveNpcDialogueId(npc, trainerId);
     if (!dialogueId) {
       return;
     }
 
-    if (!this.canPlayerStartNpcDialogue(player.mapId, player.x, player.y, npc)) {
+    if (
+      !this.canPlayerStartNpcDialogue(
+        player.mapId,
+        player.x,
+        player.y,
+        npc,
+        trainerId,
+      )
+    ) {
       return;
     }
 
@@ -673,12 +746,27 @@ export class GameGateway
       this.dialogueSessionStore.remove(client.id);
       return;
     }
-    const dialogueId = this.resolveNpcDialogueId(npc);
+
+    const trainerId = this.getTrainerId(client.id);
+    if (!trainerId) {
+      this.dialogueSessionStore.remove(client.id);
+      return;
+    }
+
+    const dialogueId = this.resolveNpcDialogueId(npc, trainerId);
     if (dialogueId !== session.dialogueId) {
       this.dialogueSessionStore.remove(client.id);
       return;
     }
-    if (!this.canPlayerStartNpcDialogue(player.mapId, player.x, player.y, npc)) {
+    if (
+      !this.canPlayerStartNpcDialogue(
+        player.mapId,
+        player.x,
+        player.y,
+        npc,
+        trainerId,
+      )
+    ) {
       this.dialogueSessionStore.remove(client.id);
       return;
     }
@@ -688,6 +776,18 @@ export class GameGateway
       client.emit(DIALOGUE_EVENTS.STATE, state);
       if (state.completed) {
         this.handleDialoguePostAction(client, npc);
+
+        if (
+          npc.trainerBattleId &&
+          !this.isTrainerBattleDefeated(trainerId, npc.trainerBattleId)
+        ) {
+          this.pokemonTrainerBattleStartAuthorizationStore.authorize({
+            playerId: client.id,
+            mapId: player.mapId,
+            npcId: session.npcId,
+            trainerBattleId: npc.trainerBattleId,
+          });
+        }
       }
     } catch (error: unknown) {
       console.warn(
@@ -781,6 +881,77 @@ export class GameGateway
     );
   }
 
+  @SubscribeMessage(POKEMON_EVENTS.TRAINER_BATTLE_START)
+  handleTrainerBattleStart(
+    @ConnectedSocket()
+    client: Socket,
+    @MessageBody()
+    payload: unknown,
+  ): void {
+    if (!isPokemonTrainerBattleStartInput(payload)) {
+      return;
+    }
+
+    const authorization =
+      this.pokemonTrainerBattleStartAuthorizationStore.consume(
+        client.id,
+        payload.npcId,
+      );
+
+    if (!authorization) {
+      return;
+    }
+
+    const player = this.playerWorldRuntimeStore.getPlayer(client.id);
+    if (!player || player.mapId !== authorization.mapId) {
+      return;
+    }
+
+    if (
+      this.dialogueSessionStore.has(client.id) ||
+      this.pokemonStorageAccessSessionStore.has(client.id) ||
+      this.pokemonWildEncounterSessionStore.has(client.id) ||
+      this.pokemonBattleSessionStore.hasPlayerBattle(client.id)
+    ) {
+      return;
+    }
+
+    const npc = getServerMapNpc(player.mapId, authorization.npcId);
+    if (
+      !npc ||
+      npc.trainerBattleId !== authorization.trainerBattleId ||
+      !isPlayerInsideTrainerNpcSight(
+        player.mapId,
+        player.x,
+        player.y,
+        npc,
+      )
+    ) {
+      return;
+    }
+
+    const trainerId = this.getTrainerId(client.id);
+    if (!trainerId) {
+      return;
+    }
+
+    if (
+      this.isTrainerBattleDefeated(
+        trainerId,
+        authorization.trainerBattleId,
+      )
+    ) {
+      return;
+    }
+
+    this.pokemonTrainerBattleStarter.start({
+      playerId: client.id,
+      trainerId,
+      npcId: authorization.npcId,
+      trainerBattleId: authorization.trainerBattleId,
+    });
+  }
+
   @SubscribeMessage(POKEMON_EVENTS.BATTLE_COMMAND)
   handleBattleCommand(
     @ConnectedSocket()
@@ -799,6 +970,27 @@ export class GameGateway
     payload: unknown,
   ): void {
     this.pokemonBattleNetworkController.handleReplacement(client, payload);
+  }
+
+  @SubscribeMessage(POKEMON_EVENTS.BLACKOUT_RECOVERY_REQUEST)
+  async handlePokemonBlackoutRecoveryRequest(
+    @ConnectedSocket() client: Socket,
+  ): Promise<void> {
+    if (this.pokemonBattleSessionStore.hasPlayerBattle(client.id)) {
+      return;
+    }
+
+    const trainerId = this.getTrainerId(client.id);
+    if (!trainerId) {
+      return;
+    }
+
+    const trainerState = this.pokemonTrainerStateStore.get(trainerId);
+    if (!trainerState || !isPokemonPartyWiped(trainerState.party)) {
+      return;
+    }
+
+    await this.handleBlackoutRecovery(client.id, trainerId);
   }
 
   @SubscribeMessage(MAP_EVENTS.REQUEST_TRANSITION)
@@ -952,10 +1144,16 @@ export class GameGateway
     return this.pokemonStorageNetworkController.handleCommand(client, payload);
   }
 
-  private resolveNpcDialogueId(npc: SharedMapNpc): string | undefined {
+  private resolveNpcDialogueId(
+    npc: SharedMapNpc,
+    trainerId: PokemonTrainerId,
+  ): string | undefined {
     if (npc.trainerBattleId) {
-      return getPokemonTrainerBattleDefinition(npc.trainerBattleId)
-        .preBattleDialogueId;
+      const definition = getPokemonTrainerBattleDefinition(npc.trainerBattleId);
+
+      return this.isTrainerBattleDefeated(trainerId, npc.trainerBattleId)
+        ? definition.postBattleDialogueId
+        : definition.preBattleDialogueId;
     }
 
     return npc.dialogueId;
@@ -966,8 +1164,13 @@ export class GameGateway
     playerX: number,
     playerY: number,
     npc: SharedMapNpc,
+    trainerId: PokemonTrainerId,
   ): boolean {
     if (npc.trainerBattleId) {
+      if (this.isTrainerBattleDefeated(trainerId, npc.trainerBattleId)) {
+        return isPlayerNearMapNpc(playerX, playerY, npc);
+      }
+
       return isPlayerInsideTrainerNpcSight(
         mapId,
         playerX,
@@ -977,6 +1180,22 @@ export class GameGateway
     }
 
     return isPlayerNearMapNpc(playerX, playerY, npc);
+  }
+
+  private isTrainerBattleDefeated(
+    trainerId: PokemonTrainerId,
+    trainerBattleId: string,
+  ): boolean {
+    const trainerState = this.pokemonTrainerStateStore.get(trainerId);
+
+    if (!trainerState) {
+      return false;
+    }
+
+    return this.pokemonTrainerBattleVictoryService.isDefeated(
+      trainerState,
+      trainerBattleId,
+    );
   }
 
   private handleDialoguePostAction(client: Socket, npc: SharedMapNpc): void {

@@ -2,6 +2,7 @@ import type {
   BattleId,
   BattleInstance,
   BattleParticipant,
+  BattleParticipantId,
   BattlePokemonState,
 } from "./pokemon-battle.types.js";
 import type { BattleCommandAction } from "./pokemon-battle-command.js";
@@ -9,6 +10,7 @@ import { isPokemonItemId } from "../inventory/pokemon-inventory.js";
 
 export interface PokemonBattleStartedPayload {
   readonly battle: BattleInstance;
+  readonly localParticipantId: BattleParticipantId;
 }
 
 export interface PokemonBattleCommandInput {
@@ -23,7 +25,19 @@ export function isPokemonBattleStartedPayload(
     return false;
   }
 
-  if (!isBattleInstance(value.battle)) {
+  if (!isPokemonBattleInstance(value.battle)) {
+    return false;
+  }
+
+  if (!isNonEmptyString(value.localParticipantId)) {
+    return false;
+  }
+
+  const localParticipant = value.battle.participants.find(
+    (participant) => participant.id === value.localParticipantId
+  );
+
+  if (!localParticipant || localParticipant.type !== "trainer") {
     return false;
   }
 
@@ -31,7 +45,7 @@ export function isPokemonBattleStartedPayload(
   return value.battle.status === "active";
 }
 
-function isBattleInstance(value: unknown): value is BattleInstance {
+export function isPokemonBattleInstance(value: unknown): value is BattleInstance {
   if (!isRecord(value)) {
     return false;
   }
@@ -111,6 +125,15 @@ function isBattleParticipant(value: unknown): value is BattleParticipant {
   }
 
   if (value.side !== "side-a" && value.side !== "side-b") {
+    return false;
+  }
+
+  const displayName = value.displayName;
+
+  if (
+    displayName !== undefined &&
+    (!isNonEmptyString(displayName) || displayName !== displayName.trim())
+  ) {
     return false;
   }
 
@@ -271,6 +294,7 @@ function isBattleCommandAction(value: unknown): value is BattleCommandAction {
       return Number.isInteger(value.pokemonIndex) && (value.pokemonIndex as number) >= 0;
 
     case "run":
+    case "struggle":
       return true;
 
     case "use-item":

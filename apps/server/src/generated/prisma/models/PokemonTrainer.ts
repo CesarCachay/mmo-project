@@ -305,6 +305,7 @@ export type PokemonTrainerWhereInput = {
   inventoryItems?: Prisma.PokemonTrainerInventoryItemListRelationFilter
   pendingMoveLearning?: Prisma.PokemonPendingMoveLearningListRelationFilter
   pendingEvolutions?: Prisma.PokemonPendingEvolutionListRelationFilter
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressListRelationFilter
 }
 
 export type PokemonTrainerOrderByWithRelationInput = {
@@ -327,6 +328,7 @@ export type PokemonTrainerOrderByWithRelationInput = {
   inventoryItems?: Prisma.PokemonTrainerInventoryItemOrderByRelationAggregateInput
   pendingMoveLearning?: Prisma.PokemonPendingMoveLearningOrderByRelationAggregateInput
   pendingEvolutions?: Prisma.PokemonPendingEvolutionOrderByRelationAggregateInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressOrderByRelationAggregateInput
 }
 
 export type PokemonTrainerWhereUniqueInput = Prisma.AtLeast<{
@@ -352,6 +354,7 @@ export type PokemonTrainerWhereUniqueInput = Prisma.AtLeast<{
   inventoryItems?: Prisma.PokemonTrainerInventoryItemListRelationFilter
   pendingMoveLearning?: Prisma.PokemonPendingMoveLearningListRelationFilter
   pendingEvolutions?: Prisma.PokemonPendingEvolutionListRelationFilter
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressListRelationFilter
 }, "id">
 
 export type PokemonTrainerOrderByWithAggregationInput = {
@@ -415,6 +418,7 @@ export type PokemonTrainerCreateInput = {
   inventoryItems?: Prisma.PokemonTrainerInventoryItemCreateNestedManyWithoutTrainerInput
   pendingMoveLearning?: Prisma.PokemonPendingMoveLearningCreateNestedManyWithoutTrainerInput
   pendingEvolutions?: Prisma.PokemonPendingEvolutionCreateNestedManyWithoutTrainerInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressCreateNestedManyWithoutTrainerInput
 }
 
 export type PokemonTrainerUncheckedCreateInput = {
@@ -436,6 +440,7 @@ export type PokemonTrainerUncheckedCreateInput = {
   inventoryItems?: Prisma.PokemonTrainerInventoryItemUncheckedCreateNestedManyWithoutTrainerInput
   pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUncheckedCreateNestedManyWithoutTrainerInput
   pendingEvolutions?: Prisma.PokemonPendingEvolutionUncheckedCreateNestedManyWithoutTrainerInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressUncheckedCreateNestedManyWithoutTrainerInput
 }
 
 export type PokemonTrainerUpdateInput = {
@@ -457,6 +462,7 @@ export type PokemonTrainerUpdateInput = {
   inventoryItems?: Prisma.PokemonTrainerInventoryItemUpdateManyWithoutTrainerNestedInput
   pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUpdateManyWithoutTrainerNestedInput
   pendingEvolutions?: Prisma.PokemonPendingEvolutionUpdateManyWithoutTrainerNestedInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressUpdateManyWithoutTrainerNestedInput
 }
 
 export type PokemonTrainerUncheckedUpdateInput = {
@@ -478,6 +484,7 @@ export type PokemonTrainerUncheckedUpdateInput = {
   inventoryItems?: Prisma.PokemonTrainerInventoryItemUncheckedUpdateManyWithoutTrainerNestedInput
   pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUncheckedUpdateManyWithoutTrainerNestedInput
   pendingEvolutions?: Prisma.PokemonPendingEvolutionUncheckedUpdateManyWithoutTrainerNestedInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressUncheckedUpdateManyWithoutTrainerNestedInput
 }
 
 export type PokemonTrainerCreateManyInput = {
@@ -716,6 +723,20 @@ export type PokemonTrainerUpdateOneRequiredWithoutPendingEvolutionsNestedInput =
   update?: Prisma.XOR<Prisma.XOR<Prisma.PokemonTrainerUpdateToOneWithWhereWithoutPendingEvolutionsInput, Prisma.PokemonTrainerUpdateWithoutPendingEvolutionsInput>, Prisma.PokemonTrainerUncheckedUpdateWithoutPendingEvolutionsInput>
 }
 
+export type PokemonTrainerCreateNestedOneWithoutTrainerBattleProgressInput = {
+  create?: Prisma.XOR<Prisma.PokemonTrainerCreateWithoutTrainerBattleProgressInput, Prisma.PokemonTrainerUncheckedCreateWithoutTrainerBattleProgressInput>
+  connectOrCreate?: Prisma.PokemonTrainerCreateOrConnectWithoutTrainerBattleProgressInput
+  connect?: Prisma.PokemonTrainerWhereUniqueInput
+}
+
+export type PokemonTrainerUpdateOneRequiredWithoutTrainerBattleProgressNestedInput = {
+  create?: Prisma.XOR<Prisma.PokemonTrainerCreateWithoutTrainerBattleProgressInput, Prisma.PokemonTrainerUncheckedCreateWithoutTrainerBattleProgressInput>
+  connectOrCreate?: Prisma.PokemonTrainerCreateOrConnectWithoutTrainerBattleProgressInput
+  upsert?: Prisma.PokemonTrainerUpsertWithoutTrainerBattleProgressInput
+  connect?: Prisma.PokemonTrainerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PokemonTrainerUpdateToOneWithWhereWithoutTrainerBattleProgressInput, Prisma.PokemonTrainerUpdateWithoutTrainerBattleProgressInput>, Prisma.PokemonTrainerUncheckedUpdateWithoutTrainerBattleProgressInput>
+}
+
 export type PokemonTrainerCreateWithoutAccountInput = {
   id: string
   displayName: string
@@ -734,6 +755,7 @@ export type PokemonTrainerCreateWithoutAccountInput = {
   inventoryItems?: Prisma.PokemonTrainerInventoryItemCreateNestedManyWithoutTrainerInput
   pendingMoveLearning?: Prisma.PokemonPendingMoveLearningCreateNestedManyWithoutTrainerInput
   pendingEvolutions?: Prisma.PokemonPendingEvolutionCreateNestedManyWithoutTrainerInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressCreateNestedManyWithoutTrainerInput
 }
 
 export type PokemonTrainerUncheckedCreateWithoutAccountInput = {
@@ -754,6 +776,7 @@ export type PokemonTrainerUncheckedCreateWithoutAccountInput = {
   inventoryItems?: Prisma.PokemonTrainerInventoryItemUncheckedCreateNestedManyWithoutTrainerInput
   pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUncheckedCreateNestedManyWithoutTrainerInput
   pendingEvolutions?: Prisma.PokemonPendingEvolutionUncheckedCreateNestedManyWithoutTrainerInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressUncheckedCreateNestedManyWithoutTrainerInput
 }
 
 export type PokemonTrainerCreateOrConnectWithoutAccountInput = {
@@ -820,6 +843,7 @@ export type PokemonTrainerCreateWithoutPokemonInstancesInput = {
   inventoryItems?: Prisma.PokemonTrainerInventoryItemCreateNestedManyWithoutTrainerInput
   pendingMoveLearning?: Prisma.PokemonPendingMoveLearningCreateNestedManyWithoutTrainerInput
   pendingEvolutions?: Prisma.PokemonPendingEvolutionCreateNestedManyWithoutTrainerInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressCreateNestedManyWithoutTrainerInput
 }
 
 export type PokemonTrainerUncheckedCreateWithoutPokemonInstancesInput = {
@@ -840,6 +864,7 @@ export type PokemonTrainerUncheckedCreateWithoutPokemonInstancesInput = {
   inventoryItems?: Prisma.PokemonTrainerInventoryItemUncheckedCreateNestedManyWithoutTrainerInput
   pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUncheckedCreateNestedManyWithoutTrainerInput
   pendingEvolutions?: Prisma.PokemonPendingEvolutionUncheckedCreateNestedManyWithoutTrainerInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressUncheckedCreateNestedManyWithoutTrainerInput
 }
 
 export type PokemonTrainerCreateOrConnectWithoutPokemonInstancesInput = {
@@ -876,6 +901,7 @@ export type PokemonTrainerUpdateWithoutPokemonInstancesInput = {
   inventoryItems?: Prisma.PokemonTrainerInventoryItemUpdateManyWithoutTrainerNestedInput
   pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUpdateManyWithoutTrainerNestedInput
   pendingEvolutions?: Prisma.PokemonPendingEvolutionUpdateManyWithoutTrainerNestedInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressUpdateManyWithoutTrainerNestedInput
 }
 
 export type PokemonTrainerUncheckedUpdateWithoutPokemonInstancesInput = {
@@ -896,6 +922,7 @@ export type PokemonTrainerUncheckedUpdateWithoutPokemonInstancesInput = {
   inventoryItems?: Prisma.PokemonTrainerInventoryItemUncheckedUpdateManyWithoutTrainerNestedInput
   pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUncheckedUpdateManyWithoutTrainerNestedInput
   pendingEvolutions?: Prisma.PokemonPendingEvolutionUncheckedUpdateManyWithoutTrainerNestedInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressUncheckedUpdateManyWithoutTrainerNestedInput
 }
 
 export type PokemonTrainerCreateWithoutPendingMoveLearningInput = {
@@ -916,6 +943,7 @@ export type PokemonTrainerCreateWithoutPendingMoveLearningInput = {
   pokemonInstances?: Prisma.PokemonInstanceCreateNestedManyWithoutTrainerInput
   inventoryItems?: Prisma.PokemonTrainerInventoryItemCreateNestedManyWithoutTrainerInput
   pendingEvolutions?: Prisma.PokemonPendingEvolutionCreateNestedManyWithoutTrainerInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressCreateNestedManyWithoutTrainerInput
 }
 
 export type PokemonTrainerUncheckedCreateWithoutPendingMoveLearningInput = {
@@ -936,6 +964,7 @@ export type PokemonTrainerUncheckedCreateWithoutPendingMoveLearningInput = {
   pokemonInstances?: Prisma.PokemonInstanceUncheckedCreateNestedManyWithoutTrainerInput
   inventoryItems?: Prisma.PokemonTrainerInventoryItemUncheckedCreateNestedManyWithoutTrainerInput
   pendingEvolutions?: Prisma.PokemonPendingEvolutionUncheckedCreateNestedManyWithoutTrainerInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressUncheckedCreateNestedManyWithoutTrainerInput
 }
 
 export type PokemonTrainerCreateOrConnectWithoutPendingMoveLearningInput = {
@@ -972,6 +1001,7 @@ export type PokemonTrainerUpdateWithoutPendingMoveLearningInput = {
   pokemonInstances?: Prisma.PokemonInstanceUpdateManyWithoutTrainerNestedInput
   inventoryItems?: Prisma.PokemonTrainerInventoryItemUpdateManyWithoutTrainerNestedInput
   pendingEvolutions?: Prisma.PokemonPendingEvolutionUpdateManyWithoutTrainerNestedInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressUpdateManyWithoutTrainerNestedInput
 }
 
 export type PokemonTrainerUncheckedUpdateWithoutPendingMoveLearningInput = {
@@ -992,6 +1022,7 @@ export type PokemonTrainerUncheckedUpdateWithoutPendingMoveLearningInput = {
   pokemonInstances?: Prisma.PokemonInstanceUncheckedUpdateManyWithoutTrainerNestedInput
   inventoryItems?: Prisma.PokemonTrainerInventoryItemUncheckedUpdateManyWithoutTrainerNestedInput
   pendingEvolutions?: Prisma.PokemonPendingEvolutionUncheckedUpdateManyWithoutTrainerNestedInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressUncheckedUpdateManyWithoutTrainerNestedInput
 }
 
 export type PokemonTrainerCreateWithoutInventoryItemsInput = {
@@ -1012,6 +1043,7 @@ export type PokemonTrainerCreateWithoutInventoryItemsInput = {
   pokemonInstances?: Prisma.PokemonInstanceCreateNestedManyWithoutTrainerInput
   pendingMoveLearning?: Prisma.PokemonPendingMoveLearningCreateNestedManyWithoutTrainerInput
   pendingEvolutions?: Prisma.PokemonPendingEvolutionCreateNestedManyWithoutTrainerInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressCreateNestedManyWithoutTrainerInput
 }
 
 export type PokemonTrainerUncheckedCreateWithoutInventoryItemsInput = {
@@ -1032,6 +1064,7 @@ export type PokemonTrainerUncheckedCreateWithoutInventoryItemsInput = {
   pokemonInstances?: Prisma.PokemonInstanceUncheckedCreateNestedManyWithoutTrainerInput
   pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUncheckedCreateNestedManyWithoutTrainerInput
   pendingEvolutions?: Prisma.PokemonPendingEvolutionUncheckedCreateNestedManyWithoutTrainerInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressUncheckedCreateNestedManyWithoutTrainerInput
 }
 
 export type PokemonTrainerCreateOrConnectWithoutInventoryItemsInput = {
@@ -1068,6 +1101,7 @@ export type PokemonTrainerUpdateWithoutInventoryItemsInput = {
   pokemonInstances?: Prisma.PokemonInstanceUpdateManyWithoutTrainerNestedInput
   pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUpdateManyWithoutTrainerNestedInput
   pendingEvolutions?: Prisma.PokemonPendingEvolutionUpdateManyWithoutTrainerNestedInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressUpdateManyWithoutTrainerNestedInput
 }
 
 export type PokemonTrainerUncheckedUpdateWithoutInventoryItemsInput = {
@@ -1088,6 +1122,7 @@ export type PokemonTrainerUncheckedUpdateWithoutInventoryItemsInput = {
   pokemonInstances?: Prisma.PokemonInstanceUncheckedUpdateManyWithoutTrainerNestedInput
   pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUncheckedUpdateManyWithoutTrainerNestedInput
   pendingEvolutions?: Prisma.PokemonPendingEvolutionUncheckedUpdateManyWithoutTrainerNestedInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressUncheckedUpdateManyWithoutTrainerNestedInput
 }
 
 export type PokemonTrainerCreateWithoutPendingEvolutionsInput = {
@@ -1108,6 +1143,7 @@ export type PokemonTrainerCreateWithoutPendingEvolutionsInput = {
   pokemonInstances?: Prisma.PokemonInstanceCreateNestedManyWithoutTrainerInput
   inventoryItems?: Prisma.PokemonTrainerInventoryItemCreateNestedManyWithoutTrainerInput
   pendingMoveLearning?: Prisma.PokemonPendingMoveLearningCreateNestedManyWithoutTrainerInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressCreateNestedManyWithoutTrainerInput
 }
 
 export type PokemonTrainerUncheckedCreateWithoutPendingEvolutionsInput = {
@@ -1128,6 +1164,7 @@ export type PokemonTrainerUncheckedCreateWithoutPendingEvolutionsInput = {
   pokemonInstances?: Prisma.PokemonInstanceUncheckedCreateNestedManyWithoutTrainerInput
   inventoryItems?: Prisma.PokemonTrainerInventoryItemUncheckedCreateNestedManyWithoutTrainerInput
   pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUncheckedCreateNestedManyWithoutTrainerInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressUncheckedCreateNestedManyWithoutTrainerInput
 }
 
 export type PokemonTrainerCreateOrConnectWithoutPendingEvolutionsInput = {
@@ -1164,6 +1201,7 @@ export type PokemonTrainerUpdateWithoutPendingEvolutionsInput = {
   pokemonInstances?: Prisma.PokemonInstanceUpdateManyWithoutTrainerNestedInput
   inventoryItems?: Prisma.PokemonTrainerInventoryItemUpdateManyWithoutTrainerNestedInput
   pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUpdateManyWithoutTrainerNestedInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressUpdateManyWithoutTrainerNestedInput
 }
 
 export type PokemonTrainerUncheckedUpdateWithoutPendingEvolutionsInput = {
@@ -1184,6 +1222,107 @@ export type PokemonTrainerUncheckedUpdateWithoutPendingEvolutionsInput = {
   pokemonInstances?: Prisma.PokemonInstanceUncheckedUpdateManyWithoutTrainerNestedInput
   inventoryItems?: Prisma.PokemonTrainerInventoryItemUncheckedUpdateManyWithoutTrainerNestedInput
   pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUncheckedUpdateManyWithoutTrainerNestedInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressUncheckedUpdateManyWithoutTrainerNestedInput
+}
+
+export type PokemonTrainerCreateWithoutTrainerBattleProgressInput = {
+  id: string
+  displayName: string
+  avatarId: string
+  worldMapId?: string | null
+  worldX?: number | null
+  worldY?: number | null
+  worldDirection?: string | null
+  recoveryMapId?: string | null
+  recoveryX?: number | null
+  recoveryY?: number | null
+  recoveryDirection?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  account: Prisma.AccountCreateNestedOneWithoutTrainersInput
+  pokemonInstances?: Prisma.PokemonInstanceCreateNestedManyWithoutTrainerInput
+  inventoryItems?: Prisma.PokemonTrainerInventoryItemCreateNestedManyWithoutTrainerInput
+  pendingMoveLearning?: Prisma.PokemonPendingMoveLearningCreateNestedManyWithoutTrainerInput
+  pendingEvolutions?: Prisma.PokemonPendingEvolutionCreateNestedManyWithoutTrainerInput
+}
+
+export type PokemonTrainerUncheckedCreateWithoutTrainerBattleProgressInput = {
+  id: string
+  accountId: string
+  displayName: string
+  avatarId: string
+  worldMapId?: string | null
+  worldX?: number | null
+  worldY?: number | null
+  worldDirection?: string | null
+  recoveryMapId?: string | null
+  recoveryX?: number | null
+  recoveryY?: number | null
+  recoveryDirection?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  pokemonInstances?: Prisma.PokemonInstanceUncheckedCreateNestedManyWithoutTrainerInput
+  inventoryItems?: Prisma.PokemonTrainerInventoryItemUncheckedCreateNestedManyWithoutTrainerInput
+  pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUncheckedCreateNestedManyWithoutTrainerInput
+  pendingEvolutions?: Prisma.PokemonPendingEvolutionUncheckedCreateNestedManyWithoutTrainerInput
+}
+
+export type PokemonTrainerCreateOrConnectWithoutTrainerBattleProgressInput = {
+  where: Prisma.PokemonTrainerWhereUniqueInput
+  create: Prisma.XOR<Prisma.PokemonTrainerCreateWithoutTrainerBattleProgressInput, Prisma.PokemonTrainerUncheckedCreateWithoutTrainerBattleProgressInput>
+}
+
+export type PokemonTrainerUpsertWithoutTrainerBattleProgressInput = {
+  update: Prisma.XOR<Prisma.PokemonTrainerUpdateWithoutTrainerBattleProgressInput, Prisma.PokemonTrainerUncheckedUpdateWithoutTrainerBattleProgressInput>
+  create: Prisma.XOR<Prisma.PokemonTrainerCreateWithoutTrainerBattleProgressInput, Prisma.PokemonTrainerUncheckedCreateWithoutTrainerBattleProgressInput>
+  where?: Prisma.PokemonTrainerWhereInput
+}
+
+export type PokemonTrainerUpdateToOneWithWhereWithoutTrainerBattleProgressInput = {
+  where?: Prisma.PokemonTrainerWhereInput
+  data: Prisma.XOR<Prisma.PokemonTrainerUpdateWithoutTrainerBattleProgressInput, Prisma.PokemonTrainerUncheckedUpdateWithoutTrainerBattleProgressInput>
+}
+
+export type PokemonTrainerUpdateWithoutTrainerBattleProgressInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarId?: Prisma.StringFieldUpdateOperationsInput | string
+  worldMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  account?: Prisma.AccountUpdateOneRequiredWithoutTrainersNestedInput
+  pokemonInstances?: Prisma.PokemonInstanceUpdateManyWithoutTrainerNestedInput
+  inventoryItems?: Prisma.PokemonTrainerInventoryItemUpdateManyWithoutTrainerNestedInput
+  pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUpdateManyWithoutTrainerNestedInput
+  pendingEvolutions?: Prisma.PokemonPendingEvolutionUpdateManyWithoutTrainerNestedInput
+}
+
+export type PokemonTrainerUncheckedUpdateWithoutTrainerBattleProgressInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accountId?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarId?: Prisma.StringFieldUpdateOperationsInput | string
+  worldMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  worldX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  worldY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  worldDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryMapId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recoveryX?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryY?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  recoveryDirection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pokemonInstances?: Prisma.PokemonInstanceUncheckedUpdateManyWithoutTrainerNestedInput
+  inventoryItems?: Prisma.PokemonTrainerInventoryItemUncheckedUpdateManyWithoutTrainerNestedInput
+  pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUncheckedUpdateManyWithoutTrainerNestedInput
+  pendingEvolutions?: Prisma.PokemonPendingEvolutionUncheckedUpdateManyWithoutTrainerNestedInput
 }
 
 export type PokemonTrainerCreateManyAccountInput = {
@@ -1220,6 +1359,7 @@ export type PokemonTrainerUpdateWithoutAccountInput = {
   inventoryItems?: Prisma.PokemonTrainerInventoryItemUpdateManyWithoutTrainerNestedInput
   pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUpdateManyWithoutTrainerNestedInput
   pendingEvolutions?: Prisma.PokemonPendingEvolutionUpdateManyWithoutTrainerNestedInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressUpdateManyWithoutTrainerNestedInput
 }
 
 export type PokemonTrainerUncheckedUpdateWithoutAccountInput = {
@@ -1240,6 +1380,7 @@ export type PokemonTrainerUncheckedUpdateWithoutAccountInput = {
   inventoryItems?: Prisma.PokemonTrainerInventoryItemUncheckedUpdateManyWithoutTrainerNestedInput
   pendingMoveLearning?: Prisma.PokemonPendingMoveLearningUncheckedUpdateManyWithoutTrainerNestedInput
   pendingEvolutions?: Prisma.PokemonPendingEvolutionUncheckedUpdateManyWithoutTrainerNestedInput
+  trainerBattleProgress?: Prisma.PokemonTrainerBattleProgressUncheckedUpdateManyWithoutTrainerNestedInput
 }
 
 export type PokemonTrainerUncheckedUpdateManyWithoutAccountInput = {
@@ -1268,6 +1409,7 @@ export type PokemonTrainerCountOutputType = {
   inventoryItems: number
   pendingMoveLearning: number
   pendingEvolutions: number
+  trainerBattleProgress: number
 }
 
 export type PokemonTrainerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1275,6 +1417,7 @@ export type PokemonTrainerCountOutputTypeSelect<ExtArgs extends runtime.Types.Ex
   inventoryItems?: boolean | PokemonTrainerCountOutputTypeCountInventoryItemsArgs
   pendingMoveLearning?: boolean | PokemonTrainerCountOutputTypeCountPendingMoveLearningArgs
   pendingEvolutions?: boolean | PokemonTrainerCountOutputTypeCountPendingEvolutionsArgs
+  trainerBattleProgress?: boolean | PokemonTrainerCountOutputTypeCountTrainerBattleProgressArgs
 }
 
 /**
@@ -1315,6 +1458,13 @@ export type PokemonTrainerCountOutputTypeCountPendingEvolutionsArgs<ExtArgs exte
   where?: Prisma.PokemonPendingEvolutionWhereInput
 }
 
+/**
+ * PokemonTrainerCountOutputType without action
+ */
+export type PokemonTrainerCountOutputTypeCountTrainerBattleProgressArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PokemonTrainerBattleProgressWhereInput
+}
+
 
 export type PokemonTrainerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1336,6 +1486,7 @@ export type PokemonTrainerSelect<ExtArgs extends runtime.Types.Extensions.Intern
   inventoryItems?: boolean | Prisma.PokemonTrainer$inventoryItemsArgs<ExtArgs>
   pendingMoveLearning?: boolean | Prisma.PokemonTrainer$pendingMoveLearningArgs<ExtArgs>
   pendingEvolutions?: boolean | Prisma.PokemonTrainer$pendingEvolutionsArgs<ExtArgs>
+  trainerBattleProgress?: boolean | Prisma.PokemonTrainer$trainerBattleProgressArgs<ExtArgs>
   _count?: boolean | Prisma.PokemonTrainerCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["pokemonTrainer"]>
 
@@ -1399,6 +1550,7 @@ export type PokemonTrainerInclude<ExtArgs extends runtime.Types.Extensions.Inter
   inventoryItems?: boolean | Prisma.PokemonTrainer$inventoryItemsArgs<ExtArgs>
   pendingMoveLearning?: boolean | Prisma.PokemonTrainer$pendingMoveLearningArgs<ExtArgs>
   pendingEvolutions?: boolean | Prisma.PokemonTrainer$pendingEvolutionsArgs<ExtArgs>
+  trainerBattleProgress?: boolean | Prisma.PokemonTrainer$trainerBattleProgressArgs<ExtArgs>
   _count?: boolean | Prisma.PokemonTrainerCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PokemonTrainerIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1416,6 +1568,7 @@ export type $PokemonTrainerPayload<ExtArgs extends runtime.Types.Extensions.Inte
     inventoryItems: Prisma.$PokemonTrainerInventoryItemPayload<ExtArgs>[]
     pendingMoveLearning: Prisma.$PokemonPendingMoveLearningPayload<ExtArgs>[]
     pendingEvolutions: Prisma.$PokemonPendingEvolutionPayload<ExtArgs>[]
+    trainerBattleProgress: Prisma.$PokemonTrainerBattleProgressPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1831,6 +1984,7 @@ export interface Prisma__PokemonTrainerClient<T, Null = never, ExtArgs extends r
   inventoryItems<T extends Prisma.PokemonTrainer$inventoryItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PokemonTrainer$inventoryItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PokemonTrainerInventoryItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pendingMoveLearning<T extends Prisma.PokemonTrainer$pendingMoveLearningArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PokemonTrainer$pendingMoveLearningArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PokemonPendingMoveLearningPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pendingEvolutions<T extends Prisma.PokemonTrainer$pendingEvolutionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PokemonTrainer$pendingEvolutionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PokemonPendingEvolutionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  trainerBattleProgress<T extends Prisma.PokemonTrainer$trainerBattleProgressArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PokemonTrainer$trainerBattleProgressArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PokemonTrainerBattleProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2368,6 +2522,30 @@ export type PokemonTrainer$pendingEvolutionsArgs<ExtArgs extends runtime.Types.E
   take?: number
   skip?: number
   distinct?: Prisma.PokemonPendingEvolutionScalarFieldEnum | Prisma.PokemonPendingEvolutionScalarFieldEnum[]
+}
+
+/**
+ * PokemonTrainer.trainerBattleProgress
+ */
+export type PokemonTrainer$trainerBattleProgressArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PokemonTrainerBattleProgress
+   */
+  select?: Prisma.PokemonTrainerBattleProgressSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PokemonTrainerBattleProgress
+   */
+  omit?: Prisma.PokemonTrainerBattleProgressOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PokemonTrainerBattleProgressInclude<ExtArgs> | null
+  where?: Prisma.PokemonTrainerBattleProgressWhereInput
+  orderBy?: Prisma.PokemonTrainerBattleProgressOrderByWithRelationInput | Prisma.PokemonTrainerBattleProgressOrderByWithRelationInput[]
+  cursor?: Prisma.PokemonTrainerBattleProgressWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PokemonTrainerBattleProgressScalarFieldEnum | Prisma.PokemonTrainerBattleProgressScalarFieldEnum[]
 }
 
 /**

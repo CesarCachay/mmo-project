@@ -1,4 +1,8 @@
-import type { BattleInstance, BattleParticipantId } from '@cesar-mmo/shared';
+import type {
+  BattleInstance,
+  BattleParticipantId,
+  PokemonTrainerBattleId,
+} from '@cesar-mmo/shared';
 
 import type { PokemonTrainerId } from '../pokemon-trainer-identity';
 
@@ -12,20 +16,28 @@ export interface PokemonBattleTrainerBinding extends PokemonBattleTrainerBinding
   readonly participatingPokemonInstanceIds: Set<string>;
 }
 
+export interface PokemonTrainerBattleSessionContext {
+  readonly npcId: string;
+  readonly trainerBattleId: PokemonTrainerBattleId;
+  readonly opponentParticipantId: BattleParticipantId;
+}
+
 export interface PokemonBattleSession {
   readonly battle: BattleInstance;
   readonly trainerBindings: readonly PokemonBattleTrainerBinding[];
+  readonly trainerBattle?: PokemonTrainerBattleSessionContext;
 }
 
 export interface CreatePokemonBattleSessionInput {
   readonly battle: BattleInstance;
   readonly trainerBindings: readonly PokemonBattleTrainerBindingInput[];
+  readonly trainerBattle?: PokemonTrainerBattleSessionContext;
 }
 
 export function createPokemonBattleSession(
   input: CreatePokemonBattleSessionInput,
 ): PokemonBattleSession {
-  const { battle, trainerBindings } = input;
+  const { battle, trainerBindings, trainerBattle } = input;
 
   if (battle.battleId.trim().length === 0) {
     throw new Error('Cannot create battle session with an empty battleId');
@@ -100,9 +112,40 @@ export function createPokemonBattleSession(
     });
   }
 
+  if (battle.type === 'trainer') {
+    if (!trainerBattle) {
+      throw new Error(
+        `Trainer Battle "${battle.battleId}" requires Trainer Battle session context`,
+      );
+    }
+
+    const opponentParticipant = battle.participants.find(
+      (participant) => participant.id === trainerBattle.opponentParticipantId,
+    );
+
+    if (!opponentParticipant || opponentParticipant.type !== 'trainer') {
+      throw new Error(
+        `Trainer Battle opponent participant "${trainerBattle.opponentParticipantId}" not found in battle "${battle.battleId}"`,
+      );
+    }
+
+    if (normalizedBindings.some(
+      (binding) => binding.participantId === opponentParticipant.id,
+    )) {
+      throw new Error(
+        `Trainer Battle opponent participant "${opponentParticipant.id}" cannot be player-bound`,
+      );
+    }
+  } else if (trainerBattle) {
+    throw new Error(
+      `Wild Battle "${battle.battleId}" cannot contain Trainer Battle session context`,
+    );
+  }
+
   return {
     battle,
     trainerBindings: normalizedBindings,
+    ...(trainerBattle ? { trainerBattle } : {}),
   };
 }
 

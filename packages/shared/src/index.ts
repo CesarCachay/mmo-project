@@ -191,6 +191,12 @@ export type {
   PokemonTrainerBattlePokemonDefinition,
   PokemonTrainerBattleDefinition,
 } from "./pokemon/trainers/pokemon-trainer-battle.types.js";
+export {
+  isPokemonTrainerBattleStartInput,
+} from "./pokemon/trainers/pokemon-trainer-battle-network.js";
+export type {
+  PokemonTrainerBattleStartInput,
+} from "./pokemon/trainers/pokemon-trainer-battle-network.js";
 export { validatePokemonTrainerBattleDefinition } from "./pokemon/trainers/pokemon-trainer-battle.validation.js";
 export type { PokemonTrainerBattleValidationIssue } from "./pokemon/trainers/pokemon-trainer-battle.validation.js";
 export { checkPokemonTrainerSight } from "./pokemon/trainers/pokemon-trainer-sight.js";
@@ -229,6 +235,7 @@ export {
   isTrainerBattleInstance,
 } from "./pokemon/battles/pokemon-battle-lifecycle.js";
 export {
+  isPokemonBattleInstance,
   isPokemonBattleStartedPayload,
   isPokemonBattleCommandInput,
 } from "./pokemon/battles/pokemon-battle-network.js";
@@ -236,17 +243,31 @@ export type {
   PokemonBattleStartedPayload,
   PokemonBattleCommandInput,
 } from "./pokemon/battles/pokemon-battle-network.js";
-export { createBattleCommand } from "./pokemon/battles/pokemon-battle-command.js";
+export {
+  createBattleCommand,
+  POKEMON_STRUGGLE_MOVE_ID,
+} from "./pokemon/battles/pokemon-battle-command.js";
 export type {
   BattleUseMoveAction,
   BattleCommandAction,
   BattleRunAction,
+  BattleStruggleAction,
   BattleUseItemAction,
   BattleUseItemTarget,
   BattleCommand,
   CreateBattleCommandInput,
   BattleSwitchPokemonAction,
 } from "./pokemon/battles/pokemon-battle-command.js";
+export {
+  evaluatePokemonBattleRunRule,
+  evaluatePokemonBattleItemRule,
+  evaluatePokemonBattleCommandActionRule,
+  assertPokemonBattleCommandActionAllowed,
+} from "./pokemon/battles/pokemon-battle-rules.js";
+export type {
+  PokemonBattleRuleDecision,
+  PokemonBattleRuleRejectionReason,
+} from "./pokemon/battles/pokemon-battle-rules.js";
 export { BattleTurn, BattleTurnNumber } from "./pokemon/battles/pokemon-battle-turn.js";
 export {
   createBattleTurn,
@@ -297,6 +318,8 @@ export {
 } from "./pokemon/battles/pokemon-battle-participant-defeat.js";
 export { resolveWildBattleContinuationOutcome } from "./pokemon/battles/pokemon-battle-continuation.js";
 export type { WildBattleContinuationOutcome } from "./pokemon/battles/pokemon-battle-continuation.js";
+export { resolveTrainerBattleContinuationOutcome } from "./pokemon/battles/pokemon-trainer-battle-continuation.js";
+export type { TrainerBattleContinuationOutcome } from "./pokemon/battles/pokemon-trainer-battle-continuation.js";
 export { replaceFaintedTrainerBattlePokemon } from "./pokemon/battles/pokemon-battle-participant-replacement.js";
 export type { BattleTrainerPokemonReplacementResult } from "./pokemon/battles/pokemon-battle-participant-replacement.js";
 export { calculateBattleNonHpStat } from "./pokemon/battles/pokemon-battle-stat.js";

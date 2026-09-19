@@ -24,6 +24,7 @@ export class ModernBattleStage {
   private readonly commandArea: HTMLDivElement;
   private readonly trainerPlatform: HTMLDivElement;
   private readonly wildPlatform: HTMLDivElement;
+  private readonly label: HTMLDivElement;
 
   constructor(parent: HTMLElement) {
     this.root = document.createElement("div");
@@ -72,13 +73,38 @@ export class ModernBattleStage {
 
     this.commandArea.appendChild(commandGlow);
 
-    const label = document.createElement("div");
+    this.label = document.createElement("div");
 
-    label.className = "battle-modern-stage__label";
+    this.label.className = "battle-modern-stage__label";
 
-    label.textContent = "WILD BATTLE";
-    this.root.append(backdrop, glow, this.battlefield, this.commandArea, label);
+    this.label.textContent = "WILD BATTLE";
+    this.root.append(
+      backdrop,
+      glow,
+      this.battlefield,
+      this.commandArea,
+      this.label,
+    );
     parent.appendChild(this.root);
+  }
+
+  public setBattleContext(
+    type: "wild" | "trainer",
+    opponentName?: string,
+  ): void {
+    const safeOpponentName = opponentName?.trim();
+
+    this.root.classList.toggle("battle-modern-stage--trainer", type === "trainer");
+    this.root.classList.toggle("battle-modern-stage--wild", type === "wild");
+
+    if (type === "trainer") {
+      this.label.textContent = safeOpponentName
+        ? `TRAINER BATTLE · ${safeOpponentName.toUpperCase()}`
+        : "TRAINER BATTLE";
+      return;
+    }
+
+    this.label.textContent = "WILD BATTLE";
   }
 
   public setLayout(layout: ModernBattleStageLayout): void {

@@ -30,6 +30,9 @@ export class ModernBattleActionMenu {
 
   private readonly callbacks: ModernBattleActionMenuCallbacks;
 
+  private enabled = true;
+  private runAllowed = true;
+
   constructor(parent: HTMLElement, callbacks: ModernBattleActionMenuCallbacks) {
     this.callbacks = callbacks;
 
@@ -113,14 +116,37 @@ export class ModernBattleActionMenu {
   }
 
   public setEnabled(enabled: boolean): void {
-    this.fightButton.disabled = !enabled;
-    this.pokemonButton.disabled = !enabled;
-    this.itemButton.disabled = !enabled;
-    this.runButton.disabled = !enabled;
+    this.enabled = enabled;
+    this.syncButtonState();
+  }
+
+  public setRunAvailability(allowed: boolean, reason?: string): void {
+    this.runAllowed = allowed;
+
+    if (allowed) {
+      this.runButton.textContent = "RUN";
+      this.runButton.removeAttribute("title");
+      this.runButton.removeAttribute("aria-label");
+      this.runButton.removeAttribute("data-rule-reason");
+    } else {
+      const message = reason?.trim() || "Run is not available in this battle.";
+
+      this.runButton.textContent = "RUN ✕";
+      this.runButton.title = message;
+      this.runButton.setAttribute("aria-label", `RUN — ${message}`);
+      this.runButton.dataset.ruleReason = message;
+    }
+
+    this.syncButtonState();
   }
 
   public clear(): void {
     this.prompt.textContent = "What will your Pokémon do?";
+    this.runAllowed = true;
+    this.runButton.textContent = "RUN";
+    this.runButton.removeAttribute("title");
+    this.runButton.removeAttribute("aria-label");
+    this.runButton.removeAttribute("data-rule-reason");
 
     this.setEnabled(true);
     this.setVisible(false);
@@ -128,6 +154,15 @@ export class ModernBattleActionMenu {
 
   public destroy(): void {
     this.root.remove();
+  }
+
+  private syncButtonState(): void {
+    const globallyDisabled = !this.enabled;
+
+    this.fightButton.disabled = globallyDisabled;
+    this.pokemonButton.disabled = globallyDisabled;
+    this.itemButton.disabled = globallyDisabled;
+    this.runButton.disabled = globallyDisabled || !this.runAllowed;
   }
 
   private createButton(

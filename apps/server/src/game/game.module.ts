@@ -28,6 +28,8 @@ import { PokemonPendingEvolutionRepository } from '#app/pokemon/evolution/pokemo
 import { PokemonPendingEvolutionStore } from '#app/pokemon/evolution/pokemon-pending-evolution.store';
 import { PokemonEvolutionDecisionService } from '#app/pokemon/evolution/pokemon-evolution-decision.service';
 import { PokemonPendingEvolutionRecoveryService } from '#app/pokemon/evolution/pokemon-pending-evolution-recovery.service';
+import { PokemonTrainerBattleProgressRepository } from '#app/pokemon/battles/pokemon-trainer-battle-progress.repository';
+import { PokemonTrainerBattleVictoryService } from '#app/pokemon/battles/pokemon-trainer-battle-victory.service';
 
 // accounts
 import { AccountService } from '#app/account/account.service';
@@ -101,6 +103,8 @@ import { GameGateway } from './game.gateway';
     PokemonPendingEvolutionStore,
     PokemonEvolutionDecisionService,
     PokemonPendingEvolutionRecoveryService,
+    PokemonTrainerBattleProgressRepository,
+    PokemonTrainerBattleVictoryService,
     AccountService,
     AccountRepository,
     AccountTrainerService,

@@ -1,5 +1,6 @@
 import {
   replaceFaintedTrainerBattlePokemon,
+  resolveTrainerBattleContinuationOutcome,
   resolveWildBattleContinuationOutcome,
 } from '@cesar-mmo/shared';
 
@@ -33,8 +34,7 @@ export function applyPokemonTrainerBattleReplacement(
 ): PokemonTrainerBattleReplacementRuntimeResult {
   const { session, playerId, replacementPokemonIndex, battleTurnStore } = input;
 
-  // 1. Resolve owner binding.
-
+  // 1. Resolve the authoritative local Trainer binding.
   const trainerBinding = session.trainerBindings.find(
     (binding) => binding.playerId === playerId,
   );
@@ -45,35 +45,38 @@ export function applyPokemonTrainerBattleReplacement(
     );
   }
 
-  // 2. Battle must currently require
-  // Trainer replacement.
+  // 2. Resolve replacement candidates from the correct battle domain.
+  const continuationBefore =
+    session.battle.type === 'trainer'
+      ? resolveTrainerBattleContinuationOutcome(
+          session.battle,
+          trainerBinding.participantId,
+        )
+      : resolveWildBattleContinuationOutcome(session.battle);
 
-  const continuationBefore = resolveWildBattleContinuationOutcome(
-    session.battle,
-  );
+  const replacementPokemonIndexes =
+    session.battle.type === 'trainer'
+      ? continuationBefore.type === 'player-replacement-required'
+        ? continuationBefore.replacementPokemonIndexes
+        : null
+      : continuationBefore.type === 'trainer-replacement-required'
+        ? continuationBefore.replacementPokemonIndexes
+        : null;
 
-  if (continuationBefore.type !== 'trainer-replacement-required') {
+  if (!replacementPokemonIndexes) {
     throw new Error(
-      `Battle "${session.battle.battleId}" does not require Trainer replacement`,
+      `Battle "${session.battle.battleId}" does not require local Trainer replacement`,
     );
   }
 
-  // 3. Requested index must be one of
-  // the server-computed candidates.
-
-  if (
-    !continuationBefore.replacementPokemonIndexes.includes(
-      replacementPokemonIndex,
-    )
-  ) {
+  // 3. Requested index must be one of the server-computed candidates.
+  if (!replacementPokemonIndexes.includes(replacementPokemonIndex)) {
     throw new Error(
       `Replacement Pokémon index "${replacementPokemonIndex}" is not available for battle "${session.battle.battleId}"`,
     );
   }
 
-  // 4. Resolve authoritative Trainer
-  // participant through server binding.
-
+  // 4. Resolve the authoritative local Trainer participant through the server binding.
   const trainerParticipant = session.battle.participants.find(
     (participant) => participant.id === trainerBinding.participantId,
   );
@@ -87,7 +90,6 @@ export function applyPokemonTrainerBattleReplacement(
   assertTrainerParticipant(trainerParticipant);
 
   // 5. Domain mutation.
-
   const replacementResult = replaceFaintedTrainerBattlePokemon(
     trainerParticipant,
     replacementPokemonIndex,
@@ -99,21 +101,22 @@ export function applyPokemonTrainerBattleReplacement(
     replacementResult.activePokemon.pokemon.instanceId,
   );
 
-  // 6. Replacement must return Battle
-  // to normal continuation.
-
-  const continuationAfter = resolveWildBattleContinuationOutcome(
-    session.battle,
-  );
+  // 6. A local forced replacement must restore normal continuation.
+  const continuationAfter =
+    session.battle.type === 'trainer'
+      ? resolveTrainerBattleContinuationOutcome(
+          session.battle,
+          trainerBinding.participantId,
+        )
+      : resolveWildBattleContinuationOutcome(session.battle);
 
   if (continuationAfter.type !== 'continue') {
     throw new Error(
-      `Battle "${session.battle.battleId}" did not return to continue after Trainer replacement`,
+      `Battle "${session.battle.battleId}" did not return to continue after local Trainer replacement; continuation is "${continuationAfter.type}"`,
     );
   }
 
-  // 7. Turn N was already resolved and
-  // retained while waiting for replacement.
+  // 7. Turn N was already fully resolved and retained while waiting for replacement.
   const nextTurn = battleTurnStore.advance(session.battle);
 
   return {

@@ -405,7 +405,8 @@ export const ModelName = {
   PokemonInstanceMove: 'PokemonInstanceMove',
   PokemonPendingMoveLearning: 'PokemonPendingMoveLearning',
   PokemonTrainerInventoryItem: 'PokemonTrainerInventoryItem',
-  PokemonPendingEvolution: 'PokemonPendingEvolution'
+  PokemonPendingEvolution: 'PokemonPendingEvolution',
+  PokemonTrainerBattleProgress: 'PokemonTrainerBattleProgress'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -421,7 +422,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "accountSession" | "accountPasswordCredential" | "pokemonTrainer" | "pokemonInstance" | "pokemonInstanceMove" | "pokemonPendingMoveLearning" | "pokemonTrainerInventoryItem" | "pokemonPendingEvolution"
+    modelProps: "account" | "accountSession" | "accountPasswordCredential" | "pokemonTrainer" | "pokemonInstance" | "pokemonInstanceMove" | "pokemonPendingMoveLearning" | "pokemonTrainerInventoryItem" | "pokemonPendingEvolution" | "pokemonTrainerBattleProgress"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1091,6 +1092,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PokemonTrainerBattleProgress: {
+      payload: Prisma.$PokemonTrainerBattleProgressPayload<ExtArgs>
+      fields: Prisma.PokemonTrainerBattleProgressFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PokemonTrainerBattleProgressFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerBattleProgressPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PokemonTrainerBattleProgressFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerBattleProgressPayload>
+        }
+        findFirst: {
+          args: Prisma.PokemonTrainerBattleProgressFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerBattleProgressPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PokemonTrainerBattleProgressFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerBattleProgressPayload>
+        }
+        findMany: {
+          args: Prisma.PokemonTrainerBattleProgressFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerBattleProgressPayload>[]
+        }
+        create: {
+          args: Prisma.PokemonTrainerBattleProgressCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerBattleProgressPayload>
+        }
+        createMany: {
+          args: Prisma.PokemonTrainerBattleProgressCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PokemonTrainerBattleProgressCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerBattleProgressPayload>[]
+        }
+        delete: {
+          args: Prisma.PokemonTrainerBattleProgressDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerBattleProgressPayload>
+        }
+        update: {
+          args: Prisma.PokemonTrainerBattleProgressUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerBattleProgressPayload>
+        }
+        deleteMany: {
+          args: Prisma.PokemonTrainerBattleProgressDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PokemonTrainerBattleProgressUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PokemonTrainerBattleProgressUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerBattleProgressPayload>[]
+        }
+        upsert: {
+          args: Prisma.PokemonTrainerBattleProgressUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerBattleProgressPayload>
+        }
+        aggregate: {
+          args: Prisma.PokemonTrainerBattleProgressAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePokemonTrainerBattleProgress>
+        }
+        groupBy: {
+          args: Prisma.PokemonTrainerBattleProgressGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PokemonTrainerBattleProgressGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PokemonTrainerBattleProgressCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PokemonTrainerBattleProgressCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1252,6 +1327,15 @@ export const PokemonPendingEvolutionScalarFieldEnum = {
 } as const
 
 export type PokemonPendingEvolutionScalarFieldEnum = (typeof PokemonPendingEvolutionScalarFieldEnum)[keyof typeof PokemonPendingEvolutionScalarFieldEnum]
+
+
+export const PokemonTrainerBattleProgressScalarFieldEnum = {
+  trainerId: 'trainerId',
+  trainerBattleId: 'trainerBattleId',
+  defeatedAt: 'defeatedAt'
+} as const
+
+export type PokemonTrainerBattleProgressScalarFieldEnum = (typeof PokemonTrainerBattleProgressScalarFieldEnum)[keyof typeof PokemonTrainerBattleProgressScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1543,6 +1627,7 @@ export type GlobalOmitConfig = {
   pokemonPendingMoveLearning?: Prisma.PokemonPendingMoveLearningOmit
   pokemonTrainerInventoryItem?: Prisma.PokemonTrainerInventoryItemOmit
   pokemonPendingEvolution?: Prisma.PokemonPendingEvolutionOmit
+  pokemonTrainerBattleProgress?: Prisma.PokemonTrainerBattleProgressOmit
 }
 
 /* Types for Logging */

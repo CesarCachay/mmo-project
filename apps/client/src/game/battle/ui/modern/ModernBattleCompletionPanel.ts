@@ -9,6 +9,8 @@ interface ModernBattleCompletionPanelOptions {
 export class ModernBattleCompletionPanel {
   private readonly root: HTMLDivElement;
   private readonly card: HTMLDivElement;
+  private readonly icon: HTMLDivElement;
+  private readonly effects: HTMLDivElement;
   private readonly eyebrow: HTMLDivElement;
   private readonly title: HTMLDivElement;
   private readonly message: HTMLDivElement;
@@ -33,11 +35,21 @@ export class ModernBattleCompletionPanel {
       "battle-ui-modern__surface",
     ].join(" ");
 
-    const icon = document.createElement("div");
+    this.effects = document.createElement("div");
+    this.effects.className = "battle-modern-completion__effects";
+    this.effects.setAttribute("aria-hidden", "true");
 
-    icon.className = "battle-modern-completion__icon";
+    for (let index = 0; index < 12; index += 1) {
+      const particle = document.createElement("span");
+      particle.className = "battle-modern-completion__particle";
+      this.effects.appendChild(particle);
+    }
 
-    icon.textContent = "◆";
+    this.icon = document.createElement("div");
+
+    this.icon.className = "battle-modern-completion__icon";
+
+    this.icon.textContent = "◆";
 
     this.eyebrow = document.createElement("div");
 
@@ -73,22 +85,33 @@ export class ModernBattleCompletionPanel {
       options.onContinue();
     });
 
-    this.card.append(icon, this.eyebrow, this.title, this.message, this.continueButton);
-    this.root.append(backdrop, this.card);
+    this.card.append(
+      this.icon,
+      this.eyebrow,
+      this.title,
+      this.message,
+      this.continueButton,
+    );
+    this.root.append(backdrop, this.effects, this.card);
     parent.appendChild(this.root);
     this.hide();
   }
 
   public show(outcome: BattleCompletionOutcome): void {
+    this.continueButton.textContent = "Continue";
+
     this.root.classList.remove(
       "battle-modern-completion--victory",
       "battle-modern-completion--defeat",
-      "battle-modern-completion--captured"
+      "battle-modern-completion--captured",
+      "battle-modern-completion--escaped",
+      "battle-modern-completion--active",
     );
 
     switch (outcome) {
       case "wild-defeated":
         this.root.classList.add("battle-modern-completion--victory");
+        this.icon.textContent = "★";
         this.eyebrow.textContent = "BATTLE COMPLETE";
         this.title.textContent = "Victory!";
         this.message.textContent = "The wild Pokémon was defeated.";
@@ -96,12 +119,34 @@ export class ModernBattleCompletionPanel {
 
       case "trainer-defeated":
         this.root.classList.add("battle-modern-completion--defeat");
+        this.icon.textContent = "×";
         this.eyebrow.textContent = "BATTLE COMPLETE";
         this.title.textContent = "Defeat";
         this.message.textContent = "Your party can no longer continue the battle.";
         break;
 
+      case "trainer-battle-victory":
+        this.root.classList.add("battle-modern-completion--victory");
+        this.icon.textContent = "★";
+        this.eyebrow.textContent = "TRAINER BATTLE COMPLETE";
+        this.title.textContent = "Victory!";
+        this.message.textContent = "The opposing Trainer was defeated.";
+        break;
+
+      case "trainer-battle-defeat":
+        this.root.classList.add("battle-modern-completion--defeat");
+        this.icon.textContent = "×";
+        this.eyebrow.textContent = "TRAINER BATTLE COMPLETE";
+        this.title.textContent = "Defeated";
+        this.message.textContent =
+          "Your party can no longer continue. Recover at your last Pokémon Center.";
+        this.continueButton.textContent = "Recover";
+        break;
+
       case "trainer-escaped": {
+        this.root.classList.add("battle-modern-completion--escaped");
+        this.icon.textContent = "↗";
+        this.eyebrow.textContent = "BATTLE COMPLETE";
         this.title.textContent = "Escaped!";
         this.message.textContent = "You got away safely.";
         break;
@@ -109,6 +154,7 @@ export class ModernBattleCompletionPanel {
 
       case "wild-captured": {
         this.root.classList.add("battle-modern-completion--captured");
+        this.icon.textContent = "◆";
         this.eyebrow.textContent = "CAPTURE COMPLETE";
         this.title.textContent = "GOTCHA!";
         this.message.textContent = "The wild Pokémon was successfully captured.";
@@ -124,10 +170,13 @@ export class ModernBattleCompletionPanel {
 
     this.continueButton.disabled = false;
     this.root.hidden = false;
+    void this.root.offsetWidth;
+    this.root.classList.add("battle-modern-completion--active");
   }
 
   public hide(): void {
     this.root.hidden = true;
+    this.root.classList.remove("battle-modern-completion--active");
     this.continueButton.disabled = false;
   }
 

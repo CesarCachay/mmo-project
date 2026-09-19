@@ -47,6 +47,10 @@ export interface BattleParticipant {
   readonly id: BattleParticipantId;
   readonly type: BattleParticipantType;
   readonly side: BattleSide;
+
+  /** Optional presentation name for an owned roster (for example, an NPC Trainer). */
+  readonly displayName?: string;
+
   readonly pokemon: readonly BattlePokemonState[];
   activePokemonIndex: number;
 }

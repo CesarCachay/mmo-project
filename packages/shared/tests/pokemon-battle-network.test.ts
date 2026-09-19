@@ -24,12 +24,14 @@ function createParticipant(
   id: string,
   type: "trainer" | "wild",
   side: "side-a" | "side-b",
-  pokemonInstanceIds: readonly string[]
+  pokemonInstanceIds: readonly string[],
+  displayName?: string
 ) {
   return {
     id,
     type,
     side,
+    ...(displayName !== undefined ? { displayName } : {}),
     activePokemonIndex: 0,
     pokemon: pokemonInstanceIds.map((instanceId) => ({
       pokemon: createPokemon(instanceId),
@@ -50,6 +52,7 @@ describe("isPokemonBattleStartedPayload", () => {
           createParticipant("wild-b", "wild", "side-b", ["wild-1"]),
         ],
       },
+      localParticipantId: "trainer-a",
     };
 
     expect(isPokemonBattleStartedPayload(payload)).toBe(true);
@@ -66,6 +69,7 @@ describe("isPokemonBattleStartedPayload", () => {
           createParticipant("trainer-b", "trainer", "side-b", ["npc-1", "npc-2"]),
         ],
       },
+      localParticipantId: "trainer-a",
     };
 
     expect(isPokemonBattleStartedPayload(payload)).toBe(true);
@@ -82,6 +86,7 @@ describe("isPokemonBattleStartedPayload", () => {
           createParticipant("wild-b", "wild", "side-b", ["wild-1"]),
         ],
       },
+      localParticipantId: "trainer-a",
     };
 
     expect(isPokemonBattleStartedPayload(payload)).toBe(false);
@@ -98,6 +103,7 @@ describe("isPokemonBattleStartedPayload", () => {
           createParticipant("trainer-b", "trainer", "side-a", ["npc-1"]),
         ],
       },
+      localParticipantId: "trainer-a",
     };
 
     expect(isPokemonBattleStartedPayload(payload)).toBe(false);
@@ -114,8 +120,72 @@ describe("isPokemonBattleStartedPayload", () => {
           createParticipant("trainer", "trainer", "side-b", ["npc-1"]),
         ],
       },
+      localParticipantId: "trainer",
     };
 
     expect(isPokemonBattleStartedPayload(payload)).toBe(false);
   });
+  it("rejects a localParticipantId that does not identify a trainer participant", () => {
+    const payload = {
+      battle: {
+        battleId: "battle-wild-invalid-local",
+        type: "wild",
+        status: "active",
+        participants: [
+          createParticipant("trainer-a", "trainer", "side-a", ["party-1"]),
+          createParticipant("wild-b", "wild", "side-b", ["wild-1"]),
+        ],
+      },
+      localParticipantId: "wild-b",
+    };
+
+    expect(isPokemonBattleStartedPayload(payload)).toBe(false);
+  });
+
+  it("accepts a non-empty participant displayName", () => {
+    const payload = {
+      battle: {
+        battleId: "battle-trainer-display-name",
+        type: "trainer",
+        status: "active",
+        participants: [
+          createParticipant("trainer-a", "trainer", "side-a", ["party-1"]),
+          createParticipant(
+            "trainer-b",
+            "trainer",
+            "side-b",
+            ["npc-1"],
+            "Gary"
+          ),
+        ],
+      },
+      localParticipantId: "trainer-a",
+    };
+
+    expect(isPokemonBattleStartedPayload(payload)).toBe(true);
+  });
+
+  it("rejects an invalid participant displayName", () => {
+    const payload = {
+      battle: {
+        battleId: "battle-trainer-invalid-display-name",
+        type: "trainer",
+        status: "active",
+        participants: [
+          createParticipant("trainer-a", "trainer", "side-a", ["party-1"]),
+          createParticipant(
+            "trainer-b",
+            "trainer",
+            "side-b",
+            ["npc-1"],
+            "   "
+          ),
+        ],
+      },
+      localParticipantId: "trainer-a",
+    };
+
+    expect(isPokemonBattleStartedPayload(payload)).toBe(false);
+  });
+
 });

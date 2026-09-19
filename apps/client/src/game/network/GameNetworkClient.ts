@@ -69,6 +69,7 @@ import type {
   PokemonCenterHealInput,
   PokemonCenterHealedPayload,
   PokemonCenterHealingErrorPayload,
+  PokemonTrainerBattleStartInput,
 } from "@cesar-mmo/shared";
 
 // deploy
@@ -108,6 +109,16 @@ export class GameNetworkClient {
     this.socket.disconnect();
   }
 
+  public destroy(): void {
+    /*
+     * Scene teardown must not leave Socket.IO listeners attached to an old
+     * GameScene instance. Remove listeners before disconnecting so an
+     * intentional teardown is not reported as a transient connection loss.
+     */
+    this.socket.removeAllListeners();
+    this.socket.disconnect();
+  }
+
   public onConnectionRejected(callback: (error: ConnectionRejectedError) => void): void {
     this.socket.on("connectionRejected", callback);
   }
@@ -116,6 +127,18 @@ export class GameNetworkClient {
     this.socket.on("connect", () => {
       callback(this.socket.id);
     });
+  }
+
+  public onDisconnect(callback: (reason: string) => void): () => void {
+    const handler = (reason: string): void => {
+      callback(reason);
+    };
+
+    this.socket.on("disconnect", handler);
+
+    return () => {
+      this.socket.off("disconnect", handler);
+    };
   }
 
   public onChatMessage(callback: (message: ChatMessage) => void): void {
@@ -294,6 +317,10 @@ export class GameNetworkClient {
     this.socket.emit(POKEMON_EVENTS.BATTLE_REPLACEMENT, input);
   }
 
+  public requestBlackoutRecovery(): void {
+    this.socket.emit(POKEMON_EVENTS.BLACKOUT_RECOVERY_REQUEST);
+  }
+
   public onBattleReplacementResolved(
     callback: (payload: PokemonBattleReplacementResolvedPayload) => void
   ): void {
@@ -449,6 +476,15 @@ export class GameNetworkClient {
 
   public cancelDialogue(): void {
     this.socket.emit(DIALOGUE_EVENTS.CANCEL);
+  }
+
+
+  public startTrainerBattle(npcId: string): void {
+    const payload: PokemonTrainerBattleStartInput = {
+      npcId,
+    };
+
+    this.socket.emit(POKEMON_EVENTS.TRAINER_BATTLE_START, payload);
   }
 
   public onBattleStarted(

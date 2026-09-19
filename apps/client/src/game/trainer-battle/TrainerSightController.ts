@@ -21,6 +21,7 @@ export class TrainerSightController {
   private alertText?: Phaser.GameObjects.Text;
   private alertTimer?: Phaser.Time.TimerEvent;
   private alertBlocking = false;
+  private defeatedTrainerBattleIds = new Set<string>();
 
   constructor(
     scene: Phaser.Scene,
@@ -34,6 +35,21 @@ export class TrainerSightController {
 
   public get isBlockingGameplay(): boolean {
     return this.alertBlocking;
+  }
+
+  public setDefeatedTrainerBattleIds(
+    trainerBattleIds: readonly string[],
+  ): void {
+    this.defeatedTrainerBattleIds = new Set(trainerBattleIds);
+
+    if (
+      this.activeNpc?.definition.trainerBattleId &&
+      this.defeatedTrainerBattleIds.has(
+        this.activeNpc.definition.trainerBattleId,
+      )
+    ) {
+      this.clear();
+    }
   }
 
   public update(
@@ -59,6 +75,15 @@ export class TrainerSightController {
     }
 
     for (const npc of this.npcManager.getTrainerBattleNpcs()) {
+      const trainerBattleId = npc.definition.trainerBattleId;
+
+      if (
+        trainerBattleId &&
+        this.defeatedTrainerBattleIds.has(trainerBattleId)
+      ) {
+        continue;
+      }
+
       if (!this.canNpcSeePlayer(npc, mapId, playerX, playerY)) {
         continue;
       }

@@ -11,6 +11,8 @@ vi.mock("socket.io-client", () => ({
     id: undefined,
     connected: false,
     on: vi.fn(),
+    off: vi.fn(),
+    removeAllListeners: vi.fn(),
     emit: vi.fn(),
     disconnect: vi.fn(),
   })),
@@ -109,4 +111,52 @@ describe("GameNetworkClient connection", () => {
 
     expect(onHealed).toHaveBeenCalledTimes(1);
   });
+  it("forwards disconnect reasons and can remove the listener", () => {
+    vi.stubEnv("VITE_API_URL", "http://server.test");
+
+    const client = new GameNetworkClient({
+      selectedTrainerId: "22222222-2222-4222-8222-222222222222",
+    });
+
+    const socket = vi.mocked(io).mock.results.at(-1)?.value;
+    if (!socket) {
+      throw new Error("Socket mock was not created");
+    }
+
+    const onDisconnect = vi.fn();
+    const dispose = client.onDisconnect(onDisconnect);
+
+    const registration = vi
+      .mocked(socket.on)
+      .mock.calls.find((call: unknown[]) => call[0] === "disconnect");
+
+    if (!registration || typeof registration[1] !== "function") {
+      throw new Error("disconnect listener was not registered");
+    }
+
+    registration[1]("transport close");
+    expect(onDisconnect).toHaveBeenCalledWith("transport close");
+
+    dispose();
+    expect(socket.off).toHaveBeenCalledWith("disconnect", registration[1]);
+  });
+
+  it("removes listeners before destroying the socket", () => {
+    vi.stubEnv("VITE_API_URL", "http://server.test");
+
+    const client = new GameNetworkClient({
+      selectedTrainerId: "22222222-2222-4222-8222-222222222222",
+    });
+
+    const socket = vi.mocked(io).mock.results.at(-1)?.value;
+    if (!socket) {
+      throw new Error("Socket mock was not created");
+    }
+
+    client.destroy();
+
+    expect(socket.removeAllListeners).toHaveBeenCalledOnce();
+    expect(socket.disconnect).toHaveBeenCalledOnce();
+  });
+
 });

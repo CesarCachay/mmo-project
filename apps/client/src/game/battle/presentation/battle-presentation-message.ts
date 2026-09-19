@@ -10,6 +10,7 @@ import { getPokemonDisplayName } from "../../pokemon/pokemon-presentation.utils"
 export function formatBattlePresentationMessage(
   battle: BattleInstance,
   event: BattlePresentationEvent,
+  localParticipantId?: string,
 ): string | null {
   switch (event.type) {
     case "move-used": {
@@ -67,8 +68,16 @@ export function formatBattlePresentationMessage(
         (candidate) => candidate.id === event.participantId,
       );
 
-      if (participant?.type === "trainer") {
+      if (participant?.id === localParticipantId) {
         return `Go! ${pokemonName}!`;
+      }
+
+      if (battle.type === "trainer" && participant?.type === "trainer") {
+        const trainerName = participant.displayName?.trim();
+
+        return trainerName
+          ? `${trainerName} sent out ${pokemonName}!`
+          : `The opposing Trainer sent out ${pokemonName}!`;
       }
 
       return `${pokemonName} entered the battle!`;

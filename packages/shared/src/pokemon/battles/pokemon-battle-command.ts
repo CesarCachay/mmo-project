@@ -12,6 +12,7 @@ import type { PokemonItemId } from "../inventory/pokemon-inventory.js";
 import { isPokemonItemId } from "../inventory/pokemon-inventory.js";
 
 import { getPokemonItem } from "../items/pokemon-item.registry.js";
+import { assertPokemonBattleCommandActionAllowed } from "./pokemon-battle-rules.js";
 
 export interface BattleUseMoveAction {
   readonly type: "use-move";
@@ -24,6 +25,20 @@ export interface BattleSwitchPokemonAction {
 export interface BattleRunAction {
   readonly type: "run";
 }
+
+/**
+ * Internal Battle fallback used by server-controlled opponents when every
+ * regular move is out of PP. The public network command validator does not
+ * accept this action from clients.
+ *
+ * V1 intentionally models Struggle without recoil; recoil can be added when
+ * self-damage / simultaneous faint rules are introduced.
+ */
+export interface BattleStruggleAction {
+  readonly type: "struggle";
+}
+
+export const POKEMON_STRUGGLE_MOVE_ID = 165;
 export type BattleUseItemTarget =
   | {
       readonly type: "trainer-pokemon";
@@ -40,7 +55,11 @@ export interface BattleUseItemAction {
 }
 
 export type BattleCommandAction =
-  BattleUseMoveAction | BattleSwitchPokemonAction | BattleRunAction | BattleUseItemAction;
+  | BattleUseMoveAction
+  | BattleSwitchPokemonAction
+  | BattleRunAction
+  | BattleUseItemAction
+  | BattleStruggleAction;
 
 export interface BattleCommand {
   readonly battleId: BattleId;
@@ -73,6 +92,13 @@ export function createBattleCommand(
     );
   }
 
+  /*
+   * Battle-type rules are enforced in the shared domain so every caller
+   * (network runtime, AI/runtime helpers and future clients) observes the
+   * same Wild-vs-Trainer semantics.
+   */
+  assertPokemonBattleCommandActionAllowed(battle, input.action);
+
   switch (input.action.type) {
     case "use-move": {
       assertValidUseMoveAction(battle, participant.id, input.action);
@@ -88,6 +114,10 @@ export function createBattleCommand(
     }
     case "use-item": {
       assertValidUseItemAction(battle, participant.id, input.action);
+      break;
+    }
+    case "struggle": {
+      assertValidStruggleAction(battle, participant.id);
       break;
     }
   }
@@ -230,6 +260,30 @@ function assertValidUseItemAction(
   if (item.battleTarget !== action.target.type) {
     throw new Error(
       `Pokémon item "${action.itemId}" cannot target "${action.target.type}"`
+    );
+  }
+}
+
+
+function assertValidStruggleAction(
+  battle: BattleInstance,
+  participantId: BattleParticipantId
+): void {
+  const participant = battle.participants.find(
+    (candidate) => candidate.id === participantId
+  );
+
+  if (!participant) {
+    throw new Error(
+      `Battle participant "${participantId}" not found in battle "${battle.battleId}"`
+    );
+  }
+
+  const activePokemon = getActiveBattlePokemon(participant);
+
+  if (activePokemon.pokemon.moves.some((move) => move.currentPp > 0)) {
+    throw new Error(
+      `Pokémon "${activePokemon.pokemon.instanceId}" cannot use Struggle while a regular move still has PP`
     );
   }
 }

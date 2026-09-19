@@ -5,7 +5,10 @@ import type {
   PokemonBattleTurnResolvedPayload,
 } from "@cesar-mmo/shared";
 
-import { BattlePresentationQueue } from "./BattlePresentationQueue";
+import {
+  BattlePresentationQueue,
+  type BattlePresentationEventContext,
+} from "./BattlePresentationQueue";
 
 interface Deferred {
   readonly promise: Promise<void>;
@@ -172,5 +175,43 @@ describe("BattlePresentationQueue critical workflow failures", () => {
     expect(onTurnCompleted).toHaveBeenCalledTimes(1);
 
     expect(onIdle).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("BattlePresentationQueue event context", () => {
+  it("exposes the immediately previous event for forced-replacement presentation", async () => {
+    const idle = createDeferred();
+    const contexts: BattlePresentationEventContext[] = [];
+
+    const faintEvent: BattlePresentationEvent = {
+      type: "pokemon-fainted",
+      participantId: "npc-trainer",
+      pokemonInstanceId: "rattata",
+    };
+
+    const switchEvent: BattlePresentationEvent = {
+      type: "pokemon-switched",
+      participantId: "npc-trainer",
+      previousActivePokemonIndex: 0,
+      currentActivePokemonIndex: 1,
+      previousPokemonInstanceId: "rattata",
+      currentPokemonInstanceId: "pidgey",
+    };
+
+    const queue = new BattlePresentationQueue({
+      presentEvent: (_event, context) => {
+        contexts.push(context);
+      },
+      onIdle: () => {
+        idle.resolve();
+      },
+    });
+
+    queue.enqueue(createTurn([faintEvent, switchEvent]));
+    await idle.promise;
+
+    expect(contexts).toHaveLength(2);
+    expect(contexts[0]?.previousEvent).toBeUndefined();
+    expect(contexts[1]?.previousEvent).toEqual(faintEvent);
   });
 });

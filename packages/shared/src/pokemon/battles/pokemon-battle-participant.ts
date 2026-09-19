@@ -11,6 +11,7 @@ export interface CreateBattleParticipantInput {
   readonly id: BattleParticipantId;
   readonly type: BattleParticipantType;
   readonly side: BattleSide;
+  readonly displayName?: string;
   readonly pokemon: readonly BattlePokemonState[];
   readonly activePokemonIndex?: number;
 }
@@ -40,10 +41,13 @@ export function createBattleParticipant(
     );
   }
 
+  const displayName = input.displayName?.trim();
+
   return {
     id: input.id,
     type: input.type,
     side: input.side,
+    ...(displayName ? { displayName } : {}),
     pokemon: [...input.pokemon],
     activePokemonIndex,
   };

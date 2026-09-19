@@ -11,8 +11,14 @@ import type {
   BattlePokemonState,
 } from "@cesar-mmo/shared";
 
+import {
+  evaluatePokemonBattleRunRule,
+} from "@cesar-mmo/shared";
+
 import { BattleDomRoot } from "./modern/BattleDomRoot";
 import { ModernBattleStage } from "./modern/ModernBattleStage";
+import { ModernBattleEffectsLayer } from "./modern/ModernBattleEffectsLayer";
+import { ModernBattlePendingIndicator } from "./modern/ModernBattlePendingIndicator";
 
 import { ModernBattlePokemonHud } from "./modern/ModernBattlePokemonHud";
 import { ModernBattleMovePanel } from "./modern/ModernBattleMovePanel";
@@ -39,6 +45,9 @@ import { ModernBattleMessagePanel } from "./modern/ModernBattleMessagePanel";
 import { getPokemonItemSpriteAsset } from "../../pokemon/pokemon-item-sprite.registry";
 
 import type { BattleClientInteractionState } from "../battle-client.types";
+import {
+  formatPokemonBattleRuleRejectionMessage,
+} from "../rules/battle-rules-ui";
 
 import { ModernBattleEvolutionLayer } from "./modern/ModernBattleEvolutionLayer";
 
@@ -87,6 +96,8 @@ export class BattleOverlay {
   private readonly modernRoot: BattleDomRoot;
 
   private readonly stage: ModernBattleStage;
+  private readonly effects: ModernBattleEffectsLayer;
+  private readonly pendingIndicator: ModernBattlePendingIndicator;
 
   private readonly wildHud: ModernBattlePokemonHud;
   private readonly trainerHud: ModernBattlePokemonHud;
@@ -109,6 +120,7 @@ export class BattleOverlay {
   private readonly partyExperiencePanel: ModernBattlePartyExperiencePanel;
 
   private commandLayoutMode: BattleCommandLayoutMode = "action";
+  private localParticipantId?: string;
 
   constructor(
     scene: Phaser.Scene,
@@ -129,6 +141,8 @@ export class BattleOverlay {
     this.modernRoot = new BattleDomRoot();
 
     this.stage = new ModernBattleStage(this.modernRoot.element);
+    this.effects = new ModernBattleEffectsLayer(this.modernRoot.element);
+    this.pendingIndicator = new ModernBattlePendingIndicator(this.modernRoot.element);
 
     this.captureLayer = new ModernBattleCaptureLayer(this.modernRoot.element);
 
@@ -188,6 +202,8 @@ export class BattleOverlay {
     this.messagePanel.clear();
 
     this.captureLayer.clear();
+    this.effects.clear();
+    this.pendingIndicator.clear();
 
     this.trainerHud.clear();
     this.wildHud.clear();
@@ -201,28 +217,38 @@ export class BattleOverlay {
     this.evolutionLayer.clear();
 
     this.partyExperiencePanel.clear();
+    this.localParticipantId = undefined;
   }
 
-  public renderBattle(battle: BattleInstance): void {
+  public renderBattle(battle: BattleInstance, localParticipantId: string): void {
     const trainerParticipant = battle.participants.find(
-      (participant) => participant.type === "trainer"
+      (participant) => participant.id === localParticipantId
     );
 
-    const wildParticipant = battle.participants.find(
-      (participant) => participant.type === "wild"
+    const opponentParticipant = battle.participants.find(
+      (participant) => participant.id !== localParticipantId
     );
 
-    if (!trainerParticipant || !wildParticipant) {
-      console.warn("[BattleOverlay] invalid Wild Battle participants", {
+    if (
+      !trainerParticipant ||
+      trainerParticipant.type !== "trainer" ||
+      !opponentParticipant
+    ) {
+      console.warn("[BattleOverlay] invalid battle perspective", {
         battleId: battle.battleId,
+        localParticipantId,
       });
 
       return;
     }
 
+    this.localParticipantId = localParticipantId;
+    this.stage.setBattleContext(battle.type, opponentParticipant.displayName);
+
     const trainerPokemon =
       trainerParticipant.pokemon[trainerParticipant.activePokemonIndex];
-    const wildPokemon = wildParticipant.pokemon[wildParticipant.activePokemonIndex];
+    const wildPokemon =
+      opponentParticipant.pokemon[opponentParticipant.activePokemonIndex];
 
     if (!trainerPokemon || !wildPokemon) {
       console.warn("[BattleOverlay] active Pokémon missing", {
@@ -235,8 +261,31 @@ export class BattleOverlay {
     this.trainerHud.setPokemon(trainerPokemon);
     this.wildHud.setPokemon(wildPokemon);
     this.actionMenu.setPokemon(trainerPokemon);
+
+    const runDecision = evaluatePokemonBattleRunRule(battle);
+    this.actionMenu.setRunAvailability(
+      runDecision.allowed,
+      runDecision.allowed
+        ? undefined
+        : formatPokemonBattleRuleRejectionMessage(runDecision.reason),
+    );
+
     this.movePanel.setPokemon(trainerPokemon);
     this.partyExperiencePanel.renderParty(trainerParticipant.pokemon);
+  }
+
+  public playBattleIntro(
+    battle: BattleInstance,
+    localParticipantId: string,
+  ): Promise<void> {
+    const opponentParticipant = battle.participants.find(
+      (participant) => participant.id !== localParticipantId,
+    );
+
+    return this.effects.playBattleIntro(
+      battle.type,
+      opponentParticipant?.displayName,
+    );
   }
 
   public destroy(): void {
@@ -263,6 +312,8 @@ export class BattleOverlay {
 
     this.evolutionLayer.destroy();
 
+    this.pendingIndicator.destroy();
+    this.effects.destroy();
     this.stage.destroy();
 
     this.modernRoot.destroy();
@@ -465,6 +516,7 @@ export class BattleOverlay {
   public setInteractionState(state: BattleClientInteractionState): void {
     this.updateCommandLayoutMode(state);
     this.layout();
+    this.pendingIndicator.setVisible(state === "waiting-for-server");
 
     if (state !== "waiting-for-server") {
       this.messagePanel.clear();
@@ -556,8 +608,18 @@ export class BattleOverlay {
     battle: BattleInstance,
     replacementPokemonIndexes: readonly number[]
   ): void {
+    const trainerParticipant = this.getLocalParticipant(battle);
+
+    if (!trainerParticipant) {
+      return;
+    }
+
     this.replacementPanel.setMode("forced");
-    this.replacementPanel.render(battle, replacementPokemonIndexes);
+    this.replacementPanel.render(
+      battle,
+      trainerParticipant.id,
+      replacementPokemonIndexes
+    );
   }
 
   public showCompletion(outcome: PokemonBattleCompletedPayload["outcome"]): void {
@@ -572,9 +634,7 @@ export class BattleOverlay {
   }
 
   public setVoluntaryPokemonOptions(battle: BattleInstance): void {
-    const trainerParticipant = battle.participants.find(
-      (participant) => participant.type === "trainer"
-    );
+    const trainerParticipant = this.getLocalParticipant(battle);
 
     if (!trainerParticipant) {
       return;
@@ -593,7 +653,11 @@ export class BattleOverlay {
       .map(({ pokemonIndex }) => pokemonIndex);
 
     this.replacementPanel.setMode("voluntary");
-    this.replacementPanel.render(battle, selectablePokemonIndexes);
+    this.replacementPanel.render(
+      battle,
+      trainerParticipant.id,
+      selectablePokemonIndexes
+    );
   }
 
   public presentMessage(message: string, durationMs?: number): Promise<void> {
@@ -617,7 +681,11 @@ export class BattleOverlay {
       return;
     }
 
-    const hud = participant.type === "trainer" ? this.trainerHud : this.wildHud;
+    const hud = this.getParticipantHud(battle, participant.id);
+
+    if (!hud) {
+      return;
+    }
 
     /* Limpiamos cualquier mensaje antes de empezar la parte puramente visual del evento */
     this.messagePanel.clear();
@@ -641,7 +709,7 @@ export class BattleOverlay {
       return;
     }
 
-    if (participant.type === "trainer") {
+    if (participant.id === this.localParticipantId) {
       this.replacementPanel.setVisible(true);
 
       try {
@@ -671,7 +739,14 @@ export class BattleOverlay {
       return Promise.resolve();
     }
 
-    return hud.animateHit(pokemonInstanceId);
+    const impactSide = participantId === this.localParticipantId
+      ? "local"
+      : "opponent";
+
+    return Promise.all([
+      hud.animateHit(pokemonInstanceId),
+      this.effects.playImpact(impactSide),
+    ]).then(() => undefined);
   }
 
   public animatePokemonSwitchOut(
@@ -714,7 +789,11 @@ export class BattleOverlay {
       return Promise.resolve();
     }
 
-    const hud = participant.type === "trainer" ? this.trainerHud : this.wildHud;
+    const hud = this.getParticipantHud(battle, participant.id);
+
+    if (!hud) {
+      return Promise.resolve();
+    }
 
     return hud.animateSwitchIn(pokemonState);
   }
@@ -749,19 +828,50 @@ export class BattleOverlay {
       return undefined;
     }
 
-    return participant.type === "trainer" ? this.trainerHud : this.wildHud;
+    if (!this.localParticipantId) {
+      return undefined;
+    }
+
+    return participant.id === this.localParticipantId
+      ? this.trainerHud
+      : this.wildHud;
   }
 
-  public setBagInventory(inventory: PokemonInventory): void {
-    this.bagPanel.render(inventory);
+  private getLocalParticipant(battle: BattleInstance) {
+    if (!this.localParticipantId) {
+      return undefined;
+    }
+
+    const participant = battle.participants.find(
+      (candidate) => candidate.id === this.localParticipantId
+    );
+
+    return participant?.type === "trainer" ? participant : undefined;
+  }
+
+  public setBagInventory(
+    battle: BattleInstance,
+    inventory: PokemonInventory,
+  ): void {
+    this.bagPanel.render(battle, inventory);
   }
 
   public setItemTargetOptions(
     battle: BattleInstance,
     selectablePokemonIndexes: readonly number[]
   ): void {
+    const trainerParticipant = this.getLocalParticipant(battle);
+
+    if (!trainerParticipant) {
+      return;
+    }
+
     this.replacementPanel.setMode("item-target");
-    this.replacementPanel.render(battle, selectablePokemonIndexes);
+    this.replacementPanel.render(
+      battle,
+      trainerParticipant.id,
+      selectablePokemonIndexes
+    );
   }
 
   public async animatePokemonCapture(
@@ -940,7 +1050,11 @@ export class BattleOverlay {
       (candidate) => candidate.id === participantId
     );
 
-    if (!participant || participant.type !== "trainer") {
+    if (
+      !participant ||
+      participant.type !== "trainer" ||
+      participant.id !== this.localParticipantId
+    ) {
       return Promise.resolve();
     }
 
@@ -984,7 +1098,11 @@ export class BattleOverlay {
       (candidate) => candidate.id === participantId
     );
 
-    if (!participant || participant.type !== "trainer") {
+    if (
+      !participant ||
+      participant.type !== "trainer" ||
+      participant.id !== this.localParticipantId
+    ) {
       return Promise.resolve();
     }
 

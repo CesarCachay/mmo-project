@@ -5,6 +5,7 @@ import {
   applyBattleMoveDamage,
   calculateBattleMoveDamage,
   evaluateBattleMoveExecutionEligibility,
+  assertPokemonBattleCommandActionAllowed,
 } from '@cesar-mmo/shared';
 
 import type {
@@ -62,6 +63,13 @@ export class PokemonBattleTurnExecutor {
     entry: BattleTurnResolutionEntry,
     playerId: string,
   ): Promise<BattleTurnEntryExecutionResult> {
+    /* Defense in depth: even a command inserted outside the normal network
+     * path must still obey the battle-type rules at execution time. */
+    assertPokemonBattleCommandActionAllowed(
+      session.battle,
+      entry.command.action,
+    );
+
     switch (entry.command.action.type) {
       case 'switch-pokemon': {
         const result = applyPokemonTrainerBattleSwitch({
@@ -223,6 +231,7 @@ export class PokemonBattleTurnExecutor {
       }
 
       case 'use-move':
+      case 'struggle':
         break;
     }
 
@@ -243,7 +252,9 @@ export class PokemonBattleTurnExecutor {
       entry,
     );
 
-    consumeBattleMovePp(executionContext);
+    if (entry.command.action.type === 'use-move') {
+      consumeBattleMovePp(executionContext);
+    }
 
     const moveUsedEvent: BattlePresentationEvent = {
       type: 'move-used',

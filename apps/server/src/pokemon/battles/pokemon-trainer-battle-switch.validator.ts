@@ -1,4 +1,7 @@
-import { resolveWildBattleContinuationOutcome } from '@cesar-mmo/shared';
+import {
+  resolveTrainerBattleContinuationOutcome,
+  resolveWildBattleContinuationOutcome,
+} from '@cesar-mmo/shared';
 
 import type { PokemonBattleSession } from './pokemon-battle-session.js';
 
@@ -51,7 +54,12 @@ export function assertPokemonTrainerBattleSwitchAllowed(
    * - not after defeat
    * - not after Wild defeat
    */
-  const continuation = resolveWildBattleContinuationOutcome(battle);
+  const continuation = battle.type === 'trainer'
+    ? resolveTrainerBattleContinuationOutcome(
+        battle,
+        trainerBinding.participantId,
+      )
+    : resolveWildBattleContinuationOutcome(battle);
 
   if (continuation.type !== 'continue') {
     throw new Error(

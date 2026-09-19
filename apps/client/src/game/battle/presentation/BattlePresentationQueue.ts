@@ -21,6 +21,7 @@ export interface BattlePresentationEventContext {
 
   readonly eventIndex: number;
   readonly eventCount: number;
+  readonly previousEvent?: BattlePresentationEvent;
 }
 
 export interface BattlePresentationEventBatchContext {
@@ -254,11 +255,15 @@ export class BattlePresentationQueue {
        * NORMAL SEQUENTIAL EVENT
        * ------------------------------------------------------
        */
+      const previousEvent =
+        eventIndex > 0 ? payload.events[eventIndex - 1] : undefined;
+
       const context: BattlePresentationEventContext = {
         battleId: payload.battleId,
         turnNumber: payload.turnNumber,
         eventIndex,
         eventCount,
+        ...(previousEvent ? { previousEvent } : {}),
       };
 
       try {

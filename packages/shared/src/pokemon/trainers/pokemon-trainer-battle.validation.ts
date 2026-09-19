@@ -1,6 +1,7 @@
 import { getDialogue } from "../../dialogue.js";
 import { MAX_POKEMON_MOVE_SLOTS, MAX_POKEMON_PARTY_SIZE } from "../pokemon.types.js";
 import { getPokemonMove } from "../pokemon-move.registry.js";
+import { isPokemonItemId } from "../inventory/pokemon-inventory.js";
 import { getPokemonSpecies } from "../pokemon.registry.js";
 import { MAX_POKEMON_LEVEL } from "../progression/pokemon-experience.js";
 import type { PokemonTrainerBattleDefinition } from "./pokemon-trainer-battle.types.js";
@@ -59,6 +60,54 @@ export function validatePokemonTrainerBattleDefinition(
       ),
     );
   }
+
+  if (!getDialogue(definition.postBattleDialogueId)) {
+    issues.push(
+      createIssue(
+        definition,
+        "postBattleDialogueId",
+        `Unknown post-battle dialogue ${definition.postBattleDialogueId}`,
+      ),
+    );
+  }
+
+  const rewardItemIds = new Set<string>();
+
+  definition.rewardItems.forEach((rewardItem, rewardIndex) => {
+    const pathPrefix = `rewardItems[${rewardIndex}]`;
+
+    if (rewardItemIds.has(rewardItem.itemId)) {
+      issues.push(
+        createIssue(
+          definition,
+          `${pathPrefix}.itemId`,
+          `Duplicate reward item ${rewardItem.itemId}`,
+        ),
+      );
+    } else {
+      rewardItemIds.add(rewardItem.itemId);
+    }
+
+    if (!isPokemonItemId(rewardItem.itemId)) {
+      issues.push(
+        createIssue(
+          definition,
+          `${pathPrefix}.itemId`,
+          `Unknown reward item ${rewardItem.itemId}`,
+        ),
+      );
+    }
+
+    if (!Number.isInteger(rewardItem.quantity) || rewardItem.quantity <= 0) {
+      issues.push(
+        createIssue(
+          definition,
+          `${pathPrefix}.quantity`,
+          "Reward quantity must be a positive integer",
+        ),
+      );
+    }
+  });
 
   if (
     definition.party.length < 1 ||

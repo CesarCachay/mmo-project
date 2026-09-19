@@ -129,6 +129,7 @@ export class ModernBattleReplacementPanel {
 
   public render(
     battle: BattleInstance,
+    participantId: string,
     selectablePokemonIndexes: readonly number[],
   ): void {
     this.slots = [];
@@ -136,12 +137,12 @@ export class ModernBattleReplacementPanel {
     this.grid.replaceChildren();
 
     const trainer = battle.participants.find(
-      (participant) => participant.type === "trainer",
+      (participant) => participant.id === participantId,
     );
 
-    if (!trainer) {
+    if (!trainer || trainer.type !== "trainer") {
       console.warn(
-        "[ModernBattleReplacementPanel] trainer participant missing",
+        "[ModernBattleReplacementPanel] local trainer participant missing",
         {
           battleId: battle.battleId,
         },

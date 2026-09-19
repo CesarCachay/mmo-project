@@ -84,3 +84,8 @@ export type PokemonTrainerInventoryItem = Prisma.PokemonTrainerInventoryItemMode
  * 
  */
 export type PokemonPendingEvolution = Prisma.PokemonPendingEvolutionModel
+/**
+ * Model PokemonTrainerBattleProgress
+ * 
+ */
+export type PokemonTrainerBattleProgress = Prisma.PokemonTrainerBattleProgressModel

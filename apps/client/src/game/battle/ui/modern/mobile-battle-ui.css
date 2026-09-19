@@ -657,3 +657,28 @@
     min-height: 50px;
   }
 }
+
+/* =========================================================
+   Milestone 1.35 hardening: touch / pending states
+========================================================= */
+@media (hover: none) and (pointer: coarse) {
+  .battle-pending-indicator {
+    top: max(10px, var(--game-safe-top));
+    min-height: 36px;
+    padding-inline: 14px;
+    font-size: 10px;
+  }
+
+  .battle-modern-completion__continue,
+  .battle-modern-bag__item,
+  .battle-replacement-panel__back {
+    min-height: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .battle-modern-completion__continue:not(:disabled):hover,
+  .battle-modern-bag__item:not(:disabled):hover {
+    transform: none;
+  }
+}

@@ -33,6 +33,22 @@ export const DIALOGUES = {
       "Show me what your Pokémon can do!",
     ],
   },
+
+  "trainer-student-gary-post-battle": {
+    id: "trainer-student-gary-post-battle",
+    lines: [
+      "That was a great battle!",
+      "I'll train harder before we battle again someday.",
+    ],
+  },
+
+  "trainer-student-francisca-post-battle": {
+    id: "trainer-student-francisca-post-battle",
+    lines: [
+      "You got me! Your team was really strong.",
+      "I'll keep training too.",
+    ],
+  },
 } satisfies Record<string, DialogueDefinition>;
 
 export type DialogueId = keyof typeof DIALOGUES;

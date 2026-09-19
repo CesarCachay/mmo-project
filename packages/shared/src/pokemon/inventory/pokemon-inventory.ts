@@ -26,7 +26,7 @@ export interface PokemonInventory {
 }
 
 export function createPokemonInventory(
-  items: readonly PokemonInventoryItemStack[] = [],
+  items: readonly PokemonInventoryItemStack[] = []
 ): PokemonInventory {
   assertValidPokemonInventoryItems(items);
 
@@ -37,7 +37,7 @@ export function createPokemonInventory(
 
 export function getPokemonInventoryItemQuantity(
   inventory: PokemonInventory,
-  itemId: PokemonItemId,
+  itemId: PokemonItemId
 ): number {
   return inventory.items.find((item) => item.itemId === itemId)?.quantity ?? 0;
 }
@@ -45,7 +45,7 @@ export function getPokemonInventoryItemQuantity(
 export function setPokemonInventoryItemQuantity(
   inventory: PokemonInventory,
   itemId: PokemonItemId,
-  quantity: number,
+  quantity: number
 ): PokemonInventory {
   assertValidQuantity(quantity);
 
@@ -76,7 +76,7 @@ export function setPokemonInventoryItemQuantity(
             ...item,
             quantity,
           }
-        : item,
+        : item
     ),
   };
 }
@@ -84,23 +84,19 @@ export function setPokemonInventoryItemQuantity(
 export function addPokemonInventoryItem(
   inventory: PokemonInventory,
   itemId: PokemonItemId,
-  quantity: number,
+  quantity: number
 ): PokemonInventory {
   assertPositiveQuantity(quantity);
 
   const currentQuantity = getPokemonInventoryItemQuantity(inventory, itemId);
 
-  return setPokemonInventoryItemQuantity(
-    inventory,
-    itemId,
-    currentQuantity + quantity,
-  );
+  return setPokemonInventoryItemQuantity(inventory, itemId, currentQuantity + quantity);
 }
 
 export function consumePokemonInventoryItem(
   inventory: PokemonInventory,
   itemId: PokemonItemId,
-  quantity: number = 1,
+  quantity: number = 1
 ): PokemonInventory {
   assertPositiveQuantity(quantity);
 
@@ -108,19 +104,15 @@ export function consumePokemonInventoryItem(
 
   if (currentQuantity < quantity) {
     throw new Error(
-      `Not enough "${itemId}" in inventory: requested ${quantity}, available ${currentQuantity}`,
+      `Not enough "${itemId}" in inventory: requested ${quantity}, available ${currentQuantity}`
     );
   }
 
-  return setPokemonInventoryItemQuantity(
-    inventory,
-    itemId,
-    currentQuantity - quantity,
-  );
+  return setPokemonInventoryItemQuantity(inventory, itemId, currentQuantity - quantity);
 }
 
 function assertValidPokemonInventoryItems(
-  items: readonly PokemonInventoryItemStack[],
+  items: readonly PokemonInventoryItemStack[]
 ): void {
   const seenItemIds = new Set<PokemonItemId>();
 
@@ -138,7 +130,7 @@ function assertValidPokemonInventoryItems(
 function assertValidQuantity(quantity: number): void {
   if (!Number.isInteger(quantity) || quantity < 0) {
     throw new Error(
-      `Pokémon inventory quantity must be a non-negative integer, received "${quantity}"`,
+      `Pokémon inventory quantity must be a non-negative integer, received "${quantity}"`
     );
   }
 }
@@ -146,7 +138,7 @@ function assertValidQuantity(quantity: number): void {
 function assertPositiveQuantity(quantity: number): void {
   if (!Number.isInteger(quantity) || quantity <= 0) {
     throw new Error(
-      `Pokémon inventory quantity must be a positive integer, received "${quantity}"`,
+      `Pokémon inventory quantity must be a positive integer, received "${quantity}"`
     );
   }
 }

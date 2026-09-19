@@ -5,6 +5,7 @@ export const BATTLE_PRESENTATION_TIMING = {
   moveMissedMessageMs: 600,
   damageResultMessageMs: 650,
   switchMessageMs: 650,
+  opponentReplacementLeadInMs: 220,
   faintMessageMs: 700,
   trainerEscapedMessageMs: 650,
 

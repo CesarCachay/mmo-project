@@ -5,7 +5,10 @@ import { PokemonInstance } from "./pokemon.types.js";
 
 import { BattleInstance } from "./battles/pokemon-battle.types.js";
 
-import { isPokemonBattleStartedPayload } from "./battles/pokemon-battle-network.js";
+import {
+  isPokemonBattleInstance,
+  isPokemonBattleStartedPayload,
+} from "./battles/pokemon-battle-network.js";
 
 import { POKEMON_ENCOUNTER_TABLES } from "./encounters/pokemon-encounter-table.registry.js";
 
@@ -18,11 +21,13 @@ export const POKEMON_EVENTS = {
   WILD_ENCOUNTER_STARTED: "pokemon:wild-encounter-started",
 
   BATTLE_STARTED: "pokemon:battle-started",
+  TRAINER_BATTLE_START: "pokemon:trainer-battle-start",
   BATTLE_COMMAND: "pokemon:battle-command",
 
   BATTLE_REPLACEMENT: "pokemon:battle-replacement",
   BATTLE_REPLACEMENT_RESOLVED: "pokemon:battle-replacement-resolved",
   BATTLE_COMPLETED: "pokemon:battle-completed",
+  BLACKOUT_RECOVERY_REQUEST: "pokemon:blackout-recovery-request",
 
   BATTLE_STATE_UPDATED: "pokemon:battle-state-updated",
   BATTLE_TURN_RESOLVED: "battleTurnResolved",
@@ -208,13 +213,16 @@ export function isPokemonBattleReplacementResolvedPayload(
     return false;
   }
 
-  return isPokemonBattleStartedPayload({
-    battle: candidate.battle,
-  });
+  return isPokemonBattleInstance(candidate.battle);
 }
 
 export type PokemonBattleCompletedOutcome =
-  "trainer-defeated" | "wild-defeated" | "trainer-escaped" | "wild-captured";
+  | "trainer-defeated"
+  | "wild-defeated"
+  | "trainer-escaped"
+  | "wild-captured"
+  | "trainer-battle-victory"
+  | "trainer-battle-defeat";
 
 export interface PokemonBattleCompletedPayload {
   readonly battleId: string;
@@ -241,7 +249,9 @@ export function isPokemonBattleCompletedPayload(
     candidate.outcome !== "trainer-defeated" &&
     candidate.outcome !== "wild-defeated" &&
     candidate.outcome !== "trainer-escaped" &&
-    candidate.outcome !== "wild-captured"
+    candidate.outcome !== "wild-captured" &&
+    candidate.outcome !== "trainer-battle-victory" &&
+    candidate.outcome !== "trainer-battle-defeat"
   ) {
     return false;
   }

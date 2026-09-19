@@ -21,6 +21,7 @@ export class PokemonTrainerStateStore {
     trainerId: PokemonTrainerId,
     party: PokemonParty = createPokemonParty(),
     inventory: PokemonInventory = createPokemonInventory(),
+    defeatedTrainerBattleIds: readonly string[] = [],
   ): PokemonTrainerState {
     if (this.trainerStates.has(trainerId)) {
       throw new Error(`Trainer state already exists for trainer ${trainerId}`);
@@ -29,6 +30,7 @@ export class PokemonTrainerStateStore {
     const trainerState: PokemonTrainerState = {
       party,
       inventory,
+      defeatedTrainerBattleIds: [...new Set(defeatedTrainerBattleIds)],
     };
 
     this.trainerStates.set(trainerId, trainerState);
@@ -54,6 +56,27 @@ export class PokemonTrainerStateStore {
       party,
     };
     this.trainerStates.set(trainerId, updatedTrainerState);
+    return updatedTrainerState;
+  }
+
+
+  setDefeatedTrainerBattleIds(
+    trainerId: PokemonTrainerId,
+    defeatedTrainerBattleIds: readonly string[],
+  ): PokemonTrainerState {
+    const trainerState = this.trainerStates.get(trainerId);
+
+    if (!trainerState) {
+      throw new Error(`Trainer state not found for trainer ${trainerId}`);
+    }
+
+    const updatedTrainerState: PokemonTrainerState = {
+      ...trainerState,
+      defeatedTrainerBattleIds: [...new Set(defeatedTrainerBattleIds)],
+    };
+
+    this.trainerStates.set(trainerId, updatedTrainerState);
+
     return updatedTrainerState;
   }
 

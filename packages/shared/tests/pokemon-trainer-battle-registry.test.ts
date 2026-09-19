@@ -24,6 +24,8 @@ describe("POKEMON_TRAINER_BATTLE_REGISTRY", () => {
 
     for (const definition of definitions) {
       expect(getDialogue(definition.preBattleDialogueId)).toBeDefined();
+      expect(getDialogue(definition.postBattleDialogueId)).toBeDefined();
+      expect(definition.rewardItems.length).toBeGreaterThan(0);
     }
   });
 

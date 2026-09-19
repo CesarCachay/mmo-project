@@ -6,9 +6,11 @@ import {
   isPokemonBattleCommandInput,
   isBattleTurnReady,
   createBattleTurnResolutionOrder,
+  resolveTrainerBattleContinuationOutcome,
   resolveWildBattleContinuationOutcome,
   isPokemonBattleReplacementInput,
   planBattleHealingItemUse,
+  assertPokemonBattleCommandActionAllowed,
 } from '@cesar-mmo/shared';
 
 import type {
@@ -17,11 +19,16 @@ import type {
   PokemonBattleTurnResolvedPayload,
   PokemonBattleCompletedPayload,
   PokemonTrainerState,
+  PokemonBattleCommandInput,
+  PokemonTrainerBattleId,
 } from '@cesar-mmo/shared';
 
 import type { PokemonTrainerId } from '../pokemon-trainer-identity';
 
-import type { PokemonBattleSession } from './pokemon-battle-session';
+import type {
+  PokemonBattleSession,
+  PokemonBattleTrainerBinding,
+} from './pokemon-battle-session';
 
 import { PokemonTrainerStateStore } from '../pokemon-trainer-state.store';
 
@@ -34,6 +41,7 @@ import { PokemonBattleSessionStore } from './pokemon-battle-session.store';
 import { PokemonBattleTurnStore } from './pokemon-battle-turn.store';
 
 import { createWildBattleCommand } from './pokemon-wild-battle-command.factory';
+import { createTrainerBattleAiCommand } from './pokemon-trainer-battle-ai.factory';
 
 import { assertPokemonTrainerBattleSwitchAllowed } from './pokemon-trainer-battle-switch.validator';
 
@@ -46,6 +54,8 @@ import {
 } from './pokemon-wild-battle-outcome.runtime';
 
 import { applyPokemonTrainerBattleReplacement } from './pokemon-trainer-battle-replacement.runtime';
+import { applyPokemonTrainerBattleOpponentReplacement } from './pokemon-trainer-battle-opponent-replacement.runtime';
+import { applyPokemonTrainerBattleOutcome } from './pokemon-trainer-battle-outcome.runtime';
 
 import { PokemonTrainerStateNetworkPresenter } from '../network/PokemonTrainerStateNetworkPresenter';
 
@@ -65,6 +75,10 @@ export interface PokemonBattleNetworkControllerOptions {
     playerId: string,
     trainerId: PokemonTrainerId,
   ) => Promise<void>;
+  readonly onTrainerBattleVictory: (
+    trainerId: PokemonTrainerId,
+    trainerBattleId: PokemonTrainerBattleId,
+  ) => Promise<PokemonTrainerState>;
 }
 
 export class PokemonBattleNetworkController {
@@ -76,6 +90,7 @@ export class PokemonBattleNetworkController {
   private readonly wildBattleProgressionService: PokemonWildBattleProgressionService;
   private readonly trainerStatePresenter: PokemonTrainerStateNetworkPresenter;
   private readonly onTrainerDefeated: PokemonBattleNetworkControllerOptions['onTrainerDefeated'];
+  private readonly onTrainerBattleVictory: PokemonBattleNetworkControllerOptions['onTrainerBattleVictory'];
 
   constructor(options: PokemonBattleNetworkControllerOptions) {
     this.trainerStateStore = options.trainerStateStore;
@@ -86,6 +101,7 @@ export class PokemonBattleNetworkController {
     this.wildBattleProgressionService = options.wildBattleProgressionService;
     this.trainerStatePresenter = options.trainerStatePresenter;
     this.onTrainerDefeated = options.onTrainerDefeated;
+    this.onTrainerBattleVictory = options.onTrainerBattleVictory;
   }
 
   public async handleCommand(client: Socket, payload: unknown): Promise<void> {
@@ -108,6 +124,16 @@ export class PokemonBattleNetworkController {
     );
 
     if (!trainerBinding) {
+      return;
+    }
+
+    if (session.battle.type === 'trainer') {
+      await this.handleTrainerBattleCommand(
+        client,
+        session,
+        trainerBinding,
+        payload,
+      );
       return;
     }
 
@@ -391,6 +417,284 @@ export class PokemonBattleNetworkController {
       }
     } catch (error: unknown) {
       console.warn(`[BattleCommand] rejected for player ${client.id}`, error);
+    }
+  }
+
+  private async handleTrainerBattleCommand(
+    client: Socket,
+    session: PokemonBattleSession,
+    trainerBinding: PokemonBattleTrainerBinding,
+    payload: PokemonBattleCommandInput,
+  ): Promise<void> {
+    const continuationBefore = resolveTrainerBattleContinuationOutcome(
+      session.battle,
+      trainerBinding.participantId,
+    );
+
+    if (continuationBefore.type !== 'continue') {
+      return;
+    }
+
+    try {
+      /*
+       * Enforce Wild-vs-Trainer semantics before any inventory planning or
+       * turn-store mutation. This is intentionally shared-domain logic so a
+       * modified client cannot bypass Trainer Battle restrictions.
+       */
+      assertPokemonBattleCommandActionAllowed(
+        session.battle,
+        payload.action,
+      );
+
+      if (payload.action.type === 'use-item') {
+        const trainerState = this.trainerStateStore.get(
+          trainerBinding.trainerId,
+        );
+
+        if (!trainerState) {
+          throw new Error(
+            `Pokémon Trainer state not found for trainer "${trainerBinding.trainerId}"`,
+          );
+        }
+
+        planBattleHealingItemUse(
+          session.battle,
+          trainerBinding.participantId,
+          payload.action,
+          trainerState.inventory,
+        );
+      }
+
+      if (payload.action.type === 'switch-pokemon') {
+        assertPokemonTrainerBattleSwitchAllowed({
+          session,
+          playerId: client.id,
+          pokemonIndex: payload.action.pokemonIndex,
+        });
+      }
+
+      const playerCommand = createBattleCommand(session.battle, {
+        participantId: trainerBinding.participantId,
+        action: payload.action,
+      });
+
+      /*
+       * Build both commands before mutating the turn store.
+       *
+       * If AI command construction fails, the player's command must not be
+       * left partially submitted; otherwise the next client retry would be
+       * rejected as a duplicate command for the same turn.
+       */
+      const aiCommand = createTrainerBattleAiCommand(session);
+
+      let turn = this.battleTurnStore.submitCommand(
+        session.battle,
+        playerCommand,
+      );
+
+      turn = this.battleTurnStore.submitCommand(session.battle, aiCommand);
+
+      if (!isBattleTurnReady(session.battle, turn)) {
+        throw new Error(
+          `Trainer Battle turn ${turn.number} for battle "${session.battle.battleId}" should be ready after AI command submission`,
+        );
+      }
+
+      const resolutionOrder = createBattleTurnResolutionOrder(
+        session.battle,
+        turn,
+        Math.random,
+      );
+
+      const presentationEvents: BattlePresentationEvent[] = [];
+      let trainerStateUpdate: PokemonTrainerState | null = null;
+
+      for (const entry of resolutionOrder.entries) {
+        const executionResult = await this.turnExecutor.execute(
+          session,
+          entry,
+          client.id,
+        );
+
+        presentationEvents.push(...executionResult.events);
+
+        if (executionResult.trainerStateUpdate) {
+          trainerStateUpdate = executionResult.trainerStateUpdate;
+        }
+
+        if (executionResult.terminalOutcome) {
+          throw new Error(
+            `Unexpected Wild terminal outcome "${executionResult.terminalOutcome}" in Trainer Battle "${session.battle.battleId}"`,
+          );
+        }
+      }
+
+      const continuationAfter = resolveTrainerBattleContinuationOutcome(
+        session.battle,
+        trainerBinding.participantId,
+      );
+
+      let nextTurnNumber: number | null = null;
+      let interactionState: PokemonBattleStateUpdatedPayload['interactionState'] | null = null;
+      let replacementPokemonIndexes: readonly number[] = [];
+
+      if (continuationAfter.type === 'continue') {
+        const nextTurn = this.battleTurnStore.advance(session.battle);
+        nextTurnNumber = nextTurn.number;
+        interactionState = 'selecting-action';
+      } else if (continuationAfter.type === 'player-replacement-required') {
+        interactionState = 'replacement-required';
+        replacementPokemonIndexes = continuationAfter.replacementPokemonIndexes;
+      } else if (continuationAfter.type === 'opponent-replacement-required') {
+        /*
+         * NPC forced replacement is server-authoritative and automatic.
+         * Apply it before publishing the resolved turn so the switch event is
+         * serialized immediately after the faint presentation for that turn.
+         */
+        const replacementResult =
+          applyPokemonTrainerBattleOpponentReplacement({
+            session,
+            localParticipantId: trainerBinding.participantId,
+            battleTurnStore: this.battleTurnStore,
+          });
+
+        presentationEvents.push(replacementResult.presentationEvent);
+        nextTurnNumber = replacementResult.nextTurnNumber;
+        interactionState = 'selecting-action';
+      }
+
+      client.emit(POKEMON_EVENTS.BATTLE_TURN_RESOLVED, {
+        battleId: session.battle.battleId,
+        turnNumber: turn.number,
+        events: [...presentationEvents],
+      } satisfies PokemonBattleTurnResolvedPayload);
+
+      if (trainerStateUpdate) {
+        this.trainerStatePresenter.emitTrainerState(client, trainerStateUpdate);
+      }
+
+      if (interactionState) {
+        client.emit(POKEMON_EVENTS.BATTLE_STATE_UPDATED, {
+          battle: session.battle,
+          resolvedTurnNumber: turn.number,
+          interactionState,
+          nextTurnNumber,
+          replacementPokemonIndexes,
+        } satisfies PokemonBattleStateUpdatedPayload);
+        return;
+      }
+
+      if (
+        continuationAfter.type !== 'player-defeated' &&
+        continuationAfter.type !== 'opponent-defeated'
+      ) {
+        throw new Error(
+          `Unsupported Trainer Battle continuation "${continuationAfter.type}" after turn ${turn.number}`,
+        );
+      }
+
+      /*
+       * Persist the player's authoritative Party state BEFORE releasing the
+       * Battle session. This guarantees the final HP/PP snapshot survives
+       * both victory and defeat, and gives Step 10B a durable source for
+       * rewards / blackout healing.
+       */
+      const updatedTrainerState = await this.syncBattleResultToTrainer(
+        session,
+        trainerBinding.trainerId,
+        trainerBinding.participantId,
+      );
+
+      let completionTrainerState = updatedTrainerState;
+
+      if (continuationAfter.type === 'opponent-defeated') {
+        const trainerBattleContext = session.trainerBattle;
+
+        if (!trainerBattleContext) {
+          throw new Error(
+            `Trainer Battle "${session.battle.battleId}" is missing Trainer Battle context`,
+          );
+        }
+
+        try {
+          completionTrainerState = await this.onTrainerBattleVictory(
+            trainerBinding.trainerId,
+            trainerBattleContext.trainerBattleId,
+          );
+        } catch (error: unknown) {
+          /*
+           * A persistence outage must not strand an already-resolved Battle.
+           * The durable Party result is already saved; log the reward/progress
+           * failure and still complete the Battle. Because victory recording is
+           * idempotent, the player can earn it on a later successful rematch.
+           */
+          console.error(
+            `[TrainerBattleVictory] failed for Trainer Battle "${trainerBattleContext.trainerBattleId}"`,
+            error,
+          );
+        }
+      }
+
+      const outcomeRuntime = applyPokemonTrainerBattleOutcome({
+        battleId: session.battle.battleId,
+        outcome: continuationAfter,
+        battleSessionStore: this.battleSessionStore,
+        battleTurnStore: this.battleTurnStore,
+      });
+
+      this.trainerStatePresenter.emitTrainerState(client, completionTrainerState);
+
+      client.emit(POKEMON_EVENTS.BATTLE_COMPLETED, {
+        battleId: session.battle.battleId,
+        outcome: outcomeRuntime.type,
+      } satisfies PokemonBattleCompletedPayload);
+
+      /*
+       * Step 10B intentionally owns: victory rewards, defeated-Trainer
+       * persistence, completion acknowledgement, blackout healing and world
+       * recovery. Do not relocate the player from this core outcome step.
+       */
+    } catch (error: unknown) {
+      console.warn(
+        `[TrainerBattleCommand] rejected for player ${client.id}`,
+        error,
+      );
+    }
+  }
+
+  public async handlePlayerDisconnected(playerId: string): Promise<void> {
+    const session = this.battleSessionStore.getByPlayerId(playerId);
+
+    if (!session) {
+      return;
+    }
+
+    const battleId = session.battle.battleId;
+    const trainerBinding = session.trainerBindings.find(
+      (binding) => binding.playerId === playerId,
+    );
+
+    try {
+      /*
+       * Persist the latest authoritative HP / PP snapshot when possible.
+       * A transient network loss must not leave the Trainer permanently
+       * bound to an orphaned Battle session after reconnect.
+       */
+      if (trainerBinding) {
+        await this.syncBattleResultToTrainer(
+          session,
+          trainerBinding.trainerId,
+          trainerBinding.participantId,
+        );
+      }
+    } catch (error: unknown) {
+      console.error(
+        `[BattleDisconnect] failed to persist battle "${battleId}" for player ${playerId}`,
+        error,
+      );
+    } finally {
+      this.battleTurnStore.remove(battleId);
+      this.battleSessionStore.remove(battleId);
     }
   }
 

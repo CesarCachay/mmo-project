@@ -67,10 +67,12 @@ export class WildBattleAudioController {
 
     switch (outcome) {
       case "wild-defeated":
+      case "trainer-battle-victory":
         this.victory.play();
         return;
 
       case "trainer-defeated":
+      case "trainer-battle-defeat":
         this.defeat.play();
         return;
 

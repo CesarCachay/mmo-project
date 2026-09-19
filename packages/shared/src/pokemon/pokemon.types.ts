@@ -137,6 +137,8 @@ export interface PokemonParty {
 export interface PokemonTrainerState {
   party: PokemonParty;
   inventory: PokemonInventory;
+  /** Persisted one-time Trainer Battle victories. Optional for backwards-compatible tests/fixtures. */
+  defeatedTrainerBattleIds?: readonly string[];
 }
 
 // Follower for multiplayers

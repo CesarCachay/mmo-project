@@ -190,6 +190,8 @@ export class ModernBattlePokemonHud {
     this.finishPendingSpriteAnimation();
     this.finishPendingExperienceAnimation();
 
+    this.root.classList.remove("battle-modern-hud--impact");
+
     this.sprite.classList.remove(
       "battle-modern-hud__sprite--switched-out",
       "battle-modern-hud__sprite--fainted",
@@ -254,6 +256,11 @@ export class ModernBattlePokemonHud {
 
     this.pokemonState = undefined;
 
+    this.root.classList.remove(
+      "battle-modern-hud--critical",
+      "battle-modern-hud--impact",
+    );
+
     this.root.hidden = true;
 
     this.name.textContent = "";
@@ -313,6 +320,12 @@ export class ModernBattlePokemonHud {
 
     const hpRatio =
       safeMaxHp > 0 ? Math.max(0, Math.min(1, safeCurrentHp / safeMaxHp)) : 0;
+
+    this.root.classList.toggle(
+      "battle-modern-hud--critical",
+      safeCurrentHp > 0 && hpRatio <= 0.2,
+    );
+
     this.hpText.textContent = `${safeCurrentHp} / ${safeMaxHp}`;
     this.hpFill.style.width = `${hpRatio * 100}%`;
     this.hpFill.classList.remove(
@@ -805,6 +818,11 @@ export class ModernBattlePokemonHud {
     }
 
     this.hitSprite.src = currentSpriteSrc;
+
+    this.root.classList.remove("battle-modern-hud--impact");
+    void this.root.offsetWidth;
+    this.root.classList.add("battle-modern-hud--impact");
+
     this.hitSprite.style.opacity = "1";
     await this.delay(100);
     this.hitSprite.style.opacity = "0";
@@ -812,6 +830,7 @@ export class ModernBattlePokemonHud {
     this.hitSprite.style.opacity = "0.8";
     await this.delay(90);
     this.hitSprite.style.opacity = "0";
+    this.root.classList.remove("battle-modern-hud--impact");
   }
 
   public async animateFaint(pokemonInstanceId: string): Promise<void> {

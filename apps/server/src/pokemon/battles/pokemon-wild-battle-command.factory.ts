@@ -27,9 +27,10 @@ export function createWildBattleCommand(
   );
 
   if (availableMoves.length === 0) {
-    throw new Error(
-      `Wild Pokémon "${activePokemon.pokemon.instanceId}" has no usable moves`,
-    );
+    return createBattleCommand(battle, {
+      participantId: wildParticipant.id,
+      action: { type: 'struggle' },
+    });
   }
 
   const randomValue = random();

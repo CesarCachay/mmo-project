@@ -8,6 +8,8 @@ export const POKEMON_TRAINER_BATTLE_REGISTRY = {
     appearanceId: "student-gary",
     aiProfileId: "basic",
     preBattleDialogueId: "trainer-student-gary-pre-battle",
+    postBattleDialogueId: "trainer-student-gary-post-battle",
+    rewardItems: [{ itemId: "potion", quantity: 1 }],
     party: [
       {
         speciesId: 19, // Rattata
@@ -29,6 +31,8 @@ export const POKEMON_TRAINER_BATTLE_REGISTRY = {
     appearanceId: "student-francisca",
     aiProfileId: "basic",
     preBattleDialogueId: "trainer-student-francisca-pre-battle",
+    postBattleDialogueId: "trainer-student-francisca-post-battle",
+    rewardItems: [{ itemId: "super-potion", quantity: 1 }],
     party: [
       {
         speciesId: 29, // Nidoran♀

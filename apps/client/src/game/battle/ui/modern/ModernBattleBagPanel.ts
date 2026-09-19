@@ -1,10 +1,12 @@
 import {
   getPokemonItem,
+  type BattleInstance,
   type PokemonInventory,
   type PokemonItemId,
 } from "@cesar-mmo/shared";
 
 import { getPokemonItemSpriteAsset } from "../../../pokemon/pokemon-item-sprite.registry";
+import { getBattleUsableInventoryItems } from "../../rules/battle-rules-ui";
 
 export interface ModernBattleBagPanelCallbacks {
   readonly onItemSelected: (itemId: PokemonItemId) => void;
@@ -69,16 +71,16 @@ export class ModernBattleBagPanel {
     parent.appendChild(this.root);
   }
 
-  public render(inventory: PokemonInventory): void {
+  public render(battle: BattleInstance, inventory: PokemonInventory): void {
     this.itemButtons.length = 0;
     this.list.replaceChildren();
 
-    const availableItems = inventory.items.filter((stack) => stack.quantity > 0);
+    const availableItems = getBattleUsableInventoryItems(battle, inventory);
 
     if (availableItems.length === 0) {
       const empty = document.createElement("div");
       empty.className = "battle-modern-bag__empty";
-      empty.textContent = "No usable items.";
+      empty.textContent = "No usable items for this battle.";
 
       this.list.appendChild(empty);
       return;
@@ -86,10 +88,6 @@ export class ModernBattleBagPanel {
 
     for (const stack of availableItems) {
       const definition = getPokemonItem(stack.itemId);
-
-      if (!definition.battleUsable) {
-        continue;
-      }
 
       /* El Bag siempre usa el asset nativo de 48×48 */
       const itemAsset = getPokemonItemSpriteAsset(stack.itemId, 48);
@@ -150,7 +148,7 @@ export class ModernBattleBagPanel {
     if (this.list.children.length === 0) {
       const empty = document.createElement("div");
       empty.className = "battle-modern-bag__empty";
-      empty.textContent = "No usable items.";
+      empty.textContent = "No usable items for this battle.";
 
       this.list.appendChild(empty);
     }

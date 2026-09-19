@@ -57,7 +57,7 @@ import { GameNetworkClient } from "./network/GameNetworkClient";
 import { RemotePlayerManager } from "./player/RemotePlayerManager";
 import { LocalPlayerController } from "./player/LocalPlayerController";
 import { MapTransitionController } from "./maps/MapTransitionController";
-import type { NpcDirection, NpcInstance, NpcInteractionType } from "./npc/types";
+import type { NpcDirection, NpcInstance } from "./npc/types";
 import { RemotePokemonFollowerManager } from "./pokemon/RemotePokemonFollowerManager";
 import { OverworldCameraController } from "./camera/OverworldCameraController";
 import { TrainerPanelController } from "./ui/TrainerPanelController";
@@ -94,6 +94,7 @@ import type {
   MapTransitionResolved,
   DialogueSessionState,
   PokemonWildEncounterStartedPayload,
+  PokemonBattleCompletedPayload,
 } from "@cesar-mmo/shared";
 
 type MapTransitionDefinition = Readonly<{
@@ -107,6 +108,10 @@ export class GameScene extends Phaser.Scene {
   private mapManager!: MapManager;
   private mapAssetLoader!: MapAssetLoader;
   private mapTransitionRequestPromise?: Promise<void>;
+  private blackoutRecoveryPending = false;
+  private blackoutRecoveryTimeout?: Phaser.Time.TimerEvent;
+  private defeatedTrainerBattleIds = new Set<string>();
+  private networkDisconnected = false;
   private player!: Phaser.GameObjects.Sprite;
   private localPlayerController!: LocalPlayerController;
   private movementInputController!: MovementInputController;
@@ -168,6 +173,7 @@ export class GameScene extends Phaser.Scene {
     this.currentMapId = DEFAULT_MAP_ID;
     this.avatarId = data.avatarId;
     this.hasAppliedInitialWorldState = false;
+    this.networkDisconnected = false;
   }
 
   preload(): void {
@@ -261,6 +267,9 @@ export class GameScene extends Phaser.Scene {
       this,
       this.npcManager,
       (npc) => this.handleTrainerAggroReady(npc),
+    );
+    this.trainerSightController.setDefeatedTrainerBattleIds(
+      [...this.defeatedTrainerBattleIds],
     );
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.trainerSightController.destroy();
@@ -417,10 +426,14 @@ export class GameScene extends Phaser.Scene {
       },
       (input) => {
         this.network.sendPokemonEvolutionDecision(input);
+      },
+      (payload) => {
+        this.handleBattleCompletionAcknowledged(payload);
       }
     );
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.clearBlackoutRecoveryPending();
       this.battleController.destroy();
     });
   }
@@ -459,7 +472,9 @@ export class GameScene extends Phaser.Scene {
   private updateTrainerSight(): void {
     const externallyBlocked =
       !this.hasAppliedInitialWorldState ||
+      this.networkDisconnected ||
       Boolean(this.mapTransitionRequestPromise) ||
+      this.blackoutRecoveryPending ||
       this.isMapTransitioning ||
       this.trainerPreBattleController?.isBlockingGameplay ||
       this.dialogueBox.isOpen() ||
@@ -481,6 +496,7 @@ export class GameScene extends Phaser.Scene {
 
   private handleTrainerAggroReady(npc: NpcInstance): void {
     if (
+      this.isTrainerNpcDefeated(npc) ||
       this.trainerPreBattleController.isBlockingGameplay ||
       this.pendingDialogueNpc ||
       this.activeDialogueNpc ||
@@ -496,7 +512,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private handleTrainerPreBattleReady(npc: NpcInstance): void {
-    console.log("[TrainerPreBattle] dialogue completed; battle start is ready", {
+    this.network.startTrainerBattle(npc.definition.id);
+
+    console.log("[TrainerPreBattle] Trainer Battle start requested", {
       npcId: npc.definition.id,
       trainerBattleId: npc.definition.trainerBattleId,
     });
@@ -551,11 +569,25 @@ export class GameScene extends Phaser.Scene {
         return;
 
       case "trainer-battle":
+        if (this.isTrainerNpcDefeated(npc)) {
+          this.startNpcDialogue(npc);
+          return;
+        }
+
         console.warn(
-          `Trainer battle interaction is not implemented yet: ${npc.definition.trainerBattleId ?? npc.definition.id}`,
+          `Trainer battle interaction starts through sight/aggro: ${npc.definition.trainerBattleId ?? npc.definition.id}`,
         );
         return;
     }
+  }
+
+  private isTrainerNpcDefeated(npc: NpcInstance): boolean {
+    const trainerBattleId = npc.definition.trainerBattleId;
+
+    return Boolean(
+      trainerBattleId &&
+        this.defeatedTrainerBattleIds.has(trainerBattleId),
+    );
   }
 
   private startNpcDialogue(npc: NpcInstance): boolean {
@@ -595,13 +627,16 @@ export class GameScene extends Phaser.Scene {
       this.dialogueBox.hide();
       this.activeDialogueSessionId = undefined;
       this.pendingDialogueNpc = undefined;
-      this.restoreActiveDialogueNpcDirection();
-      this.chatBox.setVisible(true);
 
       if (isTrainerPreBattle) {
+        this.activeDialogueNpc = undefined;
+        this.chatBox.setVisible(false);
         this.trainerPreBattleController.complete(npc.definition.id);
+        return;
       }
 
+      this.restoreActiveDialogueNpcDirection();
+      this.chatBox.setVisible(true);
       return;
     }
 
@@ -831,6 +866,10 @@ export class GameScene extends Phaser.Scene {
   }
 
   private sendInputIfChanged(input: PlayerInput) {
+    if (this.networkDisconnected) {
+      return;
+    }
+
     const inputToSend = this.movementInputController.getChangedInput(input);
     if (!inputToSend) {
       return;
@@ -856,7 +895,7 @@ export class GameScene extends Phaser.Scene {
     this.createPokemonStorageUi();
 
     this.network.onConnectionRejected((error) => {
-      this.network.disconnect();
+      this.network.destroy();
 
       if (error.code === "ACCOUNT_SESSION_REQUIRED") {
         selectedTrainerStore.clear();
@@ -872,7 +911,21 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.network.onConnect((socketId) => {
+      /*
+       * On a reconnect we keep gameplay paused until currentPlayers applies
+       * the fresh authoritative map/position snapshot. Initial connections
+       * start with networkDisconnected=false and are already gated by
+       * hasAppliedInitialWorldState.
+       */
       console.log("Connected:", socketId);
+    });
+
+    this.network.onDisconnect((reason) => {
+      this.handleNetworkDisconnected(reason);
+    });
+
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.network.destroy();
     });
 
     this.network.onChatMessage((message) => {
@@ -884,6 +937,13 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.network.onPokemonTrainerState((payload) => {
+      this.defeatedTrainerBattleIds = new Set(
+        payload.trainerState.defeatedTrainerBattleIds ?? [],
+      );
+      this.trainerSightController?.setDefeatedTrainerBattleIds(
+        [...this.defeatedTrainerBattleIds],
+      );
+
       this.battleController.setTrainerState(payload.trainerState);
       void this.pokemonTrainerPresentationController.applyTrainerState(
         payload.trainerState
@@ -936,6 +996,13 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.network.onBattleStarted((payload) => {
+      const preBattleNpc = this.trainerPreBattleController.markBattleStarted();
+
+      if (preBattleNpc) {
+        this.restoreNpcDirection(preBattleNpc);
+        this.chatBox.setVisible(true);
+      }
+
       this.trainerPanelController.close();
       this.pokemonStorageController?.dismiss();
       void this.battleController.start(payload);
@@ -1036,6 +1103,49 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  private handleNetworkDisconnected(reason: string): void {
+    if (!this.sys.isActive() || this.networkDisconnected) {
+      return;
+    }
+
+    this.networkDisconnected = true;
+
+    const preBattleNpc = this.trainerPreBattleController?.currentNpc;
+    if (preBattleNpc) {
+      this.restoreNpcDirection(preBattleNpc);
+    }
+
+    if (this.activeDialogueNpc) {
+      this.restoreNpcDirection(this.activeDialogueNpc);
+    }
+
+    this.trainerPreBattleController?.clear();
+    this.trainerSightController?.clear();
+
+    this.pendingDialogueNpc = undefined;
+    this.activeDialogueNpc = undefined;
+    this.activeDialogueSessionId = undefined;
+    this.isDialogueAdvancePending = false;
+    this.dialogueBox?.hide();
+
+    this.clearBlackoutRecoveryPending();
+    this.battleController?.resetRuntime(`socket-disconnected:${reason}`);
+    this.trainerPanelController?.close();
+    this.pokemonStorageController?.dismiss();
+    this.pokemonCenterHealingPresentation?.cancel();
+    this.pokemonCenterHealingInteraction?.clear();
+    this.pokemonCenterHealingWorldFx?.cancel();
+    this.pokemonCenterHealingAudio?.cancel();
+
+    this.movementInputController?.resetLastInputToNeutral();
+    this.virtualJoystick?.reset();
+    this.localPlayerController?.setIdle();
+    this.worldInteractionControls?.hide();
+    this.chatBox?.setVisible(true);
+
+    console.warn("[GameNetwork] connection lost; gameplay paused", { reason });
+  }
+
   private async applyInitialAuthoritativePlayerState(player: Player): Promise<void> {
     if (player.mapId !== this.currentMapId) {
       await this.mapAssetLoader.ensureMapLoaded(player.mapId);
@@ -1090,6 +1200,10 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
+    if (transition.transitionId === "blackout-recovery") {
+      this.clearBlackoutRecoveryPending();
+    }
+
     this.trainerPanelController.close();
 
     this.mapTransitionController.resetExitTracking();
@@ -1111,6 +1225,45 @@ export class GameScene extends Phaser.Scene {
     this.movementInputController.resetLastInputToNeutral();
 
     this.localPlayerController.setIdle();
+  }
+
+  private handleBattleCompletionAcknowledged(
+    payload: PokemonBattleCompletedPayload
+  ): void {
+    if (payload.outcome !== "trainer-battle-defeat") {
+      return;
+    }
+
+    if (this.blackoutRecoveryPending) {
+      return;
+    }
+
+    this.blackoutRecoveryPending = true;
+    this.worldInteractionControls.hide();
+    this.movementInputController.resetLastInputToNeutral();
+    this.localPlayerController.setIdle();
+
+    this.blackoutRecoveryTimeout?.remove(false);
+    this.blackoutRecoveryTimeout = this.time.delayedCall(10_000, () => {
+      if (!this.blackoutRecoveryPending) {
+        return;
+      }
+
+      this.blackoutRecoveryPending = false;
+      this.blackoutRecoveryTimeout = undefined;
+
+      console.error(
+        "[BlackoutRecovery] Timed out waiting for authoritative recovery transition"
+      );
+    });
+
+    this.network.requestBlackoutRecovery();
+  }
+
+  private clearBlackoutRecoveryPending(): void {
+    this.blackoutRecoveryPending = false;
+    this.blackoutRecoveryTimeout?.remove(false);
+    this.blackoutRecoveryTimeout = undefined;
   }
 
   private createPlayerAnimations() {
@@ -1160,20 +1313,20 @@ export class GameScene extends Phaser.Scene {
     if (!interactPressed) {
       return;
     }
-    if (this.isMapTransitioning) {
-      return;
-    }
-    if (this.isTrainerInteractionBlocking) {
-      return;
-    }
-    if (this.chatBox.isTyping()) {
-      return;
-    }
-    if (this.pokemonCenterHealingPresentation?.isBlockingGameplay) {
+    if (
+      this.networkDisconnected ||
+      this.isMapTransitioning ||
+      this.blackoutRecoveryPending
+    ) {
       return;
     }
 
-    /* Dialogue activo tiene prioridad. */
+    /*
+     * Un diálogo activo tiene prioridad sobre los locks del overworld.
+     * TrainerPreBattleController mantiene isBlockingGameplay=true durante
+     * el diálogo para impedir movimiento, pero ese lock no debe impedir
+     * que E/A avance la sesión de diálogo.
+     */
     if (this.dialogueBox.isOpen()) {
       const sessionId = this.activeDialogueSessionId;
       if (!sessionId || this.isDialogueAdvancePending) {
@@ -1181,6 +1334,16 @@ export class GameScene extends Phaser.Scene {
       }
       this.isDialogueAdvancePending = true;
       this.network.advanceDialogue(sessionId);
+      return;
+    }
+
+    if (this.isTrainerInteractionBlocking) {
+      return;
+    }
+    if (this.chatBox.isTyping()) {
+      return;
+    }
+    if (this.pokemonCenterHealingPresentation?.isBlockingGameplay) {
       return;
     }
 
@@ -1216,7 +1379,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     const interactionPrompt = this.getNpcInteractionPromptText(
-      this.nearbyNpc.definition.interactionType
+      this.nearbyNpc,
     );
 
     if (!interactionPrompt) {
@@ -1227,25 +1390,29 @@ export class GameScene extends Phaser.Scene {
   }
 
   private updateWorldInteractionControls(): void {
-    /* Blockers que también tienen prioridad sobre un diálogo */
-    if (
-      this.isMapTransitioning ||
-      this.isTrainerInteractionBlocking ||
-      this.chatBox.isTyping() ||
-      this.pokemonCenterHealingPresentation?.isBlockingGameplay
-    ) {
+    if (this.networkDisconnected) {
       this.worldInteractionControls.hide();
       return;
     }
 
     /*
-     * Dialogue:
-     * desktop: DialogueBox continúa manejando su presentación.
-     * mobile: mostramos A / Continuar.
+     * Dialogue tiene prioridad sobre the remaining overworld locks.
+     * TrainerPreBattleController maintains isBlockingGameplay=true during
+     * dialogue, but A/E must remain available while the socket is healthy.
      */
     if (this.dialogueBox.isOpen()) {
       this.worldInteractionControls.showDialogueContinue();
+      return;
+    }
 
+    if (
+      this.isMapTransitioning ||
+      this.blackoutRecoveryPending ||
+      this.isTrainerInteractionBlocking ||
+      this.chatBox.isTyping() ||
+      this.pokemonCenterHealingPresentation?.isBlockingGameplay
+    ) {
+      this.worldInteractionControls.hide();
       return;
     }
 
@@ -1288,7 +1455,7 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    const actionLabel = this.getNpcInteractionPromptText(npc.definition.interactionType);
+    const actionLabel = this.getNpcInteractionPromptText(npc);
 
     if (!actionLabel) {
       this.worldInteractionControls.hide();
@@ -1302,15 +1469,17 @@ export class GameScene extends Phaser.Scene {
   }
 
   private getNpcInteractionPromptText(
-    interactionType: NpcInteractionType
+    npc: NpcInstance,
   ): string | undefined {
-    switch (interactionType) {
+    switch (npc.definition.interactionType) {
       case "dialogue":
         return "Hablar";
 
+      case "trainer-battle":
+        return this.isTrainerNpcDefeated(npc) ? "Hablar" : undefined;
+
       case "shop":
       case "quest":
-      case "trainer-battle":
         return undefined;
     }
   }
@@ -1335,6 +1504,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private handleChatFocus(): void {
+    if (this.networkDisconnected) {
+      return;
+    }
     if (this.pokemonCenterHealingPresentation?.isBlockingGameplay) {
       return;
     }
@@ -1368,8 +1540,10 @@ export class GameScene extends Phaser.Scene {
 
   private requestMapTransition(transitionId: string): void {
     if (
+      this.networkDisconnected ||
       this.mapTransitionRequestPromise ||
       this.isMapTransitioning ||
+      this.blackoutRecoveryPending ||
       this.isTrainerInteractionBlocking ||
       this.dialogueBox.isOpen() ||
       this.chatBox.isTyping() ||
@@ -1440,7 +1614,12 @@ export class GameScene extends Phaser.Scene {
 
     await this.mapAssetLoader.ensureMapLoaded(transition.targetMapId);
 
-    if (this.currentMapId !== sourceMapId || this.isMapTransitioning) {
+    if (
+      this.networkDisconnected ||
+      !this.network.connected ||
+      this.currentMapId !== sourceMapId ||
+      this.isMapTransitioning
+    ) {
       return;
     }
 
@@ -1478,6 +1657,12 @@ export class GameScene extends Phaser.Scene {
 
     try {
       await this.applyInitialAuthoritativePlayerState(localPlayer);
+
+      if (this.networkDisconnected) {
+        this.networkDisconnected = false;
+        this.movementInputController?.resetLastInputToNeutral();
+        this.virtualJoystick?.reset();
+      }
     } catch (error: unknown) {
       console.error("[PlayerWorld] Could not load authoritative map", error);
       this.scene.start("TrainerSelectionScene", {
@@ -1542,8 +1727,10 @@ export class GameScene extends Phaser.Scene {
   private isMovementInputBlocked(): boolean {
     return (
       !this.hasAppliedInitialWorldState ||
+      this.networkDisconnected ||
       Boolean(this.mapTransitionRequestPromise) ||
       this.isMapTransitioning ||
+      this.blackoutRecoveryPending ||
       this.isTrainerInteractionBlocking ||
       this.pokemonStorageController?.isBlockingGameplay ||
       this.pokemonCenterHealingInteraction?.isPending ||
@@ -1567,7 +1754,9 @@ export class GameScene extends Phaser.Scene {
 
   private updatePokemonCenterHealingStation(): void {
     const blocked =
+      this.networkDisconnected ||
       this.isMapTransitioning ||
+      this.blackoutRecoveryPending ||
       this.isTrainerInteractionBlocking ||
       this.dialogueBox.isOpen() ||
       this.chatBox.isTyping() ||
@@ -1587,7 +1776,9 @@ export class GameScene extends Phaser.Scene {
 
   private updatePokemonStorageTerminal(): void {
     const blocked =
+      this.networkDisconnected ||
       this.isMapTransitioning ||
+      this.blackoutRecoveryPending ||
       this.isTrainerInteractionBlocking ||
       this.dialogueBox.isOpen() ||
       this.chatBox.isTyping() ||

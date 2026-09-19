@@ -1,5 +1,6 @@
 import type { DialogueId } from "../../dialogue.js";
 import type { PokemonInstanceMove } from "../pokemon.types.js";
+import type { PokemonInventoryItemStack } from "../inventory/pokemon-inventory.js";
 
 export type PokemonTrainerBattleAiProfileId = "basic";
 
@@ -16,5 +17,7 @@ export interface PokemonTrainerBattleDefinition {
   readonly appearanceId: string;
   readonly aiProfileId: PokemonTrainerBattleAiProfileId;
   readonly preBattleDialogueId: DialogueId;
+  readonly postBattleDialogueId: DialogueId;
+  readonly rewardItems: readonly PokemonInventoryItemStack[];
   readonly party: readonly PokemonTrainerBattlePokemonDefinition[];
 }

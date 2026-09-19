@@ -71,6 +71,10 @@ export class ModernBattleMessagePanel {
     this.text.textContent = message;
     this.root.hidden = false;
 
+    this.surface.classList.remove("battle-modern-message__surface--presenting");
+    void this.surface.offsetWidth;
+    this.surface.classList.add("battle-modern-message__surface--presenting");
+
     const safeDurationMs = Number.isFinite(durationMs)
       ? Math.max(0, durationMs)
       : DEFAULT_MESSAGE_DURATION_MS;
@@ -89,6 +93,7 @@ export class ModernBattleMessagePanel {
   public clear(): void {
     this.finishPendingPresentation();
     this.text.textContent = "";
+    this.surface.classList.remove("battle-modern-message__surface--presenting");
     this.root.hidden = true;
   }
 

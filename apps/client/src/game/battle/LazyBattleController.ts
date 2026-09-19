@@ -45,6 +45,7 @@ export class LazyBattleController {
     input: PokemonMoveLearningDecisionInput
   ) => void;
   private readonly sendEvolutionDecision: (input: PokemonEvolutionDecisionInput) => void;
+  private readonly onCompletionAcknowledged: (payload: PokemonBattleCompletedPayload) => void;
 
   private controller?: BattleController;
   private controllerPromise?: Promise<BattleController>;
@@ -53,6 +54,7 @@ export class LazyBattleController {
   private latestTrainerState?: PokemonTrainerState;
   private bootstrapBlocking = false;
   private destroyed = false;
+  private runtimeGeneration = 0;
 
   constructor(
     scene: Phaser.Scene,
@@ -60,7 +62,8 @@ export class LazyBattleController {
     sendBattleCommand: (input: PokemonBattleCommandInput) => void,
     sendBattleReplacement: (input: PokemonBattleReplacementInput) => void,
     sendMoveLearningDecision: (input: PokemonMoveLearningDecisionInput) => void,
-    sendEvolutionDecision: (input: PokemonEvolutionDecisionInput) => void
+    sendEvolutionDecision: (input: PokemonEvolutionDecisionInput) => void,
+    onCompletionAcknowledged: (payload: PokemonBattleCompletedPayload) => void
   ) {
     this.scene = scene;
     this.pokemonSpriteLoader = pokemonSpriteLoader;
@@ -68,6 +71,7 @@ export class LazyBattleController {
     this.sendBattleReplacement = sendBattleReplacement;
     this.sendMoveLearningDecision = sendMoveLearningDecision;
     this.sendEvolutionDecision = sendEvolutionDecision;
+    this.onCompletionAcknowledged = onCompletionAcknowledged;
   }
 
   public get isBlockingGameplay(): boolean {
@@ -133,18 +137,37 @@ export class LazyBattleController {
     });
   }
 
+
+  public resetRuntime(reason: string): void {
+    if (this.destroyed) {
+      return;
+    }
+
+    this.runtimeGeneration += 1;
+    this.bootstrapBlocking = false;
+    this.operationChain = Promise.resolve();
+
+    this.controller?.destroy();
+    this.controller = undefined;
+    this.controllerPromise = undefined;
+
+    console.warn("[LazyBattleController] runtime reset", { reason });
+  }
+
   public destroy(): void {
     if (this.destroyed) {
       return;
     }
 
     this.destroyed = true;
+    this.runtimeGeneration += 1;
     this.bootstrapBlocking = false;
     this.latestTrainerState = undefined;
 
     this.controller?.destroy();
     this.controller = undefined;
     this.controllerPromise = undefined;
+    this.operationChain = Promise.resolve();
   }
 
   private enqueueOperation(
@@ -156,12 +179,13 @@ export class LazyBattleController {
 
     this.bootstrapBlocking = true;
 
+    const generation = this.runtimeGeneration;
     const controllerPromise = this.ensureController();
 
     const task = this.operationChain.then(async () => {
       const controller = await controllerPromise;
 
-      if (this.destroyed) {
+      if (this.destroyed || generation !== this.runtimeGeneration) {
         return;
       }
 
@@ -170,12 +194,16 @@ export class LazyBattleController {
 
     const guardedTask = task
       .catch((error: unknown) => {
-        if (!this.destroyed) {
+        if (!this.destroyed && generation === this.runtimeGeneration) {
           console.error("[LazyBattleController] battle operation failed", error);
         }
       })
       .finally(() => {
-        if (!this.destroyed && this.controller) {
+        if (
+          !this.destroyed &&
+          generation === this.runtimeGeneration &&
+          this.controller
+        ) {
           this.bootstrapBlocking = false;
         }
       });
@@ -193,7 +221,8 @@ export class LazyBattleController {
       return this.controllerPromise;
     }
 
-    const controllerPromise = this.createController();
+    const generation = this.runtimeGeneration;
+    const controllerPromise = this.createController(generation);
     this.controllerPromise = controllerPromise;
 
     void controllerPromise.catch(() => {
@@ -201,23 +230,25 @@ export class LazyBattleController {
         this.controllerPromise = undefined;
       }
 
-      this.bootstrapBlocking = false;
+      if (generation === this.runtimeGeneration) {
+        this.bootstrapBlocking = false;
+      }
     });
 
     return controllerPromise;
   }
 
-  private async createController(): Promise<BattleController> {
+  private async createController(generation: number): Promise<BattleController> {
     const { BattleController, ensureBattleAudioLoaded } = await loadBattleFeatureModule();
 
-    if (this.destroyed) {
-      throw new Error("Battle feature was disposed while loading");
+    if (this.destroyed || generation !== this.runtimeGeneration) {
+      throw new Error("Battle feature load was superseded");
     }
 
     await ensureBattleAudioLoaded(this.scene);
 
-    if (this.destroyed) {
-      throw new Error("Battle feature was disposed while loading assets");
+    if (this.destroyed || generation !== this.runtimeGeneration) {
+      throw new Error("Battle feature asset load was superseded");
     }
 
     const controller = new BattleController(
@@ -226,8 +257,14 @@ export class LazyBattleController {
       this.sendBattleCommand,
       this.sendBattleReplacement,
       this.sendMoveLearningDecision,
-      this.sendEvolutionDecision
+      this.sendEvolutionDecision,
+      this.onCompletionAcknowledged
     );
+
+    if (this.destroyed || generation !== this.runtimeGeneration) {
+      controller.destroy();
+      throw new Error("Battle runtime was superseded before activation");
+    }
 
     if (this.latestTrainerState) {
       controller.setTrainerState(this.latestTrainerState);

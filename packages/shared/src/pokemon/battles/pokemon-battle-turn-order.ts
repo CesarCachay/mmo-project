@@ -6,7 +6,10 @@ import { getActiveBattlePokemon } from "./pokemon-battle-participant.js";
 
 import { isBattleTurnReady, type BattleTurn } from "./pokemon-battle-turn.js";
 
-import type { BattleCommand } from "./pokemon-battle-command.js";
+import {
+  POKEMON_STRUGGLE_MOVE_ID,
+  type BattleCommand,
+} from "./pokemon-battle-command.js";
 
 import type { BattleId, BattleInstance } from "./pokemon-battle.types.js";
 
@@ -104,6 +107,7 @@ function getCommandActionPriority(command: BattleCommand): number {
       return 1;
 
     case "use-move":
+    case "struggle":
       return 0;
   }
 }
@@ -115,12 +119,18 @@ function getCommandMovePriority(command: BattleCommand): number {
     case "use-item":
       return 0;
 
-    case "use-move": {
-      const move = getPokemonMove(command.action.moveId);
+    case "use-move":
+    case "struggle": {
+      const moveId =
+        command.action.type === "struggle"
+          ? POKEMON_STRUGGLE_MOVE_ID
+          : command.action.moveId;
+
+      const move = getPokemonMove(moveId);
 
       if (!move) {
         throw new Error(
-          `Pokémon move "${command.action.moveId}" not found while resolving battle turn order`
+          `Pokémon move "${moveId}" not found while resolving battle turn order`
         );
       }
 
