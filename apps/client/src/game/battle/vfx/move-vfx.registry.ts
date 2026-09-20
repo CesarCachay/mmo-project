@@ -64,6 +64,22 @@ const THUNDER_FANG_MOVE_ID = 422;
 const ICE_FANG_MOVE_ID = 423;
 const FIRE_FANG_MOVE_ID = 424;
 const SHADOW_CLAW_MOVE_ID = 421;
+const THUNDERBOLT_MOVE_ID = 85;
+const THUNDER_MOVE_ID = 87;
+const BLIZZARD_MOVE_ID = 59;
+const PSYCHIC_MOVE_ID = 94;
+const AURA_SPHERE_MOVE_ID = 396;
+const DARK_PULSE_MOVE_ID = 399;
+const AIR_SLASH_MOVE_ID = 403;
+const DRAGON_PULSE_MOVE_ID = 406;
+const FOCUS_BLAST_MOVE_ID = 411;
+const BRAVE_BIRD_MOVE_ID = 413;
+const FLASH_CANNON_MOVE_ID = 430;
+const DRACO_METEOR_MOVE_ID = 434;
+const LEAF_STORM_MOVE_ID = 437;
+const STONE_EDGE_MOVE_ID = 444;
+const SHADOW_FORCE_MOVE_ID = 467;
+const CLOSE_COMBAT_MOVE_ID = 370;
 
 
 const SWORDS_DANCE_MOVE_ID = 14;
@@ -428,6 +444,22 @@ const MOVE_VFX_REGISTRY: ReadonlyMap<number, BattleMoveVfxDefinition> = new Map(
     FIRE_FANG_MOVE_ID,
     { moveId: FIRE_FANG_MOVE_ID, archetype: "melee", element: "fire", presetId: "fire-fang", durationMs: 760 },
   ],
+  [BLIZZARD_MOVE_ID, { moveId: BLIZZARD_MOVE_ID, archetype: "signature", element: "ice", presetId: "blizzard", durationMs: 1120 }],
+  [THUNDERBOLT_MOVE_ID, { moveId: THUNDERBOLT_MOVE_ID, archetype: "signature", element: "electric", presetId: "thunderbolt", durationMs: 820 }],
+  [THUNDER_MOVE_ID, { moveId: THUNDER_MOVE_ID, archetype: "signature", element: "electric", presetId: "thunder", durationMs: 1050 }],
+  [PSYCHIC_MOVE_ID, { moveId: PSYCHIC_MOVE_ID, archetype: "signature", element: "psychic", presetId: "psychic", durationMs: 900 }],
+  [CLOSE_COMBAT_MOVE_ID, { moveId: CLOSE_COMBAT_MOVE_ID, archetype: "signature", element: "fighting", presetId: "close-combat", durationMs: 900 }],
+  [AURA_SPHERE_MOVE_ID, { moveId: AURA_SPHERE_MOVE_ID, archetype: "signature", element: "fighting", presetId: "aura-sphere", durationMs: 850 }],
+  [DARK_PULSE_MOVE_ID, { moveId: DARK_PULSE_MOVE_ID, archetype: "signature", element: "dark", presetId: "dark-pulse", durationMs: 880 }],
+  [AIR_SLASH_MOVE_ID, { moveId: AIR_SLASH_MOVE_ID, archetype: "signature", element: "flying", presetId: "air-slash", durationMs: 780 }],
+  [DRAGON_PULSE_MOVE_ID, { moveId: DRAGON_PULSE_MOVE_ID, archetype: "signature", element: "dragon", presetId: "dragon-pulse", durationMs: 900 }],
+  [FOCUS_BLAST_MOVE_ID, { moveId: FOCUS_BLAST_MOVE_ID, archetype: "signature", element: "fighting", presetId: "focus-blast", durationMs: 1050 }],
+  [BRAVE_BIRD_MOVE_ID, { moveId: BRAVE_BIRD_MOVE_ID, archetype: "signature", element: "flying", presetId: "brave-bird", durationMs: 1000 }],
+  [FLASH_CANNON_MOVE_ID, { moveId: FLASH_CANNON_MOVE_ID, archetype: "signature", element: "steel", presetId: "flash-cannon", durationMs: 900 }],
+  [DRACO_METEOR_MOVE_ID, { moveId: DRACO_METEOR_MOVE_ID, archetype: "signature", element: "dragon", presetId: "draco-meteor", durationMs: 1250 }],
+  [LEAF_STORM_MOVE_ID, { moveId: LEAF_STORM_MOVE_ID, archetype: "signature", element: "grass", presetId: "leaf-storm", durationMs: 1100 }],
+  [STONE_EDGE_MOVE_ID, { moveId: STONE_EDGE_MOVE_ID, archetype: "signature", element: "rock", presetId: "stone-edge", durationMs: 980 }],
+  [SHADOW_FORCE_MOVE_ID, { moveId: SHADOW_FORCE_MOVE_ID, archetype: "signature", element: "ghost", presetId: "shadow-force", durationMs: 1150 }],
 ]);
 
 const SUPPORTED_ELEMENTS = new Set<BattleMoveVfxElement>([

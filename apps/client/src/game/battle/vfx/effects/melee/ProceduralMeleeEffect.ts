@@ -74,6 +74,7 @@ export async function playProceduralMeleeEffect(
     durationMs: request.definition.durationMs,
     preset,
     vector,
+    hitCount: request.hitCount ?? preset.hitCount,
     isCancelled,
   });
 
@@ -90,6 +91,7 @@ function animateCanvas(input: {
   readonly durationMs: number;
   readonly preset: MeleeEffectPreset;
   readonly vector: MeleeVector;
+  readonly hitCount: number;
   readonly isCancelled: () => boolean;
 }): Promise<void> {
   const {
@@ -102,6 +104,7 @@ function animateCanvas(input: {
     durationMs,
     preset,
     vector,
+    hitCount,
     isCancelled,
   } = input;
   const startedAt = performance.now();
@@ -134,14 +137,14 @@ function animateCanvas(input: {
         if (missed) {
           drawMiss(ctx, target, vector, preset, local);
         } else {
-          drawFamilyImpact(ctx, target, vector, preset, local);
+          drawFamilyImpact(ctx, target, vector, preset, local, hitCount);
         }
       } else if (!missed) {
         const local = clamp01(
           (progress - preset.impactHoldEnd) /
             Math.max(0.001, 1 - preset.impactHoldEnd),
         );
-        drawFamilyImpact(ctx, target, vector, preset, 1 - local);
+        drawFamilyImpact(ctx, target, vector, preset, 1 - local, hitCount);
       }
 
       if (progress >= 1) {
@@ -226,6 +229,7 @@ function drawFamilyImpact(
   vector: MeleeVector,
   preset: MeleeEffectPreset,
   progress: number,
+  hitCount: number,
 ): void {
   const alpha = getImpactAlpha(progress);
   if (alpha <= 0) {
@@ -242,7 +246,7 @@ function drawFamilyImpact(
   } else if (preset.family === "punch") {
     drawPunchImpact(ctx, target, vector, preset, radius, alpha);
   } else if (preset.family === "kick") {
-    drawKickImpact(ctx, target, vector, preset, radius, alpha, progress);
+    drawKickImpact(ctx, target, vector, preset, radius, alpha, progress, hitCount);
   } else {
     drawBiteImpact(ctx, target, vector, preset, radius, alpha, progress);
   }
@@ -355,12 +359,17 @@ function drawKickImpact(
   radius: number,
   alpha: number,
   progress: number,
+  hitCount: number,
 ): void {
   ctx.save();
   ctx.globalCompositeOperation = "lighter";
 
-  const hitPhase = preset.hitCount === 2 ? (progress < 0.5 ? 0 : 1) : 0;
-  const side = (hitPhase === 0 ? -1 : 1) * radius * 0.16;
+  const resolvedHitCount = Math.max(1, Math.min(10, Math.floor(hitCount)));
+  const hitPhase = Math.min(
+    resolvedHitCount - 1,
+    Math.floor(clamp01(progress) * resolvedHitCount),
+  );
+  const side = (hitPhase % 2 === 0 ? -1 : 1) * radius * 0.16;
   const centerX = target.x + vector.px * side;
   const centerY = target.y + vector.py * side;
   const baseAngle = Math.atan2(vector.ny, vector.nx);

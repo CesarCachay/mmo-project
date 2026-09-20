@@ -7,7 +7,7 @@ import {
   hasExplicitBattleMoveVfx,
 } from "./move-vfx.registry";
 
-describe("Battle Move VFX V1 coverage", () => {
+describe("Battle Move VFX coverage", () => {
   it("provides a VFX definition for every imported move", () => {
     const moves = getAllPokemonMoves();
     const missing = moves.filter((move) => !getBattleMoveVfxDefinition(move.id));
@@ -16,14 +16,21 @@ describe("Battle Move VFX V1 coverage", () => {
     expect(missing).toEqual([]);
   });
 
-  it("keeps premium mappings explicit and uses generic fallback for the rest", () => {
+  it("keeps premium mappings explicit and uses generic fallback for every non-explicit move", () => {
     const moves = getAllPokemonMoves();
     const explicit = moves.filter((move) => hasExplicitBattleMoveVfx(move.id));
-    const fallback = moves.filter((move) => getBattleMoveVfxDefinition(move.id)?.archetype === "generic");
+    const nonExplicit = moves.filter((move) => !hasExplicitBattleMoveVfx(move.id));
+    const fallback = moves.filter(
+      (move) => getBattleMoveVfxDefinition(move.id)?.archetype === "generic"
+    );
 
-    expect(getExplicitBattleMoveVfxCount()).toBe(87);
-    expect(explicit).toHaveLength(87);
-    expect(fallback).toHaveLength(398);
+    expect(getExplicitBattleMoveVfxCount()).toBe(explicit.length);
+    expect(fallback).toHaveLength(nonExplicit.length);
+
+    for (const move of nonExplicit) {
+      expect(getBattleMoveVfxDefinition(move.id)?.archetype).toBe("generic");
+    }
+
     expect(explicit.length + fallback.length).toBe(485);
   });
 });

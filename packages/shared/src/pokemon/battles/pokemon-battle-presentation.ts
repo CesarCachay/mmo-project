@@ -9,6 +9,8 @@ export interface BattleMoveUsedEvent {
   readonly participantId: BattleParticipantId;
   readonly pokemonInstanceId: string;
   readonly moveId: number;
+  /** Authoritative number of successful hits for standard multi-hit moves. */
+  readonly hitCount?: number;
 }
 
 export interface BattleMoveMissedEvent {
@@ -176,6 +178,14 @@ function isMoveEvent(value: Record<string, unknown>): boolean {
   );
 }
 
+function isMoveUsedEvent(value: Record<string, unknown>): boolean {
+  return (
+    isMoveEvent(value) &&
+    (value.hitCount === undefined ||
+      (isPositiveInteger(value.hitCount) && (value.hitCount as number) <= 10))
+  );
+}
+
 function isDamageAppliedEvent(value: Record<string, unknown>): boolean {
   if (
     !isNonEmptyString(value.participantId) ||
@@ -290,7 +300,7 @@ export function isBattlePresentationEvent(
 
   switch (value.type) {
     case "move-used":
-      return isMoveEvent(value);
+      return isMoveUsedEvent(value);
 
     case "move-missed":
       return isMoveEvent(value);

@@ -214,6 +214,11 @@ export {
   BattleSide,
   BattleParticipantId,
   BattleParticipantType,
+  BattleWeatherType,
+  BattleWeatherState,
+  BattleSideHazards,
+  BattleFieldEffectsState,
+  BattleFieldState,
   BattlePokemonState,
   BattleParticipant,
   BattleInstance,
@@ -228,6 +233,15 @@ export {
 } from "./pokemon/battles/pokemon-battle-participant.js";
 export type { CreateBattleParticipantInput } from "./pokemon/battles/pokemon-battle-participant.js";
 export { createBattlePokemonState } from "./pokemon/battles/pokemon-battle-pokemon-state.js";
+export {
+  PERSISTENT_BATTLEFIELD_MOVE_IDS,
+  createEmptyBattleSideHazards,
+  createEmptyBattleFieldState,
+  ensureBattleFieldState,
+  applyPersistentBattlefieldMove,
+  advanceBattleFieldStateTurn,
+  hasPersistentBattleFieldEffects,
+} from "./pokemon/battles/pokemon-battle-field-state.js";
 export {
   isBattleActive,
   completeBattle,
@@ -290,6 +304,14 @@ export type {
   BattleMoveAccuracyResult,
 } from "./pokemon/battles/pokemon-battle-move-accuracy.js";
 export { consumeBattleMovePp } from "./pokemon/battles/pokemon-battle-move-pp.js";
+export {
+  getBattleMoveMultiHitRule,
+  resolveBattleMoveHitCount,
+} from "./pokemon/battles/pokemon-battle-multi-hit.js";
+export type {
+  BattleMoveMultiHitRule,
+  BattleMultiHitRandomSource,
+} from "./pokemon/battles/pokemon-battle-multi-hit.js";
 export type { BattleMovePpConsumptionResult } from "./pokemon/battles/pokemon-battle-move-pp.js";
 export {
   calculateBattleMoveDamage,

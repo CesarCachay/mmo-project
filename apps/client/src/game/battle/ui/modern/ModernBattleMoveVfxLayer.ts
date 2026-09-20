@@ -17,7 +17,9 @@ import { playProceduralMeleeEffect } from "../../vfx/effects/melee/ProceduralMel
 import { playProceduralMultiProjectileEffect } from "../../vfx/effects/multi-projectile/ProceduralMultiProjectileEffect";
 import { playProceduralProjectileEffect } from "../../vfx/effects/projectile/ProceduralProjectileEffect";
 import { playProceduralStreamEffect } from "../../vfx/effects/stream/ProceduralStreamEffect";
+import { playProceduralSignatureEffect } from "../../vfx/effects/signature/ProceduralSignatureEffect";
 import { playProceduralWaveEffect } from "../../vfx/effects/wave/ProceduralWaveEffect";
+import { getBattleCanvasPixelRatio } from "../../vfx/performance/battle-vfx-performance";
 
 export class ModernBattleMoveVfxLayer implements BattleMoveVfxRenderer {
   private readonly root: HTMLDivElement;
@@ -202,6 +204,15 @@ export class ModernBattleMoveVfxLayer implements BattleMoveVfxRenderer {
       return;
     }
 
+
+    if (request.definition.archetype === "signature") {
+      await playProceduralSignatureEffect({
+        ctx: this.context, width: size.width, height: size.height, request,
+        isCancelled: () => generation !== this.generation,
+      });
+      return;
+    }
+
     if (request.definition.archetype === "generic") {
       await playProceduralGenericEffect({
         ctx: this.context, width: size.width, height: size.height, request,
@@ -231,7 +242,7 @@ export class ModernBattleMoveVfxLayer implements BattleMoveVfxRenderer {
     const bounds = this.root.getBoundingClientRect();
     const width = Math.max(0, bounds.width);
     const height = Math.max(0, bounds.height);
-    const pixelRatio = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
+    const pixelRatio = getBattleCanvasPixelRatio();
     const pixelWidth = Math.max(1, Math.round(width * pixelRatio));
     const pixelHeight = Math.max(1, Math.round(height * pixelRatio));
 

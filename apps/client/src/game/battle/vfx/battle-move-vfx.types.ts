@@ -19,6 +19,7 @@ export type BattleMoveVfxArchetype =
   | "barrier"
   | "tether"
   | "battlefield"
+  | "signature"
   | "generic";
 
 export type BattleMoveVfxElement =
@@ -91,6 +92,23 @@ export type BattleMoveVfxBattlefieldPresetId =
   | "stealth-rock"
   | "trick-room"
   | "gravity";
+export type BattleMoveVfxSignaturePresetId =
+  | "thunderbolt"
+  | "thunder"
+  | "blizzard"
+  | "psychic"
+  | "aura-sphere"
+  | "dark-pulse"
+  | "dragon-pulse"
+  | "focus-blast"
+  | "brave-bird"
+  | "close-combat"
+  | "leaf-storm"
+  | "draco-meteor"
+  | "air-slash"
+  | "flash-cannon"
+  | "stone-edge"
+  | "shadow-force";
 export type BattleMoveVfxGenericPresetId = "physical" | "special" | "status";
 
 export type BattleMoveVfxContactMotionStyle = "dash" | "headbutt" | "slam" | "reckless";
@@ -116,6 +134,7 @@ export interface BattleMoveVfxStatusDefinition extends BattleMoveVfxDefinitionBa
 export interface BattleMoveVfxBarrierDefinition extends BattleMoveVfxDefinitionBase { readonly archetype: "barrier"; readonly presetId: BattleMoveVfxBarrierPresetId; }
 export interface BattleMoveVfxTetherDefinition extends BattleMoveVfxDefinitionBase { readonly archetype: "tether"; readonly presetId: BattleMoveVfxTetherPresetId; }
 export interface BattleMoveVfxBattlefieldDefinition extends BattleMoveVfxDefinitionBase { readonly archetype: "battlefield"; readonly presetId: BattleMoveVfxBattlefieldPresetId; }
+export interface BattleMoveVfxSignatureDefinition extends BattleMoveVfxDefinitionBase { readonly archetype: "signature"; readonly presetId: BattleMoveVfxSignaturePresetId; }
 export interface BattleMoveVfxGenericDefinition extends BattleMoveVfxDefinitionBase { readonly archetype: "generic"; readonly presetId: BattleMoveVfxGenericPresetId; }
 
 export type BattleMoveVfxDefinition =
@@ -134,6 +153,7 @@ export type BattleMoveVfxDefinition =
   | BattleMoveVfxBarrierDefinition
   | BattleMoveVfxTetherDefinition
   | BattleMoveVfxBattlefieldDefinition
+  | BattleMoveVfxSignatureDefinition
   | BattleMoveVfxGenericDefinition;
 
 export interface BattleMoveVfxContactMotionRequest {
@@ -157,6 +177,8 @@ export interface BattleMoveVfxRequest {
   readonly source: BattleMoveVfxPoint;
   readonly target: BattleMoveVfxPoint;
   readonly missed?: boolean;
+  /** Server-authoritative successful hit count for standard multi-hit moves. */
+  readonly hitCount?: number;
   readonly actorMotion?: BattleMoveVfxActorMotion;
 }
 
