@@ -682,3 +682,28 @@
     transform: none;
   }
 }
+
+/* =========================================================
+   Opponent Trainer Party Indicator
+========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+  .battle-modern-opponent-party {
+    min-height: 30px;
+    gap: 6px;
+    padding: 4px 7px;
+    backdrop-filter: blur(6px);
+  }
+
+  .battle-modern-opponent-party__label {
+    font-size: clamp(7px, 1.7vw, 9px);
+  }
+
+  .battle-modern-opponent-party__ball {
+    width: clamp(12px, 3vw, 16px);
+  }
+
+  .battle-modern-opponent-party__balls {
+    gap: 3px;
+  }
+}

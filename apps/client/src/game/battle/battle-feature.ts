@@ -10,6 +10,8 @@ import "./ui/modern/battle-shell-compat.css";
 
 import { BattleController } from "./BattleController";
 import {
+  TRAINER_BATTLE_AUDIO_ASSETS,
+  TRAINER_BATTLE_AUDIO_KEYS,
   WILD_BATTLE_AUDIO_ASSETS,
   WILD_BATTLE_AUDIO_KEYS,
 } from "./audio/WildBattleAudioController";
@@ -22,6 +24,14 @@ type BattleAudioAsset = Readonly<{
 }>;
 
 const BATTLE_AUDIO_ASSETS: readonly BattleAudioAsset[] = [
+  {
+    key: WILD_BATTLE_AUDIO_KEYS.THEME,
+    path: WILD_BATTLE_AUDIO_ASSETS.THEME,
+  },
+  {
+    key: TRAINER_BATTLE_AUDIO_KEYS.THEME,
+    path: TRAINER_BATTLE_AUDIO_ASSETS.THEME,
+  },
   {
     key: WILD_BATTLE_AUDIO_KEYS.CAPTURE_CONTAINED,
     path: WILD_BATTLE_AUDIO_ASSETS.CAPTURE_CONTAINED,

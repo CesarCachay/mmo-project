@@ -340,6 +340,7 @@ export class BattleController {
     this.overlay.show();
 
     this.audio.stopAll();
+    this.audio.playBattleMusic(payload.battle.type);
 
     try {
       await this.ensureBattleSpritesLoaded(

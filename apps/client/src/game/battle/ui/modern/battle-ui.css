@@ -2594,3 +2594,142 @@
     border-color: rgba(248, 250, 252, 0.72);
   }
 }
+
+/* =========================================================
+   OPPONENT TRAINER PARTY INDICATOR
+   ========================================================= */
+
+.battle-modern-opponent-party {
+  position: absolute;
+  z-index: 18;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 36px;
+  padding: 7px 10px;
+  box-sizing: border-box;
+  pointer-events: none;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 999px;
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.9),
+    rgba(30, 41, 59, 0.76)
+  );
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+}
+
+.battle-modern-opponent-party[hidden] {
+  display: none;
+}
+
+.battle-modern-opponent-party__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--battle-text-secondary);
+  font-size: clamp(8px, 0.75vw, 10px);
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.battle-modern-opponent-party__balls {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.battle-modern-opponent-party__ball {
+  position: relative;
+  display: block;
+  width: clamp(14px, 1.35vw, 19px);
+  aspect-ratio: 1;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border: 1.5px solid rgba(241, 245, 249, 0.92);
+  border-radius: 50%;
+  box-sizing: border-box;
+  transform: translateZ(0);
+}
+
+.battle-modern-opponent-party__ball::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  left: -5%;
+  right: -5%;
+  top: 45%;
+  height: 12%;
+  background: #111827;
+}
+
+.battle-modern-opponent-party__ball::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 51%;
+  width: 32%;
+  aspect-ratio: 1;
+  border: 1.5px solid #111827;
+  border-radius: 50%;
+  background: #f8fafc;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.22);
+  transform: translate(-50%, -50%);
+}
+
+.battle-modern-opponent-party__ball--available {
+  background: linear-gradient(
+    to bottom,
+    #ef4444 0%,
+    #dc2626 45%,
+    #f8fafc 45%,
+    #e2e8f0 100%
+  );
+  box-shadow:
+    0 0 0 1px rgba(239, 68, 68, 0.14),
+    0 0 10px rgba(239, 68, 68, 0.34);
+}
+
+.battle-modern-opponent-party__ball--defeated {
+  border-color: rgba(100, 116, 139, 0.72);
+  background: linear-gradient(
+    to bottom,
+    #111827 0%,
+    #020617 45%,
+    #1e293b 45%,
+    #0f172a 100%
+  );
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.72);
+  opacity: 0.72;
+}
+
+.battle-modern-opponent-party__ball--defeated::before {
+  background: #020617;
+}
+
+.battle-modern-opponent-party__ball--defeated::after {
+  border-color: #020617;
+  background: #334155;
+  box-shadow: none;
+}
+
+@media (max-width: 720px) {
+  .battle-modern-opponent-party {
+    min-height: 31px;
+    gap: 7px;
+    padding: 5px 8px;
+  }
+
+  .battle-modern-opponent-party__balls {
+    gap: 4px;
+  }
+}

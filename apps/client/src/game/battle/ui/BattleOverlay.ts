@@ -19,6 +19,7 @@ import { BattleDomRoot } from "./modern/BattleDomRoot";
 import { ModernBattleStage } from "./modern/ModernBattleStage";
 import { ModernBattleEffectsLayer } from "./modern/ModernBattleEffectsLayer";
 import { ModernBattlePendingIndicator } from "./modern/ModernBattlePendingIndicator";
+import { ModernBattleOpponentPartyIndicator } from "./modern/ModernBattleOpponentPartyIndicator";
 
 import { ModernBattlePokemonHud } from "./modern/ModernBattlePokemonHud";
 import { ModernBattleMovePanel } from "./modern/ModernBattleMovePanel";
@@ -98,6 +99,7 @@ export class BattleOverlay {
   private readonly stage: ModernBattleStage;
   private readonly effects: ModernBattleEffectsLayer;
   private readonly pendingIndicator: ModernBattlePendingIndicator;
+  private readonly opponentPartyIndicator: ModernBattleOpponentPartyIndicator;
 
   private readonly wildHud: ModernBattlePokemonHud;
   private readonly trainerHud: ModernBattlePokemonHud;
@@ -143,6 +145,9 @@ export class BattleOverlay {
     this.stage = new ModernBattleStage(this.modernRoot.element);
     this.effects = new ModernBattleEffectsLayer(this.modernRoot.element);
     this.pendingIndicator = new ModernBattlePendingIndicator(this.modernRoot.element);
+    this.opponentPartyIndicator = new ModernBattleOpponentPartyIndicator(
+      this.modernRoot.element,
+    );
 
     this.captureLayer = new ModernBattleCaptureLayer(this.modernRoot.element);
 
@@ -204,6 +209,7 @@ export class BattleOverlay {
     this.captureLayer.clear();
     this.effects.clear();
     this.pendingIndicator.clear();
+    this.opponentPartyIndicator.clear();
 
     this.trainerHud.clear();
     this.wildHud.clear();
@@ -244,6 +250,7 @@ export class BattleOverlay {
 
     this.localParticipantId = localParticipantId;
     this.stage.setBattleContext(battle.type, opponentParticipant.displayName);
+    this.opponentPartyIndicator.render(battle, localParticipantId);
 
     const trainerPokemon =
       trainerParticipant.pokemon[trainerParticipant.activePokemonIndex];
@@ -313,6 +320,7 @@ export class BattleOverlay {
     this.evolutionLayer.destroy();
 
     this.pendingIndicator.destroy();
+    this.opponentPartyIndicator.destroy();
     this.effects.destroy();
     this.stage.destroy();
 
@@ -393,6 +401,7 @@ export class BattleOverlay {
 
     this.wildHud.setBounds(wildBounds, viewport);
     this.trainerHud.setBounds(trainerBounds, viewport);
+    this.opponentPartyIndicator.setBounds(wildBounds, viewport);
     this.stage.setLayout({
       viewport,
       battleFieldHeight,

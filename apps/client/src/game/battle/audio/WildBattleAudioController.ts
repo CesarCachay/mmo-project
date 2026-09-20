@@ -1,8 +1,9 @@
 import Phaser from "phaser";
 
-import type { PokemonBattleCompletedPayload } from "@cesar-mmo/shared";
+import type { BattleType, PokemonBattleCompletedPayload } from "@cesar-mmo/shared";
 
 export const WILD_BATTLE_AUDIO_KEYS = {
+  THEME: "wild-battle-theme",
   CAPTURE_CONTAINED: "wild-battle-capture-contained",
   CAPTURE_SUCCESS: "wild-battle-capture-success",
   CAPTURE_FAILED: "wild-battle-capture-failed",
@@ -11,6 +12,7 @@ export const WILD_BATTLE_AUDIO_KEYS = {
 } as const;
 
 export const WILD_BATTLE_AUDIO_ASSETS = {
+  THEME: "/assets/audio/battle/wild-battle-theme.wav",
   CAPTURE_CONTAINED: "/assets/audio/battle/capture-contained.wav",
   CAPTURE_SUCCESS: "/assets/audio/battle/capture-success.wav",
   CAPTURE_FAILED: "/assets/audio/battle/capture-failed.wav",
@@ -18,7 +20,17 @@ export const WILD_BATTLE_AUDIO_ASSETS = {
   DEFEAT: "/assets/audio/battle/wild-battle-defeat.wav",
 } as const;
 
+export const TRAINER_BATTLE_AUDIO_KEYS = {
+  THEME: "trainer-battle-theme",
+} as const;
+
+export const TRAINER_BATTLE_AUDIO_ASSETS = {
+  THEME: "/assets/audio/battle/trainer-battle-theme.wav",
+} as const;
+
 export class WildBattleAudioController {
+  private readonly theme: Phaser.Sound.BaseSound;
+  private readonly trainerTheme: Phaser.Sound.BaseSound;
   private readonly captureContained: Phaser.Sound.BaseSound;
   private readonly captureSuccess: Phaser.Sound.BaseSound;
   private readonly captureFailed: Phaser.Sound.BaseSound;
@@ -26,6 +38,16 @@ export class WildBattleAudioController {
   private readonly defeat: Phaser.Sound.BaseSound;
 
   constructor(scene: Phaser.Scene) {
+    this.theme = scene.sound.add(WILD_BATTLE_AUDIO_KEYS.THEME, {
+      volume: 0.3,
+      loop: true,
+    });
+
+    this.trainerTheme = scene.sound.add(TRAINER_BATTLE_AUDIO_KEYS.THEME, {
+      volume: 0.32,
+      loop: true,
+    });
+
     this.captureContained = scene.sound.add(WILD_BATTLE_AUDIO_KEYS.CAPTURE_CONTAINED, {
       volume: 0.48,
     });
@@ -47,6 +69,25 @@ export class WildBattleAudioController {
     });
   }
 
+  public playBattleMusic(battleType: BattleType): void {
+    this.stopBattleMusic();
+
+    switch (battleType) {
+      case "wild":
+        this.theme.play();
+        return;
+
+      case "trainer":
+        this.trainerTheme.play();
+        return;
+    }
+  }
+
+  public stopBattleMusic(): void {
+    this.theme.stop();
+    this.trainerTheme.stop();
+  }
+
   public playCaptureContained(): void {
     this.captureContained.stop();
     this.captureContained.play();
@@ -63,6 +104,7 @@ export class WildBattleAudioController {
   }
 
   public playBattleOutcome(outcome: PokemonBattleCompletedPayload["outcome"]): void {
+    this.stopBattleMusic();
     this.stopOutcome();
 
     switch (outcome) {
@@ -88,6 +130,7 @@ export class WildBattleAudioController {
   }
 
   public stopAll(): void {
+    this.stopBattleMusic();
     this.captureContained.stop();
     this.captureSuccess.stop();
     this.captureFailed.stop();
@@ -98,6 +141,8 @@ export class WildBattleAudioController {
   public destroy(): void {
     this.stopAll();
 
+    this.theme.destroy();
+    this.trainerTheme.destroy();
     this.captureContained.destroy();
     this.captureSuccess.destroy();
     this.captureFailed.destroy();
