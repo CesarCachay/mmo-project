@@ -35,7 +35,7 @@ import { getPokemonItemIconAsset } from "./items/pokemon-item-icon.registry";
 // ui components
 import { ChatDock } from "./ui/ChatDock";
 import { DialogueBox } from "./ui/DialogueBox";
-import { TouchDpad } from "./mobile/TouchDpad";
+import { VirtualJoystick } from "./mobile/VirtualJoystick";
 import { StarterSelectionPanel } from "./ui/StarterSelectionPanel";
 import { TrainerHudNavigationController } from "./ui/TrainerHudNavigationController";
 import { MobileGameplayUxController } from "./mobile/MobileGameplayUxController";
@@ -116,7 +116,7 @@ export class GameScene extends Phaser.Scene {
   private localPlayerController!: LocalPlayerController;
   private movementInputController!: MovementInputController;
   private touchMovementInputSource!: TouchMovementInputSource;
-  private touchDpad?: TouchDpad;
+  private virtualJoystick?: VirtualJoystick;
   private overworldCameraController!: OverworldCameraController;
   private trainerPanelController!: TrainerPanelController;
   private trainerHudNavigation!: TrainerHudNavigationController;
@@ -363,7 +363,7 @@ export class GameScene extends Phaser.Scene {
 
     const movementInputBlocked = this.isMovementInputBlocked();
 
-    this.touchDpad?.setEnabled(!movementInputBlocked);
+    this.virtualJoystick?.setEnabled(!movementInputBlocked);
 
     const input = this.movementInputController.getCurrentInput(movementInputBlocked);
 
@@ -490,7 +490,7 @@ export class GameScene extends Phaser.Scene {
 
     /*
      * Trainer sight is a server-authoritative gameplay gate. In mobile the
-     * touch D-Pad can predict the local sprite a few pixels ahead of the
+     * virtual joystick can predict the local sprite a few pixels ahead of the
      * server position. If sight uses the predicted sprite, the client may show
      * the alert and request dialogue while the server still sees the player
      * outside the lane/range, producing a dialogue-start-timeout.
@@ -524,10 +524,10 @@ export class GameScene extends Phaser.Scene {
     /*
      * Stop touch movement immediately before opening the Trainer pre-battle
      * handshake. This sends a neutral input before dialogue:start retries and
-     * prevents the server from advancing another touch movement tick while
+     * prevents the server from advancing another analogue movement tick while
      * the client is showing the alert/dialogue transition.
      */
-    this.touchDpad?.reset();
+    this.virtualJoystick?.reset();
     this.touchMovementInputSource.reset();
 
     const neutralInput = this.movementInputController.getCurrentInput(true);
@@ -821,7 +821,7 @@ export class GameScene extends Phaser.Scene {
       throw new Error('Mobile controls require "#app"');
     }
 
-    this.touchDpad = new TouchDpad({
+    this.virtualJoystick = new VirtualJoystick({
       parent: app,
 
       onChange: (state) => {
@@ -830,8 +830,8 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-      this.touchDpad?.destroy();
-      this.touchDpad = undefined;
+      this.virtualJoystick?.destroy();
+      this.virtualJoystick = undefined;
       this.touchMovementInputSource.reset();
     });
   }
@@ -1181,7 +1181,7 @@ export class GameScene extends Phaser.Scene {
     this.pokemonCenterHealingAudio?.cancel();
 
     this.movementInputController?.resetLastInputToNeutral();
-    this.touchDpad?.reset();
+    this.virtualJoystick?.reset();
     this.localPlayerController?.setIdle();
     this.worldInteractionControls?.hide();
     this.chatBox?.setVisible(true);
@@ -1704,7 +1704,7 @@ export class GameScene extends Phaser.Scene {
       if (this.networkDisconnected) {
         this.networkDisconnected = false;
         this.movementInputController?.resetLastInputToNeutral();
-        this.touchDpad?.reset();
+        this.virtualJoystick?.reset();
       }
     } catch (error: unknown) {
       console.error("[PlayerWorld] Could not load authoritative map", error);
