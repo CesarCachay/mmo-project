@@ -117,25 +117,84 @@ export class TrainerSightController {
       return false;
     }
 
-    const result = checkPokemonTrainerSight({
-      trainer: {
-        position: {
-          x: npc.sprite.x,
-          y: npc.sprite.y,
-        },
-        direction: npc.definition.direction,
-        sightRangeTiles,
+    const map = MAP_DATA_REGISTRY[mapId];
+
+    const trainer = {
+      position: {
+        x: npc.sprite.x,
+        y: npc.sprite.y,
       },
+      direction: npc.definition.direction,
+      sightRangeTiles,
+    };
+
+    // 1. Primero mantenemos exactamente la validación actual.
+    const strictResult = checkPokemonTrainerSight({
+      trainer,
       target: {
         x: playerX,
         y: playerY,
       },
-      map: MAP_DATA_REGISTRY[mapId],
+      map,
     });
 
-    return result.detected;
-  }
+    if (strictResult.detected) {
+      return true;
+    }
 
+    /*
+     * Desktop/keyboard debe seguir siendo completamente estricto.
+     * La tolerancia solamente se aplica en dispositivos touch con
+     * pointer coarse, donde el joystick analógico puede dejar al
+     * jugador unos píxeles fuera del centro exacto del trainer lane.
+     */
+    const isTouchPrimary =
+      typeof window !== "undefined" &&
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+
+    if (!isTouchPrimary) {
+      return false;
+    }
+
+    const direction = npc.definition.direction;
+
+    const horizontal = direction === "left" || direction === "right";
+
+    /*
+     * Si el trainer mira izquierda/derecha, la desviación relevante es vertical (Y).
+     * Si mira arriba/abajo, la desviación relevante es horizontal (X).
+     */
+    const lateralDelta = horizontal
+      ? Math.abs(playerY - npc.sprite.y)
+      : Math.abs(playerX - npc.sprite.x);
+
+    const laneSize = horizontal ? map.tileHeight : map.tileWidth;
+
+    const mobileLaneTolerance = laneSize * 0.5;
+
+    if (lateralDelta > mobileLaneTolerance) {
+      return false;
+    }
+
+    const snappedTarget = horizontal
+      ? {
+          x: playerX,
+          y: npc.sprite.y,
+        }
+      : {
+          x: npc.sprite.x,
+          y: playerY,
+        };
+
+    const mobileResult = checkPokemonTrainerSight({
+      trainer,
+      target: snappedTarget,
+      map,
+    });
+
+    return mobileResult.detected;
+  }
   private triggerTrainerAlert(npc: NpcInstance): void {
     this.activeNpc = npc;
     this.alertBlocking = true;
