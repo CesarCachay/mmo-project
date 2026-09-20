@@ -16,7 +16,7 @@ import "./game/ui/interaction-prompt.css";
 import "./game/ui/trainer-drawer.css";
 import "./game/ui/dialogue-box.css";
 import "./game/ui/starter-selection-panel.css";
-import "./game/mobile/virtual-joystick.css";
+import "./game/mobile/touch-dpad.css";
 import "./game/mobile/mobile-action-button.css";
 
 import { AccountLoginScene } from "./game/AccountLoginScene";

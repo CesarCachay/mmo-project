@@ -35,7 +35,7 @@ import { getPokemonItemIconAsset } from "./items/pokemon-item-icon.registry";
 // ui components
 import { ChatDock } from "./ui/ChatDock";
 import { DialogueBox } from "./ui/DialogueBox";
-import { VirtualJoystick } from "./mobile/VirtualJoystick";
+import { TouchDpad } from "./mobile/TouchDpad";
 import { StarterSelectionPanel } from "./ui/StarterSelectionPanel";
 import { TrainerHudNavigationController } from "./ui/TrainerHudNavigationController";
 import { MobileGameplayUxController } from "./mobile/MobileGameplayUxController";
@@ -116,7 +116,7 @@ export class GameScene extends Phaser.Scene {
   private localPlayerController!: LocalPlayerController;
   private movementInputController!: MovementInputController;
   private touchMovementInputSource!: TouchMovementInputSource;
-  private virtualJoystick?: VirtualJoystick;
+  private touchDpad?: TouchDpad;
   private overworldCameraController!: OverworldCameraController;
   private trainerPanelController!: TrainerPanelController;
   private trainerHudNavigation!: TrainerHudNavigationController;
@@ -266,11 +266,11 @@ export class GameScene extends Phaser.Scene {
     this.trainerSightController = new TrainerSightController(
       this,
       this.npcManager,
-      (npc) => this.handleTrainerAggroReady(npc)
+      (npc) => this.handleTrainerAggroReady(npc),
     );
-    this.trainerSightController.setDefeatedTrainerBattleIds([
-      ...this.defeatedTrainerBattleIds,
-    ]);
+    this.trainerSightController.setDefeatedTrainerBattleIds(
+      [...this.defeatedTrainerBattleIds],
+    );
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.trainerSightController.destroy();
     });
@@ -278,7 +278,8 @@ export class GameScene extends Phaser.Scene {
     this.trainerPreBattleController = new TrainerPreBattleController(this, {
       requestDialogue: (npc) => this.startNpcDialogue(npc),
       onReady: (npc) => this.handleTrainerPreBattleReady(npc),
-      onCancelled: (npc, reason) => this.handleTrainerPreBattleCancelled(npc, reason),
+      onCancelled: (npc, reason) =>
+        this.handleTrainerPreBattleCancelled(npc, reason),
     });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.trainerPreBattleController.destroy();
@@ -362,7 +363,7 @@ export class GameScene extends Phaser.Scene {
 
     const movementInputBlocked = this.isMovementInputBlocked();
 
-    this.virtualJoystick?.setEnabled(!movementInputBlocked);
+    this.touchDpad?.setEnabled(!movementInputBlocked);
 
     const input = this.movementInputController.getCurrentInput(movementInputBlocked);
 
@@ -489,7 +490,7 @@ export class GameScene extends Phaser.Scene {
 
     /*
      * Trainer sight is a server-authoritative gameplay gate. In mobile the
-     * virtual joystick can predict the local sprite a few pixels ahead of the
+     * touch D-Pad can predict the local sprite a few pixels ahead of the
      * server position. If sight uses the predicted sprite, the client may show
      * the alert and request dialogue while the server still sees the player
      * outside the lane/range, producing a dialogue-start-timeout.
@@ -498,13 +499,14 @@ export class GameScene extends Phaser.Scene {
      * server's dialogue validation are based on the same coordinates. Visual
      * movement continues to use prediction/reconciliation normally.
      */
-    const trainerSightPosition = this.localPlayerController.authoritativePosition;
+    const trainerSightPosition =
+      this.localPlayerController.authoritativePosition;
 
     this.trainerSightController.update(
       this.currentMapId,
       trainerSightPosition.x,
       trainerSightPosition.y,
-      Boolean(externallyBlocked)
+      Boolean(externallyBlocked),
     );
   }
 
@@ -522,10 +524,10 @@ export class GameScene extends Phaser.Scene {
     /*
      * Stop touch movement immediately before opening the Trainer pre-battle
      * handshake. This sends a neutral input before dialogue:start retries and
-     * prevents the server from advancing another analogue movement tick while
+     * prevents the server from advancing another touch movement tick while
      * the client is showing the alert/dialogue transition.
      */
-    this.virtualJoystick?.reset();
+    this.touchDpad?.reset();
     this.touchMovementInputSource.reset();
 
     const neutralInput = this.movementInputController.getCurrentInput(true);
@@ -547,7 +549,10 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  private handleTrainerPreBattleCancelled(npc: NpcInstance, reason: string): void {
+  private handleTrainerPreBattleCancelled(
+    npc: NpcInstance,
+    reason: string,
+  ): void {
     this.network.cancelDialogue();
 
     if (this.pendingDialogueNpc?.definition.id === npc.definition.id) {
@@ -599,7 +604,7 @@ export class GameScene extends Phaser.Scene {
         }
 
         console.warn(
-          `Trainer battle interaction starts through sight/aggro: ${npc.definition.trainerBattleId ?? npc.definition.id}`
+          `Trainer battle interaction starts through sight/aggro: ${npc.definition.trainerBattleId ?? npc.definition.id}`,
         );
         return;
     }
@@ -608,7 +613,10 @@ export class GameScene extends Phaser.Scene {
   private isTrainerNpcDefeated(npc: NpcInstance): boolean {
     const trainerBattleId = npc.definition.trainerBattleId;
 
-    return Boolean(trainerBattleId && this.defeatedTrainerBattleIds.has(trainerBattleId));
+    return Boolean(
+      trainerBattleId &&
+        this.defeatedTrainerBattleIds.has(trainerBattleId),
+    );
   }
 
   private startNpcDialogue(npc: NpcInstance): boolean {
@@ -656,9 +664,8 @@ export class GameScene extends Phaser.Scene {
     this.isDialogueAdvancePending = false;
 
     if (state.completed) {
-      const isTrainerPreBattle = this.trainerPreBattleController.isActiveFor(
-        npc.definition.id
-      );
+      const isTrainerPreBattle =
+        this.trainerPreBattleController.isActiveFor(npc.definition.id);
 
       this.dialogueBox.hide();
       this.activeDialogueSessionId = undefined;
@@ -814,7 +821,7 @@ export class GameScene extends Phaser.Scene {
       throw new Error('Mobile controls require "#app"');
     }
 
-    this.virtualJoystick = new VirtualJoystick({
+    this.touchDpad = new TouchDpad({
       parent: app,
 
       onChange: (state) => {
@@ -823,8 +830,8 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-      this.virtualJoystick?.destroy();
-      this.virtualJoystick = undefined;
+      this.touchDpad?.destroy();
+      this.touchDpad = undefined;
       this.touchMovementInputSource.reset();
     });
   }
@@ -974,11 +981,11 @@ export class GameScene extends Phaser.Scene {
 
     this.network.onPokemonTrainerState((payload) => {
       this.defeatedTrainerBattleIds = new Set(
-        payload.trainerState.defeatedTrainerBattleIds ?? []
+        payload.trainerState.defeatedTrainerBattleIds ?? [],
       );
-      this.trainerSightController?.setDefeatedTrainerBattleIds([
-        ...this.defeatedTrainerBattleIds,
-      ]);
+      this.trainerSightController?.setDefeatedTrainerBattleIds(
+        [...this.defeatedTrainerBattleIds],
+      );
 
       this.battleController.setTrainerState(payload.trainerState);
       void this.pokemonTrainerPresentationController.applyTrainerState(
@@ -1174,7 +1181,7 @@ export class GameScene extends Phaser.Scene {
     this.pokemonCenterHealingAudio?.cancel();
 
     this.movementInputController?.resetLastInputToNeutral();
-    this.virtualJoystick?.reset();
+    this.touchDpad?.reset();
     this.localPlayerController?.setIdle();
     this.worldInteractionControls?.hide();
     this.chatBox?.setVisible(true);
@@ -1414,7 +1421,9 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    const interactionPrompt = this.getNpcInteractionPromptText(this.nearbyNpc);
+    const interactionPrompt = this.getNpcInteractionPromptText(
+      this.nearbyNpc,
+    );
 
     if (!interactionPrompt) {
       return;
@@ -1502,7 +1511,9 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  private getNpcInteractionPromptText(npc: NpcInstance): string | undefined {
+  private getNpcInteractionPromptText(
+    npc: NpcInstance,
+  ): string | undefined {
     switch (npc.definition.interactionType) {
       case "dialogue":
         return "Hablar";
@@ -1693,7 +1704,7 @@ export class GameScene extends Phaser.Scene {
       if (this.networkDisconnected) {
         this.networkDisconnected = false;
         this.movementInputController?.resetLastInputToNeutral();
-        this.virtualJoystick?.reset();
+        this.touchDpad?.reset();
       }
     } catch (error: unknown) {
       console.error("[PlayerWorld] Could not load authoritative map", error);
