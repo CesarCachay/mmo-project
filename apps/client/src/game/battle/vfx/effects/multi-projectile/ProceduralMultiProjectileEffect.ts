@@ -50,7 +50,12 @@ export async function playProceduralMultiProjectileEffect(
     return;
   }
 
-  const durationMs = request.definition.durationMs;
+  const projectileCount = resolveProjectileCount(request.hitCount, preset.count);
+  const durationMs = resolveVolleyDuration(
+    request.definition.durationMs,
+    projectileCount,
+    preset.count,
+  );
   const startTime = performance.now();
 
   await new Promise<void>((resolve) => {
@@ -66,10 +71,17 @@ export async function playProceduralMultiProjectileEffect(
       ctx.clearRect(0, 0, width, height);
 
       if (progress < preset.chargeEnd) {
-        drawVolleyCharge(ctx, geometry.source, progress / preset.chargeEnd, now, preset);
+        drawVolleyCharge(
+          ctx,
+          geometry.source,
+          progress / preset.chargeEnd,
+          now,
+          preset,
+          projectileCount,
+        );
       }
 
-      for (let index = 0; index < preset.count; index += 1) {
+      for (let index = 0; index < projectileCount; index += 1) {
         drawProjectileForIndex(
           ctx,
           geometry,
@@ -136,6 +148,26 @@ function drawProjectileForIndex(
   }
 }
 
+function resolveProjectileCount(
+  authoritativeHitCount: number | undefined,
+  fallbackCount: number,
+): number {
+  if (!Number.isInteger(authoritativeHitCount) || (authoritativeHitCount ?? 0) <= 0) {
+    return fallbackCount;
+  }
+
+  return Math.min(10, authoritativeHitCount as number);
+}
+
+function resolveVolleyDuration(
+  baseDurationMs: number,
+  projectileCount: number,
+  presetCount: number,
+): number {
+  const ratio = projectileCount / Math.max(1, presetCount);
+  return Math.round(baseDurationMs * (0.62 + Math.min(1, ratio) * 0.38));
+}
+
 function resolveVolleyTarget(
   source: BattleMoveVfxPoint,
   target: BattleMoveVfxPoint,
@@ -194,12 +226,14 @@ function drawVolleyCharge(
   progress: number,
   now: number,
   preset: MultiProjectileEffectPreset,
+  projectileCount: number,
 ): void {
   const eased = easeOutCubic(clamp01(progress));
   ctx.save();
   ctx.globalCompositeOperation = "lighter";
-  for (let index = 0; index < Math.min(5, preset.count); index += 1) {
-    const angle = now * 0.005 + index * (TAU / Math.min(5, preset.count));
+  const chargeCount = Math.min(5, projectileCount);
+  for (let index = 0; index < chargeCount; index += 1) {
+    const angle = now * 0.005 + index * (TAU / chargeCount);
     const orbit = 7 + eased * 10;
     drawCircle(
       ctx,

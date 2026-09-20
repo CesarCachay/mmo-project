@@ -2,6 +2,7 @@ import {
   addBattleTurnCommand,
   createBattleTurn,
   createNextBattleTurn,
+  advanceBattleFieldStateTurn,
   type BattleCommand,
   type BattleId,
   type BattleInstance,
@@ -29,6 +30,8 @@ export class PokemonBattleTurnStore {
     if (!currentTurn) {
       throw new Error(`Battle turn not found for battle "${battle.battleId}"`);
     }
+
+    advanceBattleFieldStateTurn(battle);
 
     const nextTurn = createNextBattleTurn(battle, currentTurn);
 

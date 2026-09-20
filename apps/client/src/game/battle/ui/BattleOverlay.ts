@@ -19,7 +19,10 @@ import { BattleDomRoot } from "./modern/BattleDomRoot";
 import { ModernBattleStage } from "./modern/ModernBattleStage";
 import { ModernBattleEffectsLayer } from "./modern/ModernBattleEffectsLayer";
 import { ModernBattleMoveVfxLayer } from "./modern/ModernBattleMoveVfxLayer";
+import { ModernBattleTypeImpactVfxLayer } from "./modern/ModernBattleTypeImpactVfxLayer";
+import { ModernBattlePersistentFieldVfxLayer } from "./modern/ModernBattlePersistentFieldVfxLayer";
 import { ModernBattlePendingIndicator } from "./modern/ModernBattlePendingIndicator";
+import { ModernBattleImpactFeedbackController } from "./modern/ModernBattleImpactFeedbackController";
 
 import { ModernBattlePokemonHud } from "./modern/ModernBattlePokemonHud";
 import { ModernBattleMovePanel } from "./modern/ModernBattleMovePanel";
@@ -57,6 +60,11 @@ import {
   type PokemonEvolutionAnimationInput,
 } from "../evolution/PokemonEvolutionAnimator";
 import { BattleMoveVfxController } from "../vfx/BattleMoveVfxController";
+import {
+  resolveBattleImpactFeedbackProfile,
+  type BattleImpactFeedbackRequest,
+} from "../vfx/impact/battle-impact-feedback";
+import type { BattleTypeImpactRequest } from "../vfx/impact/battle-type-impact";
 
 const CAPTURE_TARGET_HEAD_OFFSET_PX = 44;
 const BATTLE_TOUCH_QUERY = "(hover: none) and (pointer: coarse)";
@@ -99,9 +107,12 @@ export class BattleOverlay {
 
   private readonly stage: ModernBattleStage;
   private readonly effects: ModernBattleEffectsLayer;
+  private readonly persistentFieldVfxLayer: ModernBattlePersistentFieldVfxLayer;
   private readonly moveVfxLayer: ModernBattleMoveVfxLayer;
+  private readonly typeImpactVfxLayer: ModernBattleTypeImpactVfxLayer;
   private readonly moveVfxController: BattleMoveVfxController;
   private readonly pendingIndicator: ModernBattlePendingIndicator;
+  private readonly impactFeedback: ModernBattleImpactFeedbackController;
 
   private readonly wildHud: ModernBattlePokemonHud;
   private readonly trainerHud: ModernBattlePokemonHud;
@@ -146,9 +157,18 @@ export class BattleOverlay {
 
     this.stage = new ModernBattleStage(this.modernRoot.element);
     this.effects = new ModernBattleEffectsLayer(this.modernRoot.element);
+    this.persistentFieldVfxLayer = new ModernBattlePersistentFieldVfxLayer(
+      this.modernRoot.element
+    );
     this.moveVfxLayer = new ModernBattleMoveVfxLayer(this.modernRoot.element);
+    this.typeImpactVfxLayer = new ModernBattleTypeImpactVfxLayer(
+      this.modernRoot.element
+    );
     this.moveVfxController = new BattleMoveVfxController(this.moveVfxLayer);
     this.pendingIndicator = new ModernBattlePendingIndicator(this.modernRoot.element);
+    this.impactFeedback = new ModernBattleImpactFeedbackController(
+      this.modernRoot.element
+    );
 
     this.captureLayer = new ModernBattleCaptureLayer(this.modernRoot.element);
 
@@ -209,7 +229,10 @@ export class BattleOverlay {
 
     this.captureLayer.clear();
     this.effects.clear();
+    this.persistentFieldVfxLayer.clear();
     this.moveVfxController.clear();
+    this.typeImpactVfxLayer.clear();
+    this.impactFeedback.clear();
     this.pendingIndicator.clear();
 
     this.trainerHud.clear();
@@ -251,6 +274,7 @@ export class BattleOverlay {
 
     this.localParticipantId = localParticipantId;
     this.stage.setBattleContext(battle.type, opponentParticipant.displayName);
+    this.persistentFieldVfxLayer.syncBattle(battle, localParticipantId);
 
     const trainerPokemon =
       trainerParticipant.pokemon[trainerParticipant.activePokemonIndex];
@@ -320,8 +344,11 @@ export class BattleOverlay {
     this.evolutionLayer.destroy();
 
     this.pendingIndicator.destroy();
+    this.impactFeedback.destroy();
     this.moveVfxController.clear();
+    this.typeImpactVfxLayer.destroy();
     this.moveVfxLayer.destroy();
+    this.persistentFieldVfxLayer.destroy();
     this.effects.destroy();
     this.stage.destroy();
 
@@ -739,6 +766,7 @@ export class BattleOverlay {
     pokemonInstanceId: string,
     moveId: number,
     missed = false,
+    hitCount?: number,
   ): Promise<void> {
     const sourceParticipant = battle.participants.find(
       (candidate) => candidate.id === participantId,
@@ -782,10 +810,48 @@ export class BattleOverlay {
       source,
       target,
       missed,
+      hitCount,
       actorMotion: {
         playContactMotion: (motionRequest) =>
           sourceHud.animateMoveVfxContactMotion(container, motionRequest),
       },
+    });
+  }
+
+  public playMoveImpactHitStop(
+    request: BattleImpactFeedbackRequest,
+  ): Promise<void> {
+    const profile = resolveBattleImpactFeedbackProfile(request);
+    return this.impactFeedback.playHitStop(profile);
+  }
+
+  public playMoveImpactShake(
+    request: BattleImpactFeedbackRequest,
+  ): Promise<void> {
+    const profile = resolveBattleImpactFeedbackProfile(request);
+    return this.impactFeedback.playShake(profile);
+  }
+
+  public playMoveTypeImpact(
+    battle: BattleInstance,
+    participantId: string,
+    pokemonInstanceId: string,
+    request: Omit<BattleTypeImpactRequest, "target">,
+  ): Promise<void> {
+    const hud = this.getParticipantHud(battle, participantId);
+
+    if (!hud || !hud.isDisplayingPokemon(pokemonInstanceId)) {
+      return Promise.resolve();
+    }
+
+    const target = hud.getMoveVfxTargetPoint(this.modernRoot.element);
+    if (!target) {
+      return Promise.resolve();
+    }
+
+    return this.typeImpactVfxLayer.play({
+      ...request,
+      target,
     });
   }
 

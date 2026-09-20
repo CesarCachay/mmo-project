@@ -32,6 +32,7 @@ import {
 } from "@cesar-mmo/shared";
 
 import { WildBattleAudioController } from "./audio/WildBattleAudioController";
+import { BattleMoveSfxController } from "./audio/move-sfx/BattleMoveSfxController";
 
 import { PokemonSpriteLoader } from "../pokemon/PokemonSpriteLoader";
 import { BattleOverlay } from "./ui/BattleOverlay";
@@ -85,6 +86,7 @@ export class BattleController {
   private selectedItemId?: PokemonItemId;
 
   private readonly audio: WildBattleAudioController;
+  private readonly moveSfx: BattleMoveSfxController;
   private readonly onCompletionAcknowledged: (
     payload: PokemonBattleCompletedPayload
   ) => void;
@@ -113,6 +115,7 @@ export class BattleController {
     this.sendMoveLearningDecision = sendMoveLearningDecision;
     this.onCompletionAcknowledged = onCompletionAcknowledged;
     this.audio = new WildBattleAudioController(scene);
+    this.moveSfx = new BattleMoveSfxController(scene);
     this.overlay = new BattleOverlay(
       scene,
       // FIGHT
@@ -314,6 +317,7 @@ export class BattleController {
 
       this.activeBattlePayload = payload;
       this.overlay.renderBattle(payload.battle, payload.localParticipantId);
+      void this.moveSfx.preloadBattle(payload.battle);
       return;
     }
 
@@ -340,17 +344,25 @@ export class BattleController {
     this.overlay.show();
 
     this.audio.stopAll();
+    this.moveSfx.stopAll();
 
     try {
-      await this.ensureBattleSpritesLoaded(payload.battle, payload.localParticipantId);
+      await this.ensureBattleSpritesLoaded(
+        payload.battle,
+        payload.localParticipantId
+      );
 
       if (this.activeBattlePayload?.battle.battleId !== nextBattleId) {
         return;
       }
 
       this.overlay.renderBattle(payload.battle, payload.localParticipantId);
+      void this.moveSfx.preloadBattle(payload.battle);
 
-      await this.overlay.playBattleIntro(payload.battle, payload.localParticipantId);
+      await this.overlay.playBattleIntro(
+        payload.battle,
+        payload.localParticipantId,
+      );
 
       if (this.activeBattlePayload?.battle.battleId !== nextBattleId) {
         return;
@@ -432,7 +444,11 @@ export class BattleController {
         localParticipantId: currentBattle.localParticipantId,
       };
 
-      this.overlay.renderBattle(payload.battle, currentBattle.localParticipantId);
+      this.overlay.renderBattle(
+        payload.battle,
+        currentBattle.localParticipantId
+      );
+      void this.moveSfx.preloadBattle(payload.battle);
 
       this.setInteractionState("action-menu");
 
@@ -495,6 +511,7 @@ export class BattleController {
     this.recoveryEvolutionQueue.clear();
     this.evolutionPresentationController.destroy();
 
+    this.moveSfx.destroy();
     this.audio.destroy();
 
     this.overlay.destroy();
@@ -759,7 +776,9 @@ export class BattleController {
       return;
     }
 
-    const hasUsableMove = activePokemon.pokemon.moves.some((move) => move.currentPp > 0);
+    const hasUsableMove = activePokemon.pokemon.moves.some(
+      (move) => move.currentPp > 0
+    );
 
     if (!hasUsableMove) {
       this.setInteractionState("waiting-for-server");
@@ -809,7 +828,7 @@ export class BattleController {
       void this.presentBattleRuleRejection(
         payload.battle.battleId,
         runDecision.reason,
-        "action-menu"
+        "action-menu",
       );
       return;
     }
@@ -1039,13 +1058,42 @@ export class BattleController {
               getBattlePresentationMessageDuration(event)
             )
           : Promise.resolve(),
+        this.moveSfx.playMoveUse(event.moveId, event.hitCount),
         this.overlay.playMoveVfx(
           activeBattle,
           event.participantId,
           event.pokemonInstanceId,
           event.moveId,
-          moveMissed
+          moveMissed,
+          event.hitCount,
         ),
+      ]);
+
+      return;
+    }
+
+    if (event.type === "move-missed") {
+      const message = formatBattlePresentationMessage(
+        activeBattle,
+        event,
+        this.activeBattlePayload?.localParticipantId
+      );
+
+      const moveUsedEvent =
+        context.previousEvent?.type === "move-used"
+          ? context.previousEvent
+          : undefined;
+
+      await Promise.all([
+        moveUsedEvent
+          ? this.moveSfx.playMoveMiss(moveUsedEvent.moveId)
+          : Promise.resolve(),
+        message
+          ? this.overlay.presentMessage(
+              message,
+              getBattlePresentationMessageDuration(event)
+            )
+          : Promise.resolve(),
       ]);
 
       return;
@@ -1055,7 +1103,8 @@ export class BattleController {
       const followsFaint =
         context.previousEvent?.type === "pokemon-fainted" &&
         context.previousEvent.participantId === event.participantId &&
-        context.previousEvent.pokemonInstanceId === event.previousPokemonInstanceId;
+        context.previousEvent.pokemonInstanceId ===
+          event.previousPokemonInstanceId;
 
       /*
        * A forced replacement after faint must not "withdraw" an already
@@ -1182,7 +1231,41 @@ export class BattleController {
     }
 
     if (event.type === "damage-applied" && event.appliedDamage > 0) {
+      const moveUsedEvent =
+        context.previousEvent?.type === "move-used"
+          ? context.previousEvent
+          : undefined;
+
+      const impactFeedbackRequest = moveUsedEvent
+        ? {
+            moveId: moveUsedEvent.moveId,
+            typeEffectiveness: event.typeEffectiveness,
+            hitCount: moveUsedEvent.hitCount,
+          }
+        : undefined;
+
+      if (impactFeedbackRequest) {
+        await this.overlay.playMoveImpactHitStop(impactFeedbackRequest);
+      }
+
       await Promise.all([
+        impactFeedbackRequest
+          ? this.overlay.playMoveImpactShake(impactFeedbackRequest)
+          : Promise.resolve(),
+        impactFeedbackRequest
+          ? this.overlay.playMoveTypeImpact(
+              activeBattle,
+              event.participantId,
+              event.pokemonInstanceId,
+              impactFeedbackRequest
+            )
+          : Promise.resolve(),
+        moveUsedEvent
+          ? this.moveSfx.playMoveImpact(
+              moveUsedEvent.moveId,
+              moveUsedEvent.hitCount,
+            )
+          : Promise.resolve(),
         this.overlay.animatePokemonHit(
           activeBattle,
           event.participantId,
@@ -1361,7 +1444,11 @@ export class BattleController {
         return;
       }
 
-      this.overlay.renderBattle(payload.battle, currentBattle.localParticipantId);
+      this.overlay.renderBattle(
+        payload.battle,
+        currentBattle.localParticipantId
+      );
+      void this.moveSfx.preloadBattle(payload.battle);
 
       if (payload.interactionState === "replacement-required") {
         this.overlay.setReplacementOptions(
@@ -1392,6 +1479,7 @@ export class BattleController {
     this.setInteractionState("completed");
     this.replacementPokemonIndexes = [];
     this.overlay.showCompletion(payload.outcome);
+    this.moveSfx.stopAll();
     this.audio.playBattleOutcome(payload.outcome);
   }
 
@@ -1493,7 +1581,7 @@ export class BattleController {
       void this.presentBattleRuleRejection(
         payload.battle.battleId,
         itemDecision.reason,
-        "item-selection"
+        "item-selection",
       );
       return;
     }
@@ -1634,11 +1722,11 @@ export class BattleController {
   private async presentBattleRuleRejection(
     battleId: string,
     reason: PokemonBattleRuleRejectionReason,
-    restoreState: BattleClientInteractionState
+    restoreState: BattleClientInteractionState,
   ): Promise<void> {
     await this.overlay.presentMessage(
       formatPokemonBattleRuleRejectionMessage(reason),
-      1100
+      1100,
     );
 
     if (

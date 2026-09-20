@@ -6,6 +6,9 @@ import {
   calculateBattleMoveDamage,
   evaluateBattleMoveExecutionEligibility,
   assertPokemonBattleCommandActionAllowed,
+  applyPersistentBattlefieldMove,
+  getBattleMoveMultiHitRule,
+  resolveBattleMoveHitCount,
 } from '@cesar-mmo/shared';
 
 import type {
@@ -256,8 +259,8 @@ export class PokemonBattleTurnExecutor {
       consumeBattleMovePp(executionContext);
     }
 
-    const moveUsedEvent: BattlePresentationEvent = {
-      type: 'move-used',
+    const baseMoveUsedEvent = {
+      type: 'move-used' as const,
       participantId: executionContext.actorParticipantId,
       pokemonInstanceId: executionContext.actorPokemon.pokemon.instanceId,
       moveId: executionContext.move.id,
@@ -271,7 +274,7 @@ export class PokemonBattleTurnExecutor {
     if (!accuracyResult.hit) {
       return {
         events: [
-          moveUsedEvent,
+          baseMoveUsedEvent,
           {
             type: 'move-missed',
             participantId: executionContext.actorParticipantId,
@@ -284,27 +287,63 @@ export class PokemonBattleTurnExecutor {
       };
     }
 
-    const targetPreviousHp = executionContext.targetPokemon.currentHp;
-
-    const damageResult = calculateBattleMoveDamage(executionContext);
-
-    const damageApplication = applyBattleMoveDamage(
-      executionContext,
-      damageResult,
+    applyPersistentBattlefieldMove(
+      session.battle,
+      executionContext.actorParticipantId,
+      executionContext.move.id,
     );
 
-    const events: BattlePresentationEvent[] = [moveUsedEvent];
+    const targetPreviousHp = executionContext.targetPokemon.currentHp;
+    const multiHitRule = getBattleMoveMultiHitRule(executionContext.move.id);
+    const plannedHitCount = resolveBattleMoveHitCount(
+      executionContext.move.id,
+      this.random,
+    );
 
     const resolvesDirectDamage =
-      damageResult.damageClass !== 'status' && damageResult.power !== null;
+      executionContext.move.damageClass !== 'status' &&
+      executionContext.move.power !== null;
 
     if (!resolvesDirectDamage) {
       return {
-        events,
+        events: [baseMoveUsedEvent],
         terminalOutcome: null,
       };
     }
 
+    let totalAppliedDamage = 0;
+    let currentHp = targetPreviousHp;
+    let typeEffectiveness = 1;
+    let actualHitCount = 0;
+
+    for (let hitIndex = 0; hitIndex < plannedHitCount; hitIndex += 1) {
+      if (currentHp <= 0) {
+        break;
+      }
+
+      const damageResult = multiHitRule
+        ? calculateBattleMoveDamage(executionContext, this.random)
+        : calculateBattleMoveDamage(executionContext);
+
+      if (hitIndex === 0) {
+        typeEffectiveness = damageResult.typeEffectiveness;
+      }
+
+      const damageApplication = applyBattleMoveDamage(
+        executionContext,
+        damageResult,
+      );
+
+      totalAppliedDamage += damageApplication.appliedDamage;
+      currentHp = damageApplication.currentHp;
+      actualHitCount += 1;
+    }
+
+    const moveUsedEvent: BattlePresentationEvent = multiHitRule
+      ? { ...baseMoveUsedEvent, hitCount: actualHitCount }
+      : baseMoveUsedEvent;
+
+    const events: BattlePresentationEvent[] = [moveUsedEvent];
     const targetPokemonInstanceId =
       executionContext.targetPokemon.pokemon.instanceId;
 
@@ -326,12 +365,12 @@ export class PokemonBattleTurnExecutor {
       participantId: targetParticipant.id,
       pokemonInstanceId: targetPokemonInstanceId,
       previousHp: targetPreviousHp,
-      currentHp: damageApplication.currentHp,
-      appliedDamage: damageApplication.appliedDamage,
-      typeEffectiveness: damageResult.typeEffectiveness,
+      currentHp,
+      appliedDamage: totalAppliedDamage,
+      typeEffectiveness,
     });
 
-    if (targetPreviousHp > 0 && damageApplication.currentHp === 0) {
+    if (targetPreviousHp > 0 && currentHp === 0) {
       events.push({
         type: 'pokemon-fainted',
         participantId: targetParticipant.id,

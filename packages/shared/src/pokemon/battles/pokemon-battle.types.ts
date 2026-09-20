@@ -12,6 +12,30 @@ export type BattleParticipantId = string;
 
 export type BattleParticipantType = "trainer" | "wild";
 
+export type BattleWeatherType = "rain" | "sun" | "sandstorm" | "hail";
+
+export interface BattleWeatherState {
+  readonly type: BattleWeatherType;
+  remainingTurns: number;
+}
+
+export interface BattleSideHazards {
+  spikesLayers: number;
+  toxicSpikesLayers: number;
+  stealthRock: boolean;
+}
+
+export interface BattleFieldEffectsState {
+  trickRoomRemainingTurns: number;
+  gravityRemainingTurns: number;
+}
+
+export interface BattleFieldState {
+  weather: BattleWeatherState | null;
+  readonly hazards: Record<BattleSide, BattleSideHazards>;
+  readonly effects: BattleFieldEffectsState;
+}
+
 /**
  * Represents the runtime state of one Pokémon
  * while it participates in a battle.
@@ -59,6 +83,7 @@ interface BattleInstanceBase {
   readonly battleId: BattleId;
   readonly participants: readonly BattleParticipant[];
   readonly status: BattleStatus;
+  fieldState?: BattleFieldState;
 }
 
 export interface WildBattleInstance extends BattleInstanceBase {

@@ -8,9 +8,30 @@
   z-index: 16;
   overflow: hidden;
   pointer-events: none;
+  contain: paint;
 }
 
 .battle-move-vfx__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* =========================================================
+   PERSISTENT BATTLEFIELD VFX — WEATHER / HAZARDS / FIELD
+   ========================================================= */
+
+.battle-persistent-field-vfx {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  overflow: hidden;
+  pointer-events: none;
+  contain: paint;
+}
+
+.battle-persistent-field-vfx__canvas {
   display: block;
   width: 100%;
   height: 100%;
