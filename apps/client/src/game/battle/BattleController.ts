@@ -340,7 +340,6 @@ export class BattleController {
     this.overlay.show();
 
     this.audio.stopAll();
-    this.audio.playBattleMusic(payload.battle.type);
 
     try {
       await this.ensureBattleSpritesLoaded(
@@ -1030,6 +1029,34 @@ export class BattleController {
         receivedBattleId: context.battleId,
         turnNumber: context.turnNumber,
       });
+      return;
+    }
+
+    if (event.type === "move-used") {
+      const message = formatBattlePresentationMessage(
+        activeBattle,
+        event,
+        this.activeBattlePayload?.localParticipantId
+      );
+
+      const moveMissed = context.nextEvent?.type === "move-missed";
+
+      await Promise.all([
+        message
+          ? this.overlay.presentMessage(
+              message,
+              getBattlePresentationMessageDuration(event)
+            )
+          : Promise.resolve(),
+        this.overlay.playMoveVfx(
+          activeBattle,
+          event.participantId,
+          event.pokemonInstanceId,
+          event.moveId,
+          moveMissed
+        ),
+      ]);
+
       return;
     }
 

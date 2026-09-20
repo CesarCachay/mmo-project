@@ -18,8 +18,8 @@ import {
 import { BattleDomRoot } from "./modern/BattleDomRoot";
 import { ModernBattleStage } from "./modern/ModernBattleStage";
 import { ModernBattleEffectsLayer } from "./modern/ModernBattleEffectsLayer";
+import { ModernBattleMoveVfxLayer } from "./modern/ModernBattleMoveVfxLayer";
 import { ModernBattlePendingIndicator } from "./modern/ModernBattlePendingIndicator";
-import { ModernBattleOpponentPartyIndicator } from "./modern/ModernBattleOpponentPartyIndicator";
 
 import { ModernBattlePokemonHud } from "./modern/ModernBattlePokemonHud";
 import { ModernBattleMovePanel } from "./modern/ModernBattleMovePanel";
@@ -56,6 +56,7 @@ import {
   PokemonEvolutionAnimator,
   type PokemonEvolutionAnimationInput,
 } from "../evolution/PokemonEvolutionAnimator";
+import { BattleMoveVfxController } from "../vfx/BattleMoveVfxController";
 
 const CAPTURE_TARGET_HEAD_OFFSET_PX = 44;
 const BATTLE_TOUCH_QUERY = "(hover: none) and (pointer: coarse)";
@@ -98,8 +99,9 @@ export class BattleOverlay {
 
   private readonly stage: ModernBattleStage;
   private readonly effects: ModernBattleEffectsLayer;
+  private readonly moveVfxLayer: ModernBattleMoveVfxLayer;
+  private readonly moveVfxController: BattleMoveVfxController;
   private readonly pendingIndicator: ModernBattlePendingIndicator;
-  private readonly opponentPartyIndicator: ModernBattleOpponentPartyIndicator;
 
   private readonly wildHud: ModernBattlePokemonHud;
   private readonly trainerHud: ModernBattlePokemonHud;
@@ -144,10 +146,9 @@ export class BattleOverlay {
 
     this.stage = new ModernBattleStage(this.modernRoot.element);
     this.effects = new ModernBattleEffectsLayer(this.modernRoot.element);
+    this.moveVfxLayer = new ModernBattleMoveVfxLayer(this.modernRoot.element);
+    this.moveVfxController = new BattleMoveVfxController(this.moveVfxLayer);
     this.pendingIndicator = new ModernBattlePendingIndicator(this.modernRoot.element);
-    this.opponentPartyIndicator = new ModernBattleOpponentPartyIndicator(
-      this.modernRoot.element,
-    );
 
     this.captureLayer = new ModernBattleCaptureLayer(this.modernRoot.element);
 
@@ -208,8 +209,8 @@ export class BattleOverlay {
 
     this.captureLayer.clear();
     this.effects.clear();
+    this.moveVfxController.clear();
     this.pendingIndicator.clear();
-    this.opponentPartyIndicator.clear();
 
     this.trainerHud.clear();
     this.wildHud.clear();
@@ -250,7 +251,6 @@ export class BattleOverlay {
 
     this.localParticipantId = localParticipantId;
     this.stage.setBattleContext(battle.type, opponentParticipant.displayName);
-    this.opponentPartyIndicator.render(battle, localParticipantId);
 
     const trainerPokemon =
       trainerParticipant.pokemon[trainerParticipant.activePokemonIndex];
@@ -320,7 +320,8 @@ export class BattleOverlay {
     this.evolutionLayer.destroy();
 
     this.pendingIndicator.destroy();
-    this.opponentPartyIndicator.destroy();
+    this.moveVfxController.clear();
+    this.moveVfxLayer.destroy();
     this.effects.destroy();
     this.stage.destroy();
 
@@ -401,7 +402,6 @@ export class BattleOverlay {
 
     this.wildHud.setBounds(wildBounds, viewport);
     this.trainerHud.setBounds(trainerBounds, viewport);
-    this.opponentPartyIndicator.setBounds(wildBounds, viewport);
     this.stage.setLayout({
       viewport,
       battleFieldHeight,
@@ -731,6 +731,62 @@ export class BattleOverlay {
         this.replacementPanel.setVisible(false);
       }
     }
+  }
+
+  public playMoveVfx(
+    battle: BattleInstance,
+    participantId: string,
+    pokemonInstanceId: string,
+    moveId: number,
+    missed = false,
+  ): Promise<void> {
+    const sourceParticipant = battle.participants.find(
+      (candidate) => candidate.id === participantId,
+    );
+
+    const targetParticipant = battle.participants.find(
+      (candidate) => candidate.id !== participantId,
+    );
+
+    if (!sourceParticipant || !targetParticipant) {
+      return Promise.resolve();
+    }
+
+    const sourceHud = this.getParticipantHud(battle, sourceParticipant.id);
+    const targetHud = this.getParticipantHud(battle, targetParticipant.id);
+
+    if (!sourceHud || !targetHud) {
+      return Promise.resolve();
+    }
+
+    if (!sourceHud.isDisplayingPokemon(pokemonInstanceId)) {
+      return Promise.resolve();
+    }
+
+    const targetPokemon = targetParticipant.pokemon[targetParticipant.activePokemonIndex];
+
+    if (!targetPokemon || !targetHud.isDisplayingPokemon(targetPokemon.pokemon.instanceId)) {
+      return Promise.resolve();
+    }
+
+    const container = this.modernRoot.element;
+    const source = sourceHud.getMoveVfxSourcePoint(container);
+    const target = targetHud.getMoveVfxTargetPoint(container);
+
+    if (!source || !target) {
+      return Promise.resolve();
+    }
+
+    return this.moveVfxController.play({
+      moveId,
+      source,
+      target,
+      missed,
+      actorMotion: {
+        playContactMotion: (motionRequest) =>
+          sourceHud.animateMoveVfxContactMotion(container, motionRequest),
+      },
+    });
   }
 
   public animatePokemonHit(
