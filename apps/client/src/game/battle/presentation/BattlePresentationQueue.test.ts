@@ -212,6 +212,8 @@ describe("BattlePresentationQueue event context", () => {
 
     expect(contexts).toHaveLength(2);
     expect(contexts[0]?.previousEvent).toBeUndefined();
+    expect(contexts[0]?.nextEvent).toEqual(switchEvent);
     expect(contexts[1]?.previousEvent).toEqual(faintEvent);
+    expect(contexts[1]?.nextEvent).toBeUndefined();
   });
 });

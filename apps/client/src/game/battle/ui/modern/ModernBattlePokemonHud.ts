@@ -13,6 +13,7 @@ import {
 
 import { getPokemonSpriteAsset } from "../../../pokemon/pokemon-sprite.registry";
 import { getPokemonBattleSpriteAsset } from "../../../pokemon/pokemon-battle-sprite.registry";
+import type { BattleMoveVfxContactMotionRequest } from "../../vfx/battle-move-vfx.types";
 
 const SWITCH_OUT_DURATION_MS = 260;
 const SWITCH_IN_DURATION_MS = 340;
@@ -66,6 +67,8 @@ export class ModernBattlePokemonHud {
   private spriteAnimationTimer?: number;
   private spriteAnimationResolve?: () => void;
   private hitAnimation?: Animation;
+  private contactMotionFrame?: number;
+  private contactMotionResolve?: () => void;
 
   constructor(parent: HTMLElement, side: ModernBattlePokemonHudSide) {
     this.side = side;
@@ -188,6 +191,7 @@ export class ModernBattlePokemonHud {
     this.finishPendingHpAnimation();
     this.finishPendingHitAnimation();
     this.finishPendingSpriteAnimation();
+    this.finishPendingContactMotion();
     this.finishPendingExperienceAnimation();
 
     this.root.classList.remove("battle-modern-hud--impact");
@@ -251,6 +255,7 @@ export class ModernBattlePokemonHud {
     this.finishPendingHpAnimation();
     this.finishPendingHitAnimation();
     this.finishPendingSpriteAnimation();
+    this.finishPendingContactMotion();
     this.finishPendingHealEffect();
     this.finishPendingExperienceAnimation();
 
@@ -962,6 +967,160 @@ export class ModernBattlePokemonHud {
     this.hitSprite.style.transformOrigin = computedStyle.transformOrigin;
   }
 
+  public animateMoveVfxContactMotion(
+    container: HTMLElement,
+    request: BattleMoveVfxContactMotionRequest,
+  ): Promise<void> {
+    const prefersReducedMotion =
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+
+    if (prefersReducedMotion || request.durationMs <= 0) {
+      return Promise.resolve();
+    }
+
+    const spriteRect = this.sprite.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    if (spriteRect.width <= 0 || spriteRect.height <= 0) {
+      return Promise.resolve();
+    }
+
+    this.finishPendingContactMotion();
+
+    const sourceCenterX =
+      spriteRect.left - containerRect.left + spriteRect.width * 0.5;
+    const sourceCenterY =
+      spriteRect.top - containerRect.top + spriteRect.height * 0.5;
+    const dx = request.target.x - sourceCenterX;
+    const dy = request.target.y - sourceCenterY;
+    const distance = Math.hypot(dx, dy);
+
+    if (distance <= 1) {
+      return Promise.resolve();
+    }
+
+    const nx = dx / distance;
+    const ny = dy / distance;
+    const travelX = dx * request.travelRatio;
+    const travelY = dy * request.travelRatio;
+    const windupX = -nx * request.windupDistance;
+    const windupY = -ny * request.windupDistance;
+    const startedAt = performance.now();
+
+    return new Promise<void>((resolve) => {
+      this.contactMotionResolve = resolve;
+
+      const tick = (now: number): void => {
+        const progress = Math.max(
+          0,
+          Math.min(1, (now - startedAt) / request.durationMs),
+        );
+        let x = 0;
+        let y = 0;
+
+        if (progress <= request.windupEnd) {
+          const local = easeOutCubic(
+            progress / Math.max(0.001, request.windupEnd),
+          );
+          x = windupX * local;
+          y = windupY * local;
+        } else if (progress <= request.dashEnd) {
+          const local = easeInCubic(
+            (progress - request.windupEnd) /
+              Math.max(0.001, request.dashEnd - request.windupEnd),
+          );
+          x = windupX + (travelX - windupX) * local;
+          y = windupY + (travelY - windupY) * local;
+
+          if (request.style === "slam") {
+            y -= Math.sin(local * Math.PI) * request.arcHeight;
+          } else if (request.style === "headbutt") {
+            y -= Math.sin(local * Math.PI) * request.arcHeight * 0.45;
+          }
+        } else if (progress <= request.impactHoldEnd) {
+          const local =
+            (progress - request.dashEnd) /
+            Math.max(0.001, request.impactHoldEnd - request.dashEnd);
+          x = travelX;
+          y = travelY;
+
+          if (request.style === "reckless") {
+            const shake = Math.sin(local * Math.PI * 7) * (1 - local) * 5;
+            x += -ny * shake;
+            y += nx * shake;
+          }
+        } else {
+          const local = easeOutCubic(
+            (progress - request.impactHoldEnd) /
+              Math.max(0.001, 1 - request.impactHoldEnd),
+          );
+          x = travelX * (1 - local);
+          y = travelY * (1 - local);
+        }
+
+        this.sprite.style.setProperty("translate", `${x}px ${y}px`);
+
+        if (progress >= 1) {
+          this.contactMotionFrame = undefined;
+          this.contactMotionResolve = undefined;
+          this.sprite.style.removeProperty("translate");
+          resolve();
+          return;
+        }
+
+        this.contactMotionFrame = window.requestAnimationFrame(tick);
+      };
+
+      this.contactMotionFrame = window.requestAnimationFrame(tick);
+    });
+  }
+
+  private finishPendingContactMotion(): void {
+    if (this.contactMotionFrame !== undefined) {
+      window.cancelAnimationFrame(this.contactMotionFrame);
+      this.contactMotionFrame = undefined;
+    }
+
+    this.sprite.style.removeProperty("translate");
+    const resolve = this.contactMotionResolve;
+    this.contactMotionResolve = undefined;
+    resolve?.();
+  }
+
+  public getMoveVfxSourcePoint(
+    container: HTMLElement,
+  ): { x: number; y: number } | null {
+    const spriteRect = this.sprite.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    if (spriteRect.width <= 0 || spriteRect.height <= 0) {
+      return null;
+    }
+
+    const horizontalAnchor = this.side === "trainer" ? 0.72 : 0.28;
+
+    return {
+      x: spriteRect.left - containerRect.left + spriteRect.width * horizontalAnchor,
+      y: spriteRect.top - containerRect.top + spriteRect.height * 0.43,
+    };
+  }
+
+  public getMoveVfxTargetPoint(
+    container: HTMLElement,
+  ): { x: number; y: number } | null {
+    const spriteRect = this.sprite.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    if (spriteRect.width <= 0 || spriteRect.height <= 0) {
+      return null;
+    }
+
+    return {
+      x: spriteRect.left - containerRect.left + spriteRect.width * 0.5,
+      y: spriteRect.top - containerRect.top + spriteRect.height * 0.5,
+    };
+  }
+
   public getCaptureThrowOrigin(
     container: HTMLElement,
   ): { x: number; y: number } | null {
@@ -1042,4 +1201,13 @@ export class ModernBattlePokemonHud {
     this.healFxResolve = undefined;
     resolve?.();
   }
+}
+
+function easeInCubic(value: number): number {
+  return value * value * value;
+}
+
+function easeOutCubic(value: number): number {
+  const inverse = 1 - value;
+  return 1 - inverse * inverse * inverse;
 }

@@ -340,13 +340,9 @@ export class BattleController {
     this.overlay.show();
 
     this.audio.stopAll();
-    this.audio.playBattleMusic(payload.battle.type);
 
     try {
-      await this.ensureBattleSpritesLoaded(
-        payload.battle,
-        payload.localParticipantId
-      );
+      await this.ensureBattleSpritesLoaded(payload.battle, payload.localParticipantId);
 
       if (this.activeBattlePayload?.battle.battleId !== nextBattleId) {
         return;
@@ -354,14 +350,13 @@ export class BattleController {
 
       this.overlay.renderBattle(payload.battle, payload.localParticipantId);
 
-      await this.overlay.playBattleIntro(
-        payload.battle,
-        payload.localParticipantId,
-      );
+      await this.overlay.playBattleIntro(payload.battle, payload.localParticipantId);
 
       if (this.activeBattlePayload?.battle.battleId !== nextBattleId) {
         return;
       }
+
+      this.audio.playBattleMusic(payload.battle.type);
 
       this.setInteractionState("action-menu");
     } catch (error) {
@@ -437,10 +432,7 @@ export class BattleController {
         localParticipantId: currentBattle.localParticipantId,
       };
 
-      this.overlay.renderBattle(
-        payload.battle,
-        currentBattle.localParticipantId
-      );
+      this.overlay.renderBattle(payload.battle, currentBattle.localParticipantId);
 
       this.setInteractionState("action-menu");
 
@@ -767,9 +759,7 @@ export class BattleController {
       return;
     }
 
-    const hasUsableMove = activePokemon.pokemon.moves.some(
-      (move) => move.currentPp > 0
-    );
+    const hasUsableMove = activePokemon.pokemon.moves.some((move) => move.currentPp > 0);
 
     if (!hasUsableMove) {
       this.setInteractionState("waiting-for-server");
@@ -819,7 +809,7 @@ export class BattleController {
       void this.presentBattleRuleRejection(
         payload.battle.battleId,
         runDecision.reason,
-        "action-menu",
+        "action-menu"
       );
       return;
     }
@@ -1033,12 +1023,39 @@ export class BattleController {
       return;
     }
 
+    if (event.type === "move-used") {
+      const message = formatBattlePresentationMessage(
+        activeBattle,
+        event,
+        this.activeBattlePayload?.localParticipantId
+      );
+
+      const moveMissed = context.nextEvent?.type === "move-missed";
+
+      await Promise.all([
+        message
+          ? this.overlay.presentMessage(
+              message,
+              getBattlePresentationMessageDuration(event)
+            )
+          : Promise.resolve(),
+        this.overlay.playMoveVfx(
+          activeBattle,
+          event.participantId,
+          event.pokemonInstanceId,
+          event.moveId,
+          moveMissed
+        ),
+      ]);
+
+      return;
+    }
+
     if (event.type === "pokemon-switched") {
       const followsFaint =
         context.previousEvent?.type === "pokemon-fainted" &&
         context.previousEvent.participantId === event.participantId &&
-        context.previousEvent.pokemonInstanceId ===
-          event.previousPokemonInstanceId;
+        context.previousEvent.pokemonInstanceId === event.previousPokemonInstanceId;
 
       /*
        * A forced replacement after faint must not "withdraw" an already
@@ -1344,10 +1361,7 @@ export class BattleController {
         return;
       }
 
-      this.overlay.renderBattle(
-        payload.battle,
-        currentBattle.localParticipantId
-      );
+      this.overlay.renderBattle(payload.battle, currentBattle.localParticipantId);
 
       if (payload.interactionState === "replacement-required") {
         this.overlay.setReplacementOptions(
@@ -1479,7 +1493,7 @@ export class BattleController {
       void this.presentBattleRuleRejection(
         payload.battle.battleId,
         itemDecision.reason,
-        "item-selection",
+        "item-selection"
       );
       return;
     }
@@ -1620,11 +1634,11 @@ export class BattleController {
   private async presentBattleRuleRejection(
     battleId: string,
     reason: PokemonBattleRuleRejectionReason,
-    restoreState: BattleClientInteractionState,
+    restoreState: BattleClientInteractionState
   ): Promise<void> {
     await this.overlay.presentMessage(
       formatPokemonBattleRuleRejectionMessage(reason),
-      1100,
+      1100
     );
 
     if (
