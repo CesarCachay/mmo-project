@@ -27,6 +27,28 @@ export class DialogueSessionService {
       throw new Error(`Dialogue "${dialogueId}" has no lines`);
     }
 
+    /*
+     * dialogue:start can be retried by the client while a Trainer aggro flow
+     * is waiting for the first authoritative dialogue state. If the original
+     * START already succeeded, return the existing state instead of rejecting
+     * the duplicate. This makes the handshake resilient to latency/races while
+     * still refusing a different NPC/dialogue over an active session.
+     */
+    const existingSession = this.sessionStore.get(playerId);
+
+    if (existingSession) {
+      if (
+        existingSession.npcId !== npcId ||
+        existingSession.dialogueId !== dialogueId
+      ) {
+        throw new Error(
+          `Player ${playerId} already has an active dialogue session`,
+        );
+      }
+
+      return this.toState(existingSession, dialogue.lines.length, false);
+    }
+
     const session = this.sessionStore.create(playerId, npcId, dialogueId);
 
     return this.toState(session, dialogue.lines.length, false);

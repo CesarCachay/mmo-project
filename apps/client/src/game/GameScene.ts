@@ -266,11 +266,11 @@ export class GameScene extends Phaser.Scene {
     this.trainerSightController = new TrainerSightController(
       this,
       this.npcManager,
-      (npc) => this.handleTrainerAggroReady(npc),
+      (npc) => this.handleTrainerAggroReady(npc)
     );
-    this.trainerSightController.setDefeatedTrainerBattleIds(
-      [...this.defeatedTrainerBattleIds],
-    );
+    this.trainerSightController.setDefeatedTrainerBattleIds([
+      ...this.defeatedTrainerBattleIds,
+    ]);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.trainerSightController.destroy();
     });
@@ -278,8 +278,7 @@ export class GameScene extends Phaser.Scene {
     this.trainerPreBattleController = new TrainerPreBattleController(this, {
       requestDialogue: (npc) => this.startNpcDialogue(npc),
       onReady: (npc) => this.handleTrainerPreBattleReady(npc),
-      onCancelled: (npc, reason) =>
-        this.handleTrainerPreBattleCancelled(npc, reason),
+      onCancelled: (npc, reason) => this.handleTrainerPreBattleCancelled(npc, reason),
     });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.trainerPreBattleController.destroy();
@@ -370,17 +369,19 @@ export class GameScene extends Phaser.Scene {
     this.localPlayerController.updateAnimation(input);
     this.sendInputIfChanged(input);
 
+    const playerIsMoving = isPlayerMoving(input);
+
     this.localPlayerController.predictMovement(
       input,
       delta,
       this.currentMapId,
       this.isMapTransitioning
     );
-    this.localPlayerController.reconcile(delta);
+    this.localPlayerController.reconcile(delta, playerIsMoving);
     this.overworldCameraController.update(
       delta,
       this.localPlayerController.direction,
-      isPlayerMoving(input)
+      playerIsMoving
     );
 
     this.pokemonTrainerPresentationController.updateFollower(
@@ -497,14 +498,13 @@ export class GameScene extends Phaser.Scene {
      * server's dialogue validation are based on the same coordinates. Visual
      * movement continues to use prediction/reconciliation normally.
      */
-    const trainerSightPosition =
-      this.localPlayerController.authoritativePosition;
+    const trainerSightPosition = this.localPlayerController.authoritativePosition;
 
     this.trainerSightController.update(
       this.currentMapId,
       trainerSightPosition.x,
       trainerSightPosition.y,
-      Boolean(externallyBlocked),
+      Boolean(externallyBlocked)
     );
   }
 
@@ -518,6 +518,19 @@ export class GameScene extends Phaser.Scene {
     ) {
       return;
     }
+
+    /*
+     * Stop touch movement immediately before opening the Trainer pre-battle
+     * handshake. This sends a neutral input before dialogue:start retries and
+     * prevents the server from advancing another analogue movement tick while
+     * the client is showing the alert/dialogue transition.
+     */
+    this.virtualJoystick?.reset();
+    this.touchMovementInputSource.reset();
+
+    const neutralInput = this.movementInputController.getCurrentInput(true);
+    this.sendInputIfChanged(neutralInput);
+    this.localPlayerController.setIdle();
 
     this.facePlayerAndNpc(npc);
     this.chatBox.setVisible(false);
@@ -534,10 +547,7 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  private handleTrainerPreBattleCancelled(
-    npc: NpcInstance,
-    reason: string,
-  ): void {
+  private handleTrainerPreBattleCancelled(npc: NpcInstance, reason: string): void {
     this.network.cancelDialogue();
 
     if (this.pendingDialogueNpc?.definition.id === npc.definition.id) {
@@ -589,7 +599,7 @@ export class GameScene extends Phaser.Scene {
         }
 
         console.warn(
-          `Trainer battle interaction starts through sight/aggro: ${npc.definition.trainerBattleId ?? npc.definition.id}`,
+          `Trainer battle interaction starts through sight/aggro: ${npc.definition.trainerBattleId ?? npc.definition.id}`
         );
         return;
     }
@@ -598,15 +608,26 @@ export class GameScene extends Phaser.Scene {
   private isTrainerNpcDefeated(npc: NpcInstance): boolean {
     const trainerBattleId = npc.definition.trainerBattleId;
 
-    return Boolean(
-      trainerBattleId &&
-        this.defeatedTrainerBattleIds.has(trainerBattleId),
-    );
+    return Boolean(trainerBattleId && this.defeatedTrainerBattleIds.has(trainerBattleId));
   }
 
   private startNpcDialogue(npc: NpcInstance): boolean {
-    if (this.pendingDialogueNpc || this.activeDialogueNpc) {
-      return false;
+    if (this.activeDialogueNpc) {
+      return this.activeDialogueNpc.definition.id === npc.definition.id;
+    }
+
+    if (this.pendingDialogueNpc) {
+      if (this.pendingDialogueNpc.definition.id !== npc.definition.id) {
+        return false;
+      }
+
+      /*
+       * Idempotent retry for Trainer pre-battle dialogue. If the first START
+       * was rejected because the authoritative position advanced between the
+       * sight snapshot and request processing, re-send it for the same NPC.
+       */
+      this.network.startDialogue(npc.definition.id);
+      return true;
     }
 
     this.pendingDialogueNpc = npc;
@@ -635,8 +656,9 @@ export class GameScene extends Phaser.Scene {
     this.isDialogueAdvancePending = false;
 
     if (state.completed) {
-      const isTrainerPreBattle =
-        this.trainerPreBattleController.isActiveFor(npc.definition.id);
+      const isTrainerPreBattle = this.trainerPreBattleController.isActiveFor(
+        npc.definition.id
+      );
 
       this.dialogueBox.hide();
       this.activeDialogueSessionId = undefined;
@@ -952,11 +974,11 @@ export class GameScene extends Phaser.Scene {
 
     this.network.onPokemonTrainerState((payload) => {
       this.defeatedTrainerBattleIds = new Set(
-        payload.trainerState.defeatedTrainerBattleIds ?? [],
+        payload.trainerState.defeatedTrainerBattleIds ?? []
       );
-      this.trainerSightController?.setDefeatedTrainerBattleIds(
-        [...this.defeatedTrainerBattleIds],
-      );
+      this.trainerSightController?.setDefeatedTrainerBattleIds([
+        ...this.defeatedTrainerBattleIds,
+      ]);
 
       this.battleController.setTrainerState(payload.trainerState);
       void this.pokemonTrainerPresentationController.applyTrainerState(
@@ -1392,9 +1414,7 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    const interactionPrompt = this.getNpcInteractionPromptText(
-      this.nearbyNpc,
-    );
+    const interactionPrompt = this.getNpcInteractionPromptText(this.nearbyNpc);
 
     if (!interactionPrompt) {
       return;
@@ -1482,9 +1502,7 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  private getNpcInteractionPromptText(
-    npc: NpcInstance,
-  ): string | undefined {
+  private getNpcInteractionPromptText(npc: NpcInstance): string | undefined {
     switch (npc.definition.interactionType) {
       case "dialogue":
         return "Hablar";

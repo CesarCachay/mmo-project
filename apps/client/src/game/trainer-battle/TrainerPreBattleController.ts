@@ -3,6 +3,7 @@ import type Phaser from "phaser";
 import type { NpcInstance } from "../npc/types";
 
 const PRE_BATTLE_DIALOGUE_START_TIMEOUT_MS = 5_000;
+const PRE_BATTLE_DIALOGUE_RETRY_INTERVAL_MS = 450;
 const PRE_BATTLE_BATTLE_START_TIMEOUT_MS = 5_000;
 
 type TrainerPreBattlePhase =
@@ -23,6 +24,7 @@ export class TrainerPreBattleController {
   private activeNpc?: NpcInstance;
   private phase?: TrainerPreBattlePhase;
   private timeout?: Phaser.Time.TimerEvent;
+  private dialogueRetryTimer?: Phaser.Time.TimerEvent;
 
   constructor(
     scene: Phaser.Scene,
@@ -60,6 +62,17 @@ export class TrainerPreBattleController {
       return false;
     }
 
+    /*
+     * Trainer aggro is detected from the latest authoritative player snapshot,
+     * but the server may have advanced one or two movement ticks by the time
+     * dialogue:start arrives. A rejected START has no response packet, so a
+     * single request could otherwise leave the client waiting until timeout.
+     *
+     * Retry while we are still awaiting the first dialogue state. The server
+     * handles duplicate START requests idempotently for the same NPC/session.
+     */
+    this.scheduleDialogueRetry();
+
     return true;
   }
 
@@ -73,6 +86,7 @@ export class TrainerPreBattleController {
     }
 
     this.clearTimeout();
+    this.clearDialogueRetry();
     this.phase = "dialogue";
   }
 
@@ -114,6 +128,29 @@ export class TrainerPreBattleController {
     this.reset();
   }
 
+  private scheduleDialogueRetry(): void {
+    this.clearDialogueRetry();
+
+    this.dialogueRetryTimer = this.scene.time.delayedCall(
+      PRE_BATTLE_DIALOGUE_RETRY_INTERVAL_MS,
+      () => {
+        this.dialogueRetryTimer = undefined;
+
+        if (this.phase !== "awaiting-dialogue") {
+          return;
+        }
+
+        const npc = this.activeNpc;
+        if (!npc) {
+          return;
+        }
+
+        this.options.requestDialogue(npc);
+        this.scheduleDialogueRetry();
+      },
+    );
+  }
+
   private scheduleTimeout(
     durationMs: number,
     reason: string,
@@ -145,8 +182,14 @@ export class TrainerPreBattleController {
     this.timeout = undefined;
   }
 
+  private clearDialogueRetry(): void {
+    this.dialogueRetryTimer?.remove(false);
+    this.dialogueRetryTimer = undefined;
+  }
+
   private reset(): void {
     this.clearTimeout();
+    this.clearDialogueRetry();
     this.activeNpc = undefined;
     this.phase = undefined;
   }

@@ -111,24 +111,36 @@ export class LocalPlayerController {
     this.player.setPosition(resolvedPosition.x, resolvedPosition.y);
   }
 
-  reconcile(delta: number): void {
+  reconcile(delta: number, isMoving: boolean): void {
     const errorX = this.serverPosition.x - this.player.x;
     const errorY = this.serverPosition.y - this.player.y;
     const distance = Math.sqrt(errorX * errorX + errorY * errorY);
-    const reconciliationThreshold = 4;
+
+    /*
+     * The server simulates movement at 20 Hz while the client predicts every
+     * render frame. During active movement the latest authoritative snapshot
+     * is naturally behind the predicted sprite, especially on mobile links.
+     * Pulling toward every stale snapshot makes the player feel as if the
+     * joystick is fighting the movement.
+     *
+     * While moving, tolerate normal network/simulation lag and only apply a
+     * gentle correction to meaningful drift. As soon as input stops, tighten
+     * the threshold and reconcile quickly back to the authoritative position.
+     */
+    const reconciliationThreshold = isMoving ? 24 : 3;
 
     if (distance < reconciliationThreshold) {
       return;
     }
 
-    const hardSnapDistance = 100;
+    const hardSnapDistance = isMoving ? 140 : 96;
 
     if (distance > hardSnapDistance) {
       this.player.setPosition(this.serverPosition.x, this.serverPosition.y);
       return;
     }
 
-    const reconciliationRate = 5;
+    const reconciliationRate = isMoving ? 1.5 : 10;
     const alpha = 1 - Math.exp(-reconciliationRate * (delta / 1000));
     this.player.x = Phaser.Math.Linear(this.player.x, this.serverPosition.x, alpha);
     this.player.y = Phaser.Math.Linear(this.player.y, this.serverPosition.y, alpha);

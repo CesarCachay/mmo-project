@@ -18,8 +18,8 @@ type PointerPosition = {
 
 const MOVEMENT_START_RATIO = 0.24;
 const MOVEMENT_STOP_RATIO = 0.16;
-const DIRECTION_SECTOR_RADIANS = Math.PI / 4;
-const DIRECTION_HYSTERESIS_RADIANS = (7 * Math.PI) / 180;
+const DIRECTION_SECTOR_RADIANS = Math.PI / 2;
+const DIRECTION_HYSTERESIS_RADIANS = (10 * Math.PI) / 180;
 
 export class VirtualJoystick {
   private readonly root: HTMLDivElement;
@@ -321,19 +321,29 @@ export class VirtualJoystick {
     const x = rawX * scale;
     const y = rawY * scale;
 
+    /*
+     * Let the knob follow the finger inside the deadzone. Once movement is
+     * active, emitMovement() snaps the knob to the selected cardinal axis so
+     * the visual control always matches the direction actually sent to the
+     * movement system.
+     */
     this.setKnobPosition(x, y);
 
     const normalizedX = x / geometry.maxRadius;
     const normalizedY = y / geometry.maxRadius;
 
-    this.emitMovement(normalizedX, normalizedY);
+    this.emitMovement(normalizedX, normalizedY, limitedDistance);
   }
 
   private setKnobPosition(x: number, y: number): void {
     this.knob.style.transform = `translate3d(${x}px, ${y}px, 0)`;
   }
 
-  private emitMovement(x: number, y: number): void {
+  private emitMovement(
+    x: number,
+    y: number,
+    knobDistance?: number,
+  ): void {
     const magnitude = Math.hypot(x, y);
 
     /*
@@ -363,6 +373,10 @@ export class VirtualJoystick {
 
     this.lastDirectionIndex = directionIndex;
 
+    if (knobDistance !== undefined) {
+      this.snapKnobToDirection(directionIndex, knobDistance);
+    }
+
     this.emitMovementState(this.directionIndexToState(directionIndex));
   }
 
@@ -376,16 +390,18 @@ export class VirtualJoystick {
   }
 
   /**
-   * Quantize the stick to the nearest of 8 evenly-sized direction sectors.
-   * Indexes rotate clockwise because browser Y coordinates grow downward:
+   * Quantize the stick to four cardinal sectors only. This deliberately
+   * removes diagonals from touch input so mobile movement matches the
+   * tile/cardinal nature of the overworld and the direction shown by the
+   * player sprite.
    *
-   * 0 right, 1 down-right, 2 down, 3 down-left,
-   * 4 left,  5 up-left,    6 up,   7 up-right.
+   * Indexes rotate clockwise because browser Y coordinates grow downward:
+   * 0 right, 1 down, 2 left, 3 up.
    */
   private resolveDirectionIndex(x: number, y: number): number {
     const angle = this.normalizeAngle(Math.atan2(y, x));
 
-    return Math.round(angle / DIRECTION_SECTOR_RADIANS) % 8;
+    return Math.round(angle / DIRECTION_SECTOR_RADIANS) % 4;
   }
 
   private applyDirectionHysteresis(
@@ -423,21 +439,35 @@ export class VirtualJoystick {
       case 0:
         return { up: false, down: false, left: false, right: true };
       case 1:
-        return { up: false, down: true, left: false, right: true };
-      case 2:
         return { up: false, down: true, left: false, right: false };
-      case 3:
-        return { up: false, down: true, left: true, right: false };
-      case 4:
+      case 2:
         return { up: false, down: false, left: true, right: false };
-      case 5:
-        return { up: true, down: false, left: true, right: false };
-      case 6:
+      case 3:
         return { up: true, down: false, left: false, right: false };
-      case 7:
-        return { up: true, down: false, left: false, right: true };
       default:
         return { up: false, down: false, left: false, right: false };
+    }
+  }
+
+  private snapKnobToDirection(
+    directionIndex: number,
+    distance: number,
+  ): void {
+    switch (directionIndex) {
+      case 0:
+        this.setKnobPosition(distance, 0);
+        return;
+      case 1:
+        this.setKnobPosition(0, distance);
+        return;
+      case 2:
+        this.setKnobPosition(-distance, 0);
+        return;
+      case 3:
+        this.setKnobPosition(0, -distance);
+        return;
+      default:
+        this.setKnobPosition(0, 0);
     }
   }
 
