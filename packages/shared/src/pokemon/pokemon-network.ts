@@ -13,6 +13,7 @@ import {
 import { POKEMON_ENCOUNTER_TABLES } from "./encounters/pokemon-encounter-table.registry.js";
 
 import { isPokemonItemId, type PokemonInventoryItemStack } from "./inventory/pokemon-inventory.js";
+import { isPokemonStarterId } from "./pokemon-starter.js";
 import { isPokemonMoney, type PokemonMoney } from "./economy/pokemon-money.js";
 
 
@@ -21,6 +22,7 @@ export const POKEMON_EVENTS = {
   CHOOSE_STARTER: "pokemon:choose-starter",
 
   STARTER_SELECTION_STATUS: "pokemon:starter-selection-status",
+  STARTER_SELECTED: "pokemon:starter-selected",
 
   WILD_ENCOUNTER_STARTED: "pokemon:wild-encounter-started",
 
@@ -58,6 +60,31 @@ export interface PokemonTrainerStatePayload {
 
 export interface PokemonStarterSelectionStatus {
   unlocked: boolean;
+}
+
+export interface PokemonStarterSelectedPayload {
+  readonly starterId: import("./pokemon-starter.js").PokemonStarterId;
+  readonly rewardItems: readonly PokemonInventoryItemStack[];
+}
+
+export function isPokemonStarterSelectedPayload(
+  value: unknown,
+): value is PokemonStarterSelectedPayload {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  return (
+    isPokemonStarterId(value.starterId) &&
+    Array.isArray(value.rewardItems) &&
+    value.rewardItems.every(
+      (item) =>
+        isRecord(item) &&
+        isPokemonItemId(item.itemId) &&
+        Number.isInteger(item.quantity) &&
+        Number(item.quantity) > 0,
+    )
+  );
 }
 
 export interface PokemonWildEncounterStartedPayload {

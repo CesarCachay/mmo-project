@@ -10,6 +10,7 @@ import {
   addPokemonToParty,
   createPokemonInstance,
   POKEMON_STARTERS,
+  POKEMON_STARTER_REWARD_ITEMS,
   syncPokemonPartyFromBattleParticipant,
   addPokemonInventoryItem,
   consumePokemonInventoryItem,
@@ -22,6 +23,7 @@ import { PokemonTrainerStateStore } from './pokemon-trainer-state.store.js';
 
 import { PokemonPartyRepository } from './pokemon-party.repository';
 import { PokemonInventoryRepository } from './inventory/pokemon-inventory.repository';
+import { PokemonStarterSelectionRepository } from './pokemon-starter-selection.repository';
 
 export class PokemonPartyReorderError extends Error {
   constructor(
@@ -43,6 +45,7 @@ export class PokemonTrainerService {
     private readonly trainerStateStore: PokemonTrainerStateStore,
     private readonly pokemonPartyRepository: PokemonPartyRepository,
     private readonly pokemonInventoryRepository: PokemonInventoryRepository,
+    private readonly pokemonStarterSelectionRepository: PokemonStarterSelectionRepository,
   ) {
     this.trainerStateStore = trainerStateStore;
   }
@@ -81,7 +84,10 @@ export class PokemonTrainerService {
   public async chooseStarter(
     trainerId: PokemonTrainerId,
     starterId: PokemonStarterId,
-  ): Promise<PokemonTrainerState> {
+  ): Promise<{
+    readonly trainerState: PokemonTrainerState;
+    readonly rewardItems: typeof POKEMON_STARTER_REWARD_ITEMS;
+  }> {
     const trainerState = this.trainerStateStore.get(trainerId);
 
     if (!trainerState) {
@@ -102,13 +108,35 @@ export class PokemonTrainerService {
       );
     }
 
-    const starter = POKEMON_STARTERS[starterId];
+    const starterDefinition = POKEMON_STARTERS[starterId];
+    const starterPokemon = createPokemonInstance(
+      starterDefinition.speciesId,
+      starterDefinition.level,
+    );
+    const updatedParty = addPokemonToParty(trainerState.party, starterPokemon);
 
     /* Bloqueamos ANTES del await para evitar dos elecciones concurrentes. */
     this.trainerStateStore.lockStarterSelection(trainerId);
 
     try {
-      return await this.addPokemon(trainerId, starter.speciesId, starter.level);
+      const persistence =
+        await this.pokemonStarterSelectionRepository.persistSelection({
+          trainerId,
+          starter: starterPokemon,
+          rewardItems: POKEMON_STARTER_REWARD_ITEMS,
+        });
+
+      /* DB FIRST -> RAM SECOND. */
+      const updatedTrainerState = this.trainerStateStore.setPartyAndInventory(
+        trainerId,
+        updatedParty,
+        persistence.inventory,
+      );
+
+      return {
+        trainerState: updatedTrainerState,
+        rewardItems: POKEMON_STARTER_REWARD_ITEMS,
+      };
     } catch (error: unknown) {
       /* Si falla PostgreSQL permitimos que el jugador reintente. */
       this.trainerStateStore.unlockStarterSelection(trainerId);

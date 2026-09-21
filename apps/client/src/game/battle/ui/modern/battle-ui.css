@@ -2733,3 +2733,16 @@
     gap: 4px;
   }
 }
+
+/* =========================================================
+   PLAYER TRAINER PARTY INDICATOR
+   Mirrors the opponent party indicator on the local side.
+   ========================================================= */
+
+.battle-modern-opponent-party--player {
+  flex-direction: row-reverse;
+}
+
+.battle-modern-opponent-party--player .battle-modern-opponent-party__balls {
+  justify-content: flex-start;
+}

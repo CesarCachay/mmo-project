@@ -44,7 +44,7 @@ import {
   isPlayerInsideMapTransition,
   getServerMapNpc,
   isPlayerNearMapNpc,
-  isPlayerInsideTrainerNpcSight,
+  isPlayerInsideTrainerNpcSightForInteraction as isPlayerInsideTrainerNpcSightForInteractionOnServer,
   getServerEncounterZoneAtPosition,
 } from './maps/serverMapRegistry';
 import { ChatService } from '#app/chat/chat.service';
@@ -68,6 +68,7 @@ import type { PokemonWildEncounterSession } from '#app/pokemon/encounters/pokemo
 // db and repositories
 import { PokemonPartyRepository } from '#app/pokemon/pokemon-party.repository';
 import { PokemonInventoryRepository } from '#app/pokemon/inventory/pokemon-inventory.repository';
+import { PokemonStarterSelectionRepository } from '#app/pokemon/pokemon-starter-selection.repository';
 import { PokemonWalletRepository } from '#app/pokemon/economy/pokemon-wallet.repository';
 import { PokemonCaptureRepository } from '#app/pokemon/battles/capture/pokemon-capture.repository';
 import { PokemonStorageRepository } from '#app/pokemon/storage/pokemon-storage.repository';
@@ -201,6 +202,7 @@ export class GameGateway
     private readonly pokemonTrainerStateStore: PokemonTrainerStateStore,
     private readonly pokemonPartyRepository: PokemonPartyRepository,
     private readonly pokemonInventoryRepository: PokemonInventoryRepository,
+    private readonly pokemonStarterSelectionRepository: PokemonStarterSelectionRepository,
     private readonly pokemonWalletRepository: PokemonWalletRepository,
     private readonly pokemonShopPurchaseService: PokemonShopPurchaseService,
     private readonly pokemonShopPurchaseOperationQueue: PokemonShopPurchaseOperationQueue,
@@ -224,6 +226,7 @@ export class GameGateway
       this.pokemonTrainerStateStore,
       this.pokemonPartyRepository,
       this.pokemonInventoryRepository,
+      this.pokemonStarterSelectionRepository,
     );
     this.pokemonStorageService = new PokemonStorageService(
       this.pokemonTrainerStateStore,
@@ -1234,6 +1237,14 @@ export class GameGateway
         : definition.preBattleDialogueId;
     }
 
+    if (npc.postDialogueAction === 'chooseStarter') {
+      const trainerState = this.pokemonTrainerStateStore.get(trainerId);
+
+      if (trainerState && trainerState.party.pokemon.length > 0) {
+        return 'professor-oak-after-starter';
+      }
+    }
+
     return npc.dialogueId;
   }
 
@@ -1266,33 +1277,12 @@ export class GameGateway
     playerY: number,
     npc: SharedMapNpc,
   ): boolean {
-    if (isPlayerInsideTrainerNpcSight(mapId, playerX, playerY, npc)) {
-      return true;
-    }
-
-    if (!npc.trainerBattleId || !npc.direction || !npc.sightRangeTiles) {
-      return false;
-    }
-
-    const map = MAP_DATA_REGISTRY[mapId];
-    const horizontal = npc.direction === 'left' || npc.direction === 'right';
-    const laneSize = horizontal ? map.tileHeight : map.tileWidth;
-    const lateralDelta = horizontal
-      ? Math.abs(playerY - npc.y)
-      : Math.abs(playerX - npc.x);
-
-    // Mobile analogue movement and reconciliation can leave the player only a
-    // few pixels outside the exact Trainer lane. Allow half a tile laterally,
-    // then snap only the lateral coordinate and reuse the strict sight helper
-    // so forward range and collision blocking remain authoritative.
-    if (lateralDelta > laneSize * 0.5) {
-      return false;
-    }
-
-    const snappedX = horizontal ? playerX : npc.x;
-    const snappedY = horizontal ? npc.y : playerY;
-
-    return isPlayerInsideTrainerNpcSight(mapId, snappedX, snappedY, npc);
+    return isPlayerInsideTrainerNpcSightForInteractionOnServer(
+      mapId,
+      playerX,
+      playerY,
+      npc,
+    );
   }
 
   private isTrainerBattleDefeated(

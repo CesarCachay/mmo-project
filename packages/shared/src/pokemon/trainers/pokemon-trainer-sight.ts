@@ -1,6 +1,8 @@
 import type { CollisionMap, Position } from "../../maps/collision.js";
 import type { Direction } from "../../game.types.js";
 
+export const POKEMON_TRAINER_SIGHT_INTERACTION_LATERAL_TOLERANCE_FACTOR = 0.5;
+
 export type PokemonTrainerSightSource = Readonly<{
   position: Position;
   direction: Direction;
@@ -12,10 +14,10 @@ export type PokemonTrainerSightCheckInput = Readonly<{
   target: Position;
   map: CollisionMap;
   /**
-   * Extra lateral tolerance used by authoritative interaction validation.
-   * Client detection should normally keep this at 0 so sight remains crisp,
-   * while the server may allow a few pixels to absorb prediction/reconciliation
-   * differences from analog/mobile movement.
+   * Extra lateral tolerance used by interaction validation.
+   * The normal lane already accepts half a tile. Client and server may add
+   * a small shared tolerance to absorb prediction/reconciliation and
+   * sub-tile movement differences before starting a Trainer interaction.
    */
   lateralTolerancePixels?: number;
 }>;
@@ -63,10 +65,20 @@ export function checkPokemonTrainerSight(
     return noDetection();
   }
 
+  /*
+   * Lateral tolerance means the target may be slightly outside the exact
+   * Trainer lane. Collision must still be checked along the Trainer's
+   * forward ray, otherwise a tolerated target in a neighbouring tile can
+   * never be reached by the one-axis traversal below.
+   */
+  const collisionTarget = horizontal
+    ? { x: target.x, y: trainer.position.y }
+    : { x: trainer.position.x, y: target.y };
+
   if (
     hasBlockingCollisionBetween(
       trainer.position,
-      target,
+      collisionTarget,
       trainer.direction,
       map,
     )

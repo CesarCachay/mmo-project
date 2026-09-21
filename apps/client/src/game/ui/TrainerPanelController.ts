@@ -168,6 +168,10 @@ export class TrainerPanelController {
     this.trainerDrawer.setInventory(inventory);
   }
 
+  public presentNotification(message: string): void {
+    this.showFeedback(message);
+  }
+
   public get isOpen(): boolean {
     return (
       this.partyDrawer.isVisible() ||

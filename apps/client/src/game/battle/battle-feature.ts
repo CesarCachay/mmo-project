@@ -11,6 +11,8 @@ import "./ui/modern/battle-shell-compat.css";
 
 import { BattleController } from "./BattleController";
 import {
+  BATTLE_ITEM_AUDIO_ASSETS,
+  BATTLE_ITEM_AUDIO_KEYS,
   TRAINER_BATTLE_AUDIO_ASSETS,
   TRAINER_BATTLE_AUDIO_KEYS,
   WILD_BATTLE_AUDIO_ASSETS,
@@ -52,6 +54,14 @@ const BATTLE_AUDIO_ASSETS: readonly BattleAudioAsset[] = [
   {
     key: WILD_BATTLE_AUDIO_KEYS.DEFEAT,
     path: WILD_BATTLE_AUDIO_ASSETS.DEFEAT,
+  },
+  {
+    key: BATTLE_ITEM_AUDIO_KEYS.HEAL,
+    path: BATTLE_ITEM_AUDIO_ASSETS.HEAL,
+  },
+  {
+    key: BATTLE_ITEM_AUDIO_KEYS.REVIVE,
+    path: BATTLE_ITEM_AUDIO_ASSETS.REVIVE,
   },
 ];
 

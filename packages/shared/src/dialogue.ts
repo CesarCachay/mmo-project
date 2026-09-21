@@ -9,6 +9,15 @@ export const DIALOGUES = {
     lines: ["Welcome to StoneBridge City, choose your favorite Pokemon!"],
   },
 
+  "professor-oak-after-starter": {
+    id: "professor-oak-after-starter",
+    lines: [
+      "How is your new partner doing?",
+      "I gave you 5 Poké Balls too. Use them to catch wild Pokémon and build your team!",
+      "Train together and come back stronger. Your adventure is just beginning!",
+    ],
+  },
+
   "dra-gianela-intro": {
     id: "dra-gianela-intro",
     lines: [

@@ -1061,6 +1061,19 @@ export class GameScene extends Phaser.Scene {
       this.starterSelectionPanel.show();
     });
 
+
+    this.network.onStarterSelected((payload) => {
+      const pokeBallReward = payload.rewardItems.find(
+        (item) => item.itemId === "poke-ball"
+      );
+
+      if (pokeBallReward) {
+        this.trainerPanelController.presentNotification(
+          `You received ${pokeBallReward.quantity} Poké Balls!`
+        );
+      }
+    });
+
     this.network.onWildEncounterStarted((payload) => {
       this.handleWildEncounterStarted(payload);
     });

@@ -1,5 +1,9 @@
 import Phaser from "phaser";
-import { MAP_DATA_REGISTRY, checkPokemonTrainerSight } from "@cesar-mmo/shared";
+import {
+  MAP_DATA_REGISTRY,
+  POKEMON_TRAINER_SIGHT_INTERACTION_LATERAL_TOLERANCE_FACTOR,
+  checkPokemonTrainerSight,
+} from "@cesar-mmo/shared";
 
 import type { MapId } from "@cesar-mmo/shared";
 import type { NpcInstance } from "../npc/types";
@@ -143,57 +147,26 @@ export class TrainerSightController {
     }
 
     /*
-     * Desktop/keyboard debe seguir siendo completamente estricto.
-     * La tolerancia solamente se aplica en dispositivos touch con
-     * pointer coarse, donde el joystick analógico puede dejar al
-     * jugador unos píxeles fuera del centro exacto del trainer lane.
+     * Keep client detection aligned with the authoritative interaction
+     * envelope. Strict sight stays crisp, while this second pass absorbs
+     * prediction/reconciliation and sub-tile movement differences.
      */
-    const isTouchPrimary =
-      typeof window !== "undefined" &&
-      typeof window.matchMedia === "function" &&
-      window.matchMedia("(hover: none) and (pointer: coarse)").matches;
-
-    if (!isTouchPrimary) {
-      return false;
-    }
-
     const direction = npc.definition.direction;
-
     const horizontal = direction === "left" || direction === "right";
-
-    /*
-     * Si el trainer mira izquierda/derecha, la desviación relevante es vertical (Y).
-     * Si mira arriba/abajo, la desviación relevante es horizontal (X).
-     */
-    const lateralDelta = horizontal
-      ? Math.abs(playerY - npc.sprite.y)
-      : Math.abs(playerX - npc.sprite.x);
-
     const laneSize = horizontal ? map.tileHeight : map.tileWidth;
 
-    const mobileLaneTolerance = laneSize * 0.5;
-
-    if (lateralDelta > mobileLaneTolerance) {
-      return false;
-    }
-
-    const snappedTarget = horizontal
-      ? {
-          x: playerX,
-          y: npc.sprite.y,
-        }
-      : {
-          x: npc.sprite.x,
-          y: playerY,
-        };
-
-    const mobileResult = checkPokemonTrainerSight({
+    const tolerantResult = checkPokemonTrainerSight({
       trainer,
-      target: snappedTarget,
+      target: {
+        x: playerX,
+        y: playerY,
+      },
       map,
+      lateralTolerancePixels:
+        laneSize * POKEMON_TRAINER_SIGHT_INTERACTION_LATERAL_TOLERANCE_FACTOR,
     });
 
-    return mobileResult.detected;
+    return tolerantResult.detected;
   }
   private triggerTrainerAlert(npc: NpcInstance): void {
     this.activeNpc = npc;

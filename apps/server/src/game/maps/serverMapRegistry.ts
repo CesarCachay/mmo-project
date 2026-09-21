@@ -1,4 +1,8 @@
-import { MAP_DATA_REGISTRY, checkPokemonTrainerSight } from '@cesar-mmo/shared';
+import {
+  MAP_DATA_REGISTRY,
+  POKEMON_TRAINER_SIGHT_INTERACTION_LATERAL_TOLERANCE_FACTOR,
+  checkPokemonTrainerSight,
+} from '@cesar-mmo/shared';
 
 import type {
   MapId,
@@ -16,7 +20,6 @@ const NPC_INTERACTION_DISTANCE = 36;
 
 const NPC_INTERACTION_SERVER_TOLERANCE = 4;
 
-const TRAINER_SIGHT_INTERACTION_LATERAL_TOLERANCE_FACTOR = 0.5;
 
 const MAX_NPC_INTERACTION_DISTANCE =
   NPC_INTERACTION_DISTANCE + NPC_INTERACTION_SERVER_TOLERANCE;
@@ -159,7 +162,7 @@ export function isPlayerInsideTrainerNpcSightForInteraction(
     target: { x: playerX, y: playerY },
     map,
     lateralTolerancePixels:
-      laneSize * TRAINER_SIGHT_INTERACTION_LATERAL_TOLERANCE_FACTOR,
+      laneSize * POKEMON_TRAINER_SIGHT_INTERACTION_LATERAL_TOLERANCE_FACTOR,
   }).detected;
 }
 

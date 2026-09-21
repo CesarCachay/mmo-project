@@ -347,10 +347,7 @@ export class BattleController {
     this.moveSfx.stopAll();
 
     try {
-      await this.ensureBattleSpritesLoaded(
-        payload.battle,
-        payload.localParticipantId
-      );
+      await this.ensureBattleSpritesLoaded(payload.battle, payload.localParticipantId);
 
       if (this.activeBattlePayload?.battle.battleId !== nextBattleId) {
         return;
@@ -359,10 +356,7 @@ export class BattleController {
       this.overlay.renderBattle(payload.battle, payload.localParticipantId);
       void this.moveSfx.preloadBattle(payload.battle);
 
-      await this.overlay.playBattleIntro(
-        payload.battle,
-        payload.localParticipantId,
-      );
+      await this.overlay.playBattleIntro(payload.battle, payload.localParticipantId);
 
       if (this.activeBattlePayload?.battle.battleId !== nextBattleId) {
         return;
@@ -444,10 +438,7 @@ export class BattleController {
         localParticipantId: currentBattle.localParticipantId,
       };
 
-      this.overlay.renderBattle(
-        payload.battle,
-        currentBattle.localParticipantId
-      );
+      this.overlay.renderBattle(payload.battle, currentBattle.localParticipantId);
       void this.moveSfx.preloadBattle(payload.battle);
 
       this.setInteractionState("action-menu");
@@ -776,9 +767,7 @@ export class BattleController {
       return;
     }
 
-    const hasUsableMove = activePokemon.pokemon.moves.some(
-      (move) => move.currentPp > 0
-    );
+    const hasUsableMove = activePokemon.pokemon.moves.some((move) => move.currentPp > 0);
 
     if (!hasUsableMove) {
       this.setInteractionState("waiting-for-server");
@@ -828,7 +817,7 @@ export class BattleController {
       void this.presentBattleRuleRejection(
         payload.battle.battleId,
         runDecision.reason,
-        "action-menu",
+        "action-menu"
       );
       return;
     }
@@ -1065,7 +1054,7 @@ export class BattleController {
           event.pokemonInstanceId,
           event.moveId,
           moveMissed,
-          event.hitCount,
+          event.hitCount
         ),
       ]);
 
@@ -1080,9 +1069,7 @@ export class BattleController {
       );
 
       const moveUsedEvent =
-        context.previousEvent?.type === "move-used"
-          ? context.previousEvent
-          : undefined;
+        context.previousEvent?.type === "move-used" ? context.previousEvent : undefined;
 
       await Promise.all([
         moveUsedEvent
@@ -1103,8 +1090,7 @@ export class BattleController {
       const followsFaint =
         context.previousEvent?.type === "pokemon-fainted" &&
         context.previousEvent.participantId === event.participantId &&
-        context.previousEvent.pokemonInstanceId ===
-          event.previousPokemonInstanceId;
+        context.previousEvent.pokemonInstanceId === event.previousPokemonInstanceId;
 
       /*
        * A forced replacement after faint must not "withdraw" an already
@@ -1219,6 +1205,8 @@ export class BattleController {
         );
       }
 
+      this.audio.playHpRestore(event.previousHp === 0 && event.currentHp > 0);
+
       await this.overlay.animatePokemonHp(
         activeBattle,
         event.participantId,
@@ -1232,9 +1220,7 @@ export class BattleController {
 
     if (event.type === "damage-applied" && event.appliedDamage > 0) {
       const moveUsedEvent =
-        context.previousEvent?.type === "move-used"
-          ? context.previousEvent
-          : undefined;
+        context.previousEvent?.type === "move-used" ? context.previousEvent : undefined;
 
       const impactFeedbackRequest = moveUsedEvent
         ? {
@@ -1261,10 +1247,7 @@ export class BattleController {
             )
           : Promise.resolve(),
         moveUsedEvent
-          ? this.moveSfx.playMoveImpact(
-              moveUsedEvent.moveId,
-              moveUsedEvent.hitCount,
-            )
+          ? this.moveSfx.playMoveImpact(moveUsedEvent.moveId, moveUsedEvent.hitCount)
           : Promise.resolve(),
         this.overlay.animatePokemonHit(
           activeBattle,
@@ -1444,10 +1427,7 @@ export class BattleController {
         return;
       }
 
-      this.overlay.renderBattle(
-        payload.battle,
-        currentBattle.localParticipantId
-      );
+      this.overlay.renderBattle(payload.battle, currentBattle.localParticipantId);
       void this.moveSfx.preloadBattle(payload.battle);
 
       if (payload.interactionState === "replacement-required") {
@@ -1581,7 +1561,7 @@ export class BattleController {
       void this.presentBattleRuleRejection(
         payload.battle.battleId,
         itemDecision.reason,
-        "item-selection",
+        "item-selection"
       );
       return;
     }
@@ -1722,11 +1702,11 @@ export class BattleController {
   private async presentBattleRuleRejection(
     battleId: string,
     reason: PokemonBattleRuleRejectionReason,
-    restoreState: BattleClientInteractionState,
+    restoreState: BattleClientInteractionState
   ): Promise<void> {
     await this.overlay.presentMessage(
       formatPokemonBattleRuleRejectionMessage(reason),
-      1100,
+      1100
     );
 
     if (

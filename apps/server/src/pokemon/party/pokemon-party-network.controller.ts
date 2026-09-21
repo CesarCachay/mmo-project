@@ -1,6 +1,7 @@
 import type { Socket } from 'socket.io';
 
 import {
+  POKEMON_EVENTS,
   POKEMON_PARTY_REORDER_EVENTS,
   isPokemonStarterChoiceInput,
   isPokemonPartyReorderInput,
@@ -8,6 +9,7 @@ import {
 
 import type {
   PokemonPartyReorderedPayload,
+  PokemonStarterSelectedPayload,
   PokemonPartyReorderErrorPayload,
 } from '@cesar-mmo/shared';
 
@@ -105,11 +107,15 @@ export class PokemonPartyNetworkController {
     }
 
     try {
-      const trainerState = await this.trainerService.chooseStarter(
+      const result = await this.trainerService.chooseStarter(
         trainerId,
         payload.starterId,
       );
-      this.trainerStatePresenter.publishTrainerState(client, trainerState);
+      this.trainerStatePresenter.publishTrainerState(client, result.trainerState);
+      client.emit(POKEMON_EVENTS.STARTER_SELECTED, {
+        starterId: payload.starterId,
+        rewardItems: result.rewardItems.map((item) => ({ ...item })),
+      } satisfies PokemonStarterSelectedPayload);
     } catch (error: unknown) {
       console.warn(
         `[PokemonParty] Starter selection rejected for player ${client.id}`,

@@ -2,7 +2,9 @@ import type { BattleInstance } from "@cesar-mmo/shared";
 
 import {
   getBattleOpponentPartyIndicatorModel,
+  getBattlePlayerPartyIndicatorModel,
   type BattleOpponentPartySlotState,
+  type BattlePartyIndicatorPerspective,
 } from "./battle-opponent-party-indicator";
 
 export interface ModernBattleOpponentPartyIndicatorBounds {
@@ -18,14 +20,20 @@ export interface ModernBattleOpponentPartyIndicatorViewport {
 }
 
 export class ModernBattleOpponentPartyIndicator {
+  private readonly perspective: BattlePartyIndicatorPerspective;
   private readonly root: HTMLDivElement;
   private readonly label: HTMLDivElement;
   private readonly balls: HTMLDivElement;
 
-  constructor(parent: HTMLElement) {
+  constructor(
+    parent: HTMLElement,
+    perspective: BattlePartyIndicatorPerspective = "opponent",
+  ) {
+    this.perspective = perspective;
     this.root = document.createElement("div");
     this.root.className = [
       "battle-modern-opponent-party",
+      `battle-modern-opponent-party--${perspective}`,
       "battle-ui-modern__surface",
     ].join(" ");
     this.root.hidden = true;
@@ -42,20 +50,25 @@ export class ModernBattleOpponentPartyIndicator {
   }
 
   public render(battle: BattleInstance, localParticipantId: string): void {
-    const model = getBattleOpponentPartyIndicatorModel(
-      battle,
-      localParticipantId,
-    );
+    const model =
+      this.perspective === "player"
+        ? getBattlePlayerPartyIndicatorModel(battle, localParticipantId)
+        : getBattleOpponentPartyIndicatorModel(battle, localParticipantId);
 
     if (!model) {
       this.clear();
       return;
     }
 
-    this.label.textContent = `${model.displayName.toUpperCase()} · ${model.usablePokemon}/${model.totalPokemon} READY`;
+    this.label.textContent =
+      this.perspective === "player"
+        ? `YOUR PARTY · ${model.usablePokemon}/${model.totalPokemon} READY`
+        : `${model.displayName.toUpperCase()} · ${model.usablePokemon}/${model.totalPokemon} READY`;
     this.root.setAttribute(
       "aria-label",
-      `${model.displayName} has ${model.usablePokemon} of ${model.totalPokemon} Pokémon able to battle.`,
+      this.perspective === "player"
+        ? `Your party has ${model.usablePokemon} of ${model.totalPokemon} Pokémon able to battle.`
+        : `${model.displayName} has ${model.usablePokemon} of ${model.totalPokemon} Pokémon able to battle.`,
     );
 
     this.balls.replaceChildren(

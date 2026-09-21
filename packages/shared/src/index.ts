@@ -121,10 +121,12 @@ export {
   isPokemonBattleReplacementResolvedPayload,
   isPokemonBattleCompletedPayload,
   isPokemonBattleStateUpdatedPayload,
+  isPokemonStarterSelectedPayload,
 } from "./pokemon/pokemon-network.js";
 export type {
   PokemonTrainerStatePayload,
   PokemonStarterSelectionStatus,
+  PokemonStarterSelectedPayload,
   PokemonWildEncounterStartedPayload,
   PokemonBattleReplacementInput,
   PokemonBattleReplacementResolvedPayload,
@@ -138,6 +140,7 @@ export type {
 // Pokemon Starters
 export {
   POKEMON_STARTERS,
+  POKEMON_STARTER_REWARD_ITEMS,
   isPokemonStarterId,
   isPokemonStarterChoiceInput,
 } from "./pokemon/pokemon-starter.js";
@@ -200,7 +203,10 @@ export type {
 } from "./pokemon/trainers/pokemon-trainer-battle-network.js";
 export { validatePokemonTrainerBattleDefinition } from "./pokemon/trainers/pokemon-trainer-battle.validation.js";
 export type { PokemonTrainerBattleValidationIssue } from "./pokemon/trainers/pokemon-trainer-battle.validation.js";
-export { checkPokemonTrainerSight } from "./pokemon/trainers/pokemon-trainer-sight.js";
+export {
+  checkPokemonTrainerSight,
+  POKEMON_TRAINER_SIGHT_INTERACTION_LATERAL_TOLERANCE_FACTOR,
+} from "./pokemon/trainers/pokemon-trainer-sight.js";
 export type {
   PokemonTrainerSightSource,
   PokemonTrainerSightCheckInput,

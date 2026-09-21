@@ -59,6 +59,12 @@ export const POKEMON_STARTERS = {
     level: 5,
   },
 } as const;
+export const POKEMON_STARTER_REWARD_ITEMS = [
+  {
+    itemId: "poke-ball",
+    quantity: 5,
+  },
+] as const;
 
 export type PokemonStarterId = keyof typeof POKEMON_STARTERS;
 

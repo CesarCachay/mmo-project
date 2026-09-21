@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { checkPokemonTrainerSight } from "../src/pokemon/trainers/pokemon-trainer-sight.js";
+import {
+  POKEMON_TRAINER_SIGHT_INTERACTION_LATERAL_TOLERANCE_FACTOR,
+  checkPokemonTrainerSight,
+} from "../src/pokemon/trainers/pokemon-trainer-sight.js";
 import type { CollisionMap } from "../src/maps/collision.js";
 
 const OPEN_MAP: CollisionMap = {
@@ -50,6 +53,42 @@ describe("checkPokemonTrainerSight", () => {
       },
       target: { x: 96, y: 96 },
       map: OPEN_MAP,
+    });
+
+    expect(result.detected).toBe(false);
+  });
+
+
+  it("detects a target one tile off-center when interaction tolerance is enabled", () => {
+    const result = checkPokemonTrainerSight({
+      trainer: {
+        position: { x: 80, y: 48 },
+        direction: "down",
+        sightRangeTiles: 5,
+      },
+      target: { x: 96, y: 96 },
+      map: OPEN_MAP,
+      lateralTolerancePixels:
+        OPEN_MAP.tileWidth *
+        POKEMON_TRAINER_SIGHT_INTERACTION_LATERAL_TOLERANCE_FACTOR,
+    });
+
+    expect(result.detected).toBe(true);
+  });
+
+  it("still respects forward collision when lateral tolerance is enabled", () => {
+    const collision = new Array<number>(100).fill(0);
+    collision[4 * 10 + 5] = 1;
+
+    const result = checkPokemonTrainerSight({
+      trainer: {
+        position: { x: 80, y: 48 },
+        direction: "down",
+        sightRangeTiles: 5,
+      },
+      target: { x: 96, y: 96 },
+      map: { ...OPEN_MAP, collision },
+      lateralTolerancePixels: 8,
     });
 
     expect(result.detected).toBe(false);

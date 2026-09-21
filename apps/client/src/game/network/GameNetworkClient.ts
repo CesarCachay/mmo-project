@@ -11,6 +11,7 @@ import {
   isPokemonBattleCompletedPayload,
   isPokemonBattleStateUpdatedPayload,
   isPokemonBattleTurnResolvedPayload,
+  isPokemonStarterSelectedPayload,
   POKEMON_OVERWORLD_ITEM_EVENTS,
   isPokemonOverworldItemUsedPayload,
   isPokemonOverworldItemErrorPayload,
@@ -44,6 +45,7 @@ import type {
   PokemonStarterId,
   PokemonStarterChoiceInput,
   PokemonStarterSelectionStatus,
+  PokemonStarterSelectedPayload,
   DialogueStartInput,
   DialogueSessionState,
   DialogueAdvanceInput,
@@ -171,6 +173,19 @@ export class GameNetworkClient {
     callback: (status: PokemonStarterSelectionStatus) => void
   ): void {
     this.socket.on(POKEMON_EVENTS.STARTER_SELECTION_STATUS, callback);
+  }
+
+  public onStarterSelected(
+    callback: (payload: PokemonStarterSelectedPayload) => void
+  ): void {
+    this.socket.on(POKEMON_EVENTS.STARTER_SELECTED, (payload: unknown) => {
+      if (!isPokemonStarterSelectedPayload(payload)) {
+        console.warn("[PokemonStarter] invalid selected payload", payload);
+        return;
+      }
+
+      callback(payload);
+    });
   }
 
   public reorderPokemonParty(input: PokemonPartyReorderInput): void {

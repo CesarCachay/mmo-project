@@ -2,11 +2,15 @@ import { describe, expect, it } from "vitest";
 
 import type { BattleInstance } from "@cesar-mmo/shared";
 
-import { getBattleOpponentPartyIndicatorModel } from "./battle-opponent-party-indicator";
+import {
+  getBattleOpponentPartyIndicatorModel,
+  getBattlePlayerPartyIndicatorModel,
+} from "./battle-opponent-party-indicator";
 
 function createBattle(
   type: "wild" | "trainer",
   opponentHp: readonly number[],
+  playerHp: readonly number[] = [20],
 ): BattleInstance {
   return {
     battleId: "battle-a",
@@ -17,12 +21,10 @@ function createBattle(
         id: "player",
         type: "trainer",
         side: "side-a",
-        pokemon: [
-          {
-            pokemon: { instanceId: "player-mon" },
-            currentHp: 20,
-          },
-        ],
+        pokemon: playerHp.map((currentHp, index) => ({
+          pokemon: { instanceId: `player-${index}` },
+          currentHp,
+        })),
         activePokemonIndex: 0,
       },
       {
@@ -68,6 +70,29 @@ describe("getBattleOpponentPartyIndicatorModel", () => {
     expect(
       getBattleOpponentPartyIndicatorModel(
         createBattle("wild", [12]),
+        "player",
+      ),
+    ).toBeUndefined();
+  });
+
+  it("shows the local Trainer party with available and fainted slots", () => {
+    expect(
+      getBattlePlayerPartyIndicatorModel(
+        createBattle("trainer", [18, 32, 40], [42, 0, 17]),
+        "player",
+      ),
+    ).toEqual({
+      displayName: "You",
+      totalPokemon: 3,
+      usablePokemon: 2,
+      slots: ["available", "defeated", "available"],
+    });
+  });
+
+  it("hides the local party indicator for Wild Battles", () => {
+    expect(
+      getBattlePlayerPartyIndicatorModel(
+        createBattle("wild", [12], [20, 0, 18]),
         "player",
       ),
     ).toBeUndefined();

@@ -22,6 +22,7 @@ import { ModernBattleMoveVfxLayer } from "./modern/ModernBattleMoveVfxLayer";
 import { ModernBattleTypeImpactVfxLayer } from "./modern/ModernBattleTypeImpactVfxLayer";
 import { ModernBattlePersistentFieldVfxLayer } from "./modern/ModernBattlePersistentFieldVfxLayer";
 import { ModernBattlePendingIndicator } from "./modern/ModernBattlePendingIndicator";
+import { ModernBattleOpponentPartyIndicator } from "./modern/ModernBattleOpponentPartyIndicator";
 import { ModernBattleImpactFeedbackController } from "./modern/ModernBattleImpactFeedbackController";
 
 import { ModernBattlePokemonHud } from "./modern/ModernBattlePokemonHud";
@@ -112,6 +113,8 @@ export class BattleOverlay {
   private readonly typeImpactVfxLayer: ModernBattleTypeImpactVfxLayer;
   private readonly moveVfxController: BattleMoveVfxController;
   private readonly pendingIndicator: ModernBattlePendingIndicator;
+  private readonly opponentPartyIndicator: ModernBattleOpponentPartyIndicator;
+  private readonly playerPartyIndicator: ModernBattleOpponentPartyIndicator;
   private readonly impactFeedback: ModernBattleImpactFeedbackController;
 
   private readonly wildHud: ModernBattlePokemonHud;
@@ -166,6 +169,14 @@ export class BattleOverlay {
     );
     this.moveVfxController = new BattleMoveVfxController(this.moveVfxLayer);
     this.pendingIndicator = new ModernBattlePendingIndicator(this.modernRoot.element);
+    this.opponentPartyIndicator = new ModernBattleOpponentPartyIndicator(
+      this.modernRoot.element,
+      "opponent",
+    );
+    this.playerPartyIndicator = new ModernBattleOpponentPartyIndicator(
+      this.modernRoot.element,
+      "player",
+    );
     this.impactFeedback = new ModernBattleImpactFeedbackController(
       this.modernRoot.element
     );
@@ -234,6 +245,8 @@ export class BattleOverlay {
     this.typeImpactVfxLayer.clear();
     this.impactFeedback.clear();
     this.pendingIndicator.clear();
+    this.opponentPartyIndicator.clear();
+    this.playerPartyIndicator.clear();
 
     this.trainerHud.clear();
     this.wildHud.clear();
@@ -275,6 +288,8 @@ export class BattleOverlay {
     this.localParticipantId = localParticipantId;
     this.stage.setBattleContext(battle.type, opponentParticipant.displayName);
     this.persistentFieldVfxLayer.syncBattle(battle, localParticipantId);
+    this.opponentPartyIndicator.render(battle, localParticipantId);
+    this.playerPartyIndicator.render(battle, localParticipantId);
 
     const trainerPokemon =
       trainerParticipant.pokemon[trainerParticipant.activePokemonIndex];
@@ -344,6 +359,8 @@ export class BattleOverlay {
     this.evolutionLayer.destroy();
 
     this.pendingIndicator.destroy();
+    this.opponentPartyIndicator.destroy();
+    this.playerPartyIndicator.destroy();
     this.impactFeedback.destroy();
     this.moveVfxController.clear();
     this.typeImpactVfxLayer.destroy();
@@ -429,6 +446,8 @@ export class BattleOverlay {
 
     this.wildHud.setBounds(wildBounds, viewport);
     this.trainerHud.setBounds(trainerBounds, viewport);
+    this.opponentPartyIndicator.setBounds(wildBounds, viewport);
+    this.playerPartyIndicator.setBounds(trainerBounds, viewport);
     this.stage.setLayout({
       viewport,
       battleFieldHeight,

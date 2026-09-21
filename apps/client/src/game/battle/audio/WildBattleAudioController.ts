@@ -28,6 +28,16 @@ export const TRAINER_BATTLE_AUDIO_ASSETS = {
   THEME: "/assets/audio/battle/trainer-battle-theme.wav",
 } as const;
 
+export const BATTLE_ITEM_AUDIO_KEYS = {
+  HEAL: "battle-item-heal",
+  REVIVE: "battle-item-revive",
+} as const;
+
+export const BATTLE_ITEM_AUDIO_ASSETS = {
+  HEAL: "/assets/audio/battle/item-heal.wav",
+  REVIVE: "/assets/audio/battle/item-revive.wav",
+} as const;
+
 export class WildBattleAudioController {
   private readonly theme: Phaser.Sound.BaseSound;
   private readonly trainerTheme: Phaser.Sound.BaseSound;
@@ -36,6 +46,8 @@ export class WildBattleAudioController {
   private readonly captureFailed: Phaser.Sound.BaseSound;
   private readonly victory: Phaser.Sound.BaseSound;
   private readonly defeat: Phaser.Sound.BaseSound;
+  private readonly itemHeal: Phaser.Sound.BaseSound;
+  private readonly itemRevive: Phaser.Sound.BaseSound;
 
   constructor(scene: Phaser.Scene) {
     this.theme = scene.sound.add(WILD_BATTLE_AUDIO_KEYS.THEME, {
@@ -66,6 +78,14 @@ export class WildBattleAudioController {
 
     this.defeat = scene.sound.add(WILD_BATTLE_AUDIO_KEYS.DEFEAT, {
       volume: 0.55,
+    });
+
+    this.itemHeal = scene.sound.add(BATTLE_ITEM_AUDIO_KEYS.HEAL, {
+      volume: 0.46,
+    });
+
+    this.itemRevive = scene.sound.add(BATTLE_ITEM_AUDIO_KEYS.REVIVE, {
+      volume: 0.5,
     });
   }
 
@@ -103,6 +123,12 @@ export class WildBattleAudioController {
     this.captureFailed.play();
   }
 
+  public playHpRestore(isRevive: boolean): void {
+    const sound = isRevive ? this.itemRevive : this.itemHeal;
+    sound.stop();
+    sound.play();
+  }
+
   public playBattleOutcome(outcome: PokemonBattleCompletedPayload["outcome"]): void {
     this.stopBattleMusic();
     this.stopOutcome();
@@ -134,6 +160,8 @@ export class WildBattleAudioController {
     this.captureContained.stop();
     this.captureSuccess.stop();
     this.captureFailed.stop();
+    this.itemHeal.stop();
+    this.itemRevive.stop();
 
     this.stopOutcome();
   }
@@ -146,6 +174,8 @@ export class WildBattleAudioController {
     this.captureContained.destroy();
     this.captureSuccess.destroy();
     this.captureFailed.destroy();
+    this.itemHeal.destroy();
+    this.itemRevive.destroy();
     this.victory.destroy();
     this.defeat.destroy();
   }

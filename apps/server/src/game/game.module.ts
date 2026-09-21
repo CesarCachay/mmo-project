@@ -4,6 +4,7 @@ import { ChatService } from '#app/chat/chat.service';
 import { PrismaService } from '#app/database/prisma.service';
 import { PokemonPartyRepository } from '#app/pokemon/pokemon-party.repository';
 import { PokemonInventoryRepository } from '#app/pokemon/inventory/pokemon-inventory.repository';
+import { PokemonStarterSelectionRepository } from '#app/pokemon/pokemon-starter-selection.repository';
 import { PokemonWalletRepository } from '#app/pokemon/economy/pokemon-wallet.repository';
 import { PokemonShopPurchaseRepository } from '#app/pokemon/economy/shop/pokemon-shop-purchase.repository';
 import { PokemonShopPurchaseOperationQueue } from '#app/pokemon/economy/shop/pokemon-shop-purchase-operation.queue';
@@ -85,6 +86,7 @@ import { GameGateway } from './game.gateway';
     PrismaService,
     PokemonPartyRepository,
     PokemonInventoryRepository,
+    PokemonStarterSelectionRepository,
     PokemonWalletRepository,
     PokemonShopPurchaseRepository,
     PokemonShopPurchaseOperationQueue,
