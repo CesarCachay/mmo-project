@@ -1418,7 +1418,7 @@ function drawScreenVignette(ctx: CanvasRenderingContext2D, width: number, height
 }
 
 
-function drawCutRetro(input: FrameInput, progress: number, time: number): void {
+function drawCutRetro(input: FrameInput, progress: number, _time: number): void {
   const { ctx, source, target, preset, missed } = input;
   const travel = phase(progress, preset.chargeEnd, preset.travelEnd);
   const center = lerpPoint(source, target, easeOutCubic(Math.max(0.15, travel)));
@@ -1518,7 +1518,7 @@ function drawSurfRetro(input: FrameInput, progress: number, time: number): void 
 }
 
 function drawStrengthRetro(input: FrameInput, progress: number, time: number): void {
-  const { ctx, source, target, vector, preset, missed } = input;
+  const { ctx, source, target, preset, missed } = input;
   const travel = phase(progress, preset.chargeEnd, preset.travelEnd);
   const p = travel > 0 ? lerpPoint(source, target, easeInOutCubic(travel)) : source;
   if (progress < preset.chargeEnd) {
@@ -1543,7 +1543,7 @@ function drawStrengthRetro(input: FrameInput, progress: number, time: number): v
 }
 
 function drawWaterfallRetro(input: FrameInput, progress: number, time: number): void {
-  const { ctx, source, target, vector, preset, missed } = input;
+  const { ctx, source, target, preset, missed } = input;
   const travel = phase(progress, preset.chargeEnd, preset.travelEnd);
   if (travel > 0) {
     const front = lerpPoint(source, target, easeOutCubic(travel));
@@ -1574,7 +1574,7 @@ function drawWaterfallRetro(input: FrameInput, progress: number, time: number): 
   if (!missed && progress >= preset.travelEnd) drawRadialImpact(ctx, target, preset, phase(progress, preset.travelEnd, preset.impactEnd), 52);
 }
 
-function drawRockSmashRetro(input: FrameInput, progress: number, time: number): void {
+function drawRockSmashRetro(input: FrameInput, progress: number, _time: number): void {
   const { ctx, target, preset, missed } = input;
   if (!missed && progress >= preset.travelEnd * 0.7) {
     const hit = phase(progress, preset.travelEnd * 0.7, preset.impactEnd);
@@ -1588,7 +1588,7 @@ function drawRockSmashRetro(input: FrameInput, progress: number, time: number): 
 }
 
 function drawWhirlpoolRetro(input: FrameInput, progress: number, time: number): void {
-  const { ctx, source, target, vector, preset, missed } = input;
+  const { ctx, source, target, preset, missed } = input;
   const travel = phase(progress, preset.chargeEnd, preset.travelEnd * 0.72);
   if (travel > 0) {
     const front = lerpPoint(source, target, easeInOutCubic(travel));
@@ -1618,7 +1618,7 @@ function drawWhirlpoolRetro(input: FrameInput, progress: number, time: number): 
   }
 }
 
-function drawRockClimbRetro(input: FrameInput, progress: number, time: number): void {
+function drawRockClimbRetro(input: FrameInput, progress: number, _time: number): void {
   const { ctx, source, target, preset, missed } = input;
   const travel = phase(progress, preset.chargeEnd, preset.travelEnd);
   if (travel > 0) drawTrail(ctx, source, lerpPoint(source, target, easeOutCubic(travel)), preset, 18, 0.2);
@@ -1632,7 +1632,7 @@ function drawRockClimbRetro(input: FrameInput, progress: number, time: number): 
   }
 }
 
-function drawDefogRetro(input: FrameInput, progress: number, time: number): void {
+function drawDefogRetro(input: FrameInput, progress: number, _time: number): void {
   const { ctx, width, height, source, target, vector, preset, missed } = input;
   const active = phase(progress, 0, preset.impactEnd);
   drawScreenVignette(ctx, width, height, preset.palette.shadow, 0.06 * (1 - active));

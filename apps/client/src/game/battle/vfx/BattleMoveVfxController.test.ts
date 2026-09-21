@@ -86,7 +86,6 @@ describe("BattleMoveVfxController", () => {
 
   it.each([
     [53, "fire", "flamethrower"],
-    [55, "water", "water-gun"],
     [56, "water", "hydro-pump"],
   ] as const)(
     "plays registered stream move %i with the expected preset",
@@ -265,7 +264,6 @@ describe("BattleMoveVfxController", () => {
 
   it.each([
     [16, "flying", "gust"],
-    [57, "water", "surf"],
     [196, "ice", "icy-wind"],
     [257, "fire", "heat-wave"],
     [304, "normal", "hyper-voice"],
@@ -385,10 +383,8 @@ describe("BattleMoveVfxController", () => {
   );
 
   it.each([
-    [71, "grass", "absorb"],
     [72, "grass", "mega-drain"],
     [73, "grass", "leech-seed"],
-    [202, "grass", "giga-drain"],
     [275, "grass", "ingrain"],
   ] as const)(
     "plays registered tether move %i with the expected preset",
@@ -400,6 +396,59 @@ describe("BattleMoveVfxController", () => {
         moveId,
         definition: expect.objectContaining({ archetype: "tether", element, presetId }),
       }));
+    },
+  );
+
+  it.each([
+    // Mini Premium Pass 1
+    [55, "water", "water-gun-retro"],
+    [75, "grass", "razor-leaf-retro"],
+    [71, "grass", "absorb-retro"],
+    [202, "grass", "giga-drain-retro"],
+    [172, "fire", "flame-wheel-retro"],
+
+    // Mini Premium Pass 2
+    [98, "normal", "quick-attack-retro"],
+    [184, "normal", "scary-face-retro"],
+    [99, "normal", "rage-retro"],
+    [22, "grass", "vine-whip-retro"],
+    [145, "water", "bubble-retro"],
+    [82, "dragon", "dragon-rage-retro"],
+    [84, "electric", "thunder-shock-retro"],
+
+    // HM / MO Premium Pass
+    [15, "normal", "cut-retro"],
+    [19, "flying", "fly-retro"],
+    [57, "water", "surf-retro"],
+    [70, "normal", "strength-retro"],
+    [127, "water", "waterfall-retro"],
+    [249, "fighting", "rock-smash-retro"],
+    [250, "water", "whirlpool-retro"],
+    [431, "normal", "rock-climb-retro"],
+    [432, "flying", "defog-retro"],
+  ] as const)(
+    "plays registered mini-premium signature move %i with the expected preset",
+    async (moveId, element, presetId) => {
+      const renderer = createRenderer();
+      const controller = new BattleMoveVfxController(renderer);
+
+      await controller.play({
+        moveId,
+        source: { x: 100, y: 200 },
+        target: { x: 700, y: 160 },
+      });
+
+      expect(renderer.play).toHaveBeenCalledTimes(1);
+      expect(renderer.play).toHaveBeenCalledWith(
+        expect.objectContaining({
+          moveId,
+          definition: expect.objectContaining({
+            archetype: "signature",
+            element,
+            presetId,
+          }),
+        }),
+      );
     },
   );
 
@@ -448,7 +497,6 @@ describe("BattleMoveVfxController", () => {
   it.each([
     [1, "normal", "physical"],
     [13, "normal", "special"],
-    [84, "electric", "special"],
     [106, "normal", "status"],
   ] as const)("falls back to generic VFX for registered move %i", async (moveId, element, presetId) => {
     const renderer = createRenderer();

@@ -166,7 +166,10 @@ export class ModernBattleMoveVfxLayer implements BattleMoveVfxRenderer {
 
     if (request.definition.archetype === "support") {
       await playProceduralSupportEffect({
-        ctx: this.context, width: size.width, height: size.height, request,
+        ctx: this.context,
+        width: size.width,
+        height: size.height,
+        request,
         isCancelled: () => generation !== this.generation,
       });
       return;
@@ -174,7 +177,10 @@ export class ModernBattleMoveVfxLayer implements BattleMoveVfxRenderer {
 
     if (request.definition.archetype === "status") {
       await playProceduralStatusEffect({
-        ctx: this.context, width: size.width, height: size.height, request,
+        ctx: this.context,
+        width: size.width,
+        height: size.height,
+        request,
         isCancelled: () => generation !== this.generation,
       });
       return;
@@ -182,7 +188,10 @@ export class ModernBattleMoveVfxLayer implements BattleMoveVfxRenderer {
 
     if (request.definition.archetype === "barrier") {
       await playProceduralBarrierEffect({
-        ctx: this.context, width: size.width, height: size.height, request,
+        ctx: this.context,
+        width: size.width,
+        height: size.height,
+        request,
         isCancelled: () => generation !== this.generation,
       });
       return;
@@ -190,7 +199,10 @@ export class ModernBattleMoveVfxLayer implements BattleMoveVfxRenderer {
 
     if (request.definition.archetype === "tether") {
       await playProceduralTetherEffect({
-        ctx: this.context, width: size.width, height: size.height, request,
+        ctx: this.context,
+        width: size.width,
+        height: size.height,
+        request,
         isCancelled: () => generation !== this.generation,
       });
       return;
@@ -198,16 +210,21 @@ export class ModernBattleMoveVfxLayer implements BattleMoveVfxRenderer {
 
     if (request.definition.archetype === "battlefield") {
       await playProceduralBattlefieldEffect({
-        ctx: this.context, width: size.width, height: size.height, request,
+        ctx: this.context,
+        width: size.width,
+        height: size.height,
+        request,
         isCancelled: () => generation !== this.generation,
       });
       return;
     }
 
-
     if (request.definition.archetype === "signature") {
       await playProceduralSignatureEffect({
-        ctx: this.context, width: size.width, height: size.height, request,
+        ctx: this.context,
+        width: size.width,
+        height: size.height,
+        request,
         isCancelled: () => generation !== this.generation,
       });
       return;
@@ -215,7 +232,10 @@ export class ModernBattleMoveVfxLayer implements BattleMoveVfxRenderer {
 
     if (request.definition.archetype === "generic") {
       await playProceduralGenericEffect({
-        ctx: this.context, width: size.width, height: size.height, request,
+        ctx: this.context,
+        width: size.width,
+        height: size.height,
+        request,
         isCancelled: () => generation !== this.generation,
       });
       return;
