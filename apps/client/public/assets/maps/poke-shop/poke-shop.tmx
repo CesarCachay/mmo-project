@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="32" height="24" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="4">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="32" height="24" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="5">
  <editorsettings>
   <export target="poke-shop.json" format="json" />
  </editorsettings>
@@ -153,6 +153,16 @@
     <property name="targetMapId" value="city-01"/>
     <property name="targetSpawn" value="pokeShopExitSpawn"/>
    </properties>
+  </object>
+  <object id="4" name="shopClerk" type="npc" x="256" y="128">
+   <properties>
+    <property name="direction" value="down"/>
+    <property name="displayName" value="Dependiente"/>
+    <property name="interactionType" value="shop"/>
+    <property name="shopCatalogId" value="standard-poke-shop-v1"/>
+    <property name="sprite" value="manager-cesar"/>
+   </properties>
+   <point/>
   </object>
  </objectgroup>
 </map>

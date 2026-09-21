@@ -26,7 +26,13 @@ export const POKE_SHOP_MAP = {
     },
   },
 
-  npcs: {},
+  npcs: {
+    "shopClerk": {
+      x: 256,
+      y: 128,
+      shopCatalogId: "standard-poke-shop-v1",
+    },
+  },
 
   storageTerminals: {},
 

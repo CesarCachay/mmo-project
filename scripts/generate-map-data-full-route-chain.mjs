@@ -129,6 +129,8 @@ function parseNpc(object, mapName) {
 
   const trainerBattleId = getOptionalStringProperty(object, "trainerBattleId");
 
+  const shopCatalogId = getOptionalStringProperty(object, "shopCatalogId");
+
   const direction = getOptionalStringProperty(object, "direction");
 
   const sightRangeTiles = getOptionalPositiveIntegerProperty(object, "sightRangeTiles");
@@ -155,6 +157,7 @@ function parseNpc(object, mapName) {
     y: object.y,
     dialogueId,
     trainerBattleId,
+    shopCatalogId,
     direction: trainerBattleId ? direction : undefined,
     sightRangeTiles,
     postDialogueAction,
@@ -396,6 +399,12 @@ function formatNpcs(npcs) {
 
     if (npc.trainerBattleId) {
       properties.push(`      trainerBattleId: ${JSON.stringify(npc.trainerBattleId)},`);
+    }
+
+    if (npc.shopCatalogId) {
+      properties.push(
+        `      shopCatalogId: ${JSON.stringify(npc.shopCatalogId)},`
+      );
     }
 
     if (npc.direction) {

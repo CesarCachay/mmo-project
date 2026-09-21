@@ -33,6 +33,7 @@ import {
   POKEMON_OVERWORLD_ITEM_EVENTS,
   POKEMON_PARTY_REORDER_EVENTS,
   POKEMON_CENTER_HEALING_EVENTS,
+  POKEMON_SHOP_EVENTS,
   isPokemonPartyWiped,
   getPokemonTrainerBattleDefinition,
   isPokemonTrainerBattleStartInput,
@@ -67,6 +68,7 @@ import type { PokemonWildEncounterSession } from '#app/pokemon/encounters/pokemo
 // db and repositories
 import { PokemonPartyRepository } from '#app/pokemon/pokemon-party.repository';
 import { PokemonInventoryRepository } from '#app/pokemon/inventory/pokemon-inventory.repository';
+import { PokemonWalletRepository } from '#app/pokemon/economy/pokemon-wallet.repository';
 import { PokemonCaptureRepository } from '#app/pokemon/battles/capture/pokemon-capture.repository';
 import { PokemonStorageRepository } from '#app/pokemon/storage/pokemon-storage.repository';
 import { PokemonOverworldItemRepository } from '#app/pokemon/items/pokemon-overworld-item.repository';
@@ -104,6 +106,11 @@ import type { PokemonPendingEvolutionState } from '#app/pokemon/evolution/pokemo
 import { PokemonCenterHealingService } from '#app/pokemon/healing/pokemon-center-healing.service';
 import { PokemonCenterHealingNetworkController } from '#app/pokemon/healing/pokemon-center-healing-network.controller';
 import { PokemonBlackoutRecoveryService } from '#app/pokemon/blackout/pokemon-blackout-recovery.service';
+import { PokemonShopNetworkController } from '#app/pokemon/economy/shop/pokemon-shop-network.controller';
+import { PokemonShopAccessSessionStore } from '#app/pokemon/economy/shop/pokemon-shop-access-session.store';
+import { PokemonShopPurchaseService } from '#app/pokemon/economy/shop/pokemon-shop-purchase.service';
+import { PokemonShopPurchaseOperationQueue } from '#app/pokemon/economy/shop/pokemon-shop-purchase-operation.queue';
+import { PokemonShopSaleService } from '#app/pokemon/economy/shop/pokemon-shop-sale.service';
 
 // stores
 import { PlayerWorldRuntimeStore } from './world/player-world-runtime.store';
@@ -165,6 +172,8 @@ export class GameGateway
   private readonly pokemonOverworldItemService: PokemonOverworldItemService;
   private readonly pokemonStorageAccessSessionStore =
     new PokemonStorageAccessSessionStore();
+  private readonly pokemonShopAccessSessionStore =
+    new PokemonShopAccessSessionStore();
 
   private readonly pokemonPartyNetworkController: PokemonPartyNetworkController;
   private readonly pokemonStorageNetworkController: PokemonStorageNetworkController;
@@ -183,6 +192,7 @@ export class GameGateway
   private readonly pokemonEvolutionNetworkController: PokemonEvolutionNetworkController;
 
   private readonly pokemonCenterHealingNetworkController: PokemonCenterHealingNetworkController;
+  private readonly pokemonShopNetworkController: PokemonShopNetworkController;
 
   private gameLoop?: ReturnType<typeof setInterval>;
 
@@ -191,6 +201,10 @@ export class GameGateway
     private readonly pokemonTrainerStateStore: PokemonTrainerStateStore,
     private readonly pokemonPartyRepository: PokemonPartyRepository,
     private readonly pokemonInventoryRepository: PokemonInventoryRepository,
+    private readonly pokemonWalletRepository: PokemonWalletRepository,
+    private readonly pokemonShopPurchaseService: PokemonShopPurchaseService,
+    private readonly pokemonShopPurchaseOperationQueue: PokemonShopPurchaseOperationQueue,
+    private readonly pokemonShopSaleService: PokemonShopSaleService,
     private readonly pokemonCaptureRepository: PokemonCaptureRepository,
     private readonly pokemonStorageRepository: PokemonStorageRepository,
     private readonly playerWorldRuntimeStore: PlayerWorldRuntimeStore,
@@ -235,10 +249,26 @@ export class GameGateway
         playerWorldRuntimeStore: this.playerWorldRuntimeStore,
         dialogueSessionStore: this.dialogueSessionStore,
         storageAccessSessionStore: this.pokemonStorageAccessSessionStore,
+        shopAccessSessionStore: this.pokemonShopAccessSessionStore,
         wildEncounterSessionStore: this.pokemonWildEncounterSessionStore,
         battleSessionStore: this.pokemonBattleSessionStore,
         resolveTrainerId: (playerId) => this.getTrainerId(playerId),
       });
+
+    this.pokemonShopNetworkController = new PokemonShopNetworkController({
+      accessSessionStore: this.pokemonShopAccessSessionStore,
+      purchaseService: this.pokemonShopPurchaseService,
+      operationQueue: this.pokemonShopPurchaseOperationQueue,
+      saleService: this.pokemonShopSaleService,
+      trainerStateStore: this.pokemonTrainerStateStore,
+      trainerStatePresenter: this.pokemonTrainerStateNetworkPresenter,
+      playerWorldRuntimeStore: this.playerWorldRuntimeStore,
+      dialogueSessionStore: this.dialogueSessionStore,
+      storageAccessSessionStore: this.pokemonStorageAccessSessionStore,
+      wildEncounterSessionStore: this.pokemonWildEncounterSessionStore,
+      battleSessionStore: this.pokemonBattleSessionStore,
+      resolveTrainerId: (playerId) => this.getTrainerId(playerId),
+    });
 
     this.pokemonProgressionNetworkController =
       new PokemonProgressionNetworkController({
@@ -269,13 +299,10 @@ export class GameGateway
       onTrainerDefeated: (playerId, trainerId) =>
         this.handleBlackoutRecovery(playerId, trainerId),
       onTrainerBattleVictory: async (trainerId, trainerBattleId) => {
-        const result =
-          await this.pokemonTrainerBattleVictoryService.recordVictory(
-            trainerId,
-            trainerBattleId,
-          );
-
-        return result.trainerState;
+        return this.pokemonTrainerBattleVictoryService.recordVictory(
+          trainerId,
+          trainerBattleId,
+        );
       },
     });
 
@@ -285,6 +312,7 @@ export class GameGateway
       battleSessionStore: this.pokemonBattleSessionStore,
       battleTurnStore: this.pokemonBattleTurnStore,
       storageAccessSessionStore: this.pokemonStorageAccessSessionStore,
+      shopAccessSessionStore: this.pokemonShopAccessSessionStore,
       resolvePlayerSocket: (playerId) =>
         this.server.sockets.sockets.get(playerId),
     });
@@ -295,6 +323,7 @@ export class GameGateway
       battleSessionStore: this.pokemonBattleSessionStore,
       battleTurnStore: this.pokemonBattleTurnStore,
       storageAccessSessionStore: this.pokemonStorageAccessSessionStore,
+      shopAccessSessionStore: this.pokemonShopAccessSessionStore,
       resolvePlayerSocket: (playerId) =>
         this.server.sockets.sockets.get(playerId),
     });
@@ -305,6 +334,7 @@ export class GameGateway
         trainerStatePresenter: this.pokemonTrainerStateNetworkPresenter,
         dialogueSessionStore: this.dialogueSessionStore,
         storageAccessSessionStore: this.pokemonStorageAccessSessionStore,
+        shopAccessSessionStore: this.pokemonShopAccessSessionStore,
         wildEncounterSessionStore: this.pokemonWildEncounterSessionStore,
         battleSessionStore: this.pokemonBattleSessionStore,
         resolveTrainerId: (playerId) => this.getTrainerId(playerId),
@@ -315,6 +345,7 @@ export class GameGateway
       playerWorldRuntimeStore: this.playerWorldRuntimeStore,
       dialogueSessionStore: this.dialogueSessionStore,
       storageAccessSessionStore: this.pokemonStorageAccessSessionStore,
+      shopAccessSessionStore: this.pokemonShopAccessSessionStore,
       wildEncounterSessionStore: this.pokemonWildEncounterSessionStore,
       battleSessionStore: this.pokemonBattleSessionStore,
       trainerStatePresenter: this.pokemonTrainerStateNetworkPresenter,
@@ -323,6 +354,7 @@ export class GameGateway
     this.pokemonStorageNetworkController = new PokemonStorageNetworkController({
       storageService: this.pokemonStorageService,
       storageAccessSessionStore: this.pokemonStorageAccessSessionStore,
+      shopAccessSessionStore: this.pokemonShopAccessSessionStore,
       trainerStatePresenter: this.pokemonTrainerStateNetworkPresenter,
       playerWorldRuntimeStore: this.playerWorldRuntimeStore,
       dialogueSessionStore: this.dialogueSessionStore,
@@ -459,13 +491,18 @@ export class GameGateway
       if (existingTrainerState) {
         trainerState = existingTrainerState;
       } else {
-        const [persistedParty, persistedInventory, defeatedTrainerBattleIds] =
-          await Promise.all([
+        const [
+          persistedParty,
+          persistedInventory,
+          defeatedTrainerBattleIds,
+          persistedMoney,
+        ] = await Promise.all([
             this.pokemonPartyRepository.loadParty(trainerId),
             this.pokemonInventoryRepository.loadInventory(trainerId),
             this.pokemonTrainerBattleVictoryService.loadDefeatedTrainerBattleIds(
               trainerId,
             ),
+            this.pokemonWalletRepository.loadMoney(trainerId),
           ]);
 
         trainerState = this.pokemonTrainerStateStore.create(
@@ -473,6 +510,7 @@ export class GameGateway
           persistedParty,
           persistedInventory,
           defeatedTrainerBattleIds,
+          persistedMoney,
         );
       }
 
@@ -577,6 +615,10 @@ export class GameGateway
     this.dialogueSessionStore.remove(client.id);
     this.pokemonTrainerBattleStartAuthorizationStore.remove(client.id);
     this.pokemonStorageAccessSessionStore.remove(client.id);
+    this.pokemonShopNetworkController.closeForRuntimeReason(
+      client,
+      'disconnect',
+    );
 
     this.playerEncounterZoneIds.delete(client.id);
     this.pokemonWildEncounterTriggerService.reset(client.id);
@@ -624,6 +666,11 @@ export class GameGateway
     if (!player) {
       return;
     }
+
+    if (this.pokemonShopAccessSessionStore.has(client.id)) {
+      return;
+    }
+
     if (input.sequence <= player.lastProcessedInputSequence) {
       return;
     }
@@ -668,6 +715,7 @@ export class GameGateway
 
     if (
       this.pokemonStorageAccessSessionStore.has(client.id) ||
+      this.pokemonShopAccessSessionStore.has(client.id) ||
       this.pokemonBattleSessionStore.getByPlayerId(client.id)
     ) {
       return;
@@ -1007,6 +1055,7 @@ export class GameGateway
     if (
       this.dialogueSessionStore.has(client.id) ||
       this.pokemonStorageAccessSessionStore.has(client.id) ||
+      this.pokemonShopAccessSessionStore.has(client.id) ||
       this.pokemonBattleSessionStore.getByPlayerId(client.id)
     ) {
       return;
@@ -1111,6 +1160,38 @@ export class GameGateway
     client.to(targetRoom).emit('playerJoined', player);
 
     client.emit(MAP_EVENTS.TRANSITION_RESOLVED, resolvedTransition);
+  }
+
+  @SubscribeMessage(POKEMON_SHOP_EVENTS.OPEN)
+  handlePokemonShopOpen(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: unknown,
+  ): Promise<void> {
+    return this.pokemonShopNetworkController.handleOpen(client, payload);
+  }
+
+  @SubscribeMessage(POKEMON_SHOP_EVENTS.BUY)
+  handlePokemonShopBuy(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: unknown,
+  ): Promise<void> {
+    return this.pokemonShopNetworkController.handleBuy(client, payload);
+  }
+
+  @SubscribeMessage(POKEMON_SHOP_EVENTS.SELL)
+  handlePokemonShopSell(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: unknown,
+  ): Promise<void> {
+    return this.pokemonShopNetworkController.handleSell(client, payload);
+  }
+
+  @SubscribeMessage(POKEMON_SHOP_EVENTS.CLOSE)
+  handlePokemonShopClose(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: unknown,
+  ): void {
+    this.pokemonShopNetworkController.handleClose(client, payload);
   }
 
   @SubscribeMessage(POKEMON_EVENTS.STORAGE_OPEN)

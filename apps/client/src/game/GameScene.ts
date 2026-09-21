@@ -69,6 +69,7 @@ import { TrainerPreBattleController } from "./trainer-battle/TrainerPreBattleCon
 import { LazyBattleController } from "./battle/LazyBattleController";
 import { PokemonStorageController } from "./storage/PokemonStorageController";
 import { PokemonStorageTerminalInteractionController } from "./storage/PokemonStorageTerminalInteractionController";
+import { PokemonShopController } from "./shop/PokemonShopController";
 import { PokemonCenterHealingInteractionController } from "./pokemon-center/PokemonCenterHealingInteractionController";
 import { PokemonCenterHealingPresentationController } from "./pokemon-center/PokemonCenterHealingPresentationController";
 import { PokemonCenterHealingWorldFxController } from "./pokemon-center/PokemonCenterHealingWorldFxController";
@@ -147,6 +148,7 @@ export class GameScene extends Phaser.Scene {
   private battleController!: LazyBattleController;
 
   private pokemonStorageController!: PokemonStorageController;
+  private pokemonShopController!: PokemonShopController;
   private pokemonStorageTerminalInteraction!: PokemonStorageTerminalInteractionController;
 
   private pokemonCenterHealingInteraction!: PokemonCenterHealingInteractionController;
@@ -458,6 +460,27 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  private createPokemonShopUi(): void {
+    this.pokemonShopController = new PokemonShopController({
+      openShop: (npcId) => {
+        this.network.openPokemonShop(npcId);
+      },
+      buyItem: (input) => {
+        this.network.buyPokemonShopItem(input);
+      },
+      sellItem: (input) => {
+        this.network.sellPokemonShopItem(input);
+      },
+      closeShop: (sessionId) => {
+        this.network.closePokemonShop(sessionId);
+      },
+    });
+
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.pokemonShopController.destroy();
+    });
+  }
+
   private createPlayer() {
     const spawn = this.mapManager.getPlayerSpawn();
 
@@ -485,6 +508,7 @@ export class GameScene extends Phaser.Scene {
       this.trainerPanelController.isOpen ||
       this.battleController?.isBlockingGameplay ||
       this.pokemonStorageController?.isBlockingGameplay ||
+      this.pokemonShopController?.isBlockingGameplay ||
       this.pokemonCenterHealingInteraction?.isPending ||
       this.pokemonCenterHealingPresentation?.isBlockingGameplay;
 
@@ -590,7 +614,8 @@ export class GameScene extends Phaser.Scene {
         return;
 
       case "shop":
-        console.warn("Shop interactions are not implemented yet");
+        this.trainerPanelController.close();
+        this.pokemonShopController.requestOpen(npc.definition.id);
         return;
 
       case "quest":
@@ -860,6 +885,7 @@ export class GameScene extends Phaser.Scene {
     this.trainerPanelController = new TrainerPanelController(this, {
       isInteractionBlocked: () =>
         Boolean(this.pokemonStorageController?.isBlockingGameplay) ||
+        Boolean(this.pokemonShopController?.isBlockingGameplay) ||
         Boolean(this.pokemonCenterHealingInteraction?.isPending) ||
         Boolean(this.pokemonCenterHealingPresentation?.isBlockingGameplay) ||
         Boolean(this.battleController?.isBlockingGameplay) ||
@@ -936,6 +962,7 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.createPokemonStorageUi();
+    this.createPokemonShopUi();
 
     this.network.onConnectionRejected((error) => {
       this.network.destroy();
@@ -1048,6 +1075,7 @@ export class GameScene extends Phaser.Scene {
 
       this.trainerPanelController.close();
       this.pokemonStorageController?.dismiss();
+      this.pokemonShopController?.dismiss();
       void this.battleController.start(payload);
     });
 
@@ -1094,6 +1122,27 @@ export class GameScene extends Phaser.Scene {
     this.network.onPokemonStorageError((payload) => {
       console.warn("[PokemonStorage] authoritative error", payload);
       this.pokemonStorageController.applyError(payload);
+    });
+
+    this.network.onPokemonShopOpened((payload) => {
+      this.trainerPanelController.close();
+      this.pokemonShopController.applyOpened(payload);
+    });
+
+    this.network.onPokemonShopPurchased((payload) => {
+      this.pokemonShopController.applyPurchased(payload);
+    });
+
+    this.network.onPokemonShopSold((payload) => {
+      this.pokemonShopController.applySold(payload);
+    });
+
+    this.network.onPokemonShopClosed((payload) => {
+      this.pokemonShopController.applyClosed(payload);
+    });
+
+    this.network.onPokemonShopError((payload) => {
+      this.pokemonShopController.applyError(payload);
     });
 
     this.network.onCurrentPlayers((players) => {
@@ -1175,6 +1224,7 @@ export class GameScene extends Phaser.Scene {
     this.battleController?.resetRuntime(`socket-disconnected:${reason}`);
     this.trainerPanelController?.close();
     this.pokemonStorageController?.dismiss();
+    this.pokemonShopController?.dismiss();
     this.pokemonCenterHealingPresentation?.cancel();
     this.pokemonCenterHealingInteraction?.clear();
     this.pokemonCenterHealingWorldFx?.cancel();
@@ -1465,6 +1515,7 @@ export class GameScene extends Phaser.Scene {
       this.trainerPanelController.isOpen ||
       this.battleController?.isBlockingGameplay ||
       this.pokemonStorageController?.isBlockingGameplay ||
+      this.pokemonShopController?.isBlockingGameplay ||
       this.pokemonCenterHealingInteraction?.isPending
     ) {
       this.worldInteractionControls.hide();
@@ -1522,6 +1573,8 @@ export class GameScene extends Phaser.Scene {
         return this.isTrainerNpcDefeated(npc) ? "Hablar" : undefined;
 
       case "shop":
+        return "Abrir tienda";
+
       case "quest":
         return undefined;
     }
@@ -1554,6 +1607,9 @@ export class GameScene extends Phaser.Scene {
       return;
     }
     if (this.pokemonStorageController?.isBlockingGameplay) {
+      return;
+    }
+    if (this.pokemonShopController?.isBlockingGameplay) {
       return;
     }
     if (this.isMapTransitioning) {
@@ -1594,6 +1650,7 @@ export class GameScene extends Phaser.Scene {
       this.trainerPanelController.isPartyVisible ||
       this.battleController.isBlockingGameplay ||
       this.pokemonStorageController?.isBlockingGameplay ||
+      this.pokemonShopController?.isBlockingGameplay ||
       this.pokemonCenterHealingPresentation?.isBlockingGameplay ||
       this.pokemonCenterHealingInteraction?.isPending
     ) {
@@ -1732,6 +1789,7 @@ export class GameScene extends Phaser.Scene {
     this.pokemonCenterHealingPresentation?.cancel();
     this.pokemonCenterHealingInteraction?.clear();
     this.pokemonStorageTerminalInteraction?.clear();
+    this.pokemonShopController?.dismiss();
     this.pokemonCenterHealingWorldFx?.cancel();
     this.pokemonCenterHealingAudio?.cancel();
     this.trainerSightController?.clear();
@@ -1776,6 +1834,7 @@ export class GameScene extends Phaser.Scene {
       this.blackoutRecoveryPending ||
       this.isTrainerInteractionBlocking ||
       this.pokemonStorageController?.isBlockingGameplay ||
+      this.pokemonShopController?.isBlockingGameplay ||
       this.pokemonCenterHealingInteraction?.isPending ||
       this.pokemonCenterHealingPresentation?.isBlockingGameplay ||
       this.dialogueBox.isOpen() ||
@@ -1807,6 +1866,7 @@ export class GameScene extends Phaser.Scene {
       this.trainerPanelController.isOpen ||
       this.battleController?.isBlockingGameplay ||
       this.pokemonStorageController?.isBlockingGameplay ||
+      this.pokemonShopController?.isBlockingGameplay ||
       this.pokemonCenterHealingPresentation?.isBlockingGameplay;
 
     this.pokemonCenterHealingInteraction.update(
@@ -1829,6 +1889,7 @@ export class GameScene extends Phaser.Scene {
       this.trainerPanelController.isPartyVisible ||
       this.battleController?.isBlockingGameplay ||
       this.pokemonStorageController?.isBlockingGameplay ||
+      this.pokemonShopController?.isBlockingGameplay ||
       this.pokemonCenterHealingInteraction.hasNearbyStation ||
       this.pokemonCenterHealingInteraction.isPending ||
       this.pokemonCenterHealingPresentation?.isBlockingGameplay;

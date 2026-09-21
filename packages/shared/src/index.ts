@@ -130,6 +130,7 @@ export type {
   PokemonBattleReplacementResolvedPayload,
   PokemonBattleCompletedOutcome,
   PokemonBattleCompletedPayload,
+  PokemonTrainerBattleCompletionRewards,
   PokemonBattleInteractionState,
   PokemonBattleStateUpdatedPayload,
 } from "./pokemon/pokemon-network.js";
@@ -372,6 +373,77 @@ export type {
   BattleRunRandomSource,
   BattleRunResolution,
 } from "./pokemon/battles/run/pokemon-battle-run.js";
+
+// ECONOMY
+export {
+  POKEMON_STARTING_MONEY,
+  POKEMON_MAX_MONEY,
+  isPokemonMoney,
+  createPokemonMoney,
+  addPokemonMoney,
+  spendPokemonMoney,
+  assertPokemonMoney,
+} from "./pokemon/economy/pokemon-money.js";
+export type { PokemonMoney } from "./pokemon/economy/pokemon-money.js";
+export {
+  POKEMON_ITEM_ECONOMY_REGISTRY,
+  getPokemonItemEconomyDefinition,
+  getPokemonItemBuyPrice,
+  getPokemonItemSellPrice,
+  isPokemonItemPurchasable,
+  isPokemonItemSellable,
+} from "./pokemon/economy/pokemon-item-economy.registry.js";
+export type {
+  PokemonItemEconomyDefinition,
+} from "./pokemon/economy/pokemon-item-economy.registry.js";
+export {
+  POKEMON_SHOP_CATALOG_IDS,
+  POKEMON_SHOP_CATALOG_REGISTRY,
+  getPokemonShopCatalog,
+  isPokemonShopCatalogId,
+  isPokemonShopItemStocked,
+} from "./pokemon/economy/shop/pokemon-shop.catalog.js";
+export type {
+  PokemonShopCatalogId,
+  PokemonShopCatalogDefinition,
+} from "./pokemon/economy/shop/pokemon-shop.catalog.js";
+export {
+  POKEMON_SHOP_MAX_TRANSACTION_QUANTITY,
+  quotePokemonShopPurchase,
+  quotePokemonShopSale,
+  isPokemonShopTransactionQuantity,
+  assertPokemonShopTransactionQuantity,
+} from "./pokemon/economy/shop/pokemon-shop-pricing.js";
+export type {
+  PokemonShopPriceQuote,
+} from "./pokemon/economy/shop/pokemon-shop-pricing.js";
+export {
+  POKEMON_SHOP_EVENTS,
+  isPokemonShopOpenInput,
+  isPokemonShopBuyInput,
+  isPokemonShopSellInput,
+  isPokemonShopCloseInput,
+  isPokemonShopOpenedPayload,
+  isPokemonShopPurchasedPayload,
+  isPokemonShopSoldPayload,
+  isPokemonShopClosedReason,
+  isPokemonShopClosedPayload,
+  isPokemonShopErrorCode,
+  isPokemonShopErrorPayload,
+} from "./pokemon/economy/shop/pokemon-shop-network.js";
+export type {
+  PokemonShopOpenInput,
+  PokemonShopBuyInput,
+  PokemonShopSellInput,
+  PokemonShopCloseInput,
+  PokemonShopOpenedPayload,
+  PokemonShopPurchasedPayload,
+  PokemonShopSoldPayload,
+  PokemonShopClosedReason,
+  PokemonShopClosedPayload,
+  PokemonShopErrorCode,
+  PokemonShopErrorPayload,
+} from "./pokemon/economy/shop/pokemon-shop-network.js";
 
 // INVENTORY
 export {

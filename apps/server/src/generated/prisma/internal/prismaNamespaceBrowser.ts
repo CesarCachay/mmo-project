@@ -60,6 +60,7 @@ export const ModelName = {
   PokemonPendingMoveLearning: 'PokemonPendingMoveLearning',
   PokemonTrainerInventoryItem: 'PokemonTrainerInventoryItem',
   PokemonPendingEvolution: 'PokemonPendingEvolution',
+  PokemonShopTransaction: 'PokemonShopTransaction',
   PokemonTrainerBattleProgress: 'PokemonTrainerBattleProgress'
 } as const
 
@@ -127,6 +128,7 @@ export const PokemonTrainerScalarFieldEnum = {
   recoveryX: 'recoveryX',
   recoveryY: 'recoveryY',
   recoveryDirection: 'recoveryDirection',
+  money: 'money',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -201,6 +203,21 @@ export const PokemonPendingEvolutionScalarFieldEnum = {
 } as const
 
 export type PokemonPendingEvolutionScalarFieldEnum = (typeof PokemonPendingEvolutionScalarFieldEnum)[keyof typeof PokemonPendingEvolutionScalarFieldEnum]
+
+
+export const PokemonShopTransactionScalarFieldEnum = {
+  trainerId: 'trainerId',
+  requestId: 'requestId',
+  operation: 'operation',
+  catalogId: 'catalogId',
+  itemId: 'itemId',
+  quantity: 'quantity',
+  unitPrice: 'unitPrice',
+  totalPrice: 'totalPrice',
+  createdAt: 'createdAt'
+} as const
+
+export type PokemonShopTransactionScalarFieldEnum = (typeof PokemonShopTransactionScalarFieldEnum)[keyof typeof PokemonShopTransactionScalarFieldEnum]
 
 
 export const PokemonTrainerBattleProgressScalarFieldEnum = {

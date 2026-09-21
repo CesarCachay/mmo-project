@@ -25,6 +25,7 @@ import { PlayerWorldRuntimeStore } from '../../game/world/player-world-runtime.s
 import { PlayerRecoveryCheckpointService } from '../../game/world/player-recovery-checkpoint.service';
 
 import { PokemonStorageAccessSessionStore } from '../storage/pokemon-storage-access-session.store';
+import { PokemonShopAccessSessionStore } from '../economy/shop/pokemon-shop-access-session.store';
 
 import { PokemonWildEncounterSessionStore } from '../encounters/pokemon-wild-encounter-session.store';
 
@@ -44,6 +45,7 @@ export interface PokemonCenterHealingNetworkControllerOptions {
     has(playerId: string): boolean;
   };
   readonly storageAccessSessionStore: PokemonStorageAccessSessionStore;
+  readonly shopAccessSessionStore: PokemonShopAccessSessionStore;
   readonly wildEncounterSessionStore: PokemonWildEncounterSessionStore;
   readonly battleSessionStore: PokemonBattleSessionStore;
   readonly resolveTrainerId: (playerId: string) => PokemonTrainerId | undefined;
@@ -58,6 +60,7 @@ export class PokemonCenterHealingNetworkController {
   private readonly playerWorldRuntimeStore: PlayerWorldRuntimeStore;
   private readonly dialogueSessionStore: PokemonCenterHealingNetworkControllerOptions['dialogueSessionStore'];
   private readonly storageAccessSessionStore: PokemonStorageAccessSessionStore;
+  private readonly shopAccessSessionStore: PokemonShopAccessSessionStore;
   private readonly wildEncounterSessionStore: PokemonWildEncounterSessionStore;
   private readonly battleSessionStore: PokemonBattleSessionStore;
   private readonly resolveTrainerId: PokemonCenterHealingNetworkControllerOptions['resolveTrainerId'];
@@ -71,6 +74,7 @@ export class PokemonCenterHealingNetworkController {
     this.playerWorldRuntimeStore = options.playerWorldRuntimeStore;
     this.dialogueSessionStore = options.dialogueSessionStore;
     this.storageAccessSessionStore = options.storageAccessSessionStore;
+    this.shopAccessSessionStore = options.shopAccessSessionStore;
     this.wildEncounterSessionStore = options.wildEncounterSessionStore;
     this.battleSessionStore = options.battleSessionStore;
     this.resolveTrainerId = options.resolveTrainerId;
@@ -215,6 +219,7 @@ export class PokemonCenterHealingNetworkController {
     return (
       this.dialogueSessionStore.has(playerId) ||
       this.storageAccessSessionStore.has(playerId) ||
+      this.shopAccessSessionStore.has(playerId) ||
       this.wildEncounterSessionStore.has(playerId) ||
       Boolean(this.battleSessionStore.getByPlayerId(playerId))
     );

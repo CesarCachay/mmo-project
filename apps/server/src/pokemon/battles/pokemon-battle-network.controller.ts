@@ -21,6 +21,7 @@ import type {
   PokemonTrainerState,
   PokemonBattleCommandInput,
   PokemonTrainerBattleId,
+  PokemonTrainerBattleCompletionRewards,
 } from '@cesar-mmo/shared';
 
 import type { PokemonTrainerId } from '../pokemon-trainer-identity';
@@ -62,6 +63,7 @@ import { PokemonTrainerStateNetworkPresenter } from '../network/PokemonTrainerSt
 import { PokemonBattleTurnExecutor } from './pokemon-battle-turn.executor';
 
 import { createPokemonWildBattleProgressionPresentationEvents } from './pokemon-wild-battle-progression.presentation';
+import type { PokemonTrainerBattleVictoryResult } from './pokemon-trainer-battle-victory.service';
 
 export interface PokemonBattleNetworkControllerOptions {
   readonly trainerStateStore: PokemonTrainerStateStore;
@@ -78,7 +80,7 @@ export interface PokemonBattleNetworkControllerOptions {
   readonly onTrainerBattleVictory: (
     trainerId: PokemonTrainerId,
     trainerBattleId: PokemonTrainerBattleId,
-  ) => Promise<PokemonTrainerState>;
+  ) => Promise<PokemonTrainerBattleVictoryResult>;
 }
 
 export class PokemonBattleNetworkController {
@@ -603,6 +605,7 @@ export class PokemonBattleNetworkController {
       );
 
       let completionTrainerState = updatedTrainerState;
+      let trainerBattleRewards: PokemonTrainerBattleCompletionRewards | undefined;
 
       if (continuationAfter.type === 'opponent-defeated') {
         const trainerBattleContext = session.trainerBattle;
@@ -614,10 +617,19 @@ export class PokemonBattleNetworkController {
         }
 
         try {
-          completionTrainerState = await this.onTrainerBattleVictory(
+          const victoryResult = await this.onTrainerBattleVictory(
             trainerBinding.trainerId,
             trainerBattleContext.trainerBattleId,
           );
+
+          completionTrainerState = victoryResult.trainerState;
+
+          if (victoryResult.firstVictory) {
+            trainerBattleRewards = {
+              money: victoryResult.rewardMoney,
+              items: victoryResult.rewardItems,
+            };
+          }
         } catch (error: unknown) {
           /*
            * A persistence outage must not strand an already-resolved Battle.
@@ -647,6 +659,7 @@ export class PokemonBattleNetworkController {
       client.emit(POKEMON_EVENTS.BATTLE_COMPLETED, {
         battleId: session.battle.battleId,
         outcome: outcomeRuntime.type,
+        ...(trainerBattleRewards ? { trainerBattleRewards } : {}),
       } satisfies PokemonBattleCompletedPayload);
 
       /*

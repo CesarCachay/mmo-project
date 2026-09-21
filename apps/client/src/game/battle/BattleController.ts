@@ -1478,7 +1478,7 @@ export class BattleController {
     this.committedCompletion = payload;
     this.setInteractionState("completed");
     this.replacementPokemonIndexes = [];
-    this.overlay.showCompletion(payload.outcome);
+    this.overlay.showCompletion(payload);
     this.moveSfx.stopAll();
     this.audio.playBattleOutcome(payload.outcome);
   }

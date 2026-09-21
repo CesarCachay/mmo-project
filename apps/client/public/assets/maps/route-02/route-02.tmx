@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="50" height="40" tilewidth="16" tileheight="16" infinite="0" nextlayerid="8" nextobjectid="13">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="50" height="40" tilewidth="16" tileheight="16" infinite="0" nextlayerid="8" nextobjectid="17">
  <editorsettings>
   <export target="route-02.json" format="json"/>
  </editorsettings>
@@ -239,6 +239,38 @@
    <properties>
     <property name="targetMapId" value="city-01"/>
     <property name="targetSpawn" value="route02Entrance"/>
+   </properties>
+  </object>
+  <object id="13" name="route02YoungsterDiego" type="npc" x="240" y="512">
+   <properties>
+    <property name="direction" value="down"/>
+    <property name="interactionType" value="trainer-battle"/>
+    <property name="trainerBattleId" value="youngster-diego"/>
+    <property name="sightRangeTiles" type="int" value="4"/>
+   </properties>
+  </object>
+  <object id="14" name="route02PicnickerValeria" type="npc" x="320" y="400">
+   <properties>
+    <property name="direction" value="left"/>
+    <property name="interactionType" value="trainer-battle"/>
+    <property name="trainerBattleId" value="picnicker-valeria"/>
+    <property name="sightRangeTiles" type="int" value="5"/>
+   </properties>
+  </object>
+  <object id="15" name="route02HikerMarcos" type="npc" x="496" y="304">
+   <properties>
+    <property name="direction" value="left"/>
+    <property name="interactionType" value="trainer-battle"/>
+    <property name="trainerBattleId" value="hiker-marcos"/>
+    <property name="sightRangeTiles" type="int" value="5"/>
+   </properties>
+  </object>
+  <object id="16" name="route02AceTrainerLucia" type="npc" x="624" y="176">
+   <properties>
+    <property name="direction" value="down"/>
+    <property name="interactionType" value="trainer-battle"/>
+    <property name="trainerBattleId" value="ace-trainer-lucia"/>
+    <property name="sightRangeTiles" type="int" value="5"/>
    </properties>
   </object>
  </objectgroup>

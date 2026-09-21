@@ -4,6 +4,12 @@ import { ChatService } from '#app/chat/chat.service';
 import { PrismaService } from '#app/database/prisma.service';
 import { PokemonPartyRepository } from '#app/pokemon/pokemon-party.repository';
 import { PokemonInventoryRepository } from '#app/pokemon/inventory/pokemon-inventory.repository';
+import { PokemonWalletRepository } from '#app/pokemon/economy/pokemon-wallet.repository';
+import { PokemonShopPurchaseRepository } from '#app/pokemon/economy/shop/pokemon-shop-purchase.repository';
+import { PokemonShopPurchaseOperationQueue } from '#app/pokemon/economy/shop/pokemon-shop-purchase-operation.queue';
+import { PokemonShopPurchaseService } from '#app/pokemon/economy/shop/pokemon-shop-purchase.service';
+import { PokemonShopSaleRepository } from '#app/pokemon/economy/shop/pokemon-shop-sale.repository';
+import { PokemonShopSaleService } from '#app/pokemon/economy/shop/pokemon-shop-sale.service';
 import { PokemonCaptureRepository } from '#app/pokemon/battles/capture/pokemon-capture.repository';
 import { PokemonStorageRepository } from '#app/pokemon/storage/pokemon-storage.repository';
 import { PlayerWorldRuntimeStore } from './world/player-world-runtime.store';
@@ -79,6 +85,12 @@ import { GameGateway } from './game.gateway';
     PrismaService,
     PokemonPartyRepository,
     PokemonInventoryRepository,
+    PokemonWalletRepository,
+    PokemonShopPurchaseRepository,
+    PokemonShopPurchaseOperationQueue,
+    PokemonShopPurchaseService,
+    PokemonShopSaleRepository,
+    PokemonShopSaleService,
     PokemonCaptureRepository,
     PokemonStorageRepository,
     PlayerWorldRuntimeStore,

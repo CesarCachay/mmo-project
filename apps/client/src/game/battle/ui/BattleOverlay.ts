@@ -658,13 +658,13 @@ export class BattleOverlay {
     );
   }
 
-  public showCompletion(outcome: PokemonBattleCompletedPayload["outcome"]): void {
+  public showCompletion(payload: PokemonBattleCompletedPayload): void {
     this.actionMenu.setVisible(false);
     this.movePanel.setVisible(false);
     this.replacementPanel.setVisible(false);
     this.bagPanel.setVisible(false);
     this.partyExperiencePanel.hide();
-    this.completionPanel.show(outcome);
+    this.completionPanel.show(payload);
     this.moveLearningPanel.setVisible(false);
     this.evolutionDecisionPanel.setVisible(false);
   }

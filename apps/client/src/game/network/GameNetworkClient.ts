@@ -25,6 +25,12 @@ import {
   POKEMON_CENTER_HEALING_EVENTS,
   isPokemonCenterHealedPayload,
   isPokemonCenterHealingErrorPayload,
+  POKEMON_SHOP_EVENTS,
+  isPokemonShopOpenedPayload,
+  isPokemonShopPurchasedPayload,
+  isPokemonShopSoldPayload,
+  isPokemonShopClosedPayload,
+  isPokemonShopErrorPayload,
 } from "@cesar-mmo/shared";
 
 import type {
@@ -70,6 +76,15 @@ import type {
   PokemonCenterHealedPayload,
   PokemonCenterHealingErrorPayload,
   PokemonTrainerBattleStartInput,
+  PokemonShopOpenInput,
+  PokemonShopBuyInput,
+  PokemonShopSellInput,
+  PokemonShopCloseInput,
+  PokemonShopOpenedPayload,
+  PokemonShopPurchasedPayload,
+  PokemonShopSoldPayload,
+  PokemonShopClosedPayload,
+  PokemonShopErrorPayload,
 } from "@cesar-mmo/shared";
 
 // deploy
@@ -414,6 +429,90 @@ export class GameNetworkClient {
         console.warn("[PokemonCenterHealing] invalid ERROR payload", payload);
         return;
       }
+      callback(payload);
+    });
+  }
+
+  // pokemon shop
+  public openPokemonShop(npcId: string): void {
+    const payload: PokemonShopOpenInput = { npcId };
+    this.socket.emit(POKEMON_SHOP_EVENTS.OPEN, payload);
+  }
+
+  public buyPokemonShopItem(input: PokemonShopBuyInput): void {
+    this.socket.emit(POKEMON_SHOP_EVENTS.BUY, input);
+  }
+
+  public sellPokemonShopItem(input: PokemonShopSellInput): void {
+    this.socket.emit(POKEMON_SHOP_EVENTS.SELL, input);
+  }
+
+  public closePokemonShop(sessionId: string): void {
+    const payload: PokemonShopCloseInput = { sessionId };
+    this.socket.emit(POKEMON_SHOP_EVENTS.CLOSE, payload);
+  }
+
+  public onPokemonShopOpened(
+    callback: (payload: PokemonShopOpenedPayload) => void
+  ): void {
+    this.socket.on(POKEMON_SHOP_EVENTS.OPENED, (payload: unknown) => {
+      if (!isPokemonShopOpenedPayload(payload)) {
+        console.warn("[PokemonShop] invalid OPENED payload", payload);
+        return;
+      }
+
+      callback(payload);
+    });
+  }
+
+  public onPokemonShopPurchased(
+    callback: (payload: PokemonShopPurchasedPayload) => void
+  ): void {
+    this.socket.on(POKEMON_SHOP_EVENTS.PURCHASED, (payload: unknown) => {
+      if (!isPokemonShopPurchasedPayload(payload)) {
+        console.warn("[PokemonShop] invalid PURCHASED payload", payload);
+        return;
+      }
+
+      callback(payload);
+    });
+  }
+
+  public onPokemonShopSold(
+    callback: (payload: PokemonShopSoldPayload) => void
+  ): void {
+    this.socket.on(POKEMON_SHOP_EVENTS.SOLD, (payload: unknown) => {
+      if (!isPokemonShopSoldPayload(payload)) {
+        console.warn("[PokemonShop] invalid SOLD payload", payload);
+        return;
+      }
+
+      callback(payload);
+    });
+  }
+
+  public onPokemonShopClosed(
+    callback: (payload: PokemonShopClosedPayload) => void
+  ): void {
+    this.socket.on(POKEMON_SHOP_EVENTS.CLOSED, (payload: unknown) => {
+      if (!isPokemonShopClosedPayload(payload)) {
+        console.warn("[PokemonShop] invalid CLOSED payload", payload);
+        return;
+      }
+
+      callback(payload);
+    });
+  }
+
+  public onPokemonShopError(
+    callback: (payload: PokemonShopErrorPayload) => void
+  ): void {
+    this.socket.on(POKEMON_SHOP_EVENTS.ERROR, (payload: unknown) => {
+      if (!isPokemonShopErrorPayload(payload)) {
+        console.warn("[PokemonShop] invalid ERROR payload", payload);
+        return;
+      }
+
       callback(payload);
     });
   }

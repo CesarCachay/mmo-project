@@ -17,6 +17,7 @@ import type { PokemonTrainerId } from '../pokemon-trainer-identity';
 import { PokemonTrainerStateStore } from '../pokemon-trainer-state.store';
 import { PokemonWildEncounterSessionStore } from '../encounters/pokemon-wild-encounter-session.store';
 import { PokemonStorageAccessSessionStore } from '../storage/pokemon-storage-access-session.store';
+import { PokemonShopAccessSessionStore } from '../economy/shop/pokemon-shop-access-session.store';
 
 import { PokemonBattleSessionStore } from './pokemon-battle-session.store';
 import { PokemonBattleTurnStore } from './pokemon-battle-turn.store';
@@ -35,6 +36,7 @@ export interface PokemonTrainerBattleStarterOptions {
   readonly battleSessionStore: PokemonBattleSessionStore;
   readonly battleTurnStore: PokemonBattleTurnStore;
   readonly storageAccessSessionStore: PokemonStorageAccessSessionStore;
+  readonly shopAccessSessionStore: PokemonShopAccessSessionStore;
   readonly resolvePlayerSocket: (playerId: string) => Socket | undefined;
 }
 
@@ -44,6 +46,7 @@ export class PokemonTrainerBattleStarter {
   private readonly battleSessionStore: PokemonBattleSessionStore;
   private readonly battleTurnStore: PokemonBattleTurnStore;
   private readonly storageAccessSessionStore: PokemonStorageAccessSessionStore;
+  private readonly shopAccessSessionStore: PokemonShopAccessSessionStore;
   private readonly resolvePlayerSocket: PokemonTrainerBattleStarterOptions['resolvePlayerSocket'];
 
   constructor(options: PokemonTrainerBattleStarterOptions) {
@@ -52,6 +55,7 @@ export class PokemonTrainerBattleStarter {
     this.battleSessionStore = options.battleSessionStore;
     this.battleTurnStore = options.battleTurnStore;
     this.storageAccessSessionStore = options.storageAccessSessionStore;
+    this.shopAccessSessionStore = options.shopAccessSessionStore;
     this.resolvePlayerSocket = options.resolvePlayerSocket;
   }
 
@@ -78,6 +82,18 @@ export class PokemonTrainerBattleStarter {
     if (this.storageAccessSessionStore.has(input.playerId)) {
       console.warn(
         '[TrainerBattle] start rejected because Storage is active',
+        {
+          playerId: input.playerId,
+          trainerId: input.trainerId,
+          trainerBattleId: input.trainerBattleId,
+        },
+      );
+      return;
+    }
+
+    if (this.shopAccessSessionStore.has(input.playerId)) {
+      console.warn(
+        '[TrainerBattle] start rejected because Poké Shop is active',
         {
           playerId: input.playerId,
           trainerId: input.trainerId,

@@ -210,6 +210,11 @@
   background: rgba(30, 41, 59, 0.46);
 }
 
+.trainer-drawer__stat--money {
+  min-height: 64px;
+  grid-column: 1 / -1;
+}
+
 .trainer-drawer__stat-label {
   color: #94a3b8;
 

@@ -625,14 +625,6 @@ export type PokemonInstanceUncheckedUpdateManyWithoutTrainerNestedInput = {
   deleteMany?: Prisma.PokemonInstanceScalarWhereInput | Prisma.PokemonInstanceScalarWhereInput[]
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type NullableIntFieldUpdateOperationsInput = {
   set?: number | null
   increment?: number

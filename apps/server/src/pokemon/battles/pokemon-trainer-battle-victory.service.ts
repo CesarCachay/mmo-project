@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 
 import {
-  addPokemonInventoryItem,
+  createPokemonMoney,
   getPokemonTrainerBattleDefinition,
   isPokemonTrainerBattleId,
   type PokemonInventoryItemStack,
+  type PokemonMoney,
   type PokemonTrainerBattleId,
   type PokemonTrainerState,
 } from '@cesar-mmo/shared';
@@ -17,6 +18,8 @@ export interface PokemonTrainerBattleVictoryResult {
   readonly firstVictory: boolean;
   readonly trainerState: PokemonTrainerState;
   readonly rewardItems: readonly PokemonInventoryItemStack[];
+  /** Actual money credited. May be lower than configured when wallet is capped. */
+  readonly rewardMoney: PokemonMoney;
 }
 
 @Injectable()
@@ -59,57 +62,52 @@ export class PokemonTrainerBattleVictoryService {
 
     const definition = getPokemonTrainerBattleDefinition(trainerBattleId);
 
-    let rewardedInventory = trainerState.inventory;
-
-    for (const rewardItem of definition.rewardItems) {
-      rewardedInventory = addPokemonInventoryItem(
-        rewardedInventory,
-        rewardItem.itemId,
-        rewardItem.quantity,
-      );
-    }
-
-    const firstVictory = await this.progressRepository.recordFirstVictory({
+    const persistenceResult = await this.progressRepository.recordFirstVictory({
       trainerId,
       trainerBattleId,
-      inventory: rewardedInventory,
+      rewardItems: definition.rewardItems,
+      rewardMoney: definition.rewardMoney,
     });
 
-    if (!firstVictory) {
-      const persistedDefeatedIds =
-        await this.progressRepository.loadDefeatedTrainerBattleIds(trainerId);
+    const persistedDefeatedIds = persistenceResult.firstVictory
+      ? Array.from(
+          new Set([
+            ...(trainerState.defeatedTrainerBattleIds ?? []),
+            trainerBattleId,
+          ]),
+        )
+      : await this.progressRepository.loadDefeatedTrainerBattleIds(trainerId);
 
-      const reconciledState = this.trainerStateStore.setDefeatedTrainerBattleIds(
-        trainerId,
-        persistedDefeatedIds,
-      );
-
-      return {
-        firstVictory: false,
-        trainerState: reconciledState,
-        rewardItems: [],
-      };
-    }
-
-    this.trainerStateStore.setInventory(trainerId, rewardedInventory);
-
-    const defeatedIds = Array.from(
-      new Set([
-        ...(trainerState.defeatedTrainerBattleIds ?? []),
-        trainerBattleId,
-      ]),
+    /*
+     * DB FIRST -> RAM SECOND. Use the inventory snapshot returned by the same
+     * durable transaction, never a pre-transaction RAM-derived snapshot.
+     */
+    this.trainerStateStore.setInventoryAndMoney(
+      trainerId,
+      persistenceResult.inventory,
+      persistenceResult.money,
     );
 
     const updatedTrainerState =
       this.trainerStateStore.setDefeatedTrainerBattleIds(
         trainerId,
-        defeatedIds,
+        persistedDefeatedIds,
       );
+
+    if (!persistenceResult.firstVictory) {
+      return {
+        firstVictory: false,
+        trainerState: updatedTrainerState,
+        rewardItems: [],
+        rewardMoney: createPokemonMoney(0),
+      };
+    }
 
     return {
       firstVictory: true,
       trainerState: updatedTrainerState,
       rewardItems: definition.rewardItems,
+      rewardMoney: persistenceResult.creditedMoney,
     };
   }
 }

@@ -19,6 +19,7 @@ import { PokemonStorageService } from './pokemon-storage.service';
 import { PokemonStoragePersistenceError } from './pokemon-storage.repository';
 
 import { PokemonStorageAccessSessionStore } from './pokemon-storage-access-session.store';
+import { PokemonShopAccessSessionStore } from '../economy/shop/pokemon-shop-access-session.store';
 
 import { PokemonTrainerStateNetworkPresenter } from '../network/PokemonTrainerStateNetworkPresenter';
 
@@ -38,6 +39,7 @@ type PokemonStorageServiceState = Awaited<
 export interface PokemonStorageNetworkControllerOptions {
   readonly storageService: PokemonStorageService;
   readonly storageAccessSessionStore: PokemonStorageAccessSessionStore;
+  readonly shopAccessSessionStore: PokemonShopAccessSessionStore;
   readonly trainerStatePresenter: PokemonTrainerStateNetworkPresenter;
   readonly playerWorldRuntimeStore: PlayerWorldRuntimeStore;
   readonly dialogueSessionStore: {
@@ -50,6 +52,7 @@ export interface PokemonStorageNetworkControllerOptions {
 export class PokemonStorageNetworkController {
   private readonly storageService: PokemonStorageService;
   private readonly storageAccessSessionStore: PokemonStorageAccessSessionStore;
+  private readonly shopAccessSessionStore: PokemonShopAccessSessionStore;
   private readonly trainerStatePresenter: PokemonTrainerStateNetworkPresenter;
   private readonly playerWorldRuntimeStore: PlayerWorldRuntimeStore;
   private readonly dialogueSessionStore: PokemonStorageNetworkControllerOptions['dialogueSessionStore'];
@@ -59,6 +62,7 @@ export class PokemonStorageNetworkController {
   constructor(options: PokemonStorageNetworkControllerOptions) {
     this.storageService = options.storageService;
     this.storageAccessSessionStore = options.storageAccessSessionStore;
+    this.shopAccessSessionStore = options.shopAccessSessionStore;
     this.trainerStatePresenter = options.trainerStatePresenter;
     this.playerWorldRuntimeStore = options.playerWorldRuntimeStore;
     this.dialogueSessionStore = options.dialogueSessionStore;
@@ -92,6 +96,7 @@ export class PokemonStorageNetworkController {
 
     if (
       this.dialogueSessionStore.has(client.id) ||
+      this.shopAccessSessionStore.has(client.id) ||
       this.battleSessionStore.getByPlayerId(client.id)
     ) {
       this.emitError(
@@ -258,6 +263,12 @@ export class PokemonStorageNetworkController {
     }
 
     if (this.dialogueSessionStore.has(playerId)) {
+      this.storageAccessSessionStore.remove(playerId);
+
+      return undefined;
+    }
+
+    if (this.shopAccessSessionStore.has(playerId)) {
       this.storageAccessSessionStore.remove(playerId);
 
       return undefined;

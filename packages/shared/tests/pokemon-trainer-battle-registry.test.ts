@@ -26,6 +26,33 @@ describe("POKEMON_TRAINER_BATTLE_REGISTRY", () => {
       expect(getDialogue(definition.preBattleDialogueId)).toBeDefined();
       expect(getDialogue(definition.postBattleDialogueId)).toBeDefined();
       expect(definition.rewardItems.length).toBeGreaterThan(0);
+      expect(definition.rewardMoney).toBeGreaterThan(0);
+    }
+  });
+
+  it("configures first-victory money rewards", () => {
+    expect(getPokemonTrainerBattleDefinition("student-gary").rewardMoney).toBe(350);
+    expect(getPokemonTrainerBattleDefinition("student-francisca").rewardMoney).toBe(500);
+  });
+
+  it("configures Route 02 trainers with three Pokémon from Lv12 to Lv18 and money rewards", () => {
+    const route02TrainerIds = [
+      "youngster-diego",
+      "picnicker-valeria",
+      "hiker-marcos",
+      "ace-trainer-lucia",
+    ] as const;
+
+    for (const trainerBattleId of route02TrainerIds) {
+      const definition = getPokemonTrainerBattleDefinition(trainerBattleId);
+
+      expect(definition.party).toHaveLength(3);
+      expect(definition.rewardMoney).toBeGreaterThan(0);
+
+      for (const pokemon of definition.party) {
+        expect(pokemon.level).toBeGreaterThanOrEqual(12);
+        expect(pokemon.level).toBeLessThanOrEqual(18);
+      }
     }
   });
 

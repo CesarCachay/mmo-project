@@ -1,0 +1,672 @@
+.pokemon-shop-ui {
+  position: absolute;
+  inset: 0;
+  z-index: 2650;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  padding: max(16px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+  background:
+    radial-gradient(circle at 50% 12%, rgba(16, 185, 129, 0.14), transparent 34%),
+    rgba(3, 10, 15, 0.86);
+  color: #f8fafc;
+  font-family: Arial, sans-serif;
+  pointer-events: auto;
+  backdrop-filter: blur(3px);
+}
+
+.pokemon-shop-ui[hidden] {
+  display: none !important;
+}
+
+.pokemon-shop-ui * {
+  box-sizing: border-box;
+}
+
+.pokemon-shop-ui__shell {
+  width: min(94vw, 680px);
+  max-height: min(86vh, 720px);
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+  border: 2px solid rgba(134, 239, 172, 0.72);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(13, 74, 59, 0.995), rgba(5, 30, 29, 0.995));
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.62),
+    inset 0 1px 0 rgba(236, 253, 245, 0.08);
+}
+
+.pokemon-shop-ui__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 17px 18px 15px;
+  border-bottom: 1px solid rgba(167, 243, 208, 0.18);
+  background: linear-gradient(180deg, rgba(16, 121, 88, 0.46), rgba(16, 121, 88, 0.2));
+}
+
+.pokemon-shop-ui__heading {
+  min-width: 0;
+}
+
+.pokemon-shop-ui__title {
+  overflow: hidden;
+  color: #f0fdf4;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pokemon-shop-ui__subtitle {
+  margin-top: 5px;
+  color: rgba(236, 253, 245, 0.7);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.pokemon-shop-ui__money {
+  flex: 0 0 auto;
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  min-width: 112px;
+  padding: 8px 12px;
+  border: 1px solid rgba(253, 230, 138, 0.22);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  transition: transform 160ms ease, background 160ms ease;
+}
+
+.pokemon-shop-ui__money-label {
+  color: rgba(254, 243, 199, 0.62);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+}
+
+.pokemon-shop-ui__money-value {
+  color: #fde68a;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+.pokemon-shop-ui__money.is-updated {
+  animation: pokemon-shop-money-pulse 460ms ease-out;
+}
+
+.pokemon-shop-ui__tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 11px 14px 4px;
+}
+
+.pokemon-shop-ui__tab {
+  min-height: 38px;
+  padding: 9px 12px;
+  border: 1px solid rgba(167, 243, 208, 0.18);
+  border-radius: 9px;
+  background: rgba(2, 24, 23, 0.62);
+  color: rgba(236, 253, 245, 0.66);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease, color 120ms ease, transform 120ms ease;
+}
+
+.pokemon-shop-ui__tab:hover:not(:disabled) {
+  border-color: rgba(167, 243, 208, 0.36);
+  color: #ecfdf5;
+}
+
+.pokemon-shop-ui__tab.is-active {
+  border-color: rgba(253, 230, 138, 0.56);
+  background: linear-gradient(180deg, rgba(180, 123, 20, 0.34), rgba(146, 94, 14, 0.25));
+  color: #fef3c7;
+  box-shadow: inset 0 0 0 1px rgba(253, 230, 138, 0.06);
+}
+
+.pokemon-shop-ui__catalog {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 10px 14px 12px;
+  scrollbar-width: thin;
+}
+
+.pokemon-shop-ui__item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  padding: 12px;
+  border: 1px solid rgba(167, 243, 208, 0.14);
+  border-radius: 11px;
+  background: linear-gradient(180deg, rgba(5, 35, 33, 0.86), rgba(3, 25, 24, 0.76));
+  transition: border-color 120ms ease, background 120ms ease, opacity 120ms ease;
+}
+
+.pokemon-shop-ui__item:hover:not(.is-unavailable) {
+  border-color: rgba(167, 243, 208, 0.28);
+  background: linear-gradient(180deg, rgba(7, 43, 39, 0.92), rgba(3, 29, 27, 0.82));
+}
+
+.pokemon-shop-ui__item.is-unavailable {
+  opacity: 0.62;
+}
+
+.pokemon-shop-ui__item-info {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.pokemon-shop-ui__item-topline {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pokemon-shop-ui__item-name {
+  overflow: hidden;
+  color: #f8fafc;
+  font-size: 12px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pokemon-shop-ui__item-price {
+  flex: 0 0 auto;
+  color: #fde68a;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.pokemon-shop-ui__item-owned {
+  color: rgba(236, 253, 245, 0.56);
+  font-size: 9px;
+}
+
+.pokemon-shop-ui__item-total {
+  min-height: 13px;
+  color: rgba(187, 247, 208, 0.86);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.pokemon-shop-ui__item-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.pokemon-shop-ui__quantity-group {
+  display: grid;
+  grid-template-columns: 34px 52px 34px;
+  overflow: hidden;
+  border: 1px solid rgba(167, 243, 208, 0.25);
+  border-radius: 8px;
+  background: rgba(1, 18, 17, 0.66);
+}
+
+.pokemon-shop-ui__quantity-step,
+.pokemon-shop-ui__quantity {
+  min-height: 34px;
+  border: 0;
+  background: transparent;
+  color: #f8fafc;
+  font: inherit;
+}
+
+.pokemon-shop-ui__quantity-step {
+  padding: 0;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pokemon-shop-ui__quantity-step:first-child {
+  border-right: 1px solid rgba(167, 243, 208, 0.16);
+}
+
+.pokemon-shop-ui__quantity-step:last-child {
+  border-left: 1px solid rgba(167, 243, 208, 0.16);
+}
+
+.pokemon-shop-ui__quantity-step:hover:not(:disabled) {
+  background: rgba(16, 121, 88, 0.22);
+}
+
+.pokemon-shop-ui__quantity {
+  width: 52px;
+  padding: 6px 3px;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  appearance: textfield;
+}
+
+.pokemon-shop-ui__quantity::-webkit-inner-spin-button,
+.pokemon-shop-ui__quantity::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.pokemon-shop-ui__max,
+.pokemon-shop-ui__action,
+.pokemon-shop-ui__close {
+  min-height: 34px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: transform 100ms ease, background 120ms ease, border-color 120ms ease;
+}
+
+.pokemon-shop-ui__max {
+  min-width: 42px;
+  padding: 7px 8px;
+  border: 1px solid rgba(167, 243, 208, 0.24);
+  background: rgba(16, 121, 88, 0.2);
+  color: rgba(236, 253, 245, 0.78);
+}
+
+.pokemon-shop-ui__action {
+  min-width: 88px;
+  padding: 8px 10px;
+}
+
+.pokemon-shop-ui__buy {
+  border: 1px solid rgba(253, 230, 138, 0.48);
+  background: rgba(180, 123, 20, 0.32);
+  color: #fef3c7;
+}
+
+.pokemon-shop-ui__sell {
+  border: 1px solid rgba(147, 197, 253, 0.48);
+  background: rgba(29, 78, 216, 0.28);
+  color: #dbeafe;
+}
+
+.pokemon-shop-ui__buy:hover:not(:disabled) {
+  background: rgba(202, 138, 4, 0.48);
+}
+
+.pokemon-shop-ui__sell:hover:not(:disabled) {
+  background: rgba(37, 99, 235, 0.44);
+}
+
+.pokemon-shop-ui__max:hover:not(:disabled) {
+  border-color: rgba(167, 243, 208, 0.42);
+  background: rgba(16, 121, 88, 0.32);
+}
+
+.pokemon-shop-ui__action:active:not(:disabled),
+.pokemon-shop-ui__max:active:not(:disabled),
+.pokemon-shop-ui__quantity-step:active:not(:disabled),
+.pokemon-shop-ui__tab:active:not(:disabled),
+.pokemon-shop-ui__close:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.pokemon-shop-ui button:focus-visible,
+.pokemon-shop-ui input:focus-visible {
+  outline: 2px solid rgba(253, 230, 138, 0.88);
+  outline-offset: 2px;
+}
+
+.pokemon-shop-ui button:disabled,
+.pokemon-shop-ui input:disabled {
+  cursor: default;
+  opacity: 0.44;
+}
+
+.pokemon-shop-ui__feedback {
+  display: grid;
+  gap: 4px;
+  min-height: 34px;
+  padding: 0 14px 4px;
+}
+
+.pokemon-shop-ui__pending,
+.pokemon-shop-ui__notice,
+.pokemon-shop-ui__error {
+  display: none;
+  min-height: 28px;
+  align-items: center;
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.pokemon-shop-ui[data-pending] .pokemon-shop-ui__pending {
+  display: flex;
+  gap: 8px;
+  color: #fef3c7;
+  background: rgba(180, 123, 20, 0.16);
+}
+
+.pokemon-shop-ui__notice:not(:empty) {
+  display: flex;
+  color: #bbf7d0;
+  background: rgba(22, 101, 52, 0.18);
+}
+
+.pokemon-shop-ui__error:not(:empty) {
+  display: flex;
+  color: #fecaca;
+  background: rgba(127, 29, 29, 0.2);
+}
+
+.pokemon-shop-ui__spinner {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  border: 2px solid rgba(254, 243, 199, 0.28);
+  border-top-color: #fef3c7;
+  border-radius: 50%;
+  animation: pokemon-shop-spin 720ms linear infinite;
+}
+
+.pokemon-shop-ui__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 14px 14px;
+  border-top: 1px solid rgba(167, 243, 208, 0.08);
+}
+
+.pokemon-shop-ui__hint {
+  color: rgba(236, 253, 245, 0.48);
+  font-size: 9px;
+  line-height: 1.35;
+}
+
+.pokemon-shop-ui__close {
+  min-width: 100px;
+  padding: 9px 14px;
+  border: 1px solid rgba(167, 243, 208, 0.42);
+  background: rgba(16, 121, 88, 0.38);
+  color: #f0fdf4;
+}
+
+.pokemon-shop-ui__close:hover:not(:disabled) {
+  background: rgba(16, 145, 98, 0.58);
+}
+
+.pokemon-shop-ui__empty {
+  padding: 28px 14px;
+  border: 1px dashed rgba(167, 243, 208, 0.18);
+  border-radius: 10px;
+  color: rgba(236, 253, 245, 0.58);
+  font-size: 11px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.pokemon-shop-ui[data-pending] .pokemon-shop-ui__catalog {
+  opacity: 0.74;
+}
+
+.pokemon-shop-ui__shell--error {
+  animation: pokemon-shop-error-nudge 300ms ease-out;
+}
+
+@keyframes pokemon-shop-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pokemon-shop-money-pulse {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.055);
+    background: rgba(180, 123, 20, 0.28);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes pokemon-shop-error-nudge {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+@media (max-width: 700px) {
+  .pokemon-shop-ui {
+    place-items: stretch center;
+    padding-top: max(10px, env(safe-area-inset-top));
+    padding-right: max(8px, env(safe-area-inset-right));
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+    padding-left: max(8px, env(safe-area-inset-left));
+  }
+
+  .pokemon-shop-ui__shell {
+    width: min(100%, 520px);
+    max-height: calc(100dvh - max(20px, env(safe-area-inset-top) + env(safe-area-inset-bottom)));
+    align-self: center;
+    border-radius: 14px;
+  }
+
+  .pokemon-shop-ui__header {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .pokemon-shop-ui__title {
+    font-size: 15px;
+  }
+
+  .pokemon-shop-ui__subtitle {
+    max-width: 250px;
+    font-size: 9px;
+  }
+
+  .pokemon-shop-ui__money {
+    min-width: 96px;
+    padding: 7px 9px;
+  }
+
+  .pokemon-shop-ui__money-value {
+    font-size: 12px;
+  }
+
+  .pokemon-shop-ui__tabs {
+    padding: 8px 10px 2px;
+  }
+
+  .pokemon-shop-ui__tab {
+    min-height: 40px;
+  }
+
+  .pokemon-shop-ui__catalog {
+    gap: 7px;
+    padding: 8px 10px 10px;
+  }
+
+  .pokemon-shop-ui__item {
+    grid-template-columns: 1fr;
+    gap: 9px;
+    padding: 10px;
+  }
+
+  .pokemon-shop-ui__item-controls {
+    display: grid;
+    grid-template-columns: minmax(120px, 1fr) 48px minmax(92px, 0.7fr);
+  }
+
+  .pokemon-shop-ui__quantity-group {
+    grid-template-columns: 40px minmax(42px, 1fr) 40px;
+  }
+
+  .pokemon-shop-ui__quantity,
+  .pokemon-shop-ui__quantity-step,
+  .pokemon-shop-ui__max,
+  .pokemon-shop-ui__action {
+    min-height: 42px;
+  }
+
+  .pokemon-shop-ui__quantity {
+    width: 100%;
+  }
+
+  .pokemon-shop-ui__feedback {
+    min-height: 30px;
+    padding: 0 10px 3px;
+  }
+
+  .pokemon-shop-ui__footer {
+    padding: 8px 10px max(10px, env(safe-area-inset-bottom));
+  }
+
+  .pokemon-shop-ui__hint {
+    display: none;
+  }
+
+  .pokemon-shop-ui__close {
+    width: 100%;
+    min-height: 42px;
+  }
+}
+
+@media (max-width: 390px) {
+  .pokemon-shop-ui__header {
+    align-items: flex-start;
+  }
+
+  .pokemon-shop-ui__subtitle {
+    max-width: 190px;
+  }
+
+  .pokemon-shop-ui__money {
+    min-width: 88px;
+  }
+
+  .pokemon-shop-ui__item-topline {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .pokemon-shop-ui__item-controls {
+    grid-template-columns: 1fr 44px;
+  }
+
+  .pokemon-shop-ui__action {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .pokemon-shop-ui {
+    padding-top: max(6px, env(safe-area-inset-top));
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
+  }
+
+  .pokemon-shop-ui__shell {
+    width: min(92vw, 760px);
+    max-height: calc(100dvh - 12px);
+  }
+
+  .pokemon-shop-ui__header {
+    padding: 8px 12px;
+  }
+
+  .pokemon-shop-ui__subtitle {
+    margin-top: 2px;
+  }
+
+  .pokemon-shop-ui__tabs {
+    padding-top: 6px;
+  }
+
+  .pokemon-shop-ui__tab {
+    min-height: 32px;
+    padding: 6px 10px;
+  }
+
+  .pokemon-shop-ui__catalog {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    padding-top: 6px;
+  }
+
+  .pokemon-shop-ui__item {
+    grid-template-columns: 1fr;
+    gap: 7px;
+    padding: 8px;
+  }
+
+  .pokemon-shop-ui__item-controls {
+    display: grid;
+    grid-template-columns: minmax(110px, 1fr) 42px minmax(82px, 0.72fr);
+  }
+
+  .pokemon-shop-ui__quantity,
+  .pokemon-shop-ui__quantity-step,
+  .pokemon-shop-ui__max,
+  .pokemon-shop-ui__action {
+    min-height: 34px;
+  }
+
+  .pokemon-shop-ui__feedback {
+    min-height: 24px;
+  }
+
+  .pokemon-shop-ui__pending,
+  .pokemon-shop-ui__notice,
+  .pokemon-shop-ui__error {
+    min-height: 24px;
+    padding: 5px 8px;
+  }
+
+  .pokemon-shop-ui__footer {
+    padding-top: 5px;
+    padding-bottom: max(7px, env(safe-area-inset-bottom));
+  }
+
+  .pokemon-shop-ui__close {
+    min-height: 32px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pokemon-shop-ui *,
+  .pokemon-shop-ui *::before,
+  .pokemon-shop-ui *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

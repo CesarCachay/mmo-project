@@ -14,7 +14,7 @@ import type { PokemonTrainerBattleProgressRepository } from '../pokemon-trainer-
 const TRAINER_ID = '11111111-1111-4111-8111-111111111111';
 
 describe('PokemonTrainerBattleVictoryService', () => {
-  it('grants the configured reward and marks the Trainer Battle defeated on first victory', async () => {
+  it('uses the persisted reward snapshot and marks the Trainer Battle defeated on first victory', async () => {
     const trainerStateStore = new PokemonTrainerStateStore();
     trainerStateStore.create(
       TRAINER_ID,
@@ -22,7 +22,15 @@ describe('PokemonTrainerBattleVictoryService', () => {
       createPokemonInventory(),
     );
 
-    const recordFirstVictory = vi.fn().mockResolvedValue(true);
+    const persistedInventory = createPokemonInventory([
+      { itemId: 'potion', quantity: 1 },
+    ]);
+    const recordFirstVictory = vi.fn().mockResolvedValue({
+      firstVictory: true,
+      money: 3_350,
+      inventory: persistedInventory,
+      creditedMoney: 350,
+    });
     const progressRepository = {
       recordFirstVictory,
       loadDefeatedTrainerBattleIds: vi
@@ -39,6 +47,8 @@ describe('PokemonTrainerBattleVictoryService', () => {
 
     expect(result.firstVictory).toBe(true);
     expect(result.rewardItems).toEqual([{ itemId: 'potion', quantity: 1 }]);
+    expect(result.rewardMoney).toBe(350);
+    expect(result.trainerState.money).toBe(3_350);
     expect(result.trainerState.defeatedTrainerBattleIds).toEqual([
       'student-gary',
     ]);
@@ -46,28 +56,32 @@ describe('PokemonTrainerBattleVictoryService', () => {
       getPokemonInventoryItemQuantity(result.trainerState.inventory, 'potion'),
     ).toBe(1);
 
-    expect(recordFirstVictory).toHaveBeenCalledWith(
-      expect.objectContaining({
-        trainerId: TRAINER_ID,
-        trainerBattleId: 'student-gary',
-        inventory: expect.objectContaining({
-          items: [{ itemId: 'potion', quantity: 1 }],
-        }),
-      }),
-    );
+    expect(recordFirstVictory).toHaveBeenCalledWith({
+      trainerId: TRAINER_ID,
+      trainerBattleId: 'student-gary',
+      rewardItems: [{ itemId: 'potion', quantity: 1 }],
+      rewardMoney: 350,
+    });
   });
 
-  it('does not duplicate one-time rewards when the victory already exists', async () => {
+  it('reconciles inventory + wallet from persistence when the victory already exists', async () => {
     const trainerStateStore = new PokemonTrainerStateStore();
     trainerStateStore.create(
       TRAINER_ID,
       createPokemonParty(),
-      createPokemonInventory([{ itemId: 'potion', quantity: 1 }]),
+      createPokemonInventory(),
       ['student-gary'],
     );
 
     const progressRepository = {
-      recordFirstVictory: vi.fn().mockResolvedValue(false),
+      recordFirstVictory: vi.fn().mockResolvedValue({
+        firstVictory: false,
+        money: 3_000,
+        inventory: createPokemonInventory([
+          { itemId: 'potion', quantity: 2 },
+        ]),
+        creditedMoney: 0,
+      }),
       loadDefeatedTrainerBattleIds: vi
         .fn()
         .mockResolvedValue(['student-gary']),
@@ -82,9 +96,11 @@ describe('PokemonTrainerBattleVictoryService', () => {
 
     expect(result.firstVictory).toBe(false);
     expect(result.rewardItems).toEqual([]);
+    expect(result.rewardMoney).toBe(0);
+    expect(result.trainerState.money).toBe(3_000);
     expect(
       getPokemonInventoryItemQuantity(result.trainerState.inventory, 'potion'),
-    ).toBe(1);
+    ).toBe(2);
     expect(result.trainerState.defeatedTrainerBattleIds).toEqual([
       'student-gary',
     ]);

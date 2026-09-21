@@ -83,6 +83,8 @@ model PokemonTrainer {
   recoveryY         Float?  @map("recovery_y")
   recoveryDirection String? @map("recovery_direction") @db.VarChar(8)
 
+  money Int @default(3000)
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -93,6 +95,7 @@ model PokemonTrainer {
   pendingMoveLearning PokemonPendingMoveLearning[]
   pendingEvolutions   PokemonPendingEvolution[]
   trainerBattleProgress PokemonTrainerBattleProgress[]
+  shopTransactions      PokemonShopTransaction[]
 
   @@index([accountId])
   @@map("pokemon_trainers")
@@ -203,6 +206,27 @@ model PokemonPendingEvolution {
 
   @@index([trainerId])
   @@map("pokemon_pending_evolutions")
+}
+
+
+model PokemonShopTransaction {
+  trainerId String @map("trainer_id") @db.Uuid
+  requestId String @map("request_id") @db.Uuid
+
+  operation String @db.VarChar(8)
+  catalogId String @map("catalog_id") @db.VarChar(64)
+  itemId    String @map("item_id") @db.VarChar(64)
+  quantity  Int
+  unitPrice Int @map("unit_price")
+  totalPrice Int @map("total_price")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  trainer PokemonTrainer @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+
+  @@id([trainerId, requestId])
+  @@index([createdAt])
+  @@map("pokemon_shop_transactions")
 }
 
 model PokemonTrainerBattleProgress {

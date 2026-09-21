@@ -91,6 +91,7 @@ function createTrainerState(
     party,
 
     inventory: createPokemonInventory(),
+    money: 3_000,
   };
 }
 

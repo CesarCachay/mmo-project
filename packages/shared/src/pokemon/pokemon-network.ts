@@ -12,6 +12,10 @@ import {
 
 import { POKEMON_ENCOUNTER_TABLES } from "./encounters/pokemon-encounter-table.registry.js";
 
+import { isPokemonItemId, type PokemonInventoryItemStack } from "./inventory/pokemon-inventory.js";
+import { isPokemonMoney, type PokemonMoney } from "./economy/pokemon-money.js";
+
+
 export const POKEMON_EVENTS = {
   TRAINER_STATE: "pokemon:trainer-state",
   CHOOSE_STARTER: "pokemon:choose-starter",
@@ -224,9 +228,16 @@ export type PokemonBattleCompletedOutcome =
   | "trainer-battle-victory"
   | "trainer-battle-defeat";
 
+export interface PokemonTrainerBattleCompletionRewards {
+  /** Actual money credited after applying the wallet cap. */
+  readonly money: PokemonMoney;
+  readonly items: readonly PokemonInventoryItemStack[];
+}
+
 export interface PokemonBattleCompletedPayload {
   readonly battleId: string;
   readonly outcome: PokemonBattleCompletedOutcome;
+  readonly trainerBattleRewards?: PokemonTrainerBattleCompletionRewards;
 }
 
 export function isPokemonBattleCompletedPayload(
@@ -254,6 +265,53 @@ export function isPokemonBattleCompletedPayload(
     candidate.outcome !== "trainer-battle-defeat"
   ) {
     return false;
+  }
+
+  if (candidate.trainerBattleRewards !== undefined) {
+    if (candidate.outcome !== "trainer-battle-victory") {
+      return false;
+    }
+
+    if (!isPokemonTrainerBattleCompletionRewards(candidate.trainerBattleRewards)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+export function isPokemonTrainerBattleCompletionRewards(
+  value: unknown,
+): value is PokemonTrainerBattleCompletionRewards {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const candidate = value as Record<string, unknown>;
+
+  if (!isPokemonMoney(candidate.money) || !Array.isArray(candidate.items)) {
+    return false;
+  }
+
+  const seenItemIds = new Set<string>();
+
+  for (const item of candidate.items) {
+    if (typeof item !== "object" || item === null) {
+      return false;
+    }
+
+    const stack = item as Record<string, unknown>;
+
+    if (
+      !isPokemonItemId(stack.itemId) ||
+      !Number.isInteger(stack.quantity) ||
+      (stack.quantity as number) <= 0 ||
+      seenItemIds.has(stack.itemId)
+    ) {
+      return false;
+    }
+
+    seenItemIds.add(stack.itemId);
   }
 
   return true;

@@ -4,6 +4,7 @@ import { getPokemonMove } from "../pokemon-move.registry.js";
 import { isPokemonItemId } from "../inventory/pokemon-inventory.js";
 import { getPokemonSpecies } from "../pokemon.registry.js";
 import { MAX_POKEMON_LEVEL } from "../progression/pokemon-experience.js";
+import { POKEMON_MAX_MONEY } from "../economy/pokemon-money.js";
 import type { PokemonTrainerBattleDefinition } from "./pokemon-trainer-battle.types.js";
 
 export interface PokemonTrainerBattleValidationIssue {
@@ -67,6 +68,20 @@ export function validatePokemonTrainerBattleDefinition(
         definition,
         "postBattleDialogueId",
         `Unknown post-battle dialogue ${definition.postBattleDialogueId}`,
+      ),
+    );
+  }
+
+  if (
+    !Number.isInteger(definition.rewardMoney) ||
+    definition.rewardMoney <= 0 ||
+    definition.rewardMoney > POKEMON_MAX_MONEY
+  ) {
+    issues.push(
+      createIssue(
+        definition,
+        "rewardMoney",
+        `Money reward must be a positive integer up to ${POKEMON_MAX_MONEY}`,
       ),
     );
   }

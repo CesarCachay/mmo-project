@@ -4,7 +4,7 @@ import { io } from "socket.io-client";
 
 import { GameNetworkClient } from "../GameNetworkClient";
 
-import { POKEMON_CENTER_HEALING_EVENTS } from "@cesar-mmo/shared";
+import { POKEMON_CENTER_HEALING_EVENTS, POKEMON_SHOP_EVENTS } from "@cesar-mmo/shared";
 
 vi.mock("socket.io-client", () => ({
   io: vi.fn(() => ({
@@ -111,6 +111,54 @@ describe("GameNetworkClient connection", () => {
 
     expect(onHealed).toHaveBeenCalledTimes(1);
   });
+  it("opens and closes an authoritative Poké Shop session", () => {
+    vi.stubEnv("VITE_API_URL", "http://server.test");
+
+    const client = new GameNetworkClient({
+      selectedTrainerId: "22222222-2222-4222-8222-222222222222",
+    });
+
+    const socket = vi.mocked(io).mock.results.at(-1)?.value;
+
+    if (!socket) {
+      throw new Error("Socket mock was not created");
+    }
+
+    client.openPokemonShop("shopClerk");
+    client.buyPokemonShopItem({
+      sessionId: "shop-session-1",
+      requestId: "purchase-request-1",
+      itemId: "potion",
+      quantity: 2,
+    });
+    client.sellPokemonShopItem({
+      sessionId: "shop-session-1",
+      requestId: "sale-request-1",
+      itemId: "potion",
+      quantity: 1,
+    });
+    client.closePokemonShop("shop-session-1");
+
+    expect(socket.emit).toHaveBeenCalledWith(POKEMON_SHOP_EVENTS.OPEN, {
+      npcId: "shopClerk",
+    });
+    expect(socket.emit).toHaveBeenCalledWith(POKEMON_SHOP_EVENTS.BUY, {
+      sessionId: "shop-session-1",
+      requestId: "purchase-request-1",
+      itemId: "potion",
+      quantity: 2,
+    });
+    expect(socket.emit).toHaveBeenCalledWith(POKEMON_SHOP_EVENTS.SELL, {
+      sessionId: "shop-session-1",
+      requestId: "sale-request-1",
+      itemId: "potion",
+      quantity: 1,
+    });
+    expect(socket.emit).toHaveBeenCalledWith(POKEMON_SHOP_EVENTS.CLOSE, {
+      sessionId: "shop-session-1",
+    });
+  });
+
   it("forwards disconnect reasons and can remove the listener", () => {
     vi.stubEnv("VITE_API_URL", "http://server.test");
 

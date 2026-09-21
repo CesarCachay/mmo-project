@@ -20,6 +20,7 @@ import {
 import { PokemonTrainerStateNetworkPresenter } from '../network/PokemonTrainerStateNetworkPresenter';
 
 import { PokemonStorageAccessSessionStore } from '../storage/pokemon-storage-access-session.store';
+import { PokemonShopAccessSessionStore } from '../economy/shop/pokemon-shop-access-session.store';
 
 import { PokemonWildEncounterSessionStore } from '../encounters/pokemon-wild-encounter-session.store';
 
@@ -32,6 +33,7 @@ export interface PokemonOverworldItemNetworkControllerOptions {
     has(playerId: string): boolean;
   };
   readonly storageAccessSessionStore: PokemonStorageAccessSessionStore;
+  readonly shopAccessSessionStore: PokemonShopAccessSessionStore;
   readonly wildEncounterSessionStore: PokemonWildEncounterSessionStore;
   readonly battleSessionStore: PokemonBattleSessionStore;
   readonly resolveTrainerId: (playerId: string) => PokemonTrainerId | undefined;
@@ -42,6 +44,7 @@ export class PokemonOverworldItemNetworkController {
   private readonly trainerStatePresenter: PokemonTrainerStateNetworkPresenter;
   private readonly dialogueSessionStore: PokemonOverworldItemNetworkControllerOptions['dialogueSessionStore'];
   private readonly storageAccessSessionStore: PokemonStorageAccessSessionStore;
+  private readonly shopAccessSessionStore: PokemonShopAccessSessionStore;
   private readonly wildEncounterSessionStore: PokemonWildEncounterSessionStore;
   private readonly battleSessionStore: PokemonBattleSessionStore;
   private readonly resolveTrainerId: PokemonOverworldItemNetworkControllerOptions['resolveTrainerId'];
@@ -51,6 +54,7 @@ export class PokemonOverworldItemNetworkController {
     this.trainerStatePresenter = options.trainerStatePresenter;
     this.dialogueSessionStore = options.dialogueSessionStore;
     this.storageAccessSessionStore = options.storageAccessSessionStore;
+    this.shopAccessSessionStore = options.shopAccessSessionStore;
     this.wildEncounterSessionStore = options.wildEncounterSessionStore;
     this.battleSessionStore = options.battleSessionStore;
     this.resolveTrainerId = options.resolveTrainerId;
@@ -118,6 +122,7 @@ export class PokemonOverworldItemNetworkController {
     return (
       this.dialogueSessionStore.has(playerId) ||
       this.storageAccessSessionStore.has(playerId) ||
+      this.shopAccessSessionStore.has(playerId) ||
       this.wildEncounterSessionStore.has(playerId) ||
       Boolean(this.battleSessionStore.getByPlayerId(playerId))
     );

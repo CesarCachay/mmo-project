@@ -11,6 +11,7 @@ import { PokemonTrainerStateStore } from '../pokemon-trainer-state.store';
 import { PokemonWildEncounterSessionStore } from '../encounters/pokemon-wild-encounter-session.store';
 
 import { PokemonStorageAccessSessionStore } from '../storage/pokemon-storage-access-session.store';
+import { PokemonShopAccessSessionStore } from '../economy/shop/pokemon-shop-access-session.store';
 
 import { PokemonBattleSessionStore } from './pokemon-battle-session.store';
 
@@ -24,6 +25,7 @@ export interface PokemonWildBattleStarterOptions {
   readonly battleSessionStore: PokemonBattleSessionStore;
   readonly battleTurnStore: PokemonBattleTurnStore;
   readonly storageAccessSessionStore: PokemonStorageAccessSessionStore;
+  readonly shopAccessSessionStore: PokemonShopAccessSessionStore;
   readonly resolvePlayerSocket: (playerId: string) => Socket | undefined;
 }
 
@@ -33,6 +35,7 @@ export class PokemonWildBattleStarter {
   private readonly battleSessionStore: PokemonBattleSessionStore;
   private readonly battleTurnStore: PokemonBattleTurnStore;
   private readonly storageAccessSessionStore: PokemonStorageAccessSessionStore;
+  private readonly shopAccessSessionStore: PokemonShopAccessSessionStore;
   private readonly resolvePlayerSocket: PokemonWildBattleStarterOptions['resolvePlayerSocket'];
 
   constructor(options: PokemonWildBattleStarterOptions) {
@@ -41,12 +44,22 @@ export class PokemonWildBattleStarter {
     this.battleSessionStore = options.battleSessionStore;
     this.battleTurnStore = options.battleTurnStore;
     this.storageAccessSessionStore = options.storageAccessSessionStore;
+    this.shopAccessSessionStore = options.shopAccessSessionStore;
     this.resolvePlayerSocket = options.resolvePlayerSocket;
   }
 
   public start(encounterSession: PokemonWildEncounterSession): void {
     /* No crear dos Battles activos para el mismo Trainer */
     if (this.battleSessionStore.hasTrainerBattle(encounterSession.trainerId)) {
+      return;
+    }
+
+    if (this.shopAccessSessionStore.has(encounterSession.playerId)) {
+      this.wildEncounterSessionStore.remove(encounterSession.playerId);
+      console.warn('[WildBattle] start rejected because Poké Shop is active', {
+        playerId: encounterSession.playerId,
+        trainerId: encounterSession.trainerId,
+      });
       return;
     }
 

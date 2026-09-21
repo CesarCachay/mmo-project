@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { createPokemonParty, createPokemonInventory } from '@cesar-mmo/shared';
+import {
+  createPokemonParty,
+  createPokemonInventory,
+  createPokemonMoney,
+  type PokemonMoney,
+} from '@cesar-mmo/shared';
 
 import type { PokemonTrainerId } from './pokemon-trainer-identity';
 import type {
@@ -22,6 +27,7 @@ export class PokemonTrainerStateStore {
     party: PokemonParty = createPokemonParty(),
     inventory: PokemonInventory = createPokemonInventory(),
     defeatedTrainerBattleIds: readonly string[] = [],
+    money: PokemonMoney = createPokemonMoney(),
   ): PokemonTrainerState {
     if (this.trainerStates.has(trainerId)) {
       throw new Error(`Trainer state already exists for trainer ${trainerId}`);
@@ -30,6 +36,7 @@ export class PokemonTrainerStateStore {
     const trainerState: PokemonTrainerState = {
       party,
       inventory,
+      money: createPokemonMoney(money),
       defeatedTrainerBattleIds: [...new Set(defeatedTrainerBattleIds)],
     };
 
@@ -77,6 +84,47 @@ export class PokemonTrainerStateStore {
 
     this.trainerStates.set(trainerId, updatedTrainerState);
 
+    return updatedTrainerState;
+  }
+
+  setMoney(
+    trainerId: PokemonTrainerId,
+    money: PokemonMoney,
+  ): PokemonTrainerState {
+    const trainerState = this.trainerStates.get(trainerId);
+
+    if (!trainerState) {
+      throw new Error(`Trainer state not found for trainer ${trainerId}`);
+    }
+
+    const updatedTrainerState: PokemonTrainerState = {
+      ...trainerState,
+      money: createPokemonMoney(money),
+    };
+
+    this.trainerStates.set(trainerId, updatedTrainerState);
+
+    return updatedTrainerState;
+  }
+
+  setInventoryAndMoney(
+    trainerId: PokemonTrainerId,
+    inventory: PokemonInventory,
+    money: PokemonMoney,
+  ): PokemonTrainerState {
+    const trainerState = this.trainerStates.get(trainerId);
+
+    if (!trainerState) {
+      throw new Error(`Trainer state not found for trainer ${trainerId}`);
+    }
+
+    const updatedTrainerState: PokemonTrainerState = {
+      ...trainerState,
+      inventory,
+      money: createPokemonMoney(money),
+    };
+
+    this.trainerStates.set(trainerId, updatedTrainerState);
     return updatedTrainerState;
   }
 

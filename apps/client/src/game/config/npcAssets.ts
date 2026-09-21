@@ -26,8 +26,31 @@ export const NPC_ASSETS = {
     folder: "/assets/characters/npcs/student-francisca",
     directions: ["down"],
   },
+  "manager-cesar": {
+    folder: "/assets/characters/npcs/manager-cesar",
+    directions: ["down"],
+  },
 } satisfies Record<string, NpcAssetDefinition>;
 
 export const getNpcTextureKey = (sprite: string, direction: NpcDirection): string => {
   return `npc-${sprite}-walk-${direction}`;
+};
+
+/**
+ * Returns texture keys in render preference order without changing the NPC's
+ * logical direction. This lets Trainer Sight keep using the map direction even
+ * when an appearance only has a subset of directional sprite assets.
+ */
+export const getNpcTextureKeyCandidates = (
+  sprite: string,
+  direction: NpcDirection,
+): readonly string[] => {
+  const definition = NPC_ASSETS[sprite as keyof typeof NPC_ASSETS];
+  const fallbackDirections = definition?.directions ?? [];
+  const directions = [
+    direction,
+    ...fallbackDirections.filter((candidate) => candidate !== direction),
+  ];
+
+  return directions.map((candidate) => getNpcTextureKey(sprite, candidate));
 };

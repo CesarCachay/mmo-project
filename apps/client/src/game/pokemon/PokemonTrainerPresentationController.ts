@@ -51,6 +51,7 @@ export class PokemonTrainerPresentationController {
     /* Esta asignación debe ocurrir ANTES de cualquier await */
     this.trainerState = trainerState;
     this.trainerPanelController.setInventory(trainerState.inventory);
+    this.trainerPanelController.setMoney(trainerState.money);
 
     const party = trainerState.party.pokemon;
     const hasParty = party.length > 0;

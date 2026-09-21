@@ -1,6 +1,4 @@
-import type { PokemonBattleCompletedPayload } from "@cesar-mmo/shared";
-
-type BattleCompletionOutcome = PokemonBattleCompletedPayload["outcome"];
+import { getPokemonItem, type PokemonBattleCompletedPayload } from "@cesar-mmo/shared";
 
 interface ModernBattleCompletionPanelOptions {
   onContinue: () => void;
@@ -97,7 +95,8 @@ export class ModernBattleCompletionPanel {
     this.hide();
   }
 
-  public show(outcome: BattleCompletionOutcome): void {
+  public show(payload: PokemonBattleCompletedPayload): void {
+    const outcome = payload.outcome;
     this.continueButton.textContent = "Continue";
 
     this.root.classList.remove(
@@ -125,13 +124,21 @@ export class ModernBattleCompletionPanel {
         this.message.textContent = "Your party can no longer continue the battle.";
         break;
 
-      case "trainer-battle-victory":
+      case "trainer-battle-victory": {
         this.root.classList.add("battle-modern-completion--victory");
         this.icon.textContent = "★";
         this.eyebrow.textContent = "TRAINER BATTLE COMPLETE";
         this.title.textContent = "Victory!";
-        this.message.textContent = "The opposing Trainer was defeated.";
+
+        const rewardSummary = this.formatTrainerBattleRewards(
+          payload.trainerBattleRewards,
+        );
+
+        this.message.textContent = rewardSummary
+          ? `The opposing Trainer was defeated. Rewards: ${rewardSummary}.`
+          : "The opposing Trainer was defeated.";
         break;
+      }
 
       case "trainer-battle-defeat":
         this.root.classList.add("battle-modern-completion--defeat");
@@ -172,6 +179,27 @@ export class ModernBattleCompletionPanel {
     this.root.hidden = false;
     void this.root.offsetWidth;
     this.root.classList.add("battle-modern-completion--active");
+  }
+
+  private formatTrainerBattleRewards(
+    rewards: PokemonBattleCompletedPayload["trainerBattleRewards"],
+  ): string {
+    if (!rewards) {
+      return "";
+    }
+
+    const parts: string[] = [];
+
+    if (rewards.money > 0) {
+      parts.push(`₽${rewards.money.toLocaleString("en-US")}`);
+    }
+
+    for (const item of rewards.items) {
+      const definition = getPokemonItem(item.itemId);
+      parts.push(`${definition.name} ×${item.quantity}`);
+    }
+
+    return parts.join(" · ");
   }
 
   public hide(): void {

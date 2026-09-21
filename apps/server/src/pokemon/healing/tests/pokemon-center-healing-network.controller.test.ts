@@ -13,6 +13,7 @@ import type { PokemonTrainerStateNetworkPresenter } from '../../network/PokemonT
 import type { PlayerWorldRuntimeStore } from '../../../game/world/player-world-runtime.store';
 
 import type { PokemonStorageAccessSessionStore } from '../../storage/pokemon-storage-access-session.store';
+import type { PokemonShopAccessSessionStore } from '../../economy/shop/pokemon-shop-access-session.store';
 
 import type { PokemonWildEncounterSessionStore } from '../../encounters/pokemon-wild-encounter-session.store';
 
@@ -40,9 +41,11 @@ const trainerState: PokemonTrainerState = {
   inventory: {
     items: [],
   },
+
+  money: 3_000,
 };
 
-type BlockedBy = 'dialogue' | 'storage' | 'encounter' | 'battle';
+type BlockedBy = 'dialogue' | 'storage' | 'shop' | 'encounter' | 'battle';
 
 function createHarness(
   options: {
@@ -103,6 +106,8 @@ function createHarness(
 
   const storageHas = vi.fn(() => options.blockedBy === 'storage');
 
+  const shopHas = vi.fn(() => options.blockedBy === 'shop');
+
   const encounterHas = vi.fn(() => options.blockedBy === 'encounter');
 
   const battleGet = vi.fn(() =>
@@ -120,6 +125,10 @@ function createHarness(
   const storageAccessSessionStore = {
     has: storageHas,
   } as unknown as PokemonStorageAccessSessionStore;
+
+  const shopAccessSessionStore = {
+    has: shopHas,
+  } as unknown as PokemonShopAccessSessionStore;
 
   const wildEncounterSessionStore = {
     has: encounterHas,
@@ -145,6 +154,7 @@ function createHarness(
     playerWorldRuntimeStore,
     dialogueSessionStore,
     storageAccessSessionStore,
+    shopAccessSessionStore,
     wildEncounterSessionStore,
     battleSessionStore,
     resolveTrainerId,
@@ -219,10 +229,11 @@ describe('PokemonCenterHealingNetworkController', () => {
     expect(harness.healParty).not.toHaveBeenCalled();
   });
 
-  it('blocks healing during dialogue, Storage, Wild Encounter, or Battle', async () => {
+  it('blocks healing during dialogue, Storage, Poké Shop, Wild Encounter, or Battle', async () => {
     const blockers: readonly BlockedBy[] = [
       'dialogue',
       'storage',
+      'shop',
       'encounter',
       'battle',
     ];

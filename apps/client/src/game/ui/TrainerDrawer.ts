@@ -1,6 +1,7 @@
 import {
   MAX_POKEMON_PARTY_SIZE,
   type PokemonInventory,
+  type PokemonMoney,
 } from "@cesar-mmo/shared";
 
 import { selectedTrainerStore } from "../../account/selected-trainer.store";
@@ -26,6 +27,7 @@ export class TrainerDrawer {
   private readonly partyValue: HTMLSpanElement;
   private readonly inventoryValue: HTMLSpanElement;
   private readonly inventoryMeta: HTMLSpanElement;
+  private readonly moneyValue: HTMLSpanElement;
 
   private readonly trainerIdValue: HTMLSpanElement;
   private readonly createdAtValue: HTMLSpanElement;
@@ -36,6 +38,7 @@ export class TrainerDrawer {
   private partyCount = 0;
   private inventoryQuantity = 0;
   private inventoryKinds = 0;
+  private money: PokemonMoney = 0;
 
   private visible = false;
   private destroyed = false;
@@ -241,9 +244,22 @@ export class TrainerDrawer {
       this.inventoryMeta,
     );
 
+    const moneyStat =
+      this.createStat(
+        "Dinero",
+      );
+
+    moneyStat.root.classList.add(
+      "trainer-drawer__stat--money",
+    );
+
+    this.moneyValue =
+      moneyStat.value;
+
     summary.append(
       partyStat.root,
       inventoryStat.root,
+      moneyStat.root,
     );
 
     // -------------------------------------------------------
@@ -329,6 +345,17 @@ export class TrainerDrawer {
           Math.trunc(count),
         ),
       );
+
+    this.renderSummary();
+  }
+
+  public setMoney(
+    money: PokemonMoney,
+  ): void {
+    this.money = Math.max(
+      0,
+      Math.trunc(money),
+    );
 
     this.renderSummary();
   }
@@ -535,6 +562,9 @@ export class TrainerDrawer {
       this.inventoryKinds === 1
         ? "1 tipo"
         : `${this.inventoryKinds} tipos`;
+
+    this.moneyValue.textContent =
+      `₽ ${new Intl.NumberFormat("es-PE").format(this.money)}`;
   }
 
   private createStat(

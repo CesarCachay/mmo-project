@@ -406,6 +406,7 @@ export const ModelName = {
   PokemonPendingMoveLearning: 'PokemonPendingMoveLearning',
   PokemonTrainerInventoryItem: 'PokemonTrainerInventoryItem',
   PokemonPendingEvolution: 'PokemonPendingEvolution',
+  PokemonShopTransaction: 'PokemonShopTransaction',
   PokemonTrainerBattleProgress: 'PokemonTrainerBattleProgress'
 } as const
 
@@ -422,7 +423,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "accountSession" | "accountPasswordCredential" | "pokemonTrainer" | "pokemonInstance" | "pokemonInstanceMove" | "pokemonPendingMoveLearning" | "pokemonTrainerInventoryItem" | "pokemonPendingEvolution" | "pokemonTrainerBattleProgress"
+    modelProps: "account" | "accountSession" | "accountPasswordCredential" | "pokemonTrainer" | "pokemonInstance" | "pokemonInstanceMove" | "pokemonPendingMoveLearning" | "pokemonTrainerInventoryItem" | "pokemonPendingEvolution" | "pokemonShopTransaction" | "pokemonTrainerBattleProgress"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1092,6 +1093,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PokemonShopTransaction: {
+      payload: Prisma.$PokemonShopTransactionPayload<ExtArgs>
+      fields: Prisma.PokemonShopTransactionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PokemonShopTransactionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonShopTransactionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PokemonShopTransactionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonShopTransactionPayload>
+        }
+        findFirst: {
+          args: Prisma.PokemonShopTransactionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonShopTransactionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PokemonShopTransactionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonShopTransactionPayload>
+        }
+        findMany: {
+          args: Prisma.PokemonShopTransactionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonShopTransactionPayload>[]
+        }
+        create: {
+          args: Prisma.PokemonShopTransactionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonShopTransactionPayload>
+        }
+        createMany: {
+          args: Prisma.PokemonShopTransactionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PokemonShopTransactionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonShopTransactionPayload>[]
+        }
+        delete: {
+          args: Prisma.PokemonShopTransactionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonShopTransactionPayload>
+        }
+        update: {
+          args: Prisma.PokemonShopTransactionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonShopTransactionPayload>
+        }
+        deleteMany: {
+          args: Prisma.PokemonShopTransactionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PokemonShopTransactionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PokemonShopTransactionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonShopTransactionPayload>[]
+        }
+        upsert: {
+          args: Prisma.PokemonShopTransactionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonShopTransactionPayload>
+        }
+        aggregate: {
+          args: Prisma.PokemonShopTransactionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePokemonShopTransaction>
+        }
+        groupBy: {
+          args: Prisma.PokemonShopTransactionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PokemonShopTransactionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PokemonShopTransactionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PokemonShopTransactionCountAggregateOutputType> | number
+        }
+      }
+    }
     PokemonTrainerBattleProgress: {
       payload: Prisma.$PokemonTrainerBattleProgressPayload<ExtArgs>
       fields: Prisma.PokemonTrainerBattleProgressFieldRefs
@@ -1253,6 +1328,7 @@ export const PokemonTrainerScalarFieldEnum = {
   recoveryX: 'recoveryX',
   recoveryY: 'recoveryY',
   recoveryDirection: 'recoveryDirection',
+  money: 'money',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1327,6 +1403,21 @@ export const PokemonPendingEvolutionScalarFieldEnum = {
 } as const
 
 export type PokemonPendingEvolutionScalarFieldEnum = (typeof PokemonPendingEvolutionScalarFieldEnum)[keyof typeof PokemonPendingEvolutionScalarFieldEnum]
+
+
+export const PokemonShopTransactionScalarFieldEnum = {
+  trainerId: 'trainerId',
+  requestId: 'requestId',
+  operation: 'operation',
+  catalogId: 'catalogId',
+  itemId: 'itemId',
+  quantity: 'quantity',
+  unitPrice: 'unitPrice',
+  totalPrice: 'totalPrice',
+  createdAt: 'createdAt'
+} as const
+
+export type PokemonShopTransactionScalarFieldEnum = (typeof PokemonShopTransactionScalarFieldEnum)[keyof typeof PokemonShopTransactionScalarFieldEnum]
 
 
 export const PokemonTrainerBattleProgressScalarFieldEnum = {
@@ -1627,6 +1718,7 @@ export type GlobalOmitConfig = {
   pokemonPendingMoveLearning?: Prisma.PokemonPendingMoveLearningOmit
   pokemonTrainerInventoryItem?: Prisma.PokemonTrainerInventoryItemOmit
   pokemonPendingEvolution?: Prisma.PokemonPendingEvolutionOmit
+  pokemonShopTransaction?: Prisma.PokemonShopTransactionOmit
   pokemonTrainerBattleProgress?: Prisma.PokemonTrainerBattleProgressOmit
 }
 

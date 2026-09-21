@@ -30,7 +30,36 @@ export const ROUTE_02_MAP = {
     },
   },
 
-  npcs: {},
+  npcs: {
+    "route02YoungsterDiego": {
+      x: 240,
+      y: 512,
+      trainerBattleId: "youngster-diego",
+      direction: "down",
+      sightRangeTiles: 4,
+    },
+    "route02PicnickerValeria": {
+      x: 320,
+      y: 400,
+      trainerBattleId: "picnicker-valeria",
+      direction: "left",
+      sightRangeTiles: 5,
+    },
+    "route02HikerMarcos": {
+      x: 496,
+      y: 304,
+      trainerBattleId: "hiker-marcos",
+      direction: "left",
+      sightRangeTiles: 5,
+    },
+    "route02AceTrainerLucia": {
+      x: 624,
+      y: 176,
+      trainerBattleId: "ace-trainer-lucia",
+      direction: "down",
+      sightRangeTiles: 5,
+    },
+  },
 
   storageTerminals: {},
 

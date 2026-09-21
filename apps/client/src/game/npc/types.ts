@@ -1,5 +1,5 @@
 import type Phaser from "phaser";
-import type { PokemonTrainerBattleId } from "@cesar-mmo/shared";
+import type { PokemonShopCatalogId, PokemonTrainerBattleId } from "@cesar-mmo/shared";
 
 export type NpcInteractionType =
   | "dialogue"
@@ -19,6 +19,7 @@ export type NpcDefinition = {
   interactionType: NpcInteractionType;
   dialogueId?: string;
   trainerBattleId?: PokemonTrainerBattleId;
+  shopCatalogId?: PokemonShopCatalogId;
   sightRangeTiles?: number;
   postDialogueAction?: NpcPostDialogueAction;
 };

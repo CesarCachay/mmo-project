@@ -14,6 +14,7 @@ import { POKE_SHOP_MAP } from "./maps/generated/poke-shop.js";
 
 import { PokemonEncounterTableId } from "./pokemon/encounters/pokemon-encounter-table.registry.js";
 import type { PokemonTrainerBattleId } from "./pokemon/trainers/pokemon-trainer-battle.registry.js";
+import type { PokemonShopCatalogId } from "./pokemon/economy/shop/pokemon-shop.catalog.js";
 
 export type SharedMapSpawn = {
   readonly x: number;
@@ -25,6 +26,7 @@ export type SharedMapNpc = {
   readonly y: number;
   readonly dialogueId?: string;
   readonly trainerBattleId?: PokemonTrainerBattleId;
+  readonly shopCatalogId?: PokemonShopCatalogId;
   readonly direction?: Direction;
   readonly sightRangeTiles?: number;
   readonly postDialogueAction?: string;

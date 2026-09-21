@@ -1,10 +1,11 @@
 import Phaser from "phaser";
 import {
   getPokemonTrainerBattleDefinition,
+  isPokemonShopCatalogId,
   isPokemonTrainerBattleId,
 } from "@cesar-mmo/shared";
-import type { PokemonTrainerBattleId } from "@cesar-mmo/shared";
-import { getNpcTextureKey } from "../config/npcAssets";
+import type { PokemonShopCatalogId, PokemonTrainerBattleId } from "@cesar-mmo/shared";
+import { getNpcTextureKeyCandidates } from "../config/npcAssets";
 
 import type {
   NpcDefinition,
@@ -35,9 +36,18 @@ export class NpcManager {
     const npcDefinitions = this.getNpcDefinitions(map);
 
     for (const npc of npcDefinitions) {
-      const textureKey = getNpcTextureKey(npc.sprite, npc.direction);
-      if (!this.scene.textures.exists(textureKey)) {
-        throw new Error(`NPC texture not found: ${textureKey}`);
+      const textureCandidates = getNpcTextureKeyCandidates(
+        npc.sprite,
+        npc.direction,
+      );
+      const textureKey = textureCandidates.find((candidate) =>
+        this.scene.textures.exists(candidate),
+      );
+
+      if (!textureKey) {
+        throw new Error(
+          `NPC texture not found for ${npc.sprite}; tried: ${textureCandidates.join(", ")}`,
+        );
       }
 
       const sprite = this.scene.add.sprite(npc.x, npc.y, textureKey, 0);
@@ -113,6 +123,7 @@ export class NpcManager {
         const rawDialogueId = getProperty("dialogueId");
         const interactionType = getProperty("interactionType");
         const rawTrainerBattleId = getProperty("trainerBattleId");
+        const rawShopCatalogId = getProperty("shopCatalogId");
         const rawSightRangeTiles = getProperty("sightRangeTiles");
         const rawPostDialogueAction = getProperty("postDialogueAction");
 
@@ -143,6 +154,11 @@ export class NpcManager {
 
         const trainerBattleId = this.parseTrainerBattleId(
           rawTrainerBattleId,
+          object.name,
+        );
+
+        const shopCatalogId = this.parseShopCatalogId(
+          rawShopCatalogId,
           object.name,
         );
 
@@ -198,6 +214,18 @@ export class NpcManager {
           sprite = rawSprite.trim();
         }
 
+        if (interactionType === "shop") {
+          if (!shopCatalogId) {
+            throw new Error(
+              `Shop NPC "${object.name}" requires shopCatalogId`,
+            );
+          }
+        } else if (shopCatalogId) {
+          throw new Error(
+            `NPC "${object.name}" cannot define shopCatalogId unless interactionType is "shop"`,
+          );
+        }
+
         if (interactionType === "dialogue" && !dialogueId) {
           throw new Error(
             `Dialogue NPC "${object.name}" requires dialogueId`,
@@ -228,6 +256,7 @@ export class NpcManager {
           interactionType,
           dialogueId,
           trainerBattleId,
+          shopCatalogId,
           sightRangeTiles,
           postDialogueAction,
         };
@@ -263,6 +292,23 @@ export class NpcManager {
     if (!isPokemonTrainerBattleId(value)) {
       throw new Error(
         `NPC "${npcId}" references unknown trainerBattleId: ${String(value)}`,
+      );
+    }
+
+    return value;
+  }
+
+  private parseShopCatalogId(
+    value: unknown,
+    npcId: string,
+  ): PokemonShopCatalogId | undefined {
+    if (value === undefined) {
+      return undefined;
+    }
+
+    if (!isPokemonShopCatalogId(value)) {
+      throw new Error(
+        `NPC "${npcId}" references unknown shopCatalogId: ${String(value)}`,
       );
     }
 

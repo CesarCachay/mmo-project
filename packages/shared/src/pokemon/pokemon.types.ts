@@ -1,4 +1,5 @@
 import { PokemonInventory } from "./inventory/pokemon-inventory.js";
+import type { PokemonMoney } from "./economy/pokemon-money.js";
 import type { PokemonGrowthRate } from "./progression/pokemon-growth-rate.js";
 
 export type PokemonType =
@@ -137,6 +138,7 @@ export interface PokemonParty {
 export interface PokemonTrainerState {
   party: PokemonParty;
   inventory: PokemonInventory;
+  money: PokemonMoney;
   /** Persisted one-time Trainer Battle victories. Optional for backwards-compatible tests/fixtures. */
   defeatedTrainerBattleIds?: readonly string[];
 }

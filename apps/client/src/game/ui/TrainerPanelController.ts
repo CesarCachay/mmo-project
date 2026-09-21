@@ -3,6 +3,7 @@ import Phaser from "phaser";
 import {
   POKEMON_ITEM_REGISTRY,
   type PokemonInstance,
+  type PokemonMoney,
   type PokemonInventory,
   type PokemonOverworldItemErrorCode,
   type PokemonOverworldItemErrorPayload,
@@ -156,6 +157,10 @@ export class TrainerPanelController {
       return;
     }
     this.partyDrawer.setParty(party);
+  }
+
+  public setMoney(money: PokemonMoney): void {
+    this.trainerDrawer.setMoney(money);
   }
 
   public setInventory(inventory: PokemonInventory): void {
