@@ -108,7 +108,28 @@ export type BattleMoveVfxSignaturePresetId =
   | "air-slash"
   | "flash-cannon"
   | "stone-edge"
-  | "shadow-force";
+  | "shadow-force"
+  | "water-gun-retro"
+  | "razor-leaf-retro"
+  | "absorb-retro"
+  | "giga-drain-retro"
+  | "flame-wheel-retro"
+  | "quick-attack-retro"
+  | "scary-face-retro"
+  | "rage-retro"
+  | "vine-whip-retro"
+  | "bubble-retro"
+  | "dragon-rage-retro"
+  | "thunder-shock-retro"
+  | "cut-retro"
+  | "fly-retro"
+  | "surf-retro"
+  | "strength-retro"
+  | "waterfall-retro"
+  | "rock-smash-retro"
+  | "whirlpool-retro"
+  | "rock-climb-retro"
+  | "defog-retro";
 export type BattleMoveVfxGenericPresetId = "physical" | "special" | "status";
 
 export type BattleMoveVfxContactMotionStyle = "dash" | "headbutt" | "slam" | "reckless";

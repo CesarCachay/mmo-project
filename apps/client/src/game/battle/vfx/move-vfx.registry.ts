@@ -42,6 +42,23 @@ const TAKE_DOWN_MOVE_ID = 36;
 const EMBER_MOVE_ID = 52;
 const FLAMETHROWER_MOVE_ID = 53;
 const WATER_GUN_MOVE_ID = 55;
+const QUICK_ATTACK_MOVE_ID = 98;
+const CUT_MOVE_ID = 15;
+const FLY_MOVE_ID = 19;
+const STRENGTH_MOVE_ID = 70;
+const WATERFALL_MOVE_ID = 127;
+const ROCK_SMASH_MOVE_ID = 249;
+const WHIRLPOOL_MOVE_ID = 250;
+const ROCK_CLIMB_MOVE_ID = 431;
+const DEFOG_MOVE_ID = 432;
+const SCARY_FACE_MOVE_ID = 184;
+const RAGE_MOVE_ID = 99;
+const VINE_WHIP_MOVE_ID = 22;
+const BUBBLE_MOVE_ID = 145;
+const DRAGON_RAGE_MOVE_ID = 82;
+const THUNDER_SHOCK_MOVE_ID = 84;
+const RAZOR_LEAF_MOVE_ID = 75;
+const FLAME_WHEEL_MOVE_ID = 172;
 const HYDRO_PUMP_MOVE_ID = 56;
 const ICE_BEAM_MOVE_ID = 58;
 const AURORA_BEAM_MOVE_ID = 62;
@@ -113,6 +130,16 @@ const DRAGON_DANCE_MOVE_ID = 349;
 const ROOST_MOVE_ID = 355;
 
 const MOVE_VFX_REGISTRY: ReadonlyMap<number, BattleMoveVfxDefinition> = new Map([
+
+  [CUT_MOVE_ID, { moveId: CUT_MOVE_ID, archetype: "signature", element: "normal", presetId: "cut-retro", durationMs: 720 }],
+  [FLY_MOVE_ID, { moveId: FLY_MOVE_ID, archetype: "signature", element: "flying", presetId: "fly-retro", durationMs: 1040 }],
+  [SURF_MOVE_ID, { moveId: SURF_MOVE_ID, archetype: "signature", element: "water", presetId: "surf-retro", durationMs: 1180 }],
+  [STRENGTH_MOVE_ID, { moveId: STRENGTH_MOVE_ID, archetype: "signature", element: "normal", presetId: "strength-retro", durationMs: 860 }],
+  [WATERFALL_MOVE_ID, { moveId: WATERFALL_MOVE_ID, archetype: "signature", element: "water", presetId: "waterfall-retro", durationMs: 920 }],
+  [ROCK_SMASH_MOVE_ID, { moveId: ROCK_SMASH_MOVE_ID, archetype: "signature", element: "fighting", presetId: "rock-smash-retro", durationMs: 760 }],
+  [WHIRLPOOL_MOVE_ID, { moveId: WHIRLPOOL_MOVE_ID, archetype: "signature", element: "water", presetId: "whirlpool-retro", durationMs: 1020 }],
+  [ROCK_CLIMB_MOVE_ID, { moveId: ROCK_CLIMB_MOVE_ID, archetype: "signature", element: "normal", presetId: "rock-climb-retro", durationMs: 920 }],
+  [DEFOG_MOVE_ID, { moveId: DEFOG_MOVE_ID, archetype: "signature", element: "flying", presetId: "defog-retro", durationMs: 880 }],
   [SPIKES_MOVE_ID, { moveId: SPIKES_MOVE_ID, archetype: "battlefield", element: "ground", presetId: "spikes", durationMs: 900 }],
   [SANDSTORM_MOVE_ID, { moveId: SANDSTORM_MOVE_ID, archetype: "battlefield", element: "rock", presetId: "sandstorm", durationMs: 1150 }],
   [RAIN_DANCE_MOVE_ID, { moveId: RAIN_DANCE_MOVE_ID, archetype: "battlefield", element: "water", presetId: "rain-dance", durationMs: 1100 }],
@@ -123,12 +150,20 @@ const MOVE_VFX_REGISTRY: ReadonlyMap<number, BattleMoveVfxDefinition> = new Map(
   [TRICK_ROOM_MOVE_ID, { moveId: TRICK_ROOM_MOVE_ID, archetype: "battlefield", element: "psychic", presetId: "trick-room", durationMs: 1120 }],
   [STEALTH_ROCK_MOVE_ID, { moveId: STEALTH_ROCK_MOVE_ID, archetype: "battlefield", element: "rock", presetId: "stealth-rock", durationMs: 980 }],
 
+  [QUICK_ATTACK_MOVE_ID, { moveId: QUICK_ATTACK_MOVE_ID, archetype: "signature", element: "normal", presetId: "quick-attack-retro", durationMs: 560 }],
+  [SCARY_FACE_MOVE_ID, { moveId: SCARY_FACE_MOVE_ID, archetype: "signature", element: "normal", presetId: "scary-face-retro", durationMs: 920 }],
+  [RAGE_MOVE_ID, { moveId: RAGE_MOVE_ID, archetype: "signature", element: "normal", presetId: "rage-retro", durationMs: 860 }],
+  [VINE_WHIP_MOVE_ID, { moveId: VINE_WHIP_MOVE_ID, archetype: "signature", element: "grass", presetId: "vine-whip-retro", durationMs: 760 }],
+  [BUBBLE_MOVE_ID, { moveId: BUBBLE_MOVE_ID, archetype: "signature", element: "water", presetId: "bubble-retro", durationMs: 880 }],
+  [DRAGON_RAGE_MOVE_ID, { moveId: DRAGON_RAGE_MOVE_ID, archetype: "signature", element: "dragon", presetId: "dragon-rage-retro", durationMs: 920 }],
+  [THUNDER_SHOCK_MOVE_ID, { moveId: THUNDER_SHOCK_MOVE_ID, archetype: "signature", element: "electric", presetId: "thunder-shock-retro", durationMs: 700 }],
+
   [SWORDS_DANCE_MOVE_ID, { moveId: SWORDS_DANCE_MOVE_ID, archetype: "support", element: "normal", presetId: "swords-dance", durationMs: 860 }],
   [TAIL_WHIP_MOVE_ID, { moveId: TAIL_WHIP_MOVE_ID, archetype: "status", element: "normal", presetId: "tail-whip", durationMs: 700 }],
   [LEER_MOVE_ID, { moveId: LEER_MOVE_ID, archetype: "status", element: "normal", presetId: "leer", durationMs: 680 }],
   [GROWL_MOVE_ID, { moveId: GROWL_MOVE_ID, archetype: "status", element: "normal", presetId: "growl", durationMs: 720 }],
   [SING_MOVE_ID, { moveId: SING_MOVE_ID, archetype: "status", element: "normal", presetId: "sing", durationMs: 900 }],
-  [ABSORB_MOVE_ID, { moveId: ABSORB_MOVE_ID, archetype: "tether", element: "grass", presetId: "absorb", durationMs: 760 }],
+  [ABSORB_MOVE_ID, { moveId: ABSORB_MOVE_ID, archetype: "signature", element: "grass", presetId: "absorb-retro", durationMs: 820 }],
   [MEGA_DRAIN_MOVE_ID, { moveId: MEGA_DRAIN_MOVE_ID, archetype: "tether", element: "grass", presetId: "mega-drain", durationMs: 900 }],
   [LEECH_SEED_MOVE_ID, { moveId: LEECH_SEED_MOVE_ID, archetype: "tether", element: "grass", presetId: "leech-seed", durationMs: 920 }],
   [POISON_POWDER_MOVE_ID, { moveId: POISON_POWDER_MOVE_ID, archetype: "status", element: "poison", presetId: "poison-powder", durationMs: 900 }],
@@ -143,7 +178,7 @@ const MOVE_VFX_REGISTRY: ReadonlyMap<number, BattleMoveVfxDefinition> = new Map(
   [REFLECT_MOVE_ID, { moveId: REFLECT_MOVE_ID, archetype: "barrier", element: "psychic", presetId: "reflect", durationMs: 920 }],
   [FOCUS_ENERGY_MOVE_ID, { moveId: FOCUS_ENERGY_MOVE_ID, archetype: "support", element: "normal", presetId: "focus-energy", durationMs: 820 }],
   [REST_MOVE_ID, { moveId: REST_MOVE_ID, archetype: "support", element: "psychic", presetId: "rest", durationMs: 960 }],
-  [GIGA_DRAIN_MOVE_ID, { moveId: GIGA_DRAIN_MOVE_ID, archetype: "tether", element: "grass", presetId: "giga-drain", durationMs: 1080 }],
+  [GIGA_DRAIN_MOVE_ID, { moveId: GIGA_DRAIN_MOVE_ID, archetype: "signature", element: "grass", presetId: "giga-drain-retro", durationMs: 1180 }],
   [SAFEGUARD_MOVE_ID, { moveId: SAFEGUARD_MOVE_ID, archetype: "barrier", element: "normal", presetId: "safeguard", durationMs: 980 }],
   [CHARGE_MOVE_ID, { moveId: CHARGE_MOVE_ID, archetype: "support", element: "electric", presetId: "charge", durationMs: 880 }],
   [INGRAIN_MOVE_ID, { moveId: INGRAIN_MOVE_ID, archetype: "tether", element: "grass", presetId: "ingrain", durationMs: 940 }],
@@ -155,10 +190,6 @@ const MOVE_VFX_REGISTRY: ReadonlyMap<number, BattleMoveVfxDefinition> = new Map(
   [
     GUST_MOVE_ID,
     { moveId: GUST_MOVE_ID, archetype: "wave", element: "flying", presetId: "gust", durationMs: 700 },
-  ],
-  [
-    SURF_MOVE_ID,
-    { moveId: SURF_MOVE_ID, archetype: "wave", element: "water", presetId: "surf", durationMs: 1120 },
   ],
   [
     EARTHQUAKE_MOVE_ID,
@@ -296,10 +327,10 @@ const MOVE_VFX_REGISTRY: ReadonlyMap<number, BattleMoveVfxDefinition> = new Map(
     WATER_GUN_MOVE_ID,
     {
       moveId: WATER_GUN_MOVE_ID,
-      archetype: "stream",
+      archetype: "signature",
       element: "water",
-      presetId: "water-gun",
-      durationMs: 760,
+      presetId: "water-gun-retro",
+      durationMs: 820,
     },
   ],
   [
@@ -444,6 +475,8 @@ const MOVE_VFX_REGISTRY: ReadonlyMap<number, BattleMoveVfxDefinition> = new Map(
     FIRE_FANG_MOVE_ID,
     { moveId: FIRE_FANG_MOVE_ID, archetype: "melee", element: "fire", presetId: "fire-fang", durationMs: 760 },
   ],
+  [RAZOR_LEAF_MOVE_ID, { moveId: RAZOR_LEAF_MOVE_ID, archetype: "signature", element: "grass", presetId: "razor-leaf-retro", durationMs: 900 }],
+  [FLAME_WHEEL_MOVE_ID, { moveId: FLAME_WHEEL_MOVE_ID, archetype: "signature", element: "fire", presetId: "flame-wheel-retro", durationMs: 980 }],
   [BLIZZARD_MOVE_ID, { moveId: BLIZZARD_MOVE_ID, archetype: "signature", element: "ice", presetId: "blizzard", durationMs: 1120 }],
   [THUNDERBOLT_MOVE_ID, { moveId: THUNDERBOLT_MOVE_ID, archetype: "signature", element: "electric", presetId: "thunderbolt", durationMs: 820 }],
   [THUNDER_MOVE_ID, { moveId: THUNDER_MOVE_ID, archetype: "signature", element: "electric", presetId: "thunder", durationMs: 1050 }],
