@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  getNpcTextureKey,
-  getNpcTextureKeyCandidates,
-} from "../npcAssets";
+import { getNpcTextureKey, getNpcTextureKeyCandidates } from "../npcAssets";
 
 describe("npcAssets", () => {
   it("keeps the requested direction first when it is configured", () => {
@@ -19,6 +16,8 @@ describe("npcAssets", () => {
     expect(getNpcTextureKeyCandidates("student-francisca", "left")).toEqual([
       "npc-student-francisca-walk-left",
       "npc-student-francisca-walk-down",
+      "npc-student-francisca-walk-up",
+      "npc-student-francisca-walk-right",
     ]);
   });
 

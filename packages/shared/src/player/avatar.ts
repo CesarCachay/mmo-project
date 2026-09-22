@@ -1,4 +1,9 @@
-export const PLAYER_AVATAR_IDS = ["male-01", "female-01"] as const;
+export const PLAYER_AVATAR_IDS = [
+  "male-01",
+  "female-01",
+  "black-trainer",
+  "female-02",
+] as const;
 
 export type PlayerAvatarId = (typeof PLAYER_AVATAR_IDS)[number];
 

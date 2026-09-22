@@ -20,15 +20,15 @@ export const NPC_ASSETS = {
   },
   "student-gary": {
     folder: "/assets/characters/npcs/student-gary",
-    directions: ["down"],
+    directions: ["down", "up", "left", "right"],
   },
   "student-francisca": {
     folder: "/assets/characters/npcs/student-francisca",
-    directions: ["down"],
+    directions: ["down", "up", "left", "right"],
   },
   "manager-cesar": {
     folder: "/assets/characters/npcs/manager-cesar",
-    directions: ["down"],
+    directions: ["down", "up", "left", "right"],
   },
 } satisfies Record<string, NpcAssetDefinition>;
 
@@ -43,7 +43,7 @@ export const getNpcTextureKey = (sprite: string, direction: NpcDirection): strin
  */
 export const getNpcTextureKeyCandidates = (
   sprite: string,
-  direction: NpcDirection,
+  direction: NpcDirection
 ): readonly string[] => {
   const definition = NPC_ASSETS[sprite as keyof typeof NPC_ASSETS];
   const fallbackDirections = definition?.directions ?? [];

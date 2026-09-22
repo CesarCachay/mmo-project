@@ -111,7 +111,10 @@ export class PokemonPartyNetworkController {
         trainerId,
         payload.starterId,
       );
-      this.trainerStatePresenter.publishTrainerState(client, result.trainerState);
+      this.trainerStatePresenter.publishTrainerState(
+        client,
+        result.trainerState,
+      );
       client.emit(POKEMON_EVENTS.STARTER_SELECTED, {
         starterId: payload.starterId,
         rewardItems: result.rewardItems.map((item) => ({ ...item })),

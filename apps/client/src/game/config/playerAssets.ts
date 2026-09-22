@@ -9,14 +9,23 @@ type PlayerAvatarConfig = {
 export const PLAYER_AVATARS = {
   "male-01": {
     id: "male-01",
-    label: "Hombre",
+    label: "Hombre 01",
     path: "assets/characters/players/male-01",
   },
-
   "female-01": {
     id: "female-01",
-    label: "Mujer",
+    label: "Mujer 01",
     path: "assets/characters/players/female-01",
+  },
+  "black-trainer": {
+    id: "black-trainer",
+    label: "Hombre 02",
+    path: "assets/characters/players/black-trainer",
+  },
+  "female-02": {
+    id: "female-02",
+    label: "Mujer 02",
+    path: "assets/characters/players/female-02",
   },
 } satisfies Record<PlayerAvatarId, PlayerAvatarConfig>;
 

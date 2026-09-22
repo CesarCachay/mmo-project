@@ -268,11 +268,11 @@ export class GameScene extends Phaser.Scene {
     this.trainerSightController = new TrainerSightController(
       this,
       this.npcManager,
-      (npc) => this.handleTrainerAggroReady(npc),
+      (npc) => this.handleTrainerAggroReady(npc)
     );
-    this.trainerSightController.setDefeatedTrainerBattleIds(
-      [...this.defeatedTrainerBattleIds],
-    );
+    this.trainerSightController.setDefeatedTrainerBattleIds([
+      ...this.defeatedTrainerBattleIds,
+    ]);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.trainerSightController.destroy();
     });
@@ -280,8 +280,7 @@ export class GameScene extends Phaser.Scene {
     this.trainerPreBattleController = new TrainerPreBattleController(this, {
       requestDialogue: (npc) => this.startNpcDialogue(npc),
       onReady: (npc) => this.handleTrainerPreBattleReady(npc),
-      onCancelled: (npc, reason) =>
-        this.handleTrainerPreBattleCancelled(npc, reason),
+      onCancelled: (npc, reason) => this.handleTrainerPreBattleCancelled(npc, reason),
     });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.trainerPreBattleController.destroy();
@@ -523,14 +522,13 @@ export class GameScene extends Phaser.Scene {
      * server's dialogue validation are based on the same coordinates. Visual
      * movement continues to use prediction/reconciliation normally.
      */
-    const trainerSightPosition =
-      this.localPlayerController.authoritativePosition;
+    const trainerSightPosition = this.localPlayerController.authoritativePosition;
 
     this.trainerSightController.update(
       this.currentMapId,
       trainerSightPosition.x,
       trainerSightPosition.y,
-      Boolean(externallyBlocked),
+      Boolean(externallyBlocked)
     );
   }
 
@@ -573,10 +571,7 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  private handleTrainerPreBattleCancelled(
-    npc: NpcInstance,
-    reason: string,
-  ): void {
+  private handleTrainerPreBattleCancelled(npc: NpcInstance, reason: string): void {
     this.network.cancelDialogue();
 
     if (this.pendingDialogueNpc?.definition.id === npc.definition.id) {
@@ -629,7 +624,7 @@ export class GameScene extends Phaser.Scene {
         }
 
         console.warn(
-          `Trainer battle interaction starts through sight/aggro: ${npc.definition.trainerBattleId ?? npc.definition.id}`,
+          `Trainer battle interaction starts through sight/aggro: ${npc.definition.trainerBattleId ?? npc.definition.id}`
         );
         return;
     }
@@ -638,10 +633,7 @@ export class GameScene extends Phaser.Scene {
   private isTrainerNpcDefeated(npc: NpcInstance): boolean {
     const trainerBattleId = npc.definition.trainerBattleId;
 
-    return Boolean(
-      trainerBattleId &&
-        this.defeatedTrainerBattleIds.has(trainerBattleId),
-    );
+    return Boolean(trainerBattleId && this.defeatedTrainerBattleIds.has(trainerBattleId));
   }
 
   private startNpcDialogue(npc: NpcInstance): boolean {
@@ -689,8 +681,9 @@ export class GameScene extends Phaser.Scene {
     this.isDialogueAdvancePending = false;
 
     if (state.completed) {
-      const isTrainerPreBattle =
-        this.trainerPreBattleController.isActiveFor(npc.definition.id);
+      const isTrainerPreBattle = this.trainerPreBattleController.isActiveFor(
+        npc.definition.id
+      );
 
       this.dialogueBox.hide();
       this.activeDialogueSessionId = undefined;
@@ -1008,11 +1001,11 @@ export class GameScene extends Phaser.Scene {
 
     this.network.onPokemonTrainerState((payload) => {
       this.defeatedTrainerBattleIds = new Set(
-        payload.trainerState.defeatedTrainerBattleIds ?? [],
+        payload.trainerState.defeatedTrainerBattleIds ?? []
       );
-      this.trainerSightController?.setDefeatedTrainerBattleIds(
-        [...this.defeatedTrainerBattleIds],
-      );
+      this.trainerSightController?.setDefeatedTrainerBattleIds([
+        ...this.defeatedTrainerBattleIds,
+      ]);
 
       this.battleController.setTrainerState(payload.trainerState);
       void this.pokemonTrainerPresentationController.applyTrainerState(
@@ -1060,7 +1053,6 @@ export class GameScene extends Phaser.Scene {
       this.trainerPanelController.close();
       this.starterSelectionPanel.show();
     });
-
 
     this.network.onStarterSelected((payload) => {
       const pokeBallReward = payload.rewardItems.find(
@@ -1484,9 +1476,7 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    const interactionPrompt = this.getNpcInteractionPromptText(
-      this.nearbyNpc,
-    );
+    const interactionPrompt = this.getNpcInteractionPromptText(this.nearbyNpc);
 
     if (!interactionPrompt) {
       return;
@@ -1575,9 +1565,7 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  private getNpcInteractionPromptText(
-    npc: NpcInstance,
-  ): string | undefined {
+  private getNpcInteractionPromptText(npc: NpcInstance): string | undefined {
     switch (npc.definition.interactionType) {
       case "dialogue":
         return "Hablar";

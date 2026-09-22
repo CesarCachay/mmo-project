@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 
-import type { PlayerAvatarId } from "@cesar-mmo/shared";
+import { isPlayerAvatarId, type PlayerAvatarId } from "@cesar-mmo/shared";
 
 import { PLAYER_AVATARS } from "./config/playerAssets";
 
@@ -62,6 +62,30 @@ export class TrainerSelectionScene extends Phaser.Scene {
     const container = document.createElement("div");
 
     container.className = "trainer-selection-panel";
+
+    const avatarOptionsHtml = Object.values(PLAYER_AVATARS)
+      .map(
+        (avatar) => `
+          <button
+            class="trainer-avatar-option${avatar.id === this.selectedAvatar ? " selected" : ""}"
+            type="button"
+            data-avatar="${avatar.id}"
+          >
+            <span
+              class="trainer-avatar-sprite"
+              style="
+                background-image:
+                  url('/${avatar.path}/walk-down.png');
+              "
+            ></span>
+
+            <span>
+              ${escapeHtml(avatar.label)}
+            </span>
+          </button>
+        `
+      )
+      .join("");
 
     container.innerHTML = `
       <div class="trainer-selection-header">
@@ -142,41 +166,7 @@ export class TrainerSelectionScene extends Phaser.Scene {
           </div>
 
           <div class="trainer-avatar-grid">
-            <button
-              class="trainer-avatar-option selected"
-              type="button"
-              data-avatar="male-01"
-            >
-              <span
-                class="trainer-avatar-sprite"
-                style="
-                  background-image:
-                    url('/${PLAYER_AVATARS["male-01"].path}/walk-down.png');
-                "
-              ></span>
-
-              <span>
-                ${PLAYER_AVATARS["male-01"].label}
-              </span>
-            </button>
-
-            <button
-              class="trainer-avatar-option"
-              type="button"
-              data-avatar="female-01"
-            >
-              <span
-                class="trainer-avatar-sprite"
-                style="
-                  background-image:
-                    url('/${PLAYER_AVATARS["female-01"].path}/walk-down.png');
-                "
-              ></span>
-
-              <span>
-                ${PLAYER_AVATARS["female-01"].label}
-              </span>
-            </button>
+            ${avatarOptionsHtml}
           </div>
 
           <div
@@ -406,7 +396,7 @@ export class TrainerSelectionScene extends Phaser.Scene {
       button.addEventListener("click", () => {
         const avatarId = button.dataset.avatar;
 
-        if (avatarId !== "male-01" && avatarId !== "female-01") {
+        if (!isPlayerAvatarId(avatarId)) {
           return;
         }
 
