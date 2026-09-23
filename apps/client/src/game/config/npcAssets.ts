@@ -30,6 +30,34 @@ export const NPC_ASSETS = {
     folder: "/assets/characters/npcs/manager-cesar",
     directions: ["down", "up", "left", "right"],
   },
+  "gym-leader-brock": {
+    folder: "/assets/characters/leaders/brock",
+    directions: ["down"],
+  },
+  "gym-leader-misty": {
+    folder: "/assets/characters/leaders/misty",
+    directions: ["down"],
+  },
+  "gym-leader-surge": {
+    folder: "/assets/characters/leaders/surge",
+    directions: ["down"],
+  },
+  "gym-leader-erika": {
+    folder: "/assets/characters/leaders/erika",
+    directions: ["down"],
+  },
+  "gym-leader-koga": {
+    folder: "/assets/characters/leaders/koga",
+    directions: ["down"],
+  },
+  "gym-leader-sabrina": {
+    folder: "/assets/characters/leaders/sabrina",
+    directions: ["down"],
+  },
+  "gym-leader-giovanni": {
+    folder: "/assets/characters/leaders/giovanni",
+    directions: ["down"],
+  },
 } satisfies Record<string, NpcAssetDefinition>;
 
 export const getNpcTextureKey = (sprite: string, direction: NpcDirection): string => {

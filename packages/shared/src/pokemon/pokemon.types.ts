@@ -1,6 +1,7 @@
 import { PokemonInventory } from "./inventory/pokemon-inventory.js";
 import type { PokemonMoney } from "./economy/pokemon-money.js";
 import type { PokemonGrowthRate } from "./progression/pokemon-growth-rate.js";
+import type { PokemonGymBadgeId } from "./trainers/pokemon-gym.types.js";
 
 export type PokemonType =
   | "normal"
@@ -141,6 +142,8 @@ export interface PokemonTrainerState {
   money: PokemonMoney;
   /** Persisted one-time Trainer Battle victories. Optional for backwards-compatible tests/fixtures. */
   defeatedTrainerBattleIds?: readonly string[];
+  /** Permanently earned Gym badges. Optional for backwards-compatible tests/fixtures. */
+  earnedGymBadgeIds?: readonly PokemonGymBadgeId[];
 }
 
 // Follower for multiplayers

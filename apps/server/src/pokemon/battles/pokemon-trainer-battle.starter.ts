@@ -4,10 +4,12 @@ import {
   POKEMON_EVENTS,
   getBattleParticipantById,
   getOpposingBattleParticipant,
+  getPokemonTrainerBattleDefinition,
   isPokemonPartyWiped,
 } from '@cesar-mmo/shared';
 
 import type {
+  PokemonBattlePresentationContext,
   PokemonBattleStartedPayload,
   PokemonTrainerBattleId,
 } from '@cesar-mmo/shared';
@@ -142,6 +144,27 @@ export class PokemonTrainerBattleStarter {
       return;
     }
 
+    const trainerBattleDefinition = getPokemonTrainerBattleDefinition(
+      input.trainerBattleId,
+    );
+
+    const presentation: PokemonBattlePresentationContext =
+      trainerBattleDefinition.category === 'gym-leader'
+        ? {
+            kind: 'gym-leader',
+            trainerBattleId: input.trainerBattleId,
+            trainerClass: trainerBattleDefinition.trainerClass,
+            gymId: trainerBattleDefinition.gymLeader!.gymId,
+            badgeId: trainerBattleDefinition.gymLeader!.badgeId,
+            leaderPresentationId:
+              trainerBattleDefinition.gymLeader!.leaderPresentationId,
+          }
+        : {
+            kind: 'trainer',
+            trainerBattleId: input.trainerBattleId,
+            trainerClass: trainerBattleDefinition.trainerClass,
+          };
+
     const battle = createTrainerBattleInstance({
       trainerBattleId: input.trainerBattleId,
       trainerPokemon: trainerState.party.pokemon,
@@ -198,6 +221,7 @@ export class PokemonTrainerBattleStarter {
     ownerSocket.emit(POKEMON_EVENTS.BATTLE_STARTED, {
       battle: battleSession.battle,
       localParticipantId: playerParticipant.id,
+      presentation,
     } satisfies PokemonBattleStartedPayload);
   }
 }

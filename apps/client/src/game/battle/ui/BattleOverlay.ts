@@ -9,6 +9,7 @@ import type {
   BattlePresentationEvent,
   PokemonEvolutionDecision,
   BattlePokemonState,
+  PokemonBattlePresentationContext,
 } from "@cesar-mmo/shared";
 
 import {
@@ -263,7 +264,11 @@ export class BattleOverlay {
     this.localParticipantId = undefined;
   }
 
-  public renderBattle(battle: BattleInstance, localParticipantId: string): void {
+  public renderBattle(
+    battle: BattleInstance,
+    localParticipantId: string,
+    presentation?: PokemonBattlePresentationContext,
+  ): void {
     const trainerParticipant = battle.participants.find(
       (participant) => participant.id === localParticipantId
     );
@@ -286,7 +291,11 @@ export class BattleOverlay {
     }
 
     this.localParticipantId = localParticipantId;
-    this.stage.setBattleContext(battle.type, opponentParticipant.displayName);
+    this.stage.setBattleContext(
+      battle.type,
+      opponentParticipant.displayName,
+      presentation,
+    );
     this.persistentFieldVfxLayer.syncBattle(battle, localParticipantId);
     this.opponentPartyIndicator.render(battle, localParticipantId);
     this.playerPartyIndicator.render(battle, localParticipantId);
@@ -323,6 +332,7 @@ export class BattleOverlay {
   public playBattleIntro(
     battle: BattleInstance,
     localParticipantId: string,
+    presentation?: PokemonBattlePresentationContext,
   ): Promise<void> {
     const opponentParticipant = battle.participants.find(
       (participant) => participant.id !== localParticipantId,
@@ -331,6 +341,7 @@ export class BattleOverlay {
     return this.effects.playBattleIntro(
       battle.type,
       opponentParticipant?.displayName,
+      presentation,
     );
   }
 

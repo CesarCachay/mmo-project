@@ -32,6 +32,41 @@ describe('isPokemonBattleCompletedPayload', () => {
     ).toBe(true);
   });
 
+
+  it('accepts an authoritative Gym badge award on Gym Leader victory', () => {
+    expect(
+      isPokemonBattleCompletedPayload({
+        battleId: 'battle-gym-completed-test',
+        outcome: 'trainer-battle-victory',
+        trainerBattleRewards: {
+          money: 1_800,
+          items: [{ itemId: 'super-potion', quantity: 2 }],
+          gymBadge: {
+            badgeId: 'boulder-badge',
+            displayName: 'Boulder Badge',
+          },
+        },
+      }),
+    ).toBe(true);
+  });
+
+  it('rejects forged Gym badge display metadata', () => {
+    expect(
+      isPokemonBattleCompletedPayload({
+        battleId: 'battle-gym-completed-test',
+        outcome: 'trainer-battle-victory',
+        trainerBattleRewards: {
+          money: 1_800,
+          items: [],
+          gymBadge: {
+            badgeId: 'boulder-badge',
+            displayName: 'Fake Badge',
+          },
+        },
+      }),
+    ).toBe(false);
+  });
+
   it('rejects Trainer Battle rewards on non-victory outcomes', () => {
     expect(
       isPokemonBattleCompletedPayload({

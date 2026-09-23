@@ -146,6 +146,7 @@ export class PokemonWildBattleStarter {
     ownerSocket.emit(POKEMON_EVENTS.BATTLE_STARTED, {
       battle: battleSession.battle,
       localParticipantId: trainerParticipant.id,
+      presentation: { kind: 'wild' },
     } satisfies PokemonBattleStartedPayload);
   }
 }

@@ -15,6 +15,11 @@ import { POKEMON_ENCOUNTER_TABLES } from "./encounters/pokemon-encounter-table.r
 import { isPokemonItemId, type PokemonInventoryItemStack } from "./inventory/pokemon-inventory.js";
 import { isPokemonStarterId } from "./pokemon-starter.js";
 import { isPokemonMoney, type PokemonMoney } from "./economy/pokemon-money.js";
+import {
+  getPokemonGymBadgeDefinition,
+  isPokemonGymBadgeId,
+} from "./trainers/pokemon-gym.registry.js";
+import type { PokemonGymBadgeId } from "./trainers/pokemon-gym.types.js";
 
 
 export const POKEMON_EVENTS = {
@@ -255,10 +260,17 @@ export type PokemonBattleCompletedOutcome =
   | "trainer-battle-victory"
   | "trainer-battle-defeat";
 
+export interface PokemonGymBadgeAward {
+  readonly badgeId: PokemonGymBadgeId;
+  readonly displayName: string;
+}
+
 export interface PokemonTrainerBattleCompletionRewards {
   /** Actual money credited after applying the wallet cap. */
   readonly money: PokemonMoney;
   readonly items: readonly PokemonInventoryItemStack[];
+  /** Present only when a Gym badge was durably awarded on this victory. */
+  readonly gymBadge?: PokemonGymBadgeAward;
 }
 
 export interface PokemonBattleCompletedPayload {
@@ -339,6 +351,23 @@ export function isPokemonTrainerBattleCompletionRewards(
     }
 
     seenItemIds.add(stack.itemId);
+  }
+
+  if (candidate.gymBadge !== undefined) {
+    if (typeof candidate.gymBadge !== "object" || candidate.gymBadge === null) {
+      return false;
+    }
+
+    const gymBadge = candidate.gymBadge as Record<string, unknown>;
+
+    if (
+      !isPokemonGymBadgeId(gymBadge.badgeId) ||
+      typeof gymBadge.displayName !== "string" ||
+      gymBadge.displayName !==
+        getPokemonGymBadgeDefinition(gymBadge.badgeId).displayName
+    ) {
+      return false;
+    }
   }
 
   return true;

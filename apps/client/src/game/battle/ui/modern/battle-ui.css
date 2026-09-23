@@ -2746,3 +2746,141 @@
 .battle-modern-opponent-party--player .battle-modern-opponent-party__balls {
   justify-content: flex-start;
 }
+
+/* =========================================================
+   MILESTONE 1.37 — GYM LEADER BATTLE PRESENTATION
+   ========================================================= */
+
+.battle-modern-stage--gym-leader .battle-modern-stage__backdrop {
+  background:
+    radial-gradient(circle at 78% 23%, rgba(251, 191, 36, 0.2), transparent 28%),
+    radial-gradient(circle at 18% 63%, rgba(120, 113, 108, 0.16), transparent 32%),
+    radial-gradient(circle at 52% 48%, rgba(245, 158, 11, 0.08), transparent 46%),
+    linear-gradient(160deg, #0f0d0b 0%, #211a12 44%, #101318 100%);
+}
+
+.battle-modern-stage--gym-leader .battle-modern-stage__label {
+  border-color: rgba(251, 191, 36, 0.34);
+  color: #fde68a;
+  background: rgba(120, 53, 15, 0.32);
+  box-shadow: 0 0 24px rgba(245, 158, 11, 0.1);
+}
+
+.battle-modern-stage--gym-leader .battle-modern-stage__platform--wild {
+  background: radial-gradient(
+    ellipse,
+    rgba(251, 191, 36, 0.24) 0%,
+    rgba(180, 83, 9, 0.1) 46%,
+    transparent 72%
+  );
+  box-shadow: 0 0 48px rgba(245, 158, 11, 0.14);
+}
+
+.battle-modern-effects--gym-leader .battle-modern-effects__intro-panel {
+  border-top-color: rgba(253, 230, 138, 0.44);
+  border-bottom-color: rgba(251, 191, 36, 0.24);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(41, 31, 18, 0.86) 18%,
+    rgba(28, 22, 16, 0.96) 50%,
+    rgba(41, 31, 18, 0.86) 82%,
+    transparent
+  );
+}
+
+.battle-modern-effects--gym-leader .battle-modern-effects__intro-eyebrow {
+  color: #fbbf24;
+}
+
+.battle-modern-effects--gym-leader .battle-modern-effects__intro-title {
+  text-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.56),
+    0 0 38px rgba(245, 158, 11, 0.3);
+}
+
+.battle-modern-effects--gym-leader .battle-modern-effects__intro-slash {
+  background: linear-gradient(90deg, transparent, #fbbf24, transparent);
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.48);
+}
+
+/* =========================================================
+   GYM LEADER VICTORY / BADGE AWARD — Milestone 1.37 Step 4
+   ========================================================= */
+
+.battle-modern-completion--gym-victory {
+  --completion-accent: #facc15;
+  --completion-accent-soft: rgba(250, 204, 21, 0.12);
+  --completion-accent-border: rgba(250, 204, 21, 0.32);
+  --completion-glow: rgba(250, 204, 21, 0.24);
+  --completion-button-start: #ca8a04;
+  --completion-button-end: #a16207;
+  --completion-button-shadow: rgba(202, 138, 4, 0.24);
+  --completion-focus: rgba(250, 204, 21, 0.22);
+}
+
+.battle-modern-completion__badge-award {
+  width: min(280px, 100%);
+  margin: -4px auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 14px;
+  box-sizing: border-box;
+  border: 1px solid rgba(250, 204, 21, 0.3);
+  border-radius: 14px;
+  background: linear-gradient(
+    135deg,
+    rgba(120, 53, 15, 0.34),
+    rgba(15, 23, 42, 0.72)
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.battle-modern-completion__badge-award[hidden] {
+  display: none;
+}
+
+.battle-modern-completion__badge-emblem {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border-radius: 50%;
+  border: 2px solid rgba(254, 240, 138, 0.82);
+  background:
+    radial-gradient(circle at 38% 32%, rgba(255, 255, 255, 0.82) 0 8%, transparent 9%),
+    radial-gradient(circle at center, #fde047 0 34%, #ca8a04 35% 62%, #713f12 63% 100%);
+  box-shadow:
+    0 0 0 3px rgba(202, 138, 4, 0.18),
+    0 6px 18px rgba(0, 0, 0, 0.28);
+}
+
+.battle-modern-completion__badge-emblem::after {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  border: 2px solid rgba(113, 63, 18, 0.72);
+  transform: rotate(45deg);
+}
+
+.battle-modern-completion__badge-copy {
+  min-width: 0;
+  text-align: left;
+}
+
+.battle-modern-completion__badge-label {
+  color: #fde68a;
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 0.14em;
+}
+
+.battle-modern-completion__badge-name {
+  margin-top: 3px;
+  color: #fefce8;
+  font-size: 14px;
+  font-weight: 850;
+  line-height: 1.1;
+}

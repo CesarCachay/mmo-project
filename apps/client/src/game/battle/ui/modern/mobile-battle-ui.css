@@ -707,3 +707,22 @@
     gap: 3px;
   }
 }
+
+@media (hover: none) and (pointer: coarse) {
+  .battle-modern-completion__badge-award {
+    width: min(270px, 100%);
+    margin-bottom: 14px;
+    padding: 9px 12px;
+    gap: 10px;
+  }
+
+  .battle-modern-completion__badge-emblem {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+  }
+
+  .battle-modern-completion__badge-name {
+    font-size: 12px;
+  }
+}

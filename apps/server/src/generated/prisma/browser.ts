@@ -72,3 +72,8 @@ export type PokemonShopTransaction = Prisma.PokemonShopTransactionModel
  * 
  */
 export type PokemonTrainerBattleProgress = Prisma.PokemonTrainerBattleProgressModel
+/**
+ * Model PokemonTrainerGymBadge
+ * 
+ */
+export type PokemonTrainerGymBadge = Prisma.PokemonTrainerGymBadgeModel

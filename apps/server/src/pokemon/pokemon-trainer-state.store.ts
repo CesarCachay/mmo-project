@@ -4,6 +4,7 @@ import {
   createPokemonInventory,
   createPokemonMoney,
   type PokemonMoney,
+  type PokemonGymBadgeId,
 } from '@cesar-mmo/shared';
 
 import type { PokemonTrainerId } from './pokemon-trainer-identity';
@@ -28,6 +29,7 @@ export class PokemonTrainerStateStore {
     inventory: PokemonInventory = createPokemonInventory(),
     defeatedTrainerBattleIds: readonly string[] = [],
     money: PokemonMoney = createPokemonMoney(),
+    earnedGymBadgeIds: readonly PokemonGymBadgeId[] = [],
   ): PokemonTrainerState {
     if (this.trainerStates.has(trainerId)) {
       throw new Error(`Trainer state already exists for trainer ${trainerId}`);
@@ -38,6 +40,7 @@ export class PokemonTrainerStateStore {
       inventory,
       money: createPokemonMoney(money),
       defeatedTrainerBattleIds: [...new Set(defeatedTrainerBattleIds)],
+      earnedGymBadgeIds: [...new Set(earnedGymBadgeIds)],
     };
 
     this.trainerStates.set(trainerId, trainerState);
@@ -80,6 +83,34 @@ export class PokemonTrainerStateStore {
     const updatedTrainerState: PokemonTrainerState = {
       ...trainerState,
       defeatedTrainerBattleIds: [...new Set(defeatedTrainerBattleIds)],
+    };
+
+    this.trainerStates.set(trainerId, updatedTrainerState);
+
+    return updatedTrainerState;
+  }
+
+  setBattleVictoryProgress(
+    trainerId: PokemonTrainerId,
+    input: {
+      readonly inventory: PokemonInventory;
+      readonly money: PokemonMoney;
+      readonly defeatedTrainerBattleIds: readonly string[];
+      readonly earnedGymBadgeIds: readonly PokemonGymBadgeId[];
+    },
+  ): PokemonTrainerState {
+    const trainerState = this.trainerStates.get(trainerId);
+
+    if (!trainerState) {
+      throw new Error(`Trainer state not found for trainer ${trainerId}`);
+    }
+
+    const updatedTrainerState: PokemonTrainerState = {
+      ...trainerState,
+      inventory: input.inventory,
+      money: createPokemonMoney(input.money),
+      defeatedTrainerBattleIds: [...new Set(input.defeatedTrainerBattleIds)],
+      earnedGymBadgeIds: [...new Set(input.earnedGymBadgeIds)],
     };
 
     this.trainerStates.set(trainerId, updatedTrainerState);

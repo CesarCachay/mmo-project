@@ -199,6 +199,7 @@ export class BattleController {
             this.activeBattlePayload = {
               battle: syncedBattle,
               localParticipantId: activeBattlePayload.localParticipantId,
+              presentation: activeBattlePayload.presentation,
             };
 
             const trainerParticipant = this.getLocalTrainerParticipant(
@@ -316,7 +317,11 @@ export class BattleController {
       }
 
       this.activeBattlePayload = payload;
-      this.overlay.renderBattle(payload.battle, payload.localParticipantId);
+      this.overlay.renderBattle(
+        payload.battle,
+        payload.localParticipantId,
+        payload.presentation,
+      );
       void this.moveSfx.preloadBattle(payload.battle);
       return;
     }
@@ -353,16 +358,24 @@ export class BattleController {
         return;
       }
 
-      this.overlay.renderBattle(payload.battle, payload.localParticipantId);
+      this.overlay.renderBattle(
+        payload.battle,
+        payload.localParticipantId,
+        payload.presentation,
+      );
       void this.moveSfx.preloadBattle(payload.battle);
 
-      await this.overlay.playBattleIntro(payload.battle, payload.localParticipantId);
+      await this.overlay.playBattleIntro(
+        payload.battle,
+        payload.localParticipantId,
+        payload.presentation,
+      );
 
       if (this.activeBattlePayload?.battle.battleId !== nextBattleId) {
         return;
       }
 
-      this.audio.playBattleMusic(payload.battle.type);
+      this.audio.playBattleMusic(payload.battle.type, payload.presentation);
 
       this.setInteractionState("action-menu");
     } catch (error) {
@@ -436,9 +449,14 @@ export class BattleController {
       this.activeBattlePayload = {
         battle: payload.battle,
         localParticipantId: currentBattle.localParticipantId,
+        presentation: currentBattle.presentation,
       };
 
-      this.overlay.renderBattle(payload.battle, currentBattle.localParticipantId);
+      this.overlay.renderBattle(
+        payload.battle,
+        currentBattle.localParticipantId,
+        currentBattle.presentation,
+      );
       void this.moveSfx.preloadBattle(payload.battle);
 
       this.setInteractionState("action-menu");
@@ -1407,6 +1425,7 @@ export class BattleController {
     this.activeBattlePayload = {
       battle: payload.battle,
       localParticipantId: currentBattle.localParticipantId,
+      presentation: currentBattle.presentation,
     };
 
     this.replacementPokemonIndexes =
@@ -1427,7 +1446,11 @@ export class BattleController {
         return;
       }
 
-      this.overlay.renderBattle(payload.battle, currentBattle.localParticipantId);
+      this.overlay.renderBattle(
+        payload.battle,
+        currentBattle.localParticipantId,
+        currentBattle.presentation,
+      );
       void this.moveSfx.preloadBattle(payload.battle);
 
       if (payload.interactionState === "replacement-required") {
@@ -1460,7 +1483,7 @@ export class BattleController {
     this.replacementPokemonIndexes = [];
     this.overlay.showCompletion(payload);
     this.moveSfx.stopAll();
-    this.audio.playBattleOutcome(payload.outcome);
+    this.audio.playBattleOutcome(payload.outcome, currentBattle.presentation);
   }
 
   public setTrainerState(trainerState: PokemonTrainerState): void {

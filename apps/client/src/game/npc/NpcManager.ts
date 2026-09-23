@@ -6,6 +6,7 @@ import {
 } from "@cesar-mmo/shared";
 import type { PokemonShopCatalogId, PokemonTrainerBattleId } from "@cesar-mmo/shared";
 import { getNpcTextureKeyCandidates } from "../config/npcAssets";
+import { getGymLeaderOverworldLabelPresentation } from "../gym-leader/gym-leader-overworld-state";
 
 import type {
   NpcDefinition,
@@ -26,6 +27,7 @@ export class NpcManager {
   private readonly scene: Phaser.Scene;
   private readonly createNameLabel: CreateNameLabel;
   private readonly npcs = new Map<string, NpcInstance>();
+  private defeatedTrainerBattleIds = new Set<string>();
 
   constructor(scene: Phaser.Scene, createNameLabel: CreateNameLabel) {
     this.scene = scene;
@@ -55,11 +57,14 @@ export class NpcManager {
       const nameLabel = this.createNameLabel(npc.displayName);
       nameLabel.setPosition(Math.round(npc.x), Math.round(npc.y - 14));
 
-      this.npcs.set(npc.id, {
+      const instance: NpcInstance = {
         definition: npc,
         sprite,
         nameLabel,
-      });
+      };
+
+      this.npcs.set(npc.id, instance);
+      this.applyProgressPresentation(instance);
     }
   }
 
@@ -72,10 +77,44 @@ export class NpcManager {
     this.npcs.clear();
   }
 
+  public getById(npcId: string): NpcInstance | undefined {
+    return this.npcs.get(npcId);
+  }
+
+  public setDefeatedTrainerBattleIds(
+    trainerBattleIds: readonly string[],
+  ): void {
+    this.defeatedTrainerBattleIds = new Set(trainerBattleIds);
+
+    for (const npc of this.npcs.values()) {
+      this.applyProgressPresentation(npc);
+    }
+  }
+
+  private applyProgressPresentation(npc: NpcInstance): void {
+    const presentation = getGymLeaderOverworldLabelPresentation({
+      displayName: npc.definition.displayName,
+      trainerBattleId: npc.definition.trainerBattleId,
+      defeatedTrainerBattleIds: this.defeatedTrainerBattleIds,
+    });
+
+    npc.nameLabel.setText(presentation.text);
+    npc.nameLabel.setColor(presentation.completed ? "#facc15" : "#ffffff");
+  }
+
   public getTrainerBattleNpcs(): readonly NpcInstance[] {
-    return Array.from(this.npcs.values()).filter(
-      (npc) => npc.definition.interactionType === "trainer-battle",
-    );
+    return Array.from(this.npcs.values()).filter((npc) => {
+      if (npc.definition.interactionType !== "trainer-battle") {
+        return false;
+      }
+
+      const trainerBattleId = npc.definition.trainerBattleId;
+      if (!trainerBattleId) {
+        return false;
+      }
+
+      return getPokemonTrainerBattleDefinition(trainerBattleId).category === "standard";
+    });
   }
 
   public findNearby(

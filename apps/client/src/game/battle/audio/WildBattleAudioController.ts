@@ -1,6 +1,13 @@
 import Phaser from "phaser";
 
-import type { BattleType, PokemonBattleCompletedPayload } from "@cesar-mmo/shared";
+import type {
+  BattleType,
+  PokemonBattleCompletedPayload,
+  PokemonBattlePresentationContext,
+} from "@cesar-mmo/shared";
+
+import { resolveBattleMusicProfile } from "./battle-music-profile";
+import { resolveBattleOutcomeAudioProfile } from "./battle-outcome-audio-profile";
 
 export const WILD_BATTLE_AUDIO_KEYS = {
   THEME: "wild-battle-theme",
@@ -28,6 +35,16 @@ export const TRAINER_BATTLE_AUDIO_ASSETS = {
   THEME: "/assets/audio/battle/trainer-battle-theme.wav",
 } as const;
 
+export const GYM_LEADER_BATTLE_AUDIO_KEYS = {
+  THEME: "gym-leader-battle-theme",
+  VICTORY: "gym-leader-battle-victory",
+} as const;
+
+export const GYM_LEADER_BATTLE_AUDIO_ASSETS = {
+  THEME: "/assets/audio/battle/gym-leader-battle-theme.wav",
+  VICTORY: "/assets/audio/battle/gym-leader-battle-victory.wav",
+} as const;
+
 export const BATTLE_ITEM_AUDIO_KEYS = {
   HEAL: "battle-item-heal",
   REVIVE: "battle-item-revive",
@@ -41,10 +58,12 @@ export const BATTLE_ITEM_AUDIO_ASSETS = {
 export class WildBattleAudioController {
   private readonly theme: Phaser.Sound.BaseSound;
   private readonly trainerTheme: Phaser.Sound.BaseSound;
+  private readonly gymLeaderTheme?: Phaser.Sound.BaseSound;
   private readonly captureContained: Phaser.Sound.BaseSound;
   private readonly captureSuccess: Phaser.Sound.BaseSound;
   private readonly captureFailed: Phaser.Sound.BaseSound;
   private readonly victory: Phaser.Sound.BaseSound;
+  private readonly gymLeaderVictory?: Phaser.Sound.BaseSound;
   private readonly defeat: Phaser.Sound.BaseSound;
   private readonly itemHeal: Phaser.Sound.BaseSound;
   private readonly itemRevive: Phaser.Sound.BaseSound;
@@ -59,6 +78,13 @@ export class WildBattleAudioController {
       volume: 0.32,
       loop: true,
     });
+
+    if (scene.cache.audio.exists(GYM_LEADER_BATTLE_AUDIO_KEYS.THEME)) {
+      this.gymLeaderTheme = scene.sound.add(GYM_LEADER_BATTLE_AUDIO_KEYS.THEME, {
+        volume: 0.34,
+        loop: true,
+      });
+    }
 
     this.captureContained = scene.sound.add(WILD_BATTLE_AUDIO_KEYS.CAPTURE_CONTAINED, {
       volume: 0.48,
@@ -76,6 +102,12 @@ export class WildBattleAudioController {
       volume: 0.58,
     });
 
+    if (scene.cache.audio.exists(GYM_LEADER_BATTLE_AUDIO_KEYS.VICTORY)) {
+      this.gymLeaderVictory = scene.sound.add(GYM_LEADER_BATTLE_AUDIO_KEYS.VICTORY, {
+        volume: 0.62,
+      });
+    }
+
     this.defeat = scene.sound.add(WILD_BATTLE_AUDIO_KEYS.DEFEAT, {
       volume: 0.55,
     });
@@ -89,10 +121,13 @@ export class WildBattleAudioController {
     });
   }
 
-  public playBattleMusic(battleType: BattleType): void {
+  public playBattleMusic(
+    battleType: BattleType,
+    presentation?: PokemonBattlePresentationContext,
+  ): void {
     this.stopBattleMusic();
 
-    switch (battleType) {
+    switch (resolveBattleMusicProfile(battleType, presentation)) {
       case "wild":
         this.theme.play();
         return;
@@ -100,12 +135,17 @@ export class WildBattleAudioController {
       case "trainer":
         this.trainerTheme.play();
         return;
+
+      case "gym-leader":
+        (this.gymLeaderTheme ?? this.trainerTheme).play();
+        return;
     }
   }
 
   public stopBattleMusic(): void {
     this.theme.stop();
     this.trainerTheme.stop();
+    this.gymLeaderTheme?.stop();
   }
 
   public playCaptureContained(): void {
@@ -129,29 +169,35 @@ export class WildBattleAudioController {
     sound.play();
   }
 
-  public playBattleOutcome(outcome: PokemonBattleCompletedPayload["outcome"]): void {
+  public playBattleOutcome(
+    outcome: PokemonBattleCompletedPayload["outcome"],
+    presentation?: PokemonBattlePresentationContext,
+  ): void {
     this.stopBattleMusic();
     this.stopOutcome();
 
-    switch (outcome) {
-      case "wild-defeated":
-      case "trainer-battle-victory":
+    switch (resolveBattleOutcomeAudioProfile(outcome, presentation)) {
+      case "standard-victory":
         this.victory.play();
         return;
 
-      case "trainer-defeated":
-      case "trainer-battle-defeat":
+      case "gym-leader-victory":
+        (this.gymLeaderVictory ?? this.victory).play();
+        return;
+
+      case "defeat":
         this.defeat.play();
         return;
 
       /* wild-captured already has its own capture-success sound. trainer-escaped has no jingle */
-      default:
+      case "none":
         return;
     }
   }
 
   public stopOutcome(): void {
     this.victory.stop();
+    this.gymLeaderVictory?.stop();
     this.defeat.stop();
   }
 
@@ -171,12 +217,14 @@ export class WildBattleAudioController {
 
     this.theme.destroy();
     this.trainerTheme.destroy();
+    this.gymLeaderTheme?.destroy();
     this.captureContained.destroy();
     this.captureSuccess.destroy();
     this.captureFailed.destroy();
     this.itemHeal.destroy();
     this.itemRevive.destroy();
     this.victory.destroy();
+    this.gymLeaderVictory?.destroy();
     this.defeat.destroy();
   }
 }

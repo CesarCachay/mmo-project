@@ -12,6 +12,9 @@ export class ModernBattleCompletionPanel {
   private readonly eyebrow: HTMLDivElement;
   private readonly title: HTMLDivElement;
   private readonly message: HTMLDivElement;
+  private readonly badgeAward: HTMLDivElement;
+  private readonly badgeEmblem: HTMLDivElement;
+  private readonly badgeName: HTMLDivElement;
   private readonly continueButton: HTMLButtonElement;
 
   constructor(parent: HTMLElement, options: ModernBattleCompletionPanelOptions) {
@@ -61,6 +64,29 @@ export class ModernBattleCompletionPanel {
 
     this.message.className = "battle-modern-completion__message";
 
+    this.badgeAward = document.createElement("div");
+    this.badgeAward.className = "battle-modern-completion__badge-award";
+    this.badgeAward.hidden = true;
+    this.badgeAward.setAttribute("role", "status");
+    this.badgeAward.setAttribute("aria-live", "polite");
+
+    this.badgeEmblem = document.createElement("div");
+    this.badgeEmblem.className = "battle-modern-completion__badge-emblem";
+    this.badgeEmblem.setAttribute("aria-hidden", "true");
+
+    const badgeCopy = document.createElement("div");
+    badgeCopy.className = "battle-modern-completion__badge-copy";
+
+    const badgeLabel = document.createElement("div");
+    badgeLabel.className = "battle-modern-completion__badge-label";
+    badgeLabel.textContent = "GYM BADGE EARNED";
+
+    this.badgeName = document.createElement("div");
+    this.badgeName.className = "battle-modern-completion__badge-name";
+
+    badgeCopy.append(badgeLabel, this.badgeName);
+    this.badgeAward.append(this.badgeEmblem, badgeCopy);
+
     this.continueButton = document.createElement("button");
 
     this.continueButton.type = "button";
@@ -88,6 +114,7 @@ export class ModernBattleCompletionPanel {
       this.eyebrow,
       this.title,
       this.message,
+      this.badgeAward,
       this.continueButton,
     );
     this.root.append(backdrop, this.effects, this.card);
@@ -104,8 +131,12 @@ export class ModernBattleCompletionPanel {
       "battle-modern-completion--defeat",
       "battle-modern-completion--captured",
       "battle-modern-completion--escaped",
+      "battle-modern-completion--gym-victory",
       "battle-modern-completion--active",
     );
+
+    this.badgeAward.hidden = true;
+    this.badgeName.textContent = "";
 
     switch (outcome) {
       case "wild-defeated":
@@ -130,9 +161,23 @@ export class ModernBattleCompletionPanel {
         this.eyebrow.textContent = "TRAINER BATTLE COMPLETE";
         this.title.textContent = "Victory!";
 
-        const rewardSummary = this.formatTrainerBattleRewards(
-          payload.trainerBattleRewards,
-        );
+        const rewards = payload.trainerBattleRewards;
+        const rewardSummary = this.formatTrainerBattleRewards(rewards);
+        const gymBadge = rewards?.gymBadge;
+
+        if (gymBadge) {
+          this.root.classList.add("battle-modern-completion--gym-victory");
+          this.icon.textContent = "◆";
+          this.eyebrow.textContent = "GYM LEADER DEFEATED";
+          this.title.textContent = "Badge earned!";
+          this.message.textContent = rewardSummary
+            ? `You defeated the Gym Leader. Rewards: ${rewardSummary}.`
+            : "You defeated the Gym Leader.";
+
+          this.badgeName.textContent = gymBadge.displayName;
+          this.badgeAward.hidden = false;
+          break;
+        }
 
         this.message.textContent = rewardSummary
           ? `The opposing Trainer was defeated. Rewards: ${rewardSummary}.`

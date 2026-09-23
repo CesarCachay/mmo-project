@@ -1,4 +1,7 @@
-import type { BattleType } from "@cesar-mmo/shared";
+import type {
+  BattleType,
+  PokemonBattlePresentationContext,
+} from "@cesar-mmo/shared";
 
 import { getBattleIntroCopy } from "./battle-ui-copy";
 
@@ -63,15 +66,25 @@ export class ModernBattleEffectsLayer {
     parent.appendChild(this.root);
   }
 
-  public async playBattleIntro(type: BattleType, opponentName?: string): Promise<void> {
+  public async playBattleIntro(
+    type: BattleType,
+    opponentName?: string,
+    presentation?: PokemonBattlePresentationContext,
+  ): Promise<void> {
     this.finishIntro();
 
-    const copy = getBattleIntroCopy(type, opponentName);
+    const copy = getBattleIntroCopy(type, opponentName, presentation);
     this.introEyebrow.textContent = copy.eyebrow;
     this.introTitle.textContent = copy.title;
     this.introSubtitle.textContent = copy.subtitle;
 
-    this.root.classList.toggle("battle-modern-effects--trainer", type === "trainer");
+    const isGymLeader = presentation?.kind === "gym-leader";
+
+    this.root.classList.toggle(
+      "battle-modern-effects--trainer",
+      type === "trainer" && !isGymLeader,
+    );
+    this.root.classList.toggle("battle-modern-effects--gym-leader", isGymLeader);
     this.root.classList.toggle("battle-modern-effects--wild", type === "wild");
 
     this.intro.hidden = false;

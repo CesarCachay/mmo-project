@@ -17,6 +17,14 @@ export interface AuthorizePokemonTrainerBattleStartInput {
   readonly ttlMs?: number;
 }
 
+export interface ConsumePokemonTrainerBattleStartAuthorizationInput {
+  readonly playerId: string;
+  readonly mapId: MapId;
+  readonly npcId: string;
+  readonly trainerBattleId: PokemonTrainerBattleId;
+  readonly now?: number;
+}
+
 const DEFAULT_AUTHORIZATION_TTL_MS = 10_000;
 
 export class PokemonTrainerBattleStartAuthorizationStore {
@@ -68,6 +76,39 @@ export class PokemonTrainerBattleStartAuthorizationStore {
       return undefined;
     }
 
+    return authorization;
+  }
+
+  /**
+   * Consumes only when the full authoritative context still matches. A
+   * mismatched/forged request does not burn a valid authorization; expired
+   * authorizations are always removed.
+   */
+  public consumeExact(
+    input: ConsumePokemonTrainerBattleStartAuthorizationInput,
+  ): PokemonTrainerBattleStartAuthorization | undefined {
+    const authorization = this.authorizations.get(input.playerId);
+
+    if (!authorization) {
+      return undefined;
+    }
+
+    const now = input.now ?? Date.now();
+
+    if (authorization.expiresAt < now) {
+      this.authorizations.delete(input.playerId);
+      return undefined;
+    }
+
+    if (
+      authorization.mapId !== input.mapId ||
+      authorization.npcId !== input.npcId ||
+      authorization.trainerBattleId !== input.trainerBattleId
+    ) {
+      return undefined;
+    }
+
+    this.authorizations.delete(input.playerId);
     return authorization;
   }
 

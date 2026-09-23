@@ -52,6 +52,9 @@ export class PokemonTrainerPresentationController {
     this.trainerState = trainerState;
     this.trainerPanelController.setInventory(trainerState.inventory);
     this.trainerPanelController.setMoney(trainerState.money);
+    this.trainerPanelController.setGymBadges(
+      trainerState.earnedGymBadgeIds ?? [],
+    );
 
     const party = trainerState.party.pokemon;
     const hasParty = party.length > 0;

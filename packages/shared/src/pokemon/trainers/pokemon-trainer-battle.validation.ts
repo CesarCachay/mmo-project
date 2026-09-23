@@ -52,6 +52,46 @@ export function validatePokemonTrainerBattleDefinition(
     );
   }
 
+  if (definition.category === "gym-leader") {
+    if (!definition.gymLeader) {
+      issues.push(
+        createIssue(
+          definition,
+          "gymLeader",
+          "Gym Leader battles require gym metadata",
+        ),
+      );
+    } else {
+      if (definition.gymLeader.gymId.trim().length === 0) {
+        issues.push(createIssue(definition, "gymLeader.gymId", "Gym id is required"));
+      }
+
+      if (definition.gymLeader.badgeId.trim().length === 0) {
+        issues.push(
+          createIssue(definition, "gymLeader.badgeId", "Gym badge id is required"),
+        );
+      }
+
+      if (definition.gymLeader.leaderPresentationId.trim().length === 0) {
+        issues.push(
+          createIssue(
+            definition,
+            "gymLeader.leaderPresentationId",
+            "Gym Leader presentation id is required",
+          ),
+        );
+      }
+    }
+  } else if (definition.gymLeader) {
+    issues.push(
+      createIssue(
+        definition,
+        "gymLeader",
+        "Standard Trainer battles cannot define Gym Leader metadata",
+      ),
+    );
+  }
+
   if (!getDialogue(definition.preBattleDialogueId)) {
     issues.push(
       createIssue(

@@ -6,10 +6,12 @@ import {
   createPokemonMoney,
   isPokemonItemId,
   isPokemonTrainerBattleId,
+  isPokemonGymBadgeId,
   type PokemonInventory,
   type PokemonInventoryItemStack,
   type PokemonMoney,
   type PokemonTrainerBattleId,
+  type PokemonGymBadgeId,
 } from '@cesar-mmo/shared';
 
 import { PrismaService } from '#app/database/prisma.service';
@@ -20,6 +22,7 @@ export interface RecordPokemonTrainerBattleVictoryInput {
   readonly trainerBattleId: PokemonTrainerBattleId;
   readonly rewardItems: readonly PokemonInventoryItemStack[];
   readonly rewardMoney: PokemonMoney;
+  readonly gymBadgeId?: PokemonGymBadgeId;
 }
 
 export interface RecordPokemonTrainerBattleVictoryResult {
@@ -28,6 +31,8 @@ export interface RecordPokemonTrainerBattleVictoryResult {
   readonly inventory: PokemonInventory;
   /** Actual amount credited after applying the wallet cap. */
   readonly creditedMoney: PokemonMoney;
+  readonly earnedGymBadgeIds: readonly PokemonGymBadgeId[];
+  readonly awardedGymBadgeId?: PokemonGymBadgeId;
 }
 
 @Injectable()
@@ -60,9 +65,31 @@ export class PokemonTrainerBattleProgressRepository {
     });
   }
 
+  public async loadEarnedGymBadgeIds(
+    trainerId: PokemonTrainerId,
+  ): Promise<readonly PokemonGymBadgeId[]> {
+    const rows = await this.prisma.$queryRaw<Array<{ badgeId: string }>>`
+      SELECT "badge_id" AS "badgeId"
+      FROM "pokemon_trainer_gym_badges"
+      WHERE "trainer_id" = CAST(${trainerId} AS uuid)
+      ORDER BY "awarded_at" ASC, "badge_id" ASC
+    `;
+
+    return rows.map((row) => {
+      if (!isPokemonGymBadgeId(row.badgeId)) {
+        throw new Error(
+          `Unknown Gym badge id "${row.badgeId}" persisted for trainer "${trainerId}"`,
+        );
+      }
+
+      return row.badgeId;
+    });
+  }
+
   /**
-   * Persists first-victory progress, incremental item rewards and money in one
-   * transaction. Wallet is always locked before inventory, matching Poké Shop
+   * Persists first-victory progress, Gym badge ownership, incremental item
+   * rewards and money in one transaction. Wallet is always locked before inventory,
+   * matching Poké Shop
    * BUY/SELL and preventing cross-feature wallet/inventory deadlocks.
    *
    * Rewards are applied incrementally in PostgreSQL instead of replacing an
@@ -99,6 +126,27 @@ export class PokemonTrainerBattleProgressRepository {
         );
       };
 
+      const loadGymBadgeSnapshot = async (): Promise<
+        readonly PokemonGymBadgeId[]
+      > => {
+        const rows = await tx.$queryRaw<Array<{ badgeId: string }>>`
+          SELECT "badge_id" AS "badgeId"
+          FROM "pokemon_trainer_gym_badges"
+          WHERE "trainer_id" = CAST(${input.trainerId} AS uuid)
+          ORDER BY "awarded_at" ASC, "badge_id" ASC
+        `;
+
+        return rows.map((row) => {
+          if (!isPokemonGymBadgeId(row.badgeId)) {
+            throw new Error(
+              `Unknown Gym badge id "${row.badgeId}" persisted for trainer "${input.trainerId}"`,
+            );
+          }
+
+          return row.badgeId;
+        });
+      };
+
       const walletRows = await tx.$queryRaw<Array<{ money: number }>>`
         SELECT "money"
         FROM "pokemon_trainers"
@@ -133,6 +181,7 @@ export class PokemonTrainerBattleProgressRepository {
           money: currentMoney,
           inventory: await loadInventorySnapshot(),
           creditedMoney: createPokemonMoney(0),
+          earnedGymBadgeIds: await loadGymBadgeSnapshot(),
         };
       }
 
@@ -142,6 +191,35 @@ export class PokemonTrainerBattleProgressRepository {
           trainerBattleId: input.trainerBattleId,
         },
       });
+
+      let awardedGymBadgeId: PokemonGymBadgeId | undefined;
+
+      if (input.gymBadgeId) {
+        const awardedRows = await tx.$queryRaw<Array<{ badgeId: string }>>`
+          INSERT INTO "pokemon_trainer_gym_badges" (
+            "trainer_id",
+            "badge_id"
+          )
+          VALUES (
+            CAST(${input.trainerId} AS uuid),
+            ${input.gymBadgeId}
+          )
+          ON CONFLICT ("trainer_id", "badge_id") DO NOTHING
+          RETURNING "badge_id" AS "badgeId"
+        `;
+
+        const awardedRow = awardedRows[0];
+
+        if (awardedRow) {
+          if (!isPokemonGymBadgeId(awardedRow.badgeId)) {
+            throw new Error(
+              `Unknown Gym badge id "${awardedRow.badgeId}" returned while recording Trainer "${input.trainerId}" victory`,
+            );
+          }
+
+          awardedGymBadgeId = awardedRow.badgeId;
+        }
+      }
 
       for (const rewardItem of input.rewardItems) {
         await tx.pokemonTrainerInventoryItem.upsert({
@@ -186,6 +264,8 @@ export class PokemonTrainerBattleProgressRepository {
         money: createPokemonMoney(updatedWalletRow.money),
         inventory: await loadInventorySnapshot(),
         creditedMoney,
+        earnedGymBadgeIds: await loadGymBadgeSnapshot(),
+        ...(awardedGymBadgeId ? { awardedGymBadgeId } : {}),
       };
     });
   }

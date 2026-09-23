@@ -24,7 +24,8 @@
     "pokemon:import": "node scripts/import-pokemon-data.mjs",
     "pokemon:validate": "node scripts/validate-pokemon-data.mjs",
     "test": "pnpm run build:shared && vitest run",
-    "test:watch": "pnpm run build:shared && vitest"
+    "test:watch": "pnpm run build:shared && vitest",
+    "gym:audit": "node scripts/audit-gym-leader-v1.mjs"
   },
   "devDependencies": {
     "prettier": "^3.9.6",

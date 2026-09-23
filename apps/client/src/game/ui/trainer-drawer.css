@@ -449,3 +449,9 @@
     transition: none;
   }
 }
+
+/* Milestone 1.37 — persistent Gym badge progress */
+.trainer-drawer__metadata-value--badges {
+  color: #facc15;
+  max-width: 62%;
+}

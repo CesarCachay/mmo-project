@@ -499,6 +499,7 @@ export class GameGateway
           persistedInventory,
           defeatedTrainerBattleIds,
           persistedMoney,
+          earnedGymBadgeIds,
         ] = await Promise.all([
             this.pokemonPartyRepository.loadParty(trainerId),
             this.pokemonInventoryRepository.loadInventory(trainerId),
@@ -506,6 +507,9 @@ export class GameGateway
               trainerId,
             ),
             this.pokemonWalletRepository.loadMoney(trainerId),
+            this.pokemonTrainerBattleVictoryService.loadEarnedGymBadgeIds(
+              trainerId,
+            ),
           ]);
 
         trainerState = this.pokemonTrainerStateStore.create(
@@ -514,6 +518,7 @@ export class GameGateway
           persistedInventory,
           defeatedTrainerBattleIds,
           persistedMoney,
+          earnedGymBadgeIds,
         );
       }
 
@@ -943,18 +948,13 @@ export class GameGateway
       return;
     }
 
-    const authorization =
-      this.pokemonTrainerBattleStartAuthorizationStore.consume(
-        client.id,
-        payload.npcId,
-      );
-
-    if (!authorization) {
+    const player = this.playerWorldRuntimeStore.getPlayer(client.id);
+    if (!player) {
       return;
     }
 
-    const player = this.playerWorldRuntimeStore.getPlayer(client.id);
-    if (!player || player.mapId !== authorization.mapId) {
+    const npc = getServerMapNpc(player.mapId, payload.npcId);
+    if (!npc?.trainerBattleId) {
       return;
     }
 
@@ -967,11 +967,8 @@ export class GameGateway
       return;
     }
 
-    const npc = getServerMapNpc(player.mapId, authorization.npcId);
     if (
-      !npc ||
-      npc.trainerBattleId !== authorization.trainerBattleId ||
-      !this.isPlayerInsideTrainerNpcSightForInteraction(
+      !this.canPlayerEngageTrainerNpc(
         player.mapId,
         player.x,
         player.y,
@@ -987,8 +984,20 @@ export class GameGateway
     }
 
     if (
-      this.isTrainerBattleDefeated(trainerId, authorization.trainerBattleId)
+      this.isTrainerBattleDefeated(trainerId, npc.trainerBattleId)
     ) {
+      return;
+    }
+
+    const authorization =
+      this.pokemonTrainerBattleStartAuthorizationStore.consumeExact({
+        playerId: client.id,
+        mapId: player.mapId,
+        npcId: payload.npcId,
+        trainerBattleId: npc.trainerBattleId,
+      });
+
+    if (!authorization) {
       return;
     }
 
@@ -1260,7 +1269,7 @@ export class GameGateway
         return isPlayerNearMapNpc(playerX, playerY, npc);
       }
 
-      return this.isPlayerInsideTrainerNpcSightForInteraction(
+      return this.canPlayerEngageTrainerNpc(
         mapId,
         playerX,
         playerY,
@@ -1278,6 +1287,30 @@ export class GameGateway
     npc: SharedMapNpc,
   ): boolean {
     return isPlayerInsideTrainerNpcSightForInteractionOnServer(
+      mapId,
+      playerX,
+      playerY,
+      npc,
+    );
+  }
+
+  private canPlayerEngageTrainerNpc(
+    mapId: MapId,
+    playerX: number,
+    playerY: number,
+    npc: SharedMapNpc,
+  ): boolean {
+    if (!npc.trainerBattleId) {
+      return false;
+    }
+
+    const definition = getPokemonTrainerBattleDefinition(npc.trainerBattleId);
+
+    if (definition.category === 'gym-leader') {
+      return isPlayerNearMapNpc(playerX, playerY, npc);
+    }
+
+    return this.isPlayerInsideTrainerNpcSightForInteraction(
       mapId,
       playerX,
       playerY,

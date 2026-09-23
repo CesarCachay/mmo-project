@@ -3,11 +3,13 @@ import { Injectable } from '@nestjs/common';
 import {
   createPokemonMoney,
   getPokemonTrainerBattleDefinition,
+  getPokemonGymBadgeDefinition,
   isPokemonTrainerBattleId,
   type PokemonInventoryItemStack,
   type PokemonMoney,
   type PokemonTrainerBattleId,
   type PokemonTrainerState,
+  type PokemonGymBadgeAward,
 } from '@cesar-mmo/shared';
 
 import type { PokemonTrainerId } from '../pokemon-trainer-identity';
@@ -20,6 +22,7 @@ export interface PokemonTrainerBattleVictoryResult {
   readonly rewardItems: readonly PokemonInventoryItemStack[];
   /** Actual money credited. May be lower than configured when wallet is capped. */
   readonly rewardMoney: PokemonMoney;
+  readonly gymBadgeAward?: PokemonGymBadgeAward;
 }
 
 @Injectable()
@@ -33,6 +36,10 @@ export class PokemonTrainerBattleVictoryService {
     trainerId: PokemonTrainerId,
   ): Promise<readonly PokemonTrainerBattleId[]> {
     return this.progressRepository.loadDefeatedTrainerBattleIds(trainerId);
+  }
+
+  public loadEarnedGymBadgeIds(trainerId: PokemonTrainerId) {
+    return this.progressRepository.loadEarnedGymBadgeIds(trainerId);
   }
 
   public isDefeated(
@@ -67,6 +74,9 @@ export class PokemonTrainerBattleVictoryService {
       trainerBattleId,
       rewardItems: definition.rewardItems,
       rewardMoney: definition.rewardMoney,
+      ...(definition.category === 'gym-leader' && definition.gymLeader
+        ? { gymBadgeId: definition.gymLeader.badgeId }
+        : {}),
     });
 
     const persistedDefeatedIds = persistenceResult.firstVictory
@@ -79,20 +89,16 @@ export class PokemonTrainerBattleVictoryService {
       : await this.progressRepository.loadDefeatedTrainerBattleIds(trainerId);
 
     /*
-     * DB FIRST -> RAM SECOND. Use the inventory snapshot returned by the same
-     * durable transaction, never a pre-transaction RAM-derived snapshot.
+     * DB FIRST -> RAM SECOND. Inventory, money, defeated-Trainer progress and
+     * Gym badges are adopted from the durable transaction as one RAM snapshot.
      */
-    this.trainerStateStore.setInventoryAndMoney(
-      trainerId,
-      persistenceResult.inventory,
-      persistenceResult.money,
-    );
-
     const updatedTrainerState =
-      this.trainerStateStore.setDefeatedTrainerBattleIds(
-        trainerId,
-        persistedDefeatedIds,
-      );
+      this.trainerStateStore.setBattleVictoryProgress(trainerId, {
+        inventory: persistenceResult.inventory,
+        money: persistenceResult.money,
+        defeatedTrainerBattleIds: persistedDefeatedIds,
+        earnedGymBadgeIds: persistenceResult.earnedGymBadgeIds,
+      });
 
     if (!persistenceResult.firstVictory) {
       return {
@@ -103,11 +109,23 @@ export class PokemonTrainerBattleVictoryService {
       };
     }
 
+    const gymBadgeAward = persistenceResult.awardedGymBadgeId
+      ? getPokemonGymBadgeDefinition(persistenceResult.awardedGymBadgeId)
+      : undefined;
+
     return {
       firstVictory: true,
       trainerState: updatedTrainerState,
       rewardItems: definition.rewardItems,
       rewardMoney: persistenceResult.creditedMoney,
+      ...(gymBadgeAward
+        ? {
+            gymBadgeAward: {
+              badgeId: gymBadgeAward.id,
+              displayName: gymBadgeAward.displayName,
+            },
+          }
+        : {}),
     };
   }
 }

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="32" height="36" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="4">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="32" height="36" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="5">
  <editorsettings>
   <export target="gym-01.json" format="json" />
  </editorsettings>
@@ -212,6 +212,14 @@
    <properties>
     <property name="targetMapId" value="city-01"/>
     <property name="targetSpawn" value="gymExitSpawn"/>
+   </properties>
+  </object>
+  <object id="4" name="brock" type="npc" x="256" y="160" width="0" height="0">
+   <properties>
+    <property name="direction" value="down"/>
+    <property name="interactionType" value="trainer-battle"/>
+    <property name="sightRangeTiles" type="int" value="1"/>
+    <property name="trainerBattleId" value="gym-leader-brock"/>
    </properties>
   </object>
  </objectgroup>

@@ -407,7 +407,8 @@ export const ModelName = {
   PokemonTrainerInventoryItem: 'PokemonTrainerInventoryItem',
   PokemonPendingEvolution: 'PokemonPendingEvolution',
   PokemonShopTransaction: 'PokemonShopTransaction',
-  PokemonTrainerBattleProgress: 'PokemonTrainerBattleProgress'
+  PokemonTrainerBattleProgress: 'PokemonTrainerBattleProgress',
+  PokemonTrainerGymBadge: 'PokemonTrainerGymBadge'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -423,7 +424,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "accountSession" | "accountPasswordCredential" | "pokemonTrainer" | "pokemonInstance" | "pokemonInstanceMove" | "pokemonPendingMoveLearning" | "pokemonTrainerInventoryItem" | "pokemonPendingEvolution" | "pokemonShopTransaction" | "pokemonTrainerBattleProgress"
+    modelProps: "account" | "accountSession" | "accountPasswordCredential" | "pokemonTrainer" | "pokemonInstance" | "pokemonInstanceMove" | "pokemonPendingMoveLearning" | "pokemonTrainerInventoryItem" | "pokemonPendingEvolution" | "pokemonShopTransaction" | "pokemonTrainerBattleProgress" | "pokemonTrainerGymBadge"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1241,6 +1242,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PokemonTrainerGymBadge: {
+      payload: Prisma.$PokemonTrainerGymBadgePayload<ExtArgs>
+      fields: Prisma.PokemonTrainerGymBadgeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PokemonTrainerGymBadgeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerGymBadgePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PokemonTrainerGymBadgeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerGymBadgePayload>
+        }
+        findFirst: {
+          args: Prisma.PokemonTrainerGymBadgeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerGymBadgePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PokemonTrainerGymBadgeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerGymBadgePayload>
+        }
+        findMany: {
+          args: Prisma.PokemonTrainerGymBadgeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerGymBadgePayload>[]
+        }
+        create: {
+          args: Prisma.PokemonTrainerGymBadgeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerGymBadgePayload>
+        }
+        createMany: {
+          args: Prisma.PokemonTrainerGymBadgeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PokemonTrainerGymBadgeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerGymBadgePayload>[]
+        }
+        delete: {
+          args: Prisma.PokemonTrainerGymBadgeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerGymBadgePayload>
+        }
+        update: {
+          args: Prisma.PokemonTrainerGymBadgeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerGymBadgePayload>
+        }
+        deleteMany: {
+          args: Prisma.PokemonTrainerGymBadgeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PokemonTrainerGymBadgeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PokemonTrainerGymBadgeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerGymBadgePayload>[]
+        }
+        upsert: {
+          args: Prisma.PokemonTrainerGymBadgeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PokemonTrainerGymBadgePayload>
+        }
+        aggregate: {
+          args: Prisma.PokemonTrainerGymBadgeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePokemonTrainerGymBadge>
+        }
+        groupBy: {
+          args: Prisma.PokemonTrainerGymBadgeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PokemonTrainerGymBadgeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PokemonTrainerGymBadgeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PokemonTrainerGymBadgeCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1427,6 +1502,15 @@ export const PokemonTrainerBattleProgressScalarFieldEnum = {
 } as const
 
 export type PokemonTrainerBattleProgressScalarFieldEnum = (typeof PokemonTrainerBattleProgressScalarFieldEnum)[keyof typeof PokemonTrainerBattleProgressScalarFieldEnum]
+
+
+export const PokemonTrainerGymBadgeScalarFieldEnum = {
+  trainerId: 'trainerId',
+  badgeId: 'badgeId',
+  awardedAt: 'awardedAt'
+} as const
+
+export type PokemonTrainerGymBadgeScalarFieldEnum = (typeof PokemonTrainerGymBadgeScalarFieldEnum)[keyof typeof PokemonTrainerGymBadgeScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1720,6 +1804,7 @@ export type GlobalOmitConfig = {
   pokemonPendingEvolution?: Prisma.PokemonPendingEvolutionOmit
   pokemonShopTransaction?: Prisma.PokemonShopTransactionOmit
   pokemonTrainerBattleProgress?: Prisma.PokemonTrainerBattleProgressOmit
+  pokemonTrainerGymBadge?: Prisma.PokemonTrainerGymBadgeOmit
 }
 
 /* Types for Logging */

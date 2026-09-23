@@ -5882,6 +5882,39 @@
               "value": "gymExitSpawn"
             }
           ]
+        },
+        {
+          "height": 0,
+          "id": 4,
+          "name": "brock",
+          "rotation": 0,
+          "type": "npc",
+          "visible": true,
+          "width": 0,
+          "x": 256,
+          "y": 160,
+          "properties": [
+            {
+              "name": "direction",
+              "type": "string",
+              "value": "down"
+            },
+            {
+              "name": "interactionType",
+              "type": "string",
+              "value": "trainer-battle"
+            },
+            {
+              "name": "sightRangeTiles",
+              "type": "int",
+              "value": 1
+            },
+            {
+              "name": "trainerBattleId",
+              "type": "string",
+              "value": "gym-leader-brock"
+            }
+          ]
         }
       ],
       "opacity": 1,
@@ -5892,7 +5925,7 @@
     }
   ],
   "nextlayerid": 7,
-  "nextobjectid": 4,
+  "nextobjectid": 5,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.12.2",

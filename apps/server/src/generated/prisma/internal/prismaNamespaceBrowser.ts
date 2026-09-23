@@ -61,7 +61,8 @@ export const ModelName = {
   PokemonTrainerInventoryItem: 'PokemonTrainerInventoryItem',
   PokemonPendingEvolution: 'PokemonPendingEvolution',
   PokemonShopTransaction: 'PokemonShopTransaction',
-  PokemonTrainerBattleProgress: 'PokemonTrainerBattleProgress'
+  PokemonTrainerBattleProgress: 'PokemonTrainerBattleProgress',
+  PokemonTrainerGymBadge: 'PokemonTrainerGymBadge'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -227,6 +228,15 @@ export const PokemonTrainerBattleProgressScalarFieldEnum = {
 } as const
 
 export type PokemonTrainerBattleProgressScalarFieldEnum = (typeof PokemonTrainerBattleProgressScalarFieldEnum)[keyof typeof PokemonTrainerBattleProgressScalarFieldEnum]
+
+
+export const PokemonTrainerGymBadgeScalarFieldEnum = {
+  trainerId: 'trainerId',
+  badgeId: 'badgeId',
+  awardedAt: 'awardedAt'
+} as const
+
+export type PokemonTrainerGymBadgeScalarFieldEnum = (typeof PokemonTrainerGymBadgeScalarFieldEnum)[keyof typeof PokemonTrainerGymBadgeScalarFieldEnum]
 
 
 export const SortOrder = {

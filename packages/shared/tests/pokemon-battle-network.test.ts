@@ -188,4 +188,79 @@ describe("isPokemonBattleStartedPayload", () => {
     expect(isPokemonBattleStartedPayload(payload)).toBe(false);
   });
 
+  it("accepts an authoritative Gym Leader presentation context", () => {
+    const payload = {
+      battle: {
+        battleId: "battle-gym-leader-1",
+        type: "trainer",
+        status: "active",
+        participants: [
+          createParticipant("trainer-a", "trainer", "side-a", ["party-1"]),
+          createParticipant("trainer-b", "trainer", "side-b", ["npc-1"], "Brock"),
+        ],
+      },
+      localParticipantId: "trainer-a",
+      presentation: {
+        kind: "gym-leader",
+        trainerBattleId: "gym-leader-brock",
+        trainerClass: "Gym Leader",
+        gymId: "gym-01",
+        badgeId: "boulder-badge",
+        leaderPresentationId: "brock",
+      },
+    };
+
+    expect(isPokemonBattleStartedPayload(payload)).toBe(true);
+  });
+
+  it("rejects Gym Leader presentation metadata that does not match the registry", () => {
+    const payload = {
+      battle: {
+        battleId: "battle-gym-leader-invalid",
+        type: "trainer",
+        status: "active",
+        participants: [
+          createParticipant("trainer-a", "trainer", "side-a", ["party-1"]),
+          createParticipant("trainer-b", "trainer", "side-b", ["npc-1"], "Brock"),
+        ],
+      },
+      localParticipantId: "trainer-a",
+      presentation: {
+        kind: "gym-leader",
+        trainerBattleId: "gym-leader-brock",
+        trainerClass: "Gym Leader",
+        gymId: "gym-01",
+        badgeId: "not-the-boulder-badge",
+        leaderPresentationId: "brock",
+      },
+    };
+
+    expect(isPokemonBattleStartedPayload(payload)).toBe(false);
+  });
+
+  it("rejects a Gym Leader presentation context on a Wild Battle", () => {
+    const payload = {
+      battle: {
+        battleId: "battle-wild-wrong-presentation",
+        type: "wild",
+        status: "active",
+        participants: [
+          createParticipant("trainer-a", "trainer", "side-a", ["party-1"]),
+          createParticipant("wild-b", "wild", "side-b", ["wild-1"]),
+        ],
+      },
+      localParticipantId: "trainer-a",
+      presentation: {
+        kind: "gym-leader",
+        trainerBattleId: "gym-leader-brock",
+        trainerClass: "Gym Leader",
+        gymId: "gym-01",
+        badgeId: "boulder-badge",
+        leaderPresentationId: "brock",
+      },
+    };
+
+    expect(isPokemonBattleStartedPayload(payload)).toBe(false);
+  });
+
 });

@@ -123,6 +123,22 @@ export const DIALOGUES = {
     ],
   },
 
+  "gym-leader-brock-pre-battle": {
+    id: "gym-leader-brock-pre-battle",
+    lines: [
+      "Welcome to the StoneBridge Gym.",
+      "Show me the strength that brought you this far.",
+    ],
+  },
+
+  "gym-leader-brock-post-battle": {
+    id: "gym-leader-brock-post-battle",
+    lines: [
+      "Your team stood firm against my defense.",
+      "The Boulder Badge is yours. Keep building that strength for the road ahead.",
+    ],
+  },
+
 } satisfies Record<string, DialogueDefinition>;
 
 export type DialogueId = keyof typeof DIALOGUES;

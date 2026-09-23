@@ -7,10 +7,51 @@ import type {
 } from "./pokemon-battle.types.js";
 import type { BattleCommandAction } from "./pokemon-battle-command.js";
 import { isPokemonItemId } from "../inventory/pokemon-inventory.js";
+import {
+  getPokemonTrainerBattleDefinition,
+  isPokemonTrainerBattleId,
+  type PokemonTrainerBattleId,
+} from "../trainers/pokemon-trainer-battle.registry.js";
+import type {
+  PokemonGymBadgeId,
+  PokemonGymId,
+  PokemonGymLeaderPresentationId,
+} from "../trainers/pokemon-gym.types.js";
+
+export interface PokemonWildBattlePresentationContext {
+  readonly kind: "wild";
+}
+
+export interface PokemonStandardTrainerBattlePresentationContext {
+  readonly kind: "trainer";
+  readonly trainerBattleId: PokemonTrainerBattleId;
+  readonly trainerClass: string;
+}
+
+export interface PokemonGymLeaderBattlePresentationContext {
+  readonly kind: "gym-leader";
+  readonly trainerBattleId: PokemonTrainerBattleId;
+  readonly trainerClass: string;
+  readonly gymId: PokemonGymId;
+  readonly badgeId: PokemonGymBadgeId;
+  readonly leaderPresentationId: PokemonGymLeaderPresentationId;
+}
+
+export type PokemonBattlePresentationContext =
+  | PokemonWildBattlePresentationContext
+  | PokemonStandardTrainerBattlePresentationContext
+  | PokemonGymLeaderBattlePresentationContext;
 
 export interface PokemonBattleStartedPayload {
   readonly battle: BattleInstance;
   readonly localParticipantId: BattleParticipantId;
+
+  /**
+   * Presentation-only metadata resolved by the server at battle start.
+   * Optional for backwards compatibility with older reconnect payloads.
+   * Battle rules must never depend on this field.
+   */
+  readonly presentation?: PokemonBattlePresentationContext;
 }
 
 export interface PokemonBattleCommandInput {
@@ -30,6 +71,13 @@ export function isPokemonBattleStartedPayload(
   }
 
   if (!isNonEmptyString(value.localParticipantId)) {
+    return false;
+  }
+
+  if (
+    value.presentation !== undefined &&
+    !isPokemonBattlePresentationContext(value.presentation, value.battle)
+  ) {
     return false;
   }
 
@@ -92,23 +140,64 @@ export function isPokemonBattleInstance(value: unknown): value is BattleInstance
     }
   }
 
-  const sideA = value.participants.filter(
-    (participant) => participant.side === "side-a"
-  );
+  const sideA = value.participants.filter((participant) => participant.side === "side-a");
 
-  const sideB = value.participants.filter(
-    (participant) => participant.side === "side-b"
-  );
+  const sideB = value.participants.filter((participant) => participant.side === "side-b");
 
   if (sideA.length !== 1 || sideB.length !== 1) {
     return false;
   }
 
-  const participantIds = new Set(
-    value.participants.map((participant) => participant.id)
-  );
+  const participantIds = new Set(value.participants.map((participant) => participant.id));
 
   return participantIds.size === value.participants.length;
+}
+
+function isPokemonBattlePresentationContext(
+  value: unknown,
+  battle: BattleInstance
+): value is PokemonBattlePresentationContext {
+  if (!isRecord(value) || !isNonEmptyString(value.kind)) {
+    return false;
+  }
+
+  if (value.kind === "wild") {
+    return battle.type === "wild";
+  }
+
+  if (battle.type !== "trainer") {
+    return false;
+  }
+
+  if (
+    !isPokemonTrainerBattleId(value.trainerBattleId) ||
+    !isNonEmptyString(value.trainerClass)
+  ) {
+    return false;
+  }
+
+  const definition = getPokemonTrainerBattleDefinition(value.trainerBattleId);
+
+  if (value.trainerClass !== definition.trainerClass) {
+    return false;
+  }
+
+  if (value.kind === "trainer") {
+    return definition.category === "standard";
+  }
+
+  if (value.kind !== "gym-leader" || definition.category !== "gym-leader") {
+    return false;
+  }
+
+  const gymLeader = definition.gymLeader;
+
+  return (
+    gymLeader !== undefined &&
+    value.gymId === gymLeader.gymId &&
+    value.badgeId === gymLeader.badgeId &&
+    value.leaderPresentationId === gymLeader.leaderPresentationId
+  );
 }
 
 function isBattleParticipant(value: unknown): value is BattleParticipant {

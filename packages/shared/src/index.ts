@@ -132,6 +132,7 @@ export type {
   PokemonBattleReplacementResolvedPayload,
   PokemonBattleCompletedOutcome,
   PokemonBattleCompletedPayload,
+  PokemonGymBadgeAward,
   PokemonTrainerBattleCompletionRewards,
   PokemonBattleInteractionState,
   PokemonBattleStateUpdatedPayload,
@@ -192,6 +193,8 @@ export {
 export type { PokemonTrainerBattleId } from "./pokemon/trainers/pokemon-trainer-battle.registry.js";
 export type {
   PokemonTrainerBattleAiProfileId,
+  PokemonTrainerBattleCategory,
+  PokemonGymLeaderBattleMetadata,
   PokemonTrainerBattlePokemonDefinition,
   PokemonTrainerBattleDefinition,
 } from "./pokemon/trainers/pokemon-trainer-battle.types.js";
@@ -203,6 +206,21 @@ export type {
 } from "./pokemon/trainers/pokemon-trainer-battle-network.js";
 export { validatePokemonTrainerBattleDefinition } from "./pokemon/trainers/pokemon-trainer-battle.validation.js";
 export type { PokemonTrainerBattleValidationIssue } from "./pokemon/trainers/pokemon-trainer-battle.validation.js";
+export {
+  POKEMON_GYM_REGISTRY,
+  POKEMON_GYM_BADGE_REGISTRY,
+  isPokemonGymId,
+  isPokemonGymBadgeId,
+  getPokemonGymDefinition,
+  getPokemonGymBadgeDefinition,
+} from "./pokemon/trainers/pokemon-gym.registry.js";
+export type {
+  PokemonGymId,
+  PokemonGymBadgeId,
+  PokemonGymLeaderPresentationId,
+  PokemonGymDefinition,
+  PokemonGymBadgeDefinition,
+} from "./pokemon/trainers/pokemon-gym.types.js";
 export {
   checkPokemonTrainerSight,
   POKEMON_TRAINER_SIGHT_INTERACTION_LATERAL_TOLERANCE_FACTOR,
@@ -263,6 +281,10 @@ export {
 export type {
   PokemonBattleStartedPayload,
   PokemonBattleCommandInput,
+  PokemonBattlePresentationContext,
+  PokemonWildBattlePresentationContext,
+  PokemonStandardTrainerBattlePresentationContext,
+  PokemonGymLeaderBattlePresentationContext,
 } from "./pokemon/battles/pokemon-battle-network.js";
 export {
   createBattleCommand,

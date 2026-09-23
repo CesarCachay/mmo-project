@@ -628,6 +628,9 @@ export class PokemonBattleNetworkController {
             trainerBattleRewards = {
               money: victoryResult.rewardMoney,
               items: victoryResult.rewardItems,
+              ...(victoryResult.gymBadgeAward
+                ? { gymBadge: victoryResult.gymBadgeAward }
+                : {}),
             };
           }
         } catch (error: unknown) {

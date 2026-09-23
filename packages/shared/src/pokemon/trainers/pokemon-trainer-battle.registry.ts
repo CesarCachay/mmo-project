@@ -6,6 +6,7 @@ export const POKEMON_TRAINER_BATTLE_REGISTRY = {
     displayName: "Gary",
     trainerClass: "Student",
     appearanceId: "student-gary",
+    category: "standard",
     aiProfileId: "basic",
     preBattleDialogueId: "trainer-student-gary-pre-battle",
     postBattleDialogueId: "trainer-student-gary-post-battle",
@@ -30,6 +31,7 @@ export const POKEMON_TRAINER_BATTLE_REGISTRY = {
     displayName: "Francisca",
     trainerClass: "Student",
     appearanceId: "student-francisca",
+    category: "standard",
     aiProfileId: "basic",
     preBattleDialogueId: "trainer-student-francisca-pre-battle",
     postBattleDialogueId: "trainer-student-francisca-post-battle",
@@ -54,6 +56,7 @@ export const POKEMON_TRAINER_BATTLE_REGISTRY = {
     displayName: "Diego",
     trainerClass: "Youngster",
     appearanceId: "student-gary",
+    category: "standard",
     aiProfileId: "basic",
     preBattleDialogueId: "trainer-youngster-diego-pre-battle",
     postBattleDialogueId: "trainer-youngster-diego-post-battle",
@@ -83,6 +86,7 @@ export const POKEMON_TRAINER_BATTLE_REGISTRY = {
     displayName: "Valeria",
     trainerClass: "Picnicker",
     appearanceId: "student-francisca",
+    category: "standard",
     aiProfileId: "basic",
     preBattleDialogueId: "trainer-picnicker-valeria-pre-battle",
     postBattleDialogueId: "trainer-picnicker-valeria-post-battle",
@@ -112,6 +116,7 @@ export const POKEMON_TRAINER_BATTLE_REGISTRY = {
     displayName: "Marcos",
     trainerClass: "Hiker",
     appearanceId: "student-gary",
+    category: "standard",
     aiProfileId: "basic",
     preBattleDialogueId: "trainer-hiker-marcos-pre-battle",
     postBattleDialogueId: "trainer-hiker-marcos-post-battle",
@@ -141,6 +146,7 @@ export const POKEMON_TRAINER_BATTLE_REGISTRY = {
     displayName: "Lucia",
     trainerClass: "Ace Trainer",
     appearanceId: "student-francisca",
+    category: "standard",
     aiProfileId: "basic",
     preBattleDialogueId: "trainer-ace-trainer-lucia-pre-battle",
     postBattleDialogueId: "trainer-ace-trainer-lucia-post-battle",
@@ -161,6 +167,36 @@ export const POKEMON_TRAINER_BATTLE_REGISTRY = {
         speciesId: 17, // Pidgeotto
         level: 18,
         moveIds: [16, 98], // Gust, Quick Attack
+      },
+    ],
+  },
+
+  "gym-leader-brock": {
+    id: "gym-leader-brock",
+    displayName: "Brock",
+    trainerClass: "Gym Leader",
+    appearanceId: "gym-leader-brock",
+    category: "gym-leader",
+    gymLeader: {
+      gymId: "gym-01",
+      badgeId: "boulder-badge",
+      leaderPresentationId: "brock",
+    },
+    aiProfileId: "basic",
+    preBattleDialogueId: "gym-leader-brock-pre-battle",
+    postBattleDialogueId: "gym-leader-brock-post-battle",
+    rewardItems: [{ itemId: "super-potion", quantity: 2 }],
+    rewardMoney: 1800,
+    party: [
+      {
+        speciesId: 74, // Geodude
+        level: 18,
+        moveIds: [33, 88], // Tackle, Rock Throw
+      },
+      {
+        speciesId: 95, // Onix
+        level: 20,
+        moveIds: [20, 88], // Bind, Rock Throw
       },
     ],
   },

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getNpcTextureKey, getNpcTextureKeyCandidates } from "../npcAssets";
+import { NPC_ASSETS, getNpcTextureKey, getNpcTextureKeyCandidates } from "../npcAssets";
 
 describe("npcAssets", () => {
   it("keeps the requested direction first when it is configured", () => {
@@ -25,5 +25,20 @@ describe("npcAssets", () => {
     expect(getNpcTextureKeyCandidates("custom-npc", "right")).toEqual([
       getNpcTextureKey("custom-npc", "right"),
     ]);
+  });
+
+  it.each([
+    "brock",
+    "misty",
+    "surge",
+    "erika",
+    "koga",
+    "sabrina",
+    "giovanni",
+  ] as const)("pre-registers %s walk-down overworld art", (leaderId) => {
+    expect(NPC_ASSETS[`gym-leader-${leaderId}`]).toEqual({
+      folder: `/assets/characters/leaders/${leaderId}`,
+      directions: ["down"],
+    });
   });
 });

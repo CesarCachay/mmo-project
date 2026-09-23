@@ -26,7 +26,15 @@ export const GYM_01_MAP = {
     },
   },
 
-  npcs: {},
+  npcs: {
+    "brock": {
+      x: 256,
+      y: 160,
+      trainerBattleId: "gym-leader-brock",
+      direction: "down",
+      sightRangeTiles: 1,
+    },
+  },
 
   storageTerminals: {},
 

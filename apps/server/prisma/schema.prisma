@@ -95,6 +95,7 @@ model PokemonTrainer {
   pendingMoveLearning PokemonPendingMoveLearning[]
   pendingEvolutions   PokemonPendingEvolution[]
   trainerBattleProgress PokemonTrainerBattleProgress[]
+  gymBadges              PokemonTrainerGymBadge[]
   shopTransactions      PokemonShopTransaction[]
 
   @@index([accountId])
@@ -239,4 +240,16 @@ model PokemonTrainerBattleProgress {
   @@id([trainerId, trainerBattleId])
   @@index([trainerBattleId])
   @@map("pokemon_trainer_battle_progress")
+}
+
+model PokemonTrainerGymBadge {
+  trainerId String   @map("trainer_id") @db.Uuid
+  badgeId   String   @map("badge_id") @db.VarChar(64)
+  awardedAt DateTime @default(now()) @map("awarded_at")
+
+  trainer PokemonTrainer @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+
+  @@id([trainerId, badgeId])
+  @@index([badgeId])
+  @@map("pokemon_trainer_gym_badges")
 }

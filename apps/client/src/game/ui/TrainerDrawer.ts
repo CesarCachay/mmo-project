@@ -1,5 +1,7 @@
 import {
   MAX_POKEMON_PARTY_SIZE,
+  getPokemonGymBadgeDefinition,
+  type PokemonGymBadgeId,
   type PokemonInventory,
   type PokemonMoney,
 } from "@cesar-mmo/shared";
@@ -31,6 +33,7 @@ export class TrainerDrawer {
 
   private readonly trainerIdValue: HTMLSpanElement;
   private readonly createdAtValue: HTMLSpanElement;
+  private readonly gymBadgesValue: HTMLSpanElement;
 
   private readonly onCloseRequested?:
     TrainerDrawerOptions["onCloseRequested"];
@@ -39,6 +42,7 @@ export class TrainerDrawer {
   private inventoryQuantity = 0;
   private inventoryKinds = 0;
   private money: PokemonMoney = 0;
+  private gymBadgeIds: readonly PokemonGymBadgeId[] = [];
 
   private visible = false;
   private destroyed = false;
@@ -297,10 +301,23 @@ export class TrainerDrawer {
     this.createdAtValue =
       createdAtRow.value;
 
+    const gymBadgesRow =
+      this.createMetadataRow(
+        "Medallas",
+      );
+
+    this.gymBadgesValue =
+      gymBadgesRow.value;
+
+    this.gymBadgesValue.classList.add(
+      "trainer-drawer__metadata-value--badges",
+    );
+
     metadata.append(
       metadataTitle,
       trainerIdRow.root,
       createdAtRow.root,
+      gymBadgesRow.root,
     );
 
     content.append(
@@ -357,6 +374,13 @@ export class TrainerDrawer {
       Math.trunc(money),
     );
 
+    this.renderSummary();
+  }
+
+  public setGymBadges(
+    badgeIds: readonly PokemonGymBadgeId[],
+  ): void {
+    this.gymBadgeIds = [...new Set(badgeIds)];
     this.renderSummary();
   }
 
@@ -565,6 +589,19 @@ export class TrainerDrawer {
 
     this.moneyValue.textContent =
       `₽ ${new Intl.NumberFormat("es-PE").format(this.money)}`;
+
+    if (this.gymBadgeIds.length === 0) {
+      this.gymBadgesValue.textContent = "Ninguna";
+      this.gymBadgesValue.removeAttribute("title");
+      return;
+    }
+
+    const badgeNames = this.gymBadgeIds.map(
+      (badgeId) => getPokemonGymBadgeDefinition(badgeId).displayName,
+    );
+
+    this.gymBadgesValue.textContent = badgeNames.join(", ");
+    this.gymBadgesValue.title = badgeNames.join(", ");
   }
 
   private createStat(

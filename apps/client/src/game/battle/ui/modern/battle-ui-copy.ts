@@ -1,4 +1,7 @@
-import type { BattleType } from "@cesar-mmo/shared";
+import type {
+  BattleType,
+  PokemonBattlePresentationContext,
+} from "@cesar-mmo/shared";
 
 export interface BattleIntroCopy {
   readonly eyebrow: string;
@@ -9,8 +12,21 @@ export interface BattleIntroCopy {
 export function getBattleIntroCopy(
   type: BattleType,
   opponentName?: string,
+  presentation?: PokemonBattlePresentationContext,
 ): BattleIntroCopy {
   const safeOpponentName = opponentName?.trim();
+
+  if (presentation?.kind === "gym-leader") {
+    return {
+      eyebrow: "GYM LEADER BATTLE",
+      title: safeOpponentName
+        ? `VS ${safeOpponentName.toUpperCase()}`
+        : "VS GYM LEADER",
+      subtitle: safeOpponentName
+        ? `${presentation.trainerClass} ${safeOpponentName} challenges you!`
+        : "A Gym Leader challenges you!",
+    };
+  }
 
   if (type === "trainer") {
     return {

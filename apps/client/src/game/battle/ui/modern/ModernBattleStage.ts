@@ -1,3 +1,5 @@
+import type { PokemonBattlePresentationContext } from "@cesar-mmo/shared";
+
 export interface ModernBattleStageBounds {
   x: number;
   y: number;
@@ -91,11 +93,24 @@ export class ModernBattleStage {
   public setBattleContext(
     type: "wild" | "trainer",
     opponentName?: string,
+    presentation?: PokemonBattlePresentationContext,
   ): void {
     const safeOpponentName = opponentName?.trim();
+    const isGymLeader = presentation?.kind === "gym-leader";
 
-    this.root.classList.toggle("battle-modern-stage--trainer", type === "trainer");
+    this.root.classList.toggle(
+      "battle-modern-stage--trainer",
+      type === "trainer" && !isGymLeader,
+    );
+    this.root.classList.toggle("battle-modern-stage--gym-leader", isGymLeader);
     this.root.classList.toggle("battle-modern-stage--wild", type === "wild");
+
+    if (isGymLeader) {
+      this.label.textContent = safeOpponentName
+        ? `GYM LEADER BATTLE · ${safeOpponentName.toUpperCase()}`
+        : "GYM LEADER BATTLE";
+      return;
+    }
 
     if (type === "trainer") {
       this.label.textContent = safeOpponentName

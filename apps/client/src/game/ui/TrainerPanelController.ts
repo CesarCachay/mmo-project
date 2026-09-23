@@ -4,6 +4,7 @@ import {
   POKEMON_ITEM_REGISTRY,
   type PokemonInstance,
   type PokemonMoney,
+  type PokemonGymBadgeId,
   type PokemonInventory,
   type PokemonOverworldItemErrorCode,
   type PokemonOverworldItemErrorPayload,
@@ -161,6 +162,10 @@ export class TrainerPanelController {
 
   public setMoney(money: PokemonMoney): void {
     this.trainerDrawer.setMoney(money);
+  }
+
+  public setGymBadges(badgeIds: readonly PokemonGymBadgeId[]): void {
+    this.trainerDrawer.setGymBadges(badgeIds);
   }
 
   public setInventory(inventory: PokemonInventory): void {
