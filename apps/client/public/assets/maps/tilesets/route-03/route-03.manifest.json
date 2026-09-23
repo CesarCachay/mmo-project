@@ -1,0 +1,10 @@
+{
+  "revision": "route-03",
+  "tileSize": 16,
+  "mapWidthTiles": 40,
+  "mapHeightTiles": 64,
+  "visualAtlas": "route-03.png",
+  "atlasSha256": "64f68fe5da758ae241e1075f3a2e9b78b67fcdca7979b12930f1554a15e6ee76",
+  "referenceSha256": "64f68fe5da758ae241e1075f3a2e9b78b67fcdca7979b12930f1554a15e6ee76",
+  "notes": "Ground is an exact 1:1 16x16 tiling of the approved route-03 visual atlas; Tiled and Phaser resolve the same pixels."
+}

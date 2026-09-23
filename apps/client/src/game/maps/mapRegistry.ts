@@ -2,7 +2,10 @@ import { MAP_IDS } from "@cesar-mmo/shared";
 import type { MapId } from "@cesar-mmo/shared";
 
 export type GameMapTilesetConfig = {
+  /** Phaser texture-cache key. */
   key: string;
+  /** Name declared by Tiled inside the tilemap JSON. Defaults to `key`. */
+  tiledName?: string;
   path: string;
 };
 
@@ -180,7 +183,8 @@ export const MAP_REGISTRY: Record<MapId, GameMapConfig> = {
     path: "/assets/maps/gym-02/gym-02.json",
     tilesets: [
       {
-        key: "gym-02",
+        key: "gym-02-tileset",
+        tiledName: "gym-02-tileset",
         path: "/assets/maps/tilesets/gym-02/gym-02.png",
       },
       {

@@ -117,9 +117,11 @@ export class MapAssetLoader {
         }
 
         if (!this.isMapLoaded(mapId)) {
+          const missingAssets = this.getMissingAssets(mapId);
           reject(
             new Error(
-              `Map "${mapId}" loader completed but required assets are still missing`
+              `Map "${mapId}" loader completed but required assets are still missing: ` +
+                `${missingAssets.join(", ") || "unknown"}`
             )
           );
           return;
@@ -135,6 +137,23 @@ export class MapAssetLoader {
 
       this.scene.load.start();
     });
+  }
+
+  private getMissingAssets(mapId: MapId): string[] {
+    const mapConfig = MAP_REGISTRY[mapId];
+    const missing: string[] = [];
+
+    if (!this.scene.cache.tilemap.exists(mapConfig.key)) {
+      missing.push(`tilemap:${mapConfig.key} (${mapConfig.path})`);
+    }
+
+    for (const tileset of mapConfig.tilesets) {
+      if (!this.scene.textures.exists(tileset.key)) {
+        missing.push(`texture:${tileset.key} (${tileset.path})`);
+      }
+    }
+
+    return missing;
   }
 
   private queueMissingAssets(mapId: MapId): Set<string> {

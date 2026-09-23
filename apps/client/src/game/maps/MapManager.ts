@@ -52,11 +52,17 @@ export class MapManager {
     });
 
     const mapTilesets = mapConfig.tilesets.map((tilesetConfig) => {
-      const tileset = map.addTilesetImage(tilesetConfig.key, tilesetConfig.key);
+      const tiledName = tilesetConfig.tiledName ?? tilesetConfig.key;
+      const tileset = map.addTilesetImage(tiledName, tilesetConfig.key);
 
       if (!tileset) {
+        const availableTilesets = map.tilesets
+          .map((candidate) => candidate.name)
+          .join(", ");
+
         throw new Error(
-          `Could not load tileset "${tilesetConfig.key}" for map "${mapId}"`
+          `Could not bind Tiled tileset "${tiledName}" to texture "${tilesetConfig.key}" ` +
+            `for map "${mapId}". Tilemap tilesets: ${availableTilesets || "(none)"}`
         );
       }
 
