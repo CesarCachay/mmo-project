@@ -10,6 +10,10 @@ export const POKEMON_GYM_BADGE_REGISTRY = {
     id: "boulder-badge",
     displayName: "Boulder Badge",
   },
+  "cascade-badge": {
+    id: "cascade-badge",
+    displayName: "Cascade Badge",
+  },
 } as const satisfies Record<PokemonGymBadgeId, PokemonGymBadgeDefinition>;
 
 export const POKEMON_GYM_REGISTRY = {
@@ -20,6 +24,14 @@ export const POKEMON_GYM_REGISTRY = {
     leaderTrainerBattleId: "gym-leader-brock",
     leaderPresentationId: "brock",
     badgeId: "boulder-badge",
+  },
+  "gym-02": {
+    id: "gym-02",
+    mapId: "gym-02",
+    displayName: "AzureWave Gym",
+    leaderTrainerBattleId: "gym-leader-misty",
+    leaderPresentationId: "misty",
+    badgeId: "cascade-badge",
   },
 } as const satisfies Record<PokemonGymId, PokemonGymDefinition>;
 

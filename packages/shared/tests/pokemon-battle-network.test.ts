@@ -213,6 +213,32 @@ describe("isPokemonBattleStartedPayload", () => {
     expect(isPokemonBattleStartedPayload(payload)).toBe(true);
   });
 
+
+  it("accepts the Misty Gym Leader presentation context", () => {
+    const payload = {
+      battle: {
+        battleId: "battle-gym-leader-misty",
+        type: "trainer",
+        status: "active",
+        participants: [
+          createParticipant("trainer-a", "trainer", "side-a", ["party-1"]),
+          createParticipant("trainer-b", "trainer", "side-b", ["npc-1"], "Misty"),
+        ],
+      },
+      localParticipantId: "trainer-a",
+      presentation: {
+        kind: "gym-leader",
+        trainerBattleId: "gym-leader-misty",
+        trainerClass: "Gym Leader",
+        gymId: "gym-02",
+        badgeId: "cascade-badge",
+        leaderPresentationId: "misty",
+      },
+    };
+
+    expect(isPokemonBattleStartedPayload(payload)).toBe(true);
+  });
+
   it("rejects Gym Leader presentation metadata that does not match the registry", () => {
     const payload = {
       battle: {

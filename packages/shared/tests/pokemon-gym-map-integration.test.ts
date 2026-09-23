@@ -23,4 +23,25 @@ describe("Gym Leader map integration", () => {
     expect(battle.category).toBe("gym-leader");
     expect(battle.gymLeader?.leaderPresentationId).toBe("brock");
   });
+
+  it("places Misty inside gym-02 and links her to the Gym Leader battle definition", () => {
+    const gym = getPokemonGymDefinition("gym-02");
+    const map = MAP_DATA_REGISTRY[gym.mapId];
+    const npc = map.npcs.misty;
+    const battle = getPokemonTrainerBattleDefinition(gym.leaderTrainerBattleId);
+
+    expect(npc).toEqual({
+      x: 256,
+      y: 80,
+      trainerBattleId: "gym-leader-misty",
+      direction: "down",
+      sightRangeTiles: 1,
+    });
+    expect(map.npcs.gym02SwimmerMarina?.trainerBattleId).toBe("swimmer-marina");
+    expect(map.npcs.gym02SailorNico?.trainerBattleId).toBe("sailor-nico");
+    expect(battle.category).toBe("gym-leader");
+    expect(battle.gymLeader?.leaderPresentationId).toBe("misty");
+    expect(battle.gymLeader?.badgeId).toBe("cascade-badge");
+  });
+
 });

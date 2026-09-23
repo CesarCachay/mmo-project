@@ -6,10 +6,15 @@ export const MAP_IDS = {
   TOWN_02: "town-02",
   ROUTE_02: "route-02",
   CITY_01: "city-01",
+  ROUTE_03: "route-03",
+  CITY_02: "city-02",
 
   GYM_01: "gym-01",
+  GYM_02: "gym-02",
   POKE_CENTER: "poke-center",
+  POKE_CENTER_02: "poke-center-02",
   POKE_SHOP: "poke-shop",
+  POKE_SHOP_02: "poke-shop-02",
 } as const;
 
 export type MapId = (typeof MAP_IDS)[keyof typeof MAP_IDS];

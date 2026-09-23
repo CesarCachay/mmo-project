@@ -6,6 +6,7 @@ import {
   isPlayerMoving,
   POKEMON_ITEM_REGISTRY,
   MAP_DATA_REGISTRY,
+  getPokemonTrainerBattleDefinition,
 } from "@cesar-mmo/shared";
 import {
   GAME_SCENE_KEY,
@@ -64,6 +65,8 @@ import { TrainerPanelController } from "./ui/TrainerPanelController";
 import { PokemonTrainerPresentationController } from "./pokemon/PokemonTrainerPresentationController";
 import { TrainerSightController } from "./trainer-battle/TrainerSightController";
 import { TrainerPreBattleController } from "./trainer-battle/TrainerPreBattleController";
+import { GymLeaderIntroController } from "./gym-leader/GymLeaderIntroController";
+import { getTrainerBattleInteractionPrompt } from "./gym-leader/gym-leader-overworld-state";
 
 // controllers
 import { LazyBattleController } from "./battle/LazyBattleController";
@@ -112,6 +115,7 @@ export class GameScene extends Phaser.Scene {
   private blackoutRecoveryPending = false;
   private blackoutRecoveryTimeout?: Phaser.Time.TimerEvent;
   private defeatedTrainerBattleIds = new Set<string>();
+  private activeTrainerBattleNpcId?: string;
   private networkDisconnected = false;
   private player!: Phaser.GameObjects.Sprite;
   private localPlayerController!: LocalPlayerController;
@@ -160,6 +164,7 @@ export class GameScene extends Phaser.Scene {
   private npcManager!: NpcManager;
   private trainerSightController!: TrainerSightController;
   private trainerPreBattleController!: TrainerPreBattleController;
+  private gymLeaderIntroController!: GymLeaderIntroController;
   private remotePlayerManager!: RemotePlayerManager;
   private mapTransitionController!: MapTransitionController;
   private remotePokemonFollowerManager!: RemotePokemonFollowerManager;
@@ -176,6 +181,8 @@ export class GameScene extends Phaser.Scene {
     this.avatarId = data.avatarId;
     this.hasAppliedInitialWorldState = false;
     this.networkDisconnected = false;
+    this.defeatedTrainerBattleIds = new Set<string>();
+    this.activeTrainerBattleNpcId = undefined;
   }
 
   preload(): void {
@@ -264,6 +271,9 @@ export class GameScene extends Phaser.Scene {
     );
 
     this.npcManager.create(this.mapManager.map);
+    this.npcManager.setDefeatedTrainerBattleIds([
+      ...this.defeatedTrainerBattleIds,
+    ]);
 
     this.trainerSightController = new TrainerSightController(
       this,
@@ -275,6 +285,11 @@ export class GameScene extends Phaser.Scene {
     ]);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.trainerSightController.destroy();
+    });
+
+    this.gymLeaderIntroController = new GymLeaderIntroController();
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.gymLeaderIntroController.destroy();
     });
 
     this.trainerPreBattleController = new TrainerPreBattleController(this, {
@@ -563,12 +578,48 @@ export class GameScene extends Phaser.Scene {
   }
 
   private handleTrainerPreBattleReady(npc: NpcInstance): void {
-    this.network.startTrainerBattle(npc.definition.id);
+    const trainerBattleId = npc.definition.trainerBattleId;
 
-    console.log("[TrainerPreBattle] Trainer Battle start requested", {
-      npcId: npc.definition.id,
-      trainerBattleId: npc.definition.trainerBattleId,
-    });
+    if (!trainerBattleId) {
+      this.handleTrainerPreBattleCancelled(npc, "missing-trainer-battle-id");
+      return;
+    }
+
+    const definition = getPokemonTrainerBattleDefinition(trainerBattleId);
+    const requestBattleStart = () => {
+      if (
+        this.networkDisconnected ||
+        !this.trainerPreBattleController.isActiveFor(npc.definition.id) ||
+        (definition.category === "gym-leader" &&
+          this.currentMapId !== definition.gymLeader?.gymId)
+      ) {
+        console.warn("[TrainerPreBattle] stale battle start callback ignored", {
+          npcId: npc.definition.id,
+          trainerBattleId,
+          networkDisconnected: this.networkDisconnected,
+          currentMapId: this.currentMapId,
+        });
+        return;
+      }
+
+      this.network.startTrainerBattle(npc.definition.id);
+
+      console.log("[TrainerPreBattle] Trainer Battle start requested", {
+        npcId: npc.definition.id,
+        trainerBattleId,
+        category: definition.category,
+      });
+    };
+
+    if (definition.category !== "gym-leader" || !definition.gymLeader) {
+      requestBattleStart();
+      return;
+    }
+
+    this.gymLeaderIntroController.present(
+      definition.gymLeader.leaderPresentationId,
+      requestBattleStart,
+    );
   }
 
   private handleTrainerPreBattleCancelled(npc: NpcInstance, reason: string): void {
@@ -617,16 +668,28 @@ export class GameScene extends Phaser.Scene {
         console.warn("Quest interactions are not implemented yet");
         return;
 
-      case "trainer-battle":
+      case "trainer-battle": {
         if (this.isTrainerNpcDefeated(npc)) {
           this.startNpcDialogue(npc);
           return;
         }
 
+        const trainerBattleId = npc.definition.trainerBattleId;
+        if (!trainerBattleId) {
+          return;
+        }
+
+        const definition = getPokemonTrainerBattleDefinition(trainerBattleId);
+        if (definition.category === "gym-leader") {
+          this.handleTrainerAggroReady(npc);
+          return;
+        }
+
         console.warn(
-          `Trainer battle interaction starts through sight/aggro: ${npc.definition.trainerBattleId ?? npc.definition.id}`
+          `Trainer battle interaction starts through sight/aggro: ${trainerBattleId}`
         );
         return;
+      }
     }
   }
 
@@ -1003,9 +1066,12 @@ export class GameScene extends Phaser.Scene {
       this.defeatedTrainerBattleIds = new Set(
         payload.trainerState.defeatedTrainerBattleIds ?? []
       );
-      this.trainerSightController?.setDefeatedTrainerBattleIds([
-        ...this.defeatedTrainerBattleIds,
-      ]);
+      const defeatedTrainerBattleIds = [...this.defeatedTrainerBattleIds];
+
+      this.trainerSightController?.setDefeatedTrainerBattleIds(
+        defeatedTrainerBattleIds,
+      );
+      this.npcManager?.setDefeatedTrainerBattleIds(defeatedTrainerBattleIds);
 
       this.battleController.setTrainerState(payload.trainerState);
       void this.pokemonTrainerPresentationController.applyTrainerState(
@@ -1072,6 +1138,8 @@ export class GameScene extends Phaser.Scene {
 
     this.network.onBattleStarted((payload) => {
       const preBattleNpc = this.trainerPreBattleController.markBattleStarted();
+
+      this.activeTrainerBattleNpcId = preBattleNpc?.definition.id;
 
       if (preBattleNpc) {
         this.restoreNpcDirection(preBattleNpc);
@@ -1218,6 +1286,8 @@ export class GameScene extends Phaser.Scene {
 
     this.trainerPreBattleController?.clear();
     this.trainerSightController?.clear();
+    this.gymLeaderIntroController?.dismiss();
+    this.activeTrainerBattleNpcId = undefined;
 
     this.pendingDialogueNpc = undefined;
     this.activeDialogueNpc = undefined;
@@ -1328,6 +1398,14 @@ export class GameScene extends Phaser.Scene {
   private handleBattleCompletionAcknowledged(
     payload: PokemonBattleCompletedPayload
   ): void {
+    const battleNpcId = this.activeTrainerBattleNpcId;
+    this.activeTrainerBattleNpcId = undefined;
+
+    if (payload.outcome === "trainer-battle-victory") {
+      this.handleTrainerBattleVictoryReturnToOverworld(battleNpcId);
+      return;
+    }
+
     if (payload.outcome !== "trainer-battle-defeat") {
       return;
     }
@@ -1356,6 +1434,56 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.network.requestBlackoutRecovery();
+  }
+
+  private handleTrainerBattleVictoryReturnToOverworld(
+    battleNpcId: string | undefined,
+  ): void {
+    this.movementInputController.resetLastInputToNeutral();
+    this.localPlayerController.setIdle();
+    this.chatBox.setVisible(true);
+
+    if (!battleNpcId) {
+      return;
+    }
+
+    const npc = this.npcManager.getById(battleNpcId);
+    if (!npc?.definition.trainerBattleId) {
+      return;
+    }
+
+    const definition = getPokemonTrainerBattleDefinition(
+      npc.definition.trainerBattleId,
+    );
+
+    if (definition.category !== "gym-leader" || !this.isTrainerNpcDefeated(npc)) {
+      return;
+    }
+
+    /*
+     * The authoritative TRAINER_STATE is emitted before BATTLE_COMPLETED on
+     * the same socket, so by the time the player dismisses the victory panel
+     * the Gym Leader is already marked defeated locally and durably on the
+     * server. Start the post-battle dialogue only after the battle UI has
+     * released its gameplay lock.
+     */
+    this.time.delayedCall(120, () => {
+      if (
+        this.networkDisconnected ||
+        this.currentMapId !== definition.gymLeader?.gymId ||
+        this.battleController.isBlockingGameplay ||
+        this.dialogueBox.isOpen()
+      ) {
+        return;
+      }
+
+      const currentNpc = this.npcManager.getById(battleNpcId);
+      if (!currentNpc || !this.isTrainerNpcDefeated(currentNpc)) {
+        return;
+      }
+
+      this.startNpcDialogue(currentNpc);
+    });
   }
 
   private clearBlackoutRecoveryPending(): void {
@@ -1570,8 +1698,17 @@ export class GameScene extends Phaser.Scene {
       case "dialogue":
         return "Hablar";
 
-      case "trainer-battle":
-        return this.isTrainerNpcDefeated(npc) ? "Hablar" : undefined;
+      case "trainer-battle": {
+        const trainerBattleId = npc.definition.trainerBattleId;
+        if (!trainerBattleId) {
+          return undefined;
+        }
+
+        return getTrainerBattleInteractionPrompt(
+          trainerBattleId,
+          this.isTrainerNpcDefeated(npc),
+        );
+      }
 
       case "shop":
         return "Abrir tienda";
@@ -1813,6 +1950,9 @@ export class GameScene extends Phaser.Scene {
     initializeGameTopBar().setMap(this.currentMapId);
     this.mapTransitionController.loadZones(this.mapManager.map);
     this.npcManager.create(this.mapManager.map);
+    this.npcManager.setDefeatedTrainerBattleIds([
+      ...this.defeatedTrainerBattleIds,
+    ]);
   }
 
   private get isMapTransitioning(): boolean {
@@ -1822,7 +1962,8 @@ export class GameScene extends Phaser.Scene {
   private get isTrainerInteractionBlocking(): boolean {
     return Boolean(
       this.trainerSightController?.isBlockingGameplay ||
-      this.trainerPreBattleController?.isBlockingGameplay
+      this.trainerPreBattleController?.isBlockingGameplay ||
+      this.gymLeaderIntroController?.isBlockingGameplay
     );
   }
 

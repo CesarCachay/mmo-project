@@ -34,9 +34,7 @@ describe('PokemonTrainerBattleVictoryService', () => {
     });
     const progressRepository = {
       recordFirstVictory,
-      loadDefeatedTrainerBattleIds: vi
-        .fn()
-        .mockResolvedValue(['student-gary']),
+      loadDefeatedTrainerBattleIds: vi.fn().mockResolvedValue(['student-gary']),
       loadEarnedGymBadgeIds: vi.fn().mockResolvedValue([]),
     } as unknown as PokemonTrainerBattleProgressRepository;
 
@@ -79,15 +77,11 @@ describe('PokemonTrainerBattleVictoryService', () => {
       recordFirstVictory: vi.fn().mockResolvedValue({
         firstVictory: false,
         money: 3_000,
-        inventory: createPokemonInventory([
-          { itemId: 'potion', quantity: 2 },
-        ]),
+        inventory: createPokemonInventory([{ itemId: 'potion', quantity: 2 }]),
         creditedMoney: 0,
         earnedGymBadgeIds: [],
       }),
-      loadDefeatedTrainerBattleIds: vi
-        .fn()
-        .mockResolvedValue(['student-gary']),
+      loadDefeatedTrainerBattleIds: vi.fn().mockResolvedValue(['student-gary']),
       loadEarnedGymBadgeIds: vi.fn().mockResolvedValue([]),
     } as unknown as PokemonTrainerBattleProgressRepository;
 
@@ -164,35 +158,88 @@ describe('PokemonTrainerBattleVictoryService', () => {
       trainerStateStore,
     );
 
-    const result = await service.recordVictory(
-      TRAINER_ID,
-      'gym-leader-brock',
-    );
+    const result = await service.recordVictory(TRAINER_ID, 'gym-leader-brock');
 
     expect(recordFirstVictory).toHaveBeenCalledWith({
       trainerId: TRAINER_ID,
       trainerBattleId: 'gym-leader-brock',
       rewardItems: [{ itemId: 'super-potion', quantity: 2 }],
-      rewardMoney: 1_800,
+      rewardMoney: 2_800,
       gymBadgeId: 'boulder-badge',
     });
     expect(result.gymBadgeAward).toEqual({
       badgeId: 'boulder-badge',
       displayName: 'Boulder Badge',
     });
-    expect(result.trainerState.earnedGymBadgeIds).toEqual([
-      'boulder-badge',
-    ]);
+    expect(result.trainerState.earnedGymBadgeIds).toEqual(['boulder-badge']);
     expect(result.trainerState.defeatedTrainerBattleIds).toContain(
       'gym-leader-brock',
     );
   });
 
+  it('awards and adopts the Cascade Badge on Misty first victory', async () => {
+    const trainerStateStore = new PokemonTrainerStateStore();
+    trainerStateStore.create(
+      TRAINER_ID,
+      createPokemonParty(),
+      createPokemonInventory(),
+    );
+
+    const recordFirstVictory = vi.fn().mockResolvedValue({
+      firstVictory: true,
+      money: 5_400,
+      inventory: createPokemonInventory([
+        { itemId: 'super-potion', quantity: 2 },
+        { itemId: 'revive', quantity: 1 },
+      ]),
+      creditedMoney: 2_400,
+      earnedGymBadgeIds: ['boulder-badge', 'cascade-badge'],
+      awardedGymBadgeId: 'cascade-badge',
+    });
+
+    const progressRepository = {
+      recordFirstVictory,
+      loadDefeatedTrainerBattleIds: vi
+        .fn()
+        .mockResolvedValue(['gym-leader-brock', 'gym-leader-misty']),
+      loadEarnedGymBadgeIds: vi
+        .fn()
+        .mockResolvedValue(['boulder-badge', 'cascade-badge']),
+    } as unknown as PokemonTrainerBattleProgressRepository;
+
+    const service = new PokemonTrainerBattleVictoryService(
+      progressRepository,
+      trainerStateStore,
+    );
+
+    const result = await service.recordVictory(TRAINER_ID, 'gym-leader-misty');
+
+    expect(recordFirstVictory).toHaveBeenCalledWith({
+      trainerId: TRAINER_ID,
+      trainerBattleId: 'gym-leader-misty',
+      rewardItems: [
+        { itemId: 'super-potion', quantity: 2 },
+        { itemId: 'revive', quantity: 1 },
+      ],
+      rewardMoney: 3_400,
+      gymBadgeId: 'cascade-badge',
+    });
+    expect(result.gymBadgeAward).toEqual({
+      badgeId: 'cascade-badge',
+      displayName: 'Cascade Badge',
+    });
+    expect(result.trainerState.earnedGymBadgeIds).toEqual([
+      'boulder-badge',
+      'cascade-badge',
+    ]);
+    expect(result.trainerState.defeatedTrainerBattleIds).toContain(
+      'gym-leader-misty',
+    );
+  });
+
   it('hydrates persisted Gym badge ids through the repository', async () => {
     const trainerStateStore = new PokemonTrainerStateStore();
-    const loadEarnedGymBadgeIds = vi
-      .fn()
-      .mockResolvedValue(['boulder-badge']);
+    const loadEarnedGymBadgeIds = vi.fn().mockResolvedValue(['boulder-badge']);
 
     const progressRepository = {
       recordFirstVictory: vi.fn(),

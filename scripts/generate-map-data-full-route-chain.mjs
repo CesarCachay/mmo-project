@@ -27,16 +27,36 @@ const MAPS = [
     exportName: "CITY_01_MAP",
   },
   {
+    name: "route-03",
+    exportName: "ROUTE_03_MAP",
+  },
+  {
+    name: "city-02",
+    exportName: "CITY_02_MAP",
+  },
+  {
     name: "poke-center",
     exportName: "POKE_CENTER_MAP",
+  },
+  {
+    name: "poke-center-02",
+    exportName: "POKE_CENTER_02_MAP",
   },
   {
     name: "poke-shop",
     exportName: "POKE_SHOP_MAP",
   },
   {
+    name: "poke-shop-02",
+    exportName: "POKE_SHOP_02_MAP",
+  },
+  {
     name: "gym-01",
     exportName: "GYM_01_MAP",
+  },
+  {
+    name: "gym-02",
+    exportName: "GYM_02_MAP",
   },
 ];
 

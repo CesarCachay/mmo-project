@@ -1,5 +1,5 @@
-export type PokemonGymId = "gym-01";
-export type PokemonGymBadgeId = "boulder-badge";
+export type PokemonGymId = "gym-01" | "gym-02";
+export type PokemonGymBadgeId = "boulder-badge" | "cascade-badge";
 /*
  * Presentation IDs are intentionally broader than the currently registered
  * gyms. The corresponding runtime art already exists in the client asset

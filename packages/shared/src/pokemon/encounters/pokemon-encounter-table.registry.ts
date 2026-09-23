@@ -94,6 +94,16 @@ export const POKEMON_ENCOUNTER_TABLES = {
       },
     ],
   },
+  "route-03-grass": {
+    id: "route-03-grass",
+    entries: [
+      { speciesId: 17, minLevel: 17, maxLevel: 20, weight: 2 }, // Pidgeotto
+      { speciesId: 43, minLevel: 17, maxLevel: 20, weight: 2 }, // Oddish
+      { speciesId: 69, minLevel: 18, maxLevel: 21, weight: 2 }, // Bellsprout
+      { speciesId: 52, minLevel: 18, maxLevel: 21, weight: 1 }, // Meowth
+      { speciesId: 54, minLevel: 19, maxLevel: 21, weight: 1 }, // Psyduck
+    ],
+  },
 } as const satisfies Record<string, PokemonEncounterTable>;
 
 export type PokemonEncounterTableId = keyof typeof POKEMON_ENCOUNTER_TABLES;

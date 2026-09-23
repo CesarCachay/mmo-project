@@ -206,5 +206,4 @@ describe("GameNetworkClient connection", () => {
     expect(socket.removeAllListeners).toHaveBeenCalledOnce();
     expect(socket.disconnect).toHaveBeenCalledOnce();
   });
-
 });

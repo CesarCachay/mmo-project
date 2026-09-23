@@ -23,22 +23,43 @@ describe("POKEMON_GYM_REGISTRY", () => {
       badgeId: "boulder-badge",
       leaderPresentationId: "brock",
     });
-    expect(leader.rewardMoney).toBe(1800);
+    expect(leader.rewardMoney).toBe(2800);
   });
 
-  it("registers the first gym badge metadata", () => {
+  it("registers gym-02 with Misty as a gym leader battle", () => {
+    const gym = getPokemonGymDefinition("gym-02");
+    const leader = getPokemonTrainerBattleDefinition("gym-leader-misty");
+
+    expect(gym.mapId).toBe("gym-02");
+    expect(gym.leaderTrainerBattleId).toBe("gym-leader-misty");
+    expect(gym.leaderPresentationId).toBe("misty");
+    expect(leader.category).toBe("gym-leader");
+    expect(leader.gymLeader).toEqual({
+      gymId: "gym-02",
+      badgeId: "cascade-badge",
+      leaderPresentationId: "misty",
+    });
+    expect(leader.rewardMoney).toBe(3400);
+  });
+
+  it("registers Gym badge metadata", () => {
     expect(getPokemonGymBadgeDefinition("boulder-badge").displayName).toBe(
-      "Boulder Badge",
+      "Boulder Badge"
+    );
+    expect(getPokemonGymBadgeDefinition("cascade-badge").displayName).toBe(
+      "Cascade Badge"
     );
   });
 
   it("recognizes known gym ids", () => {
     expect(isPokemonGymId("gym-01")).toBe(true);
+    expect(isPokemonGymId("gym-02")).toBe(true);
     expect(isPokemonGymId("missing-gym")).toBe(false);
   });
 
   it("recognizes known Gym badge ids", () => {
     expect(isPokemonGymBadgeId("boulder-badge")).toBe(true);
+    expect(isPokemonGymBadgeId("cascade-badge")).toBe(true);
     expect(isPokemonGymBadgeId("fake-badge")).toBe(false);
   });
 

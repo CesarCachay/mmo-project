@@ -123,6 +123,54 @@ export const DIALOGUES = {
     ],
   },
 
+  "trainer-camper-mateo-pre-battle": {
+    id: "trainer-camper-mateo-pre-battle",
+    lines: [
+      "Route 03 is perfect for testing a growing team!",
+      "Let me see if you can handle the climb ahead.",
+    ],
+  },
+
+  "trainer-camper-mateo-post-battle": {
+    id: "trainer-camper-mateo-post-battle",
+    lines: [
+      "Nice battle! You kept your footing all the way through.",
+      "The route gets trickier near the river.",
+    ],
+  },
+
+  "trainer-picnicker-camila-pre-battle": {
+    id: "trainer-picnicker-camila-pre-battle",
+    lines: [
+      "I stopped here to train beside the meadow.",
+      "Your team looks ready for a challenge!",
+    ],
+  },
+
+  "trainer-picnicker-camila-post-battle": {
+    id: "trainer-picnicker-camila-post-battle",
+    lines: [
+      "Your Pokémon were stronger than I expected!",
+      "Keep going north and you'll reach the coast soon.",
+    ],
+  },
+
+  "trainer-ace-trainer-renato-pre-battle": {
+    id: "trainer-ace-trainer-renato-pre-battle",
+    lines: [
+      "You're almost through Route 03.",
+      "Show me you're ready for the next Gym Leader!",
+    ],
+  },
+
+  "trainer-ace-trainer-renato-post-battle": {
+    id: "trainer-ace-trainer-renato-post-battle",
+    lines: [
+      "Excellent. You didn't lose momentum for a second.",
+      "The city ahead has a Gym built around the water.",
+    ],
+  },
+
   "gym-leader-brock-pre-battle": {
     id: "gym-leader-brock-pre-battle",
     lines: [
@@ -139,6 +187,43 @@ export const DIALOGUES = {
     ],
   },
 
+
+  "trainer-swimmer-marina-pre-battle": {
+    id: "trainer-swimmer-marina-pre-battle",
+    lines: [
+      "These lanes are my training ground!",
+      "Keep your footing if you want to reach Misty.",
+    ],
+  },
+  "trainer-swimmer-marina-post-battle": {
+    id: "trainer-swimmer-marina-post-battle",
+    lines: ["Nice balance! The center pier will take you deeper into the pool."],
+  },
+  "trainer-sailor-nico-pre-battle": {
+    id: "trainer-sailor-nico-pre-battle",
+    lines: [
+      "Water battles are all about momentum.",
+      "Let's see if your team can break through the current!",
+    ],
+  },
+  "trainer-sailor-nico-post-battle": {
+    id: "trainer-sailor-nico-post-battle",
+    lines: ["You handled the current well. Misty is waiting at the far platform."],
+  },
+  "gym-leader-misty-pre-battle": {
+    id: "gym-leader-misty-pre-battle",
+    lines: [
+      "Welcome to the AzureWave Gym.",
+      "You crossed the pool and reached me. Now show me how your team moves under pressure!",
+    ],
+  },
+  "gym-leader-misty-post-battle": {
+    id: "gym-leader-misty-post-battle",
+    lines: [
+      "That was a strong battle. You kept your rhythm even when the tide turned.",
+      "The Cascade Badge is yours. Keep moving forward!",
+    ],
+  },
 } satisfies Record<string, DialogueDefinition>;
 
 export type DialogueId = keyof typeof DIALOGUES;

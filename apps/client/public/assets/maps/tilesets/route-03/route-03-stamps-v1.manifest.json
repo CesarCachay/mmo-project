@@ -1,0 +1,92 @@
+{
+  "tree-round-a": {
+    "x": 0,
+    "y": 0,
+    "width": 128,
+    "height": 160,
+    "tileX": 0,
+    "tileY": 0,
+    "tilesWide": 8,
+    "tilesHigh": 10
+  },
+  "tree-round-b": {
+    "x": 0,
+    "y": 176,
+    "width": 128,
+    "height": 160,
+    "tileX": 0,
+    "tileY": 11,
+    "tilesWide": 8,
+    "tilesHigh": 10
+  },
+  "tree-conifer-a": {
+    "x": 0,
+    "y": 352,
+    "width": 112,
+    "height": 192,
+    "tileX": 0,
+    "tileY": 22,
+    "tilesWide": 7,
+    "tilesHigh": 12
+  },
+  "tree-conifer-b": {
+    "x": 0,
+    "y": 560,
+    "width": 96,
+    "height": 208,
+    "tileX": 0,
+    "tileY": 35,
+    "tilesWide": 6,
+    "tilesHigh": 13
+  },
+  "hedge-flowers": {
+    "x": 0,
+    "y": 784,
+    "width": 192,
+    "height": 128,
+    "tileX": 0,
+    "tileY": 49,
+    "tilesWide": 12,
+    "tilesHigh": 8
+  },
+  "sign-lamp": {
+    "x": 0,
+    "y": 928,
+    "width": 128,
+    "height": 144,
+    "tileX": 0,
+    "tileY": 58,
+    "tilesWide": 8,
+    "tilesHigh": 9
+  },
+  "lamp-banner": {
+    "x": 0,
+    "y": 1088,
+    "width": 160,
+    "height": 144,
+    "tileX": 0,
+    "tileY": 68,
+    "tilesWide": 10,
+    "tilesHigh": 9
+  },
+  "flower-planter": {
+    "x": 0,
+    "y": 1248,
+    "width": 176,
+    "height": 112,
+    "tileX": 0,
+    "tileY": 78,
+    "tilesWide": 11,
+    "tilesHigh": 7
+  },
+  "bench": {
+    "x": 0,
+    "y": 1376,
+    "width": 128,
+    "height": 112,
+    "tileX": 0,
+    "tileY": 86,
+    "tilesWide": 8,
+    "tilesHigh": 7
+  }
+}

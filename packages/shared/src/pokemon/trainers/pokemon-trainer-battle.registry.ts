@@ -171,6 +171,92 @@ export const POKEMON_TRAINER_BATTLE_REGISTRY = {
     ],
   },
 
+  "camper-mateo": {
+    id: "camper-mateo",
+    displayName: "Mateo",
+    trainerClass: "Camper",
+    appearanceId: "student-gary",
+    category: "standard",
+    aiProfileId: "basic",
+    preBattleDialogueId: "trainer-camper-mateo-pre-battle",
+    postBattleDialogueId: "trainer-camper-mateo-post-battle",
+    rewardItems: [{ itemId: "poke-ball", quantity: 2 }],
+    rewardMoney: 900,
+    party: [
+      { speciesId: 21, level: 18, moveIds: [64, 31] }, // Spearow
+      { speciesId: 27, level: 19, moveIds: [10, 229] }, // Sandshrew
+    ],
+  },
+
+  "picnicker-camila": {
+    id: "picnicker-camila",
+    displayName: "Camila",
+    trainerClass: "Picnicker",
+    appearanceId: "student-francisca",
+    category: "standard",
+    aiProfileId: "basic",
+    preBattleDialogueId: "trainer-picnicker-camila-pre-battle",
+    postBattleDialogueId: "trainer-picnicker-camila-post-battle",
+    rewardItems: [{ itemId: "potion", quantity: 2 }],
+    rewardMoney: 1050,
+    party: [
+      { speciesId: 43, level: 19, moveIds: [71, 51] }, // Oddish
+      { speciesId: 12, level: 20, moveIds: [93, 16] }, // Butterfree
+    ],
+  },
+
+  "ace-trainer-renato": {
+    id: "ace-trainer-renato",
+    displayName: "Renato",
+    trainerClass: "Ace Trainer",
+    appearanceId: "student-gary",
+    category: "standard",
+    aiProfileId: "basic",
+    preBattleDialogueId: "trainer-ace-trainer-renato-pre-battle",
+    postBattleDialogueId: "trainer-ace-trainer-renato-post-battle",
+    rewardItems: [{ itemId: "revive", quantity: 1 }],
+    rewardMoney: 1350,
+    party: [
+      { speciesId: 66, level: 20, moveIds: [67, 2] }, // Machop
+      { speciesId: 96, level: 21, moveIds: [1, 93] }, // Drowzee
+      { speciesId: 17, level: 22, moveIds: [16, 98] }, // Pidgeotto
+    ],
+  },
+
+  "swimmer-marina": {
+    id: "swimmer-marina",
+    displayName: "Marina",
+    trainerClass: "Swimmer",
+    appearanceId: "student-francisca",
+    category: "standard",
+    aiProfileId: "basic",
+    preBattleDialogueId: "trainer-swimmer-marina-pre-battle",
+    postBattleDialogueId: "trainer-swimmer-marina-post-battle",
+    rewardItems: [{ itemId: "potion", quantity: 1 }],
+    rewardMoney: 850,
+    party: [
+      { speciesId: 118, level: 20, moveIds: [64, 55] }, // Goldeen: Peck, Water Gun
+      { speciesId: 120, level: 20, moveIds: [33, 55] }, // Staryu: Tackle, Water Gun
+    ],
+  },
+
+  "sailor-nico": {
+    id: "sailor-nico",
+    displayName: "Nico",
+    trainerClass: "Sailor",
+    appearanceId: "student-gary",
+    category: "standard",
+    aiProfileId: "basic",
+    preBattleDialogueId: "trainer-sailor-nico-pre-battle",
+    postBattleDialogueId: "trainer-sailor-nico-post-battle",
+    rewardItems: [{ itemId: "super-potion", quantity: 1 }],
+    rewardMoney: 950,
+    party: [
+      { speciesId: 60, level: 21, moveIds: [1, 55] }, // Poliwag: Pound, Water Gun
+      { speciesId: 54, level: 21, moveIds: [10, 55] }, // Psyduck: Scratch, Water Gun
+    ],
+  },
+
   "gym-leader-brock": {
     id: "gym-leader-brock",
     displayName: "Brock",
@@ -186,42 +272,64 @@ export const POKEMON_TRAINER_BATTLE_REGISTRY = {
     preBattleDialogueId: "gym-leader-brock-pre-battle",
     postBattleDialogueId: "gym-leader-brock-post-battle",
     rewardItems: [{ itemId: "super-potion", quantity: 2 }],
-    rewardMoney: 1800,
+    rewardMoney: 2800,
     party: [
       {
         speciesId: 74, // Geodude
-        level: 18,
-        moveIds: [33, 88], // Tackle, Rock Throw
+        level: 22,
+        moveIds: [33, 88, 222], // Tackle, Rock Throw
       },
       {
         speciesId: 95, // Onix
-        level: 20,
-        moveIds: [20, 88], // Bind, Rock Throw
+        level: 26,
+        moveIds: [20, 88, 222], // Bind, Rock Throw
       },
     ],
   },
 
+  "gym-leader-misty": {
+    id: "gym-leader-misty",
+    displayName: "Misty",
+    trainerClass: "Gym Leader",
+    appearanceId: "gym-leader-misty",
+    category: "gym-leader",
+    gymLeader: {
+      gymId: "gym-02",
+      badgeId: "cascade-badge",
+      leaderPresentationId: "misty",
+    },
+    aiProfileId: "basic",
+    preBattleDialogueId: "gym-leader-misty-pre-battle",
+    postBattleDialogueId: "gym-leader-misty-post-battle",
+    rewardItems: [
+      { itemId: "super-potion", quantity: 2 },
+      { itemId: "revive", quantity: 1 },
+    ],
+    rewardMoney: 3400,
+    party: [
+      { speciesId: 120, level: 28, moveIds: [55, 98, 94] }, // Staryu
+      { speciesId: 54, level: 30, moveIds: [55, 93] }, // Psyduck
+      { speciesId: 121, level: 34, moveIds: [55, 58, 93, 94] }, // Starmie
+    ],
+  },
 } as const satisfies Record<string, PokemonTrainerBattleDefinition>;
 
-export type PokemonTrainerBattleId =
-  keyof typeof POKEMON_TRAINER_BATTLE_REGISTRY;
+export type PokemonTrainerBattleId = keyof typeof POKEMON_TRAINER_BATTLE_REGISTRY;
 
 export function isPokemonTrainerBattleId(
-  value: unknown,
+  value: unknown
 ): value is PokemonTrainerBattleId {
-  return (
-    typeof value === "string" && value in POKEMON_TRAINER_BATTLE_REGISTRY
-  );
+  return typeof value === "string" && value in POKEMON_TRAINER_BATTLE_REGISTRY;
 }
 
 export function getPokemonTrainerBattleDefinition(
-  trainerBattleId: PokemonTrainerBattleId,
+  trainerBattleId: PokemonTrainerBattleId
 ): PokemonTrainerBattleDefinition {
   return POKEMON_TRAINER_BATTLE_REGISTRY[trainerBattleId];
 }
 
 export function findPokemonTrainerBattleDefinition(
-  trainerBattleId: string,
+  trainerBattleId: string
 ): PokemonTrainerBattleDefinition | undefined {
   if (!isPokemonTrainerBattleId(trainerBattleId)) {
     return undefined;

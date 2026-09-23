@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "tileSize": 16,
+  "authoringContract": "cesar-mmo-production-v1",
+  "layerContract": [
+    "Ground",
+    "GroundDetails",
+    "Buildings",
+    "AbovePlayer",
+    "Collision",
+    "Objects"
+  ],
+  "tilesets": {
+    "cityTerrain": {
+      "name": "city-ds-terrain-v1",
+      "tsx": "city-ds-v1/city-ds-terrain-v1.tsx",
+      "png": "city-ds-v1/city-ds-terrain-v1.png",
+      "usage": "grid"
+    },
+    "cityStamps": {
+      "name": "city-ds-stamps-v1",
+      "tsx": "city-ds-v1/city-ds-stamps-v1.tsx",
+      "png": "city-ds-v1/city-ds-stamps-v1.png",
+      "usage": "multi-tile-stamp"
+    },
+    "gymTerrain": {
+      "name": "water-gym-terrain-v1",
+      "tsx": "water-gym-v1/water-gym-terrain-v1.tsx",
+      "png": "water-gym-v1/water-gym-terrain-v1.png",
+      "usage": "grid"
+    },
+    "gymStamps": {
+      "name": "water-gym-stamps-v1",
+      "tsx": "water-gym-v1/water-gym-stamps-v1.tsx",
+      "png": "water-gym-v1/water-gym-stamps-v1.png",
+      "usage": "multi-tile-stamp"
+    },
+    "collision": {
+      "name": "production-collision",
+      "tsx": "production-collision.tsx",
+      "png": "production-collision-marker.png",
+      "usage": "collision"
+    }
+  },
+  "notes": [
+    "Ground/GroundDetails/Buildings/AbovePlayer/Collision remain 16x16 tile layers and are supported by the current Phaser MapManager.",
+    "Large artwork is provided as 16-grid stamp atlases so it can still be painted into normal tile layers without requiring a new runtime object renderer.",
+    "Approved master PNGs are preserved unchanged for future reprocessing."
+  ]
+}

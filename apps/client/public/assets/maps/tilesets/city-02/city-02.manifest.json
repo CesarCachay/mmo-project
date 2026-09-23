@@ -1,0 +1,10 @@
+{
+  "revision": "city-02",
+  "tileSize": 16,
+  "mapWidthTiles": 64,
+  "mapHeightTiles": 48,
+  "visualAtlas": "city-02.png",
+  "atlasSha256": "5a6a35afe4bfd93fd87f13c0c294d66272798e86541ddb1e2d2bb5166025551a",
+  "referenceSha256": "5a6a35afe4bfd93fd87f13c0c294d66272798e86541ddb1e2d2bb5166025551a",
+  "notes": "Ground layer is a 1:1 16x16 tiling of the approved City-02 visual atlas; Phaser and Tiled resolve identical pixels."
+}
