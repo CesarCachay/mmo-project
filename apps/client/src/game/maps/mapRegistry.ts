@@ -180,12 +180,8 @@ export const MAP_REGISTRY: Record<MapId, GameMapConfig> = {
     path: "/assets/maps/gym-02/gym-02.json",
     tilesets: [
       {
-        key: "water-gym-terrain-v1",
-        path: "/assets/maps/tilesets/production/water-gym-v1/water-gym-terrain-v1.png",
-      },
-      {
-        key: "water-gym-stamps-v1",
-        path: "/assets/maps/tilesets/production/water-gym-v1/water-gym-stamps-v1.png",
+        key: "gym-02",
+        path: "/assets/maps/tilesets/gym-02/gym-02.png",
       },
       {
         key: "production-collision",

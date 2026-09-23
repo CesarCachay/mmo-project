@@ -1,0 +1,12 @@
+{
+  "revision": "gym-02",
+  "tileSize": 16,
+  "mapWidthTiles": 32,
+  "mapHeightTiles": 36,
+  "visualAtlas": "gym-02.png",
+  "atlasSha256": "d67196852079bf72c3fe40b96c4f1f15deabc6996223b8158ed071556d9b750d",
+  "referenceSha256": "d67196852079bf72c3fe40b96c4f1f15deabc6996223b8158ed071556d9b750d",
+  "notes": "Canonical files remain gym-02.*; runtime uses distinct tilemap key gym-02 and texture/tileset key gym-02-tileset to avoid dynamic-loader key collisions.",
+  "runtimeTextureKey": "gym-02-tileset",
+  "tilemapKey": "gym-02"
+}

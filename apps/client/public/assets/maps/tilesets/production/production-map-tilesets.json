@@ -24,16 +24,10 @@
       "usage": "multi-tile-stamp"
     },
     "gymTerrain": {
-      "name": "water-gym-terrain-v1",
-      "tsx": "water-gym-v1/water-gym-terrain-v1.tsx",
-      "png": "water-gym-v1/water-gym-terrain-v1.png",
-      "usage": "grid"
-    },
-    "gymStamps": {
-      "name": "water-gym-stamps-v1",
-      "tsx": "water-gym-v1/water-gym-stamps-v1.tsx",
-      "png": "water-gym-v1/water-gym-stamps-v1.png",
-      "usage": "multi-tile-stamp"
+      "name": "gym-02",
+      "tsx": "../gym-02/gym-02.tsx",
+      "png": "../gym-02/gym-02.png",
+      "usage": "exact-fidelity-grid"
     },
     "collision": {
       "name": "production-collision",
@@ -45,6 +39,7 @@
   "notes": [
     "Ground/GroundDetails/Buildings/AbovePlayer/Collision remain 16x16 tile layers and are supported by the current Phaser MapManager.",
     "Large artwork is provided as 16-grid stamp atlases so it can still be painted into normal tile layers without requiring a new runtime object renderer.",
-    "Approved master PNGs are preserved unchanged for future reprocessing."
+    "Approved master PNGs are preserved unchanged for future reprocessing.",
+    "Gym-02 uses its canonical exact-fidelity 16x16 atlas under tilesets/gym-02/."
   ]
 }
