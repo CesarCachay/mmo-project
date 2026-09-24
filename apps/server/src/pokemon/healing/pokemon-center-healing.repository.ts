@@ -5,6 +5,7 @@ import type { PokemonParty } from '@cesar-mmo/shared';
 import { PrismaService } from '../../database/prisma.service';
 
 import type { PokemonTrainerId } from '../pokemon-trainer-identity';
+import { toPokemonMajorStatusPersistenceFields } from '../status/pokemon-major-status.persistence';
 
 export type PokemonCenterHealingPersistenceConflictCode =
   'PARTY_STATE_CHANGED' | 'POKEMON_STATE_CHANGED' | 'MOVE_STATE_CHANGED';
@@ -31,6 +32,8 @@ interface PersistedPartyPokemon {
   readonly formId: number;
   readonly level: number;
   readonly currentHp: number;
+  readonly majorStatus: string | null;
+  readonly statusTurnsRemaining: number | null;
 
   readonly moves: readonly {
     readonly slot: number;
@@ -71,6 +74,8 @@ export class PokemonCenterHealingRepository {
           formId: true,
           level: true,
           currentHp: true,
+          majorStatus: true,
+          statusTurnsRemaining: true,
           moves: {
             orderBy: {
               slot: 'asc',
@@ -97,9 +102,10 @@ export class PokemonCenterHealingRepository {
       /*
        * DB FIRST.
        *
-       * Este repository únicamente puede modificar:
+       * Este repository únicamente puede modificar la parte curable del Party:
        *
        * PokemonInstance.currentHp
+       * PokemonInstance.majorStatus / statusTurnsRemaining
        * PokemonInstanceMove.currentPp
        *
        * Los valores actuales también forman parte del WHERE.
@@ -116,6 +122,13 @@ export class PokemonCenterHealingRepository {
           );
         }
 
+        const expectedStatus = toPokemonMajorStatusPersistenceFields(
+          expectedPokemon.majorStatus,
+        );
+        const healedStatus = toPokemonMajorStatusPersistenceFields(
+          healedPokemon.majorStatus,
+        );
+
         const updatedPokemon = await tx.pokemonInstance.updateMany({
           where: {
             id: expectedPokemon.instanceId,
@@ -127,9 +140,13 @@ export class PokemonCenterHealingRepository {
             formId: expectedPokemon.formId,
             level: expectedPokemon.level,
             currentHp: expectedPokemon.currentHp,
+            majorStatus: expectedStatus.majorStatus,
+            statusTurnsRemaining: expectedStatus.statusTurnsRemaining,
           },
           data: {
             currentHp: healedPokemon.currentHp,
+            majorStatus: healedStatus.majorStatus,
+            statusTurnsRemaining: healedStatus.statusTurnsRemaining,
           },
         });
 
@@ -276,11 +293,17 @@ function assertPersistedPartyMatchesExpected(
       );
     }
 
+    const expectedStatus = toPokemonMajorStatusPersistenceFields(
+      expectedPokemon.majorStatus,
+    );
+
     if (
       persistedPokemon.speciesId !== expectedPokemon.speciesId ||
       persistedPokemon.formId !== expectedPokemon.formId ||
       persistedPokemon.level !== expectedPokemon.level ||
-      persistedPokemon.currentHp !== expectedPokemon.currentHp
+      persistedPokemon.currentHp !== expectedPokemon.currentHp ||
+      persistedPokemon.majorStatus !== expectedStatus.majorStatus ||
+      persistedPokemon.statusTurnsRemaining !== expectedStatus.statusTurnsRemaining
     ) {
       throw new PokemonCenterHealingPersistenceConflictError(
         'POKEMON_STATE_CHANGED',

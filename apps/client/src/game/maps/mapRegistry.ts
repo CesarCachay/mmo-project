@@ -111,12 +111,9 @@ export const MAP_REGISTRY: Record<MapId, GameMapConfig> = {
     path: "/assets/maps/city-01/city-01.json",
     tilesets: [
       {
-        key: "city-ds-terrain-v1",
-        path: "/assets/maps/tilesets/production/city-ds-v1/city-ds-terrain-v1.png",
-      },
-      {
-        key: "city-01-stamps-v2",
-        path: "/assets/maps/tilesets/city-01-v2/city-01-stamps-v2.png",
+        key: "city-01-tileset",
+        tiledName: "city-01-tileset",
+        path: "/assets/maps/tilesets/city-01/city-01.png",
       },
       {
         key: "production-collision",
@@ -131,12 +128,9 @@ export const MAP_REGISTRY: Record<MapId, GameMapConfig> = {
     path: "/assets/maps/route-03/route-03.json",
     tilesets: [
       {
-        key: "city-ds-terrain-v1",
-        path: "/assets/maps/tilesets/production/city-ds-v1/city-ds-terrain-v1.png",
-      },
-      {
-        key: "route-03-stamps-v1",
-        path: "/assets/maps/tilesets/route-03/route-03-stamps-v1.png",
+        key: "route-03-tileset",
+        tiledName: "route-03-tileset",
+        path: "/assets/maps/tilesets/route-03/route-03.png",
       },
       {
         key: "production-collision",

@@ -1,5 +1,6 @@
 import type { PokemonInstance } from "../pokemon.types.js";
 import type { BattlePokemonState } from "./pokemon-battle.types.js";
+import { createBattlePokemonStatusStateFromPersistent } from "./pokemon-battle-status.js";
 
 export function createBattlePokemonState(pokemon: PokemonInstance): BattlePokemonState {
   assertValidBattlePokemonSource(pokemon);
@@ -7,6 +8,7 @@ export function createBattlePokemonState(pokemon: PokemonInstance): BattlePokemo
   return {
     pokemon: createPokemonInstanceBattleSnapshot(pokemon),
     currentHp: pokemon.currentHp,
+    statusState: createBattlePokemonStatusStateFromPersistent(pokemon.majorStatus),
   };
 }
 

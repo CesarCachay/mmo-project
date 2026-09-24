@@ -116,6 +116,9 @@ model PokemonInstance {
   currentHp  Int @map("current_hp")
   abilityId  Int @map("ability_id")
 
+  majorStatus          String? @map("major_status") @db.VarChar(32)
+  statusTurnsRemaining Int?    @map("status_turns_remaining")
+
   partyPosition Int? @map("party_position")
 
   trainer PokemonTrainer @relation(fields: [trainerId], references: [id], onDelete: Cascade)

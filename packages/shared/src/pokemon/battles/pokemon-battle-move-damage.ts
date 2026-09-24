@@ -1,6 +1,7 @@
 import { getPokemonForm } from "../pokemon-form.registry.js";
 import { getCombinedTypeEffectiveness } from "../pokemon-type.registry.js";
 import { calculateBattleNonHpStat } from "./pokemon-battle-stat.js";
+import { applyBattleStatusAttackModifier } from "./pokemon-battle-status-effects.js";
 import type { PokemonForm } from "../pokemon.types.js";
 import type { BattleMoveExecutionContext } from "./pokemon-battle-move-execution.js";
 
@@ -91,7 +92,11 @@ export function calculateBattleMoveDamage(
   }
 
   // Convert base stats into our current Battle V1 derived stats.
-  const attack = calculateBattleNonHpStat(actorBaseStat, actorPokemon.level);
+  const derivedAttack = calculateBattleNonHpStat(actorBaseStat, actorPokemon.level);
+  const attack =
+    move.damageClass === "physical"
+      ? applyBattleStatusAttackModifier(context.actorPokemon, derivedAttack)
+      : derivedAttack;
   const defense = calculateBattleNonHpStat(targetBaseStat, targetPokemon.level);
 
   if (attack <= 0 || defense <= 0) {

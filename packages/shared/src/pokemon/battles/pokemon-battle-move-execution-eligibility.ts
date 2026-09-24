@@ -1,6 +1,9 @@
 import { isBattlePokemonAbleToAct } from "./pokemon-battle-faint.js";
 
-import { getActiveBattlePokemon } from "./pokemon-battle-participant.js";
+import {
+  getActiveBattlePokemon,
+  getOpposingBattleParticipant,
+} from "./pokemon-battle-participant.js";
 
 import { isBattleActive } from "./pokemon-battle-lifecycle.js";
 
@@ -12,7 +15,7 @@ import type {
   BattlePokemonState,
 } from "./pokemon-battle.types.js";
 
-export type BattleMoveExecutionSkipReason = "actor-fainted";
+export type BattleMoveExecutionSkipReason = "actor-fainted" | "target-fainted";
 
 export type BattleMoveExecutionEligibility =
   | {
@@ -60,6 +63,24 @@ export function evaluateBattleMoveExecutionEligibility(
     return {
       canExecute: false,
       skipReason: "actor-fainted",
+      actorParticipant,
+      actorPokemon,
+    };
+  }
+
+  // A self-KO (for example confusion self-damage) can leave the opposing
+  // command later in the same resolution order with no valid active target.
+  // Skip that move rather than executing into a fainted Pokémon.
+  const targetParticipant = getOpposingBattleParticipant(
+    battle,
+    actorParticipant.id,
+  );
+  const targetPokemon = getActiveBattlePokemon(targetParticipant);
+
+  if (!isBattlePokemonAbleToAct(targetPokemon)) {
+    return {
+      canExecute: false,
+      skipReason: "target-fainted",
       actorParticipant,
       actorPokemon,
     };

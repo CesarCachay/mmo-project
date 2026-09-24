@@ -1421,6 +1421,8 @@ export const PokemonInstanceScalarFieldEnum = {
   experience: 'experience',
   currentHp: 'currentHp',
   abilityId: 'abilityId',
+  majorStatus: 'majorStatus',
+  statusTurnsRemaining: 'statusTurnsRemaining',
   partyPosition: 'partyPosition',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

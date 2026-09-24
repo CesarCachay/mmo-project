@@ -2,6 +2,7 @@ import { PokemonInventory } from "./inventory/pokemon-inventory.js";
 import type { PokemonMoney } from "./economy/pokemon-money.js";
 import type { PokemonGrowthRate } from "./progression/pokemon-growth-rate.js";
 import type { PokemonGymBadgeId } from "./trainers/pokemon-gym.types.js";
+import type { PokemonPersistentMajorStatusState } from "./pokemon-status.js";
 
 export type PokemonType =
   | "normal"
@@ -126,6 +127,8 @@ export interface PokemonInstance {
   experience: number;
   currentHp: number;
   abilityId: number;
+  /** Durable major status. Confusion remains Battle-runtime only. */
+  majorStatus?: PokemonPersistentMajorStatusState | null;
   moves: PokemonInstanceMove[];
 }
 

@@ -22,7 +22,18 @@ export const POKEMON_SHOP_CATALOG_REGISTRY = {
   "standard-poke-shop-v1": {
     id: "standard-poke-shop-v1",
     displayName: "Poké Shop",
-    stockedItemIds: ["poke-ball", "potion", "super-potion", "revive"],
+    stockedItemIds: [
+      "poke-ball",
+      "potion",
+      "super-potion",
+      "revive",
+      "antidote",
+      "burn-heal",
+      "ice-heal",
+      "awakening",
+      "paralyze-heal",
+      "full-heal",
+    ],
     buysItemsFromTrainer: true,
   },
 } satisfies Record<PokemonShopCatalogId, PokemonShopCatalogDefinition>;

@@ -8,6 +8,7 @@ import {
 import { getPokemonSpriteAsset } from "../../../pokemon/pokemon-sprite.registry";
 
 import type { BattleClientInteractionState } from "../../battle-client.types";
+import { getBattleMajorStatusUiDefinition } from "./battle-status-ui";
 
 export interface ModernBattleReplacementPanelBounds {
   x: number;
@@ -313,6 +314,23 @@ export class ModernBattleReplacementPanel {
 
     hpTrack.appendChild(hpFill);
 
+    const condition = document.createElement("span");
+    condition.className =
+      "battle-modern-replacement-card__condition battle-status-badge";
+
+    const majorStatus =
+      pokemonState.statusState?.major?.type ?? pokemon.majorStatus?.type ?? null;
+
+    if (majorStatus === null) {
+      condition.hidden = true;
+    } else {
+      const definition = getBattleMajorStatusUiDefinition(majorStatus);
+      condition.textContent = definition.label;
+      condition.title = definition.title;
+      condition.setAttribute("aria-label", definition.title);
+      condition.classList.add(definition.className);
+    }
+
     const status = document.createElement("div");
 
     status.className = "battle-modern-replacement-card__status";
@@ -357,7 +375,11 @@ export class ModernBattleReplacementPanel {
       }
     }
 
-    content.append(top, hpRow, hpTrack, status);
+    const footer = document.createElement("div");
+    footer.className = "battle-modern-replacement-card__footer";
+    footer.append(status, condition);
+
+    content.append(top, hpRow, hpTrack, footer);
     button.append(spriteWrap, content);
 
     button.addEventListener("click", () => {

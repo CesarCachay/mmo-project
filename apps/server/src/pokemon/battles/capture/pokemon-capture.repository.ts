@@ -8,6 +8,7 @@ import {
 
 import { PrismaService } from '#app/database/prisma.service';
 import { PokemonTrainerId } from '#app/pokemon/pokemon-trainer-identity';
+import { toPokemonMajorStatusPersistenceFields } from '#app/pokemon/status/pokemon-major-status.persistence';
 
 export interface PersistSuccessfulPokemonCaptureInput {
   readonly trainerId: PokemonTrainerId;
@@ -182,6 +183,10 @@ export class PokemonCaptureRepository {
        * 6. Persist the SAME Pokémon that existed in the
        *    Wild Encounter / Battle.
        */
+      const statusPersistence = toPokemonMajorStatusPersistenceFields(
+        capturedPokemon.majorStatus,
+      );
+
       await tx.pokemonInstance.create({
         data: {
           id: capturedPokemon.instanceId,
@@ -193,6 +198,8 @@ export class PokemonCaptureRepository {
           experience: capturedPokemon.experience,
           currentHp: capturedPokemon.currentHp,
           abilityId: capturedPokemon.abilityId,
+          majorStatus: statusPersistence.majorStatus,
+          statusTurnsRemaining: statusPersistence.statusTurnsRemaining,
           partyPosition: expectedPartyPosition,
         },
       });

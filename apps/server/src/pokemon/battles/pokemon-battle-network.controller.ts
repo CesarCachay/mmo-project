@@ -9,8 +9,9 @@ import {
   resolveTrainerBattleContinuationOutcome,
   resolveWildBattleContinuationOutcome,
   isPokemonBattleReplacementInput,
-  planBattleHealingItemUse,
+  planBattleTrainerMedicineItemUse,
   assertPokemonBattleCommandActionAllowed,
+  applyBattleEndTurnStatusEffects,
 } from '@cesar-mmo/shared';
 
 import type {
@@ -172,7 +173,7 @@ export class PokemonBattleNetworkController {
             );
           }
 
-          planBattleHealingItemUse(
+          planBattleTrainerMedicineItemUse(
             session.battle,
             trainerBinding.participantId,
             payload.action,
@@ -239,6 +240,10 @@ export class PokemonBattleNetworkController {
           terminalOutcome = executionResult.terminalOutcome;
           break;
         }
+      }
+
+      if (!terminalOutcome) {
+        presentationEvents.push(...this.applyEndTurnStatusEffects(session));
       }
 
       const emitTurnResolved = (): void => {
@@ -422,6 +427,26 @@ export class PokemonBattleNetworkController {
     }
   }
 
+  private applyEndTurnStatusEffects(
+    session: PokemonBattleSession,
+  ): BattlePresentationEvent[] {
+    const events: BattlePresentationEvent[] = [];
+
+    for (const effect of applyBattleEndTurnStatusEffects(session.battle)) {
+      events.push({ ...effect });
+
+      if (effect.currentHp === 0) {
+        events.push({
+          type: 'pokemon-fainted',
+          participantId: effect.participantId,
+          pokemonInstanceId: effect.pokemonInstanceId,
+        });
+      }
+    }
+
+    return events;
+  }
+
   private async handleTrainerBattleCommand(
     client: Socket,
     session: PokemonBattleSession,
@@ -456,7 +481,7 @@ export class PokemonBattleNetworkController {
           );
         }
 
-        planBattleHealingItemUse(
+        planBattleTrainerMedicineItemUse(
           session.battle,
           trainerBinding.participantId,
           payload.action,
@@ -527,6 +552,8 @@ export class PokemonBattleNetworkController {
           );
         }
       }
+
+      presentationEvents.push(...this.applyEndTurnStatusEffects(session));
 
       const continuationAfter = resolveTrainerBattleContinuationOutcome(
         session.battle,

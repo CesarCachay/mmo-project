@@ -256,15 +256,17 @@ export class TrainerPanelController {
     this.partyDrawer.show();
 
     try {
-      await this.partyDrawer.animateHpRestore(
-        payload.targetPokemonInstanceId,
-        payload.previousHp,
-        payload.currentHp,
-        isRevive,
-        760,
-      );
+      if (payload.appliedHealing > 0) {
+        await this.partyDrawer.animateHpRestore(
+          payload.targetPokemonInstanceId,
+          payload.previousHp,
+          payload.currentHp,
+          isRevive,
+          760,
+        );
 
-      await this.wait(600);
+        await this.wait(600);
+      }
     } catch (error: unknown) {
       /* Un error puramente visual jamás debe impedir aplicar el TrainerState autoritativo */
       console.error(
@@ -528,6 +530,9 @@ export class TrainerPanelController {
 
       case "TARGET_FULL_HP":
         return "Ese Pokémon ya tiene todos sus PS.";
+
+      case "TARGET_STATUS_NOT_APPLICABLE":
+        return "Ese objeto no puede curar el estado actual de ese Pokémon.";
 
       case "INCOMPATIBLE_STATE":
         return "No puedes usar objetos en este momento.";

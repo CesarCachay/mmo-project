@@ -17,6 +17,8 @@ export const BATTLE_PRESENTATION_TIMING = {
   forcedReplacementMessageMs: 650,
   itemUsedMessageMs: 650,
   hpRestoredMessageMs: 500,
+  statusMessageMs: 700,
+  statusResidualMessageMs: 600,
   captureMessageMs: 1200,
   experienceGainedMessageMs: 700,
   levelUpMessageMs: 900,
@@ -43,6 +45,15 @@ export function getBattlePresentationMessageDuration(
 
     case "damage-applied":
       return BATTLE_PRESENTATION_TIMING.damageResultMessageMs;
+
+    case "status-inflicted":
+    case "status-cleared":
+    case "status-action-prevented":
+    case "confusion-self-damage":
+      return BATTLE_PRESENTATION_TIMING.statusMessageMs;
+
+    case "status-residual-damage":
+      return BATTLE_PRESENTATION_TIMING.statusResidualMessageMs;
 
     case "pokemon-switched":
       return BATTLE_PRESENTATION_TIMING.switchMessageMs;

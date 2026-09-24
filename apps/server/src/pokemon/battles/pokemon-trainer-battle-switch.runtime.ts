@@ -1,6 +1,8 @@
 import {
   resolveTrainerBattleContinuationOutcome,
   resolveWildBattleContinuationOutcome,
+  clearBattlePokemonConfusion,
+  resetBattlePokemonBadPoisonCounter,
   type BattleTurnResolutionEntry,
 } from '@cesar-mmo/shared';
 
@@ -157,6 +159,11 @@ export function applyPokemonTrainerBattleSwitch(
    * No persistence happens here.
    * This is Battle runtime state only.
    */
+  // Confusion is volatile and is removed when the Pokémon leaves the active
+  // slot. The outgoing Pokémon keeps any major status condition.
+  clearBattlePokemonConfusion(previousPokemon);
+  resetBattlePokemonBadPoisonCounter(previousPokemon);
+
   trainerParticipant.activePokemonIndex = pokemonIndex;
 
   markPokemonBattleParticipation(

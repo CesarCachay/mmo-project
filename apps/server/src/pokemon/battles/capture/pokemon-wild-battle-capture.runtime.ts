@@ -4,6 +4,8 @@ import {
   getPokemonItem,
   getPokemonSpecies,
   resolvePokemonCapture,
+  createPersistentMajorStatusFromBattle,
+  ensureBattlePokemonStatusState,
 } from '@cesar-mmo/shared';
 
 import type {
@@ -321,6 +323,9 @@ export async function executePokemonWildBattleCapture(
     ...wildPokemonState.pokemon,
 
     currentHp: wildPokemonState.currentHp,
+    majorStatus: createPersistentMajorStatusFromBattle(
+      ensureBattlePokemonStatusState(wildPokemonState).major,
+    ),
 
     moves: wildPokemonState.pokemon.moves.map((move) => ({
       ...move,

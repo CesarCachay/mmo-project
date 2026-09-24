@@ -1,0 +1,644 @@
+/* =========================================================
+   STATUS CONDITIONS V1 — PERSISTENT BATTLE VFX
+
+   Presentation only. Battle rules remain server-authoritative.
+   The layer is positioned directly over the active Pokémon sprite.
+   ========================================================= */
+
+.battle-status-vfx {
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+  overflow: visible;
+  image-rendering: pixelated;
+  transform-origin: center bottom;
+  contain: layout style paint;
+  backface-visibility: hidden;
+}
+
+.battle-status-vfx[hidden] {
+  display: none;
+}
+
+.battle-status-vfx__slot,
+.battle-status-vfx__effect {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.battle-status-vfx__effect {
+  --status-vfx-period: 1600ms;
+  --status-vfx-glow: rgba(255, 255, 255, 0.25);
+}
+
+.battle-status-vfx__particle {
+  position: absolute;
+  display: block;
+  box-sizing: border-box;
+  will-change: transform, opacity;
+}
+
+/* ------------------------- BURN ------------------------- */
+
+.battle-status-vfx__effect--burn {
+  filter: drop-shadow(0 0 5px rgba(255, 82, 20, 0.45));
+}
+
+.battle-status-vfx__effect--burn::after {
+  content: "";
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: 7%;
+  height: 12%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255, 98, 20, 0.2), transparent 70%);
+  animation: battle-status-burn-ground 1350ms steps(4, end) infinite;
+}
+
+.battle-status-vfx__effect--burn .battle-status-vfx__particle {
+  left: var(--status-vfx-x);
+  bottom: 10%;
+  width: clamp(8px, 7%, 18px);
+  height: clamp(14px, 16%, 34px);
+  border-radius: 60% 40% 62% 38% / 75% 68% 32% 25%;
+  background:
+    linear-gradient(145deg, #fff2a8 0 25%, #ffb21f 26% 52%, #ff5318 53% 76%, #c62512 77% 100%);
+  clip-path: polygon(50% 0, 78% 29%, 72% 48%, 100% 72%, 64% 100%, 28% 93%, 0 72%, 26% 45%);
+  transform-origin: 50% 100%;
+  opacity: 0;
+  animation: battle-status-burn-flame 1120ms steps(5, end) infinite;
+  animation-delay: var(--status-vfx-delay);
+}
+
+/* ------------------------- POISON / TOXIC ------------------------- */
+
+.battle-status-vfx__effect--poison,
+.battle-status-vfx__effect--badly-poisoned {
+  background: radial-gradient(circle at 50% 66%, rgba(151, 60, 193, 0.08), transparent 56%);
+}
+
+.battle-status-vfx__effect--badly-poisoned {
+  filter: drop-shadow(0 0 6px rgba(210, 65, 255, 0.38));
+}
+
+.battle-status-vfx__effect--poison .battle-status-vfx__particle,
+.battle-status-vfx__effect--badly-poisoned .battle-status-vfx__particle {
+  left: var(--status-vfx-x);
+  bottom: 8%;
+  width: clamp(6px, 6%, 16px);
+  aspect-ratio: 1;
+  border: 2px solid #e49cff;
+  border-radius: 50%;
+  background: #8838ad;
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.34),
+    0 0 0 2px rgba(84, 21, 113, 0.28);
+  opacity: 0;
+  animation: battle-status-poison-bubble 1780ms steps(6, end) infinite;
+  animation-delay: var(--status-vfx-delay);
+}
+
+.battle-status-vfx__effect--badly-poisoned .battle-status-vfx__particle {
+  background: #b92ce1;
+  border-color: #f0b4ff;
+  animation-duration: 1380ms;
+}
+
+/* ------------------------- PARALYSIS ------------------------- */
+
+.battle-status-vfx__effect--paralysis .battle-status-vfx__particle {
+  left: var(--status-vfx-x);
+  top: var(--status-vfx-y);
+  width: clamp(10px, 9%, 24px);
+  height: clamp(16px, 22%, 46px);
+  background: #ffd928;
+  clip-path: polygon(54% 0, 100% 0, 66% 39%, 91% 39%, 28% 100%, 42% 55%, 10% 55%);
+  filter: drop-shadow(0 0 3px #fff6a5) drop-shadow(0 0 5px #f2a900);
+  opacity: 0;
+  animation: battle-status-paralysis-snap 1250ms steps(2, end) infinite;
+  animation-delay: var(--status-vfx-delay);
+}
+
+.battle-status-vfx__effect--paralysis::after {
+  content: "✦";
+  position: absolute;
+  right: 12%;
+  top: 13%;
+  color: #fff59d;
+  font-size: clamp(12px, 11%, 30px);
+  text-shadow: 0 0 4px #ffd000;
+  animation: battle-status-paralysis-star 1250ms steps(3, end) infinite;
+}
+
+/* ------------------------- SLEEP ------------------------- */
+
+.battle-status-vfx__effect--sleep .battle-status-vfx__particle {
+  left: var(--status-vfx-x);
+  top: var(--status-vfx-y);
+  width: clamp(12px, 13%, 30px);
+  height: clamp(14px, 14%, 32px);
+  opacity: 0;
+  animation: battle-status-sleep-rise 2050ms steps(7, end) infinite;
+  animation-delay: var(--status-vfx-delay);
+}
+
+.battle-status-vfx__effect--sleep .battle-status-vfx__particle::before {
+  content: "Z";
+  position: absolute;
+  inset: 0;
+  color: #d9f0ff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: clamp(12px, 14%, 32px);
+  font-weight: 1000;
+  line-height: 1;
+  text-shadow:
+    2px 0 #3a79d8,
+    -2px 0 #3a79d8,
+    0 2px #3a79d8,
+    0 -2px #3a79d8,
+    0 0 8px rgba(125, 199, 255, 0.6);
+}
+
+.battle-status-vfx__effect--sleep::after {
+  content: "";
+  position: absolute;
+  left: 22%;
+  bottom: 23%;
+  width: 12%;
+  aspect-ratio: 1;
+  border: 2px solid rgba(197, 229, 255, 0.78);
+  border-radius: 50%;
+  box-shadow:
+    26px -14px 0 -2px rgba(197, 229, 255, 0.32),
+    52px 3px 0 -3px rgba(197, 229, 255, 0.22);
+  animation: battle-status-sleep-bubble 1800ms steps(6, end) infinite;
+}
+
+/* ------------------------- FREEZE ------------------------- */
+
+.battle-status-vfx__effect--freeze {
+  background:
+    radial-gradient(ellipse at 50% 78%, rgba(129, 220, 255, 0.18), transparent 55%),
+    linear-gradient(180deg, transparent 40%, rgba(132, 220, 255, 0.05));
+  filter: drop-shadow(0 0 5px rgba(102, 205, 255, 0.42));
+}
+
+.battle-status-vfx__effect--freeze::before {
+  content: "";
+  position: absolute;
+  inset: 13% 14% 7%;
+  border: 2px solid rgba(178, 233, 255, 0.58);
+  clip-path: polygon(12% 76%, 25% 34%, 37% 61%, 51% 10%, 62% 57%, 79% 28%, 89% 78%, 64% 92%, 36% 91%);
+  background: linear-gradient(145deg, rgba(206, 245, 255, 0.13), rgba(66, 167, 235, 0.08));
+  animation: battle-status-freeze-shimmer 1850ms steps(5, end) infinite;
+}
+
+.battle-status-vfx__effect--freeze .battle-status-vfx__particle {
+  left: var(--status-vfx-x);
+  top: var(--status-vfx-y);
+  width: clamp(8px, 8%, 20px);
+  height: clamp(14px, 16%, 36px);
+  background: linear-gradient(135deg, #f3fdff 0 28%, #8edcff 29% 67%, #3f9ee6 68% 100%);
+  clip-path: polygon(50% 0, 100% 68%, 50% 100%, 0 68%);
+  opacity: 0.65;
+  animation: battle-status-freeze-crystal 1600ms steps(5, end) infinite;
+  animation-delay: var(--status-vfx-delay);
+}
+
+/* ------------------------- CONFUSION ------------------------- */
+
+.battle-status-vfx__slot--confusion {
+  z-index: 2;
+}
+
+.battle-status-vfx__effect--confusion .battle-status-vfx__particle {
+  left: 50%;
+  top: 18%;
+  width: clamp(18px, 16%, 38px);
+  height: clamp(18px, 16%, 38px);
+  color: #ff8bf0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: clamp(16px, 18%, 42px);
+  font-weight: 1000;
+  line-height: 1;
+  text-align: center;
+  text-shadow:
+    2px 0 #7c2cb5,
+    -2px 0 #7c2cb5,
+    0 2px #7c2cb5,
+    0 -2px #7c2cb5,
+    0 0 8px rgba(255, 92, 227, 0.65);
+  transform-origin: 0 95%;
+  animation: battle-status-confusion-orbit 1850ms linear infinite;
+  animation-delay: var(--status-vfx-delay);
+}
+
+.battle-status-vfx__effect--confusion .battle-status-vfx__particle::before {
+  content: "@";
+}
+
+/* ------------------------- KEYFRAMES ------------------------- */
+
+@keyframes battle-status-burn-flame {
+  0%, 100% { transform: translateY(5px) scale(0.66) rotate(-3deg); opacity: 0; }
+  20% { opacity: 0.94; }
+  45% { transform: translateY(-3px) scale(1) rotate(4deg); opacity: 1; }
+  75% { transform: translateY(-12px) scale(0.72) rotate(-5deg); opacity: 0.72; }
+}
+
+@keyframes battle-status-burn-ground {
+  0%, 100% { opacity: 0.35; transform: scaleX(0.9); }
+  50% { opacity: 0.72; transform: scaleX(1.08); }
+}
+
+@keyframes battle-status-poison-bubble {
+  0% { transform: translateY(12px) scale(0.45); opacity: 0; }
+  18% { opacity: 0.86; }
+  65% { transform: translateY(-42px) scale(1); opacity: 0.82; }
+  100% { transform: translateY(-72px) scale(0.72); opacity: 0; }
+}
+
+@keyframes battle-status-paralysis-snap {
+  0%, 6%, 18%, 26%, 100% { opacity: 0; transform: scale(0.72); }
+  8%, 16%, 20%, 24% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes battle-status-paralysis-star {
+  0%, 18%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+  21%, 31% { opacity: 1; transform: scale(1.15) rotate(20deg); }
+  35% { opacity: 0; transform: scale(0.8) rotate(45deg); }
+}
+
+@keyframes battle-status-sleep-rise {
+  0% { transform: translate(0, 16px) scale(0.65); opacity: 0; }
+  18% { opacity: 0.95; }
+  68% { transform: translate(16px, -34px) scale(1); opacity: 0.9; }
+  100% { transform: translate(25px, -58px) scale(1.16); opacity: 0; }
+}
+
+@keyframes battle-status-sleep-bubble {
+  0%, 100% { transform: translateY(8px) scale(0.7); opacity: 0; }
+  25% { opacity: 0.72; }
+  75% { transform: translateY(-22px) scale(1.05); opacity: 0.48; }
+}
+
+@keyframes battle-status-freeze-shimmer {
+  0%, 100% { opacity: 0.42; filter: brightness(0.92); }
+  45% { opacity: 0.75; filter: brightness(1.35); }
+  58% { opacity: 0.56; filter: brightness(1.05); }
+}
+
+@keyframes battle-status-freeze-crystal {
+  0%, 100% { transform: translateY(2px) scale(0.82); opacity: 0.35; }
+  45% { transform: translateY(-4px) scale(1.08); opacity: 0.88; }
+  70% { opacity: 0.58; }
+}
+
+@keyframes battle-status-confusion-orbit {
+  0% {
+    transform: rotate(var(--status-vfx-angle)) translateX(clamp(28px, 25%, 56px)) rotate(calc(-1 * var(--status-vfx-angle)));
+    opacity: 0.92;
+  }
+  50% { opacity: 0.65; }
+  100% {
+    transform: rotate(calc(var(--status-vfx-angle) + 360deg)) translateX(clamp(28px, 25%, 56px)) rotate(calc(-1 * (var(--status-vfx-angle) + 360deg)));
+    opacity: 0.92;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .battle-status-vfx__effect,
+  .battle-status-vfx__effect::before,
+  .battle-status-vfx__effect::after,
+  .battle-status-vfx__particle,
+  .battle-status-vfx__particle::before {
+    animation: none !important;
+  }
+
+  .battle-status-vfx__particle {
+    opacity: 0.62;
+  }
+
+  .battle-status-vfx__effect--sleep .battle-status-vfx__particle:nth-child(n + 2),
+  .battle-status-vfx__effect--paralysis .battle-status-vfx__particle:nth-child(n + 3),
+  .battle-status-vfx__effect--burn .battle-status-vfx__particle:nth-child(n + 4),
+  .battle-status-vfx__effect--poison .battle-status-vfx__particle:nth-child(n + 4),
+  .battle-status-vfx__effect--badly-poisoned .battle-status-vfx__particle:nth-child(n + 4),
+  .battle-status-vfx__effect--freeze .battle-status-vfx__particle:nth-child(n + 4),
+  .battle-status-vfx__effect--confusion .battle-status-vfx__particle:nth-child(n + 2) {
+    display: none;
+  }
+}
+
+
+/* ------------------------- BURSTS / APPEAR / CLEAR ------------------------- */
+
+.battle-status-vfx__burst-layer,
+.battle-status-vfx__burst {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.battle-status-vfx__burst {
+  z-index: 4;
+}
+
+.battle-status-vfx__burst::before,
+.battle-status-vfx__burst::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.battle-status-vfx__burst-particle {
+  position: absolute;
+  left: var(--status-vfx-x);
+  top: var(--status-vfx-y);
+  width: clamp(8px, 8%, 20px);
+  height: clamp(8px, 8%, 20px);
+  will-change: transform, opacity;
+}
+
+.battle-status-vfx__burst--inflict::before {
+  inset: 10% 12% 12%;
+  border-radius: 50%;
+  border: 3px solid rgba(255,255,255,0.65);
+  animation: battle-status-burst-ring 560ms ease-out forwards;
+}
+
+.battle-status-vfx__burst--clear::before {
+  inset: 14% 16% 18%;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.52);
+  animation: battle-status-burst-clear-ring 520ms ease-out forwards;
+}
+
+.battle-status-vfx__burst--blocked::after {
+  inset: 20% 22% 22%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.24), transparent 58%);
+  animation: battle-status-burst-blocked-flash 540ms ease-out forwards;
+}
+
+.battle-status-vfx__burst--residual::after,
+.battle-status-vfx__burst--self-hit::after {
+  inset: 18% 20% 20%;
+  border-radius: 50%;
+  animation: battle-status-burst-hit-flash 520ms ease-out forwards;
+}
+
+.battle-status-vfx__burst--status-burn::before,
+.battle-status-vfx__burst--status-burn::after {
+  box-shadow: 0 0 0 3px rgba(255,120,35,0.18);
+}
+
+.battle-status-vfx__burst--status-burn .battle-status-vfx__burst-particle {
+  background: linear-gradient(180deg, #fff2a8 0 28%, #ffb21f 29% 60%, #ff5318 61% 100%);
+  clip-path: polygon(50% 0, 78% 29%, 72% 48%, 100% 72%, 64% 100%, 28% 93%, 0 72%, 26% 45%);
+  animation: battle-status-burst-pop-up 560ms ease-out forwards;
+  animation-delay: var(--status-vfx-delay);
+}
+
+.battle-status-vfx__burst--status-poison .battle-status-vfx__burst-particle,
+.battle-status-vfx__burst--status-badly-poisoned .battle-status-vfx__burst-particle {
+  border-radius: 50%;
+  border: 2px solid #efb7ff;
+  background: radial-gradient(circle at 35% 35%, #ffd7ff, #9c3bcf 62%, #61217f 100%);
+  animation: battle-status-burst-pop-up 620ms ease-out forwards;
+  animation-delay: var(--status-vfx-delay);
+}
+
+.battle-status-vfx__burst--status-paralysis .battle-status-vfx__burst-particle {
+  background: #ffd928;
+  clip-path: polygon(54% 0, 100% 0, 66% 39%, 91% 39%, 28% 100%, 42% 55%, 10% 55%);
+  filter: drop-shadow(0 0 3px #fff6a5) drop-shadow(0 0 5px #f2a900);
+  animation: battle-status-burst-zap 540ms ease-out forwards;
+  animation-delay: var(--status-vfx-delay);
+}
+
+.battle-status-vfx__burst--status-sleep .battle-status-vfx__burst-particle::before {
+  content: "Z";
+  position: absolute;
+  inset: 0;
+  color: #d9f0ff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: clamp(12px, 14%, 30px);
+  font-weight: 1000;
+  line-height: 1;
+  text-shadow: 0 0 6px rgba(125, 199, 255, 0.7);
+}
+
+.battle-status-vfx__burst--status-sleep .battle-status-vfx__burst-particle {
+  animation: battle-status-burst-drift 620ms ease-out forwards;
+  animation-delay: var(--status-vfx-delay);
+}
+
+.battle-status-vfx__burst--status-freeze .battle-status-vfx__burst-particle {
+  background: linear-gradient(135deg, #f3fdff 0 28%, #8edcff 29% 67%, #3f9ee6 68% 100%);
+  clip-path: polygon(50% 0, 100% 68%, 50% 100%, 0 68%);
+  animation: battle-status-burst-shard 560ms ease-out forwards;
+  animation-delay: var(--status-vfx-delay);
+}
+
+.battle-status-vfx__burst--status-confusion .battle-status-vfx__burst-particle::before {
+  content: "@";
+  position: absolute;
+  inset: 0;
+  color: #ff8bf0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: clamp(14px, 16%, 34px);
+  font-weight: 1000;
+  line-height: 1;
+  text-shadow: 0 0 8px rgba(255, 92, 227, 0.65);
+}
+
+.battle-status-vfx__burst--status-confusion .battle-status-vfx__burst-particle {
+  animation: battle-status-burst-swirl 520ms ease-out forwards;
+  animation-delay: var(--status-vfx-delay);
+}
+
+@keyframes battle-status-burst-ring {
+  0% { transform: scale(0.45); opacity: 0.9; }
+  100% { transform: scale(1.25); opacity: 0; }
+}
+
+@keyframes battle-status-burst-clear-ring {
+  0% { transform: scale(1); opacity: 0.75; }
+  100% { transform: scale(0.55); opacity: 0; }
+}
+
+@keyframes battle-status-burst-blocked-flash {
+  0% { opacity: 0; transform: scale(0.65); }
+  30% { opacity: 0.95; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.14); }
+}
+
+@keyframes battle-status-burst-hit-flash {
+  0% { opacity: 0; transform: scale(0.75); }
+  28% { opacity: 0.9; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.18); }
+}
+
+@keyframes battle-status-burst-pop-up {
+  0% { transform: translateY(8px) scale(0.3); opacity: 0; }
+  25% { opacity: 1; }
+  100% { transform: translateY(-26px) scale(1); opacity: 0; }
+}
+
+@keyframes battle-status-burst-zap {
+  0% { transform: scale(0.6); opacity: 0; }
+  18% { opacity: 1; }
+  28% { transform: scale(1.2) rotate(8deg); }
+  100% { transform: scale(0.8) rotate(-8deg); opacity: 0; }
+}
+
+@keyframes battle-status-burst-drift {
+  0% { transform: translate(0, 8px) scale(0.6); opacity: 0; }
+  18% { opacity: 1; }
+  100% { transform: translate(12px, -22px) scale(1.05); opacity: 0; }
+}
+
+@keyframes battle-status-burst-shard {
+  0% { transform: scale(0.35) rotate(0deg); opacity: 0; }
+  22% { opacity: 1; }
+  100% { transform: translateY(-10px) scale(1.1) rotate(18deg); opacity: 0; }
+}
+
+@keyframes battle-status-burst-swirl {
+  0% { transform: scale(0.3) rotate(0deg); opacity: 0; }
+  22% { opacity: 1; }
+  100% { transform: translateY(-6px) scale(1.1) rotate(240deg); opacity: 0; }
+}
+
+
+/* =========================================================
+   STATUS VFX STEP 3 — DS-LIKE POLISH / MOBILE / PERFORMANCE
+   ========================================================= */
+
+/* Keep the presentation snappy: classic handheld effects read as short,
+   stepped accents rather than long cinematic overlays. */
+.battle-status-vfx__burst--inflict::before {
+  animation-duration: 420ms;
+  animation-timing-function: steps(5, end);
+}
+
+.battle-status-vfx__burst--clear::before {
+  animation-duration: 360ms;
+  animation-timing-function: steps(4, end);
+}
+
+.battle-status-vfx__burst--blocked::after {
+  animation-duration: 380ms;
+  animation-timing-function: steps(4, end);
+}
+
+.battle-status-vfx__burst--residual::after {
+  animation-duration: 440ms;
+  animation-timing-function: steps(5, end);
+}
+
+.battle-status-vfx__burst--self-hit::after {
+  animation-duration: 400ms;
+  animation-timing-function: steps(4, end);
+}
+
+/* Distinguish blocked-action feedback without introducing new assets. */
+.battle-status-vfx__burst--blocked.battle-status-vfx__burst--status-paralysis {
+  filter: brightness(1.18) drop-shadow(0 0 4px rgba(255, 216, 40, 0.52));
+}
+
+.battle-status-vfx__burst--blocked.battle-status-vfx__burst--status-freeze {
+  filter: brightness(1.12) drop-shadow(0 0 5px rgba(126, 217, 255, 0.5));
+}
+
+.battle-status-vfx__burst--blocked.battle-status-vfx__burst--status-sleep {
+  filter: brightness(1.06);
+}
+
+/* Poison and burn residuals should feel like a brief pulse of the existing
+   condition, not a second move VFX. */
+.battle-status-vfx__burst--residual.battle-status-vfx__burst--status-burn {
+  filter: saturate(1.08) brightness(1.08);
+}
+
+.battle-status-vfx__burst--residual.battle-status-vfx__burst--status-poison,
+.battle-status-vfx__burst--residual.battle-status-vfx__burst--status-badly-poisoned {
+  filter: saturate(1.12) brightness(1.05);
+}
+
+/* Mobile profile: fewer simultaneously visible particles and cheaper filters.
+   This keeps the effect readable around the smaller battle sprites. */
+@media (hover: none) and (pointer: coarse) {
+  .battle-status-vfx {
+    contain: layout style paint;
+  }
+
+  .battle-status-vfx__effect--burn,
+  .battle-status-vfx__effect--badly-poisoned,
+  .battle-status-vfx__effect--freeze,
+  .battle-status-vfx__burst {
+    filter: none;
+  }
+
+  .battle-status-vfx__effect--burn .battle-status-vfx__particle:nth-child(n + 6),
+  .battle-status-vfx__effect--poison .battle-status-vfx__particle:nth-child(n + 7),
+  .battle-status-vfx__effect--badly-poisoned .battle-status-vfx__particle:nth-child(n + 8),
+  .battle-status-vfx__effect--paralysis .battle-status-vfx__particle:nth-child(n + 6),
+  .battle-status-vfx__effect--sleep .battle-status-vfx__particle:nth-child(n + 5),
+  .battle-status-vfx__effect--freeze .battle-status-vfx__particle:nth-child(n + 6),
+  .battle-status-vfx__burst-particle:nth-child(n + 6) {
+    display: none;
+  }
+}
+
+/* Short landscape phones: shrink the visual envelope so VFX do not overlap
+   command UI or the opposing HUD. */
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 520px) {
+  .battle-status-vfx__effect--burn .battle-status-vfx__particle,
+  .battle-status-vfx__effect--freeze .battle-status-vfx__particle,
+  .battle-status-vfx__burst-particle {
+    scale: 0.84;
+  }
+
+  .battle-status-vfx__effect--confusion .battle-status-vfx__particle {
+    font-size: clamp(12px, 14%, 28px);
+  }
+
+  .battle-status-vfx__effect--sleep .battle-status-vfx__particle::before {
+    font-size: clamp(10px, 12%, 24px);
+  }
+}
+
+/* Reduced motion still communicates the condition, but avoids orbiting,
+   flicker and repeated particle travel. Bursts become a short static cue. */
+@media (prefers-reduced-motion: reduce) {
+  .battle-status-vfx__effect,
+  .battle-status-vfx__effect::before,
+  .battle-status-vfx__effect::after,
+  .battle-status-vfx__particle,
+  .battle-status-vfx__particle::before,
+  .battle-status-vfx__burst,
+  .battle-status-vfx__burst::before,
+  .battle-status-vfx__burst::after,
+  .battle-status-vfx__burst-particle,
+  .battle-status-vfx__burst-particle::before {
+    animation: none !important;
+  }
+
+  .battle-status-vfx__effect .battle-status-vfx__particle:nth-child(n + 3),
+  .battle-status-vfx__burst-particle:nth-child(n + 4) {
+    display: none;
+  }
+
+  .battle-status-vfx__effect .battle-status-vfx__particle {
+    opacity: 0.58;
+  }
+
+  .battle-status-vfx__burst {
+    opacity: 0.62;
+  }
+}

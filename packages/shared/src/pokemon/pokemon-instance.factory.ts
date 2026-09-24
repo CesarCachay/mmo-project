@@ -114,6 +114,7 @@ export function createPokemonInstance(
     experience,
     currentHp,
     abilityId: ability.abilityId,
+    majorStatus: null,
     moves,
   };
 }

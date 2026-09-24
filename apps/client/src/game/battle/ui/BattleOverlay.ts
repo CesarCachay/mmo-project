@@ -9,6 +9,7 @@ import type {
   BattlePresentationEvent,
   PokemonEvolutionDecision,
   BattlePokemonState,
+  BattleMajorStatusCondition,
   PokemonBattlePresentationContext,
 } from "@cesar-mmo/shared";
 
@@ -730,6 +731,52 @@ export class BattleOverlay {
     /* Durante la narración no dejamos ningún menú debajo */
     this.hideCommandPanelsForPresentation();
     return this.messagePanel.present(message, durationMs);
+  }
+
+  public setPokemonMajorStatus(
+    battle: BattleInstance,
+    participantId: string,
+    pokemonInstanceId: string,
+    status: BattleMajorStatusCondition | null,
+  ): void {
+    const hud = this.getParticipantHud(battle, participantId);
+
+    if (!hud) {
+      return;
+    }
+
+    hud.setMajorStatus(pokemonInstanceId, status);
+  }
+
+  public setPokemonConfusion(
+    battle: BattleInstance,
+    participantId: string,
+    pokemonInstanceId: string,
+    confused: boolean,
+  ): void {
+    const hud = this.getParticipantHud(battle, participantId);
+
+    if (!hud) {
+      return;
+    }
+
+    hud.setConfusion(pokemonInstanceId, confused);
+  }
+
+  public playPokemonStatusVfxBurst(
+    battle: BattleInstance,
+    participantId: string,
+    pokemonInstanceId: string,
+    status: BattleMajorStatusCondition | "confusion",
+    kind: "inflict" | "clear" | "blocked" | "residual" | "self-hit",
+  ): Promise<void> {
+    const hud = this.getParticipantHud(battle, participantId);
+
+    if (!hud) {
+      return Promise.resolve();
+    }
+
+    return hud.playStatusVfxBurst(pokemonInstanceId, status, kind);
   }
 
   public async animatePokemonHp(

@@ -726,3 +726,31 @@
     font-size: 12px;
   }
 }
+
+/* =========================================================
+   Status Conditions V1 — compact touch presentation
+========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+  .battle-modern-hud__hp-meta {
+    gap: 4px;
+  }
+
+  .battle-modern-hud__status {
+    min-width: 25px;
+    min-height: 14px;
+    padding: 2px 4px;
+    font-size: 7px;
+  }
+
+  .battle-modern-replacement-card__footer {
+    gap: 4px;
+  }
+
+  .battle-modern-replacement-card__condition {
+    min-width: 24px;
+    min-height: 13px;
+    padding: 2px 4px;
+    font-size: 6px;
+  }
+}

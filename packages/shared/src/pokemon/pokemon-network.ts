@@ -20,6 +20,7 @@ import {
   isPokemonGymBadgeId,
 } from "./trainers/pokemon-gym.registry.js";
 import type { PokemonGymBadgeId } from "./trainers/pokemon-gym.types.js";
+import { isPokemonPersistentMajorStatusState } from "./pokemon-status.js";
 
 
 export const POKEMON_EVENTS = {
@@ -159,6 +160,13 @@ function isPokemonInstance(value: unknown): value is PokemonInstance {
   }
 
   if (!Number.isInteger(value.abilityId) || Number(value.abilityId) <= 0) {
+    return false;
+  }
+
+  if (
+    value.majorStatus !== undefined &&
+    !isPokemonPersistentMajorStatusState(value.majorStatus)
+  ) {
     return false;
   }
 

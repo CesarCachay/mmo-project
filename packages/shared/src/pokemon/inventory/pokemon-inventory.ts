@@ -6,6 +6,12 @@ export const POKEMON_ITEM_IDS = [
   "poke-ball",
   "revive",
   "max-revive",
+  "antidote",
+  "burn-heal",
+  "ice-heal",
+  "awakening",
+  "paralyze-heal",
+  "full-heal",
   "rare-candy",
 ] as const;
 

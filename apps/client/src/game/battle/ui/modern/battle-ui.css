@@ -185,6 +185,64 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* =========================================================
+   STATUS CONDITIONS V1 — HUD BADGES
+   ========================================================= */
+
+.battle-modern-hud__hp-meta {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.battle-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  min-height: 17px;
+  box-sizing: border-box;
+  padding: 2px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: clamp(7px, 0.68vw, 9px);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.42);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.battle-status-badge[hidden] {
+  display: none;
+}
+
+.battle-status-badge--burn {
+  background: linear-gradient(180deg, #ef4444, #991b1b);
+}
+
+.battle-status-badge--poison {
+  background: linear-gradient(180deg, #a855f7, #6b21a8);
+}
+
+.battle-status-badge--badly-poisoned {
+  background: linear-gradient(180deg, #7e22ce, #3b0764);
+}
+
+.battle-status-badge--paralysis {
+  background: linear-gradient(180deg, #eab308, #a16207);
+}
+
+.battle-status-badge--sleep {
+  background: linear-gradient(180deg, #64748b, #334155);
+}
+
+.battle-status-badge--freeze {
+  background: linear-gradient(180deg, #38bdf8, #0369a1);
+}
+
 .battle-modern-hud__hp-track {
   position: relative;
   width: 100%;
@@ -1051,14 +1109,31 @@
      STATUS
      ========================================================= */
 
+.battle-modern-replacement-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 4px;
+  min-height: 18px;
+}
+
 .battle-modern-replacement-card__status {
   display: inline-block;
-  margin-top: 4px;
+  margin-top: 0;
   padding: 2px 5px;
   border-radius: 999px;
   font-size: clamp(6px, 0.58vw, 8px);
   font-weight: 850;
   letter-spacing: 0.055em;
+}
+
+.battle-modern-replacement-card__condition {
+  flex: 0 0 auto;
+  min-width: 27px;
+  min-height: 15px;
+  padding: 2px 5px;
+  font-size: clamp(6px, 0.56vw, 8px);
 }
 
 .battle-modern-replacement-card__status--ready {

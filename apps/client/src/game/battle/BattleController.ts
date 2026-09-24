@@ -1236,6 +1236,149 @@ export class BattleController {
       return;
     }
 
+    if (event.type === "status-inflicted") {
+      if (event.status === "confusion") {
+        this.overlay.setPokemonConfusion(
+          activeBattle,
+          event.participantId,
+          event.pokemonInstanceId,
+          true,
+        );
+      } else {
+        this.overlay.setPokemonMajorStatus(
+          activeBattle,
+          event.participantId,
+          event.pokemonInstanceId,
+          event.status,
+        );
+      }
+
+      await this.overlay.playPokemonStatusVfxBurst(
+        activeBattle,
+        event.participantId,
+        event.pokemonInstanceId,
+        event.status,
+        "inflict",
+      );
+
+      const message = formatBattlePresentationMessage(
+        activeBattle,
+        event,
+        this.activeBattlePayload?.localParticipantId
+      );
+
+      if (message) {
+        await this.overlay.presentMessage(
+          message,
+          getBattlePresentationMessageDuration(event)
+        );
+      }
+
+      return;
+    }
+
+    if (event.type === "status-cleared") {
+      await this.overlay.playPokemonStatusVfxBurst(
+        activeBattle,
+        event.participantId,
+        event.pokemonInstanceId,
+        event.status,
+        "clear",
+      );
+
+      if (event.status === "confusion") {
+        this.overlay.setPokemonConfusion(
+          activeBattle,
+          event.participantId,
+          event.pokemonInstanceId,
+          false,
+        );
+      } else {
+        this.overlay.setPokemonMajorStatus(
+          activeBattle,
+          event.participantId,
+          event.pokemonInstanceId,
+          null,
+        );
+      }
+
+      const message = formatBattlePresentationMessage(
+        activeBattle,
+        event,
+        this.activeBattlePayload?.localParticipantId
+      );
+
+      if (message) {
+        await this.overlay.presentMessage(
+          message,
+          getBattlePresentationMessageDuration(event)
+        );
+      }
+
+      return;
+    }
+
+    if (event.type === "status-action-prevented") {
+      await this.overlay.playPokemonStatusVfxBurst(
+        activeBattle,
+        event.participantId,
+        event.pokemonInstanceId,
+        event.status,
+        "blocked",
+      );
+
+      const message = formatBattlePresentationMessage(
+        activeBattle,
+        event,
+        this.activeBattlePayload?.localParticipantId
+      );
+
+      if (message) {
+        await this.overlay.presentMessage(
+          message,
+          getBattlePresentationMessageDuration(event)
+        );
+      }
+
+      return;
+    }
+
+    if (
+      (event.type === "status-residual-damage" ||
+        event.type === "confusion-self-damage") &&
+      event.appliedDamage > 0
+    ) {
+      await this.overlay.playPokemonStatusVfxBurst(
+        activeBattle,
+        event.participantId,
+        event.pokemonInstanceId,
+        event.type === "confusion-self-damage" ? "confusion" : event.status,
+        event.type === "confusion-self-damage" ? "self-hit" : "residual",
+      );
+
+      const message = formatBattlePresentationMessage(
+        activeBattle,
+        event,
+        this.activeBattlePayload?.localParticipantId
+      );
+
+      if (message) {
+        await this.overlay.presentMessage(
+          message,
+          getBattlePresentationMessageDuration(event)
+        );
+      }
+
+      await this.overlay.animatePokemonHp(
+        activeBattle,
+        event.participantId,
+        event.pokemonInstanceId,
+        event.previousHp,
+        event.currentHp
+      );
+      return;
+    }
+
     if (event.type === "damage-applied" && event.appliedDamage > 0) {
       const moveUsedEvent =
         context.previousEvent?.type === "move-used" ? context.previousEvent : undefined;
@@ -1555,6 +1698,21 @@ export class BattleController {
           case "revive":
             return pokemonState.currentHp <= 0;
 
+          case "cure-status": {
+            if (pokemonState.currentHp <= 0) {
+              return false;
+            }
+
+            const majorStatus = pokemonState.statusState?.major ?? null;
+            const hasCurableMajorStatus =
+              majorStatus !== null && effect.statuses.includes(majorStatus.type);
+            const hasCurableConfusion =
+              effect.cureConfusion === true &&
+              pokemonState.statusState?.confusion != null;
+
+            return hasCurableMajorStatus || hasCurableConfusion;
+          }
+
           default:
             return false;
         }
@@ -1625,7 +1783,9 @@ export class BattleController {
     /* TRAINER MEDICINE ITEM */
     if (
       item.battleTarget !== "trainer-pokemon" ||
-      (effect.type !== "heal-hp" && effect.type !== "revive")
+      (effect.type !== "heal-hp" &&
+        effect.type !== "revive" &&
+        effect.type !== "cure-status")
     ) {
       return;
     }
@@ -1688,6 +1848,24 @@ export class BattleController {
 
       case "revive": {
         if (pokemonState.currentHp > 0) {
+          return;
+        }
+        break;
+      }
+
+      case "cure-status": {
+        if (pokemonState.currentHp <= 0) {
+          return;
+        }
+
+        const majorStatus = pokemonState.statusState?.major ?? null;
+        const canCureMajor =
+          majorStatus !== null && effect.statuses.includes(majorStatus.type);
+        const canCureConfusion =
+          effect.cureConfusion === true &&
+          pokemonState.statusState?.confusion != null;
+
+        if (!canCureMajor && !canCureConfusion) {
           return;
         }
         break;

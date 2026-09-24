@@ -34,10 +34,23 @@ describe("pokemon shop catalog and pricing", () => {
     expect(getPokemonShopCatalog(CATALOG_ID)).toMatchObject({
       displayName: "Poké Shop",
       buysItemsFromTrainer: true,
-      stockedItemIds: ["poke-ball", "potion", "super-potion", "revive"],
+      stockedItemIds: [
+        "poke-ball",
+        "potion",
+        "super-potion",
+        "revive",
+        "antidote",
+        "burn-heal",
+        "ice-heal",
+        "awakening",
+        "paralyze-heal",
+        "full-heal",
+      ],
     });
 
     expect(isPokemonShopItemStocked(CATALOG_ID, "poke-ball")).toBe(true);
+    expect(isPokemonShopItemStocked(CATALOG_ID, "antidote")).toBe(true);
+    expect(isPokemonShopItemStocked(CATALOG_ID, "full-heal")).toBe(true);
     expect(isPokemonShopItemStocked(CATALOG_ID, "hyper-potion")).toBe(false);
   });
 

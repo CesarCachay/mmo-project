@@ -138,6 +138,18 @@ export type {
   PokemonBattleStateUpdatedPayload,
 } from "./pokemon/pokemon-network.js";
 
+// Pokemon durable status
+export {
+  isPokemonMajorStatusCondition,
+  isPokemonPersistentMajorStatusState,
+  clonePokemonPersistentMajorStatusState,
+  createPokemonPersistentMajorStatusState,
+} from "./pokemon/pokemon-status.js";
+export type {
+  PokemonMajorStatusCondition,
+  PokemonPersistentMajorStatusState,
+} from "./pokemon/pokemon-status.js";
+
 // Pokemon Starters
 export {
   POKEMON_STARTERS,
@@ -258,6 +270,75 @@ export {
 } from "./pokemon/battles/pokemon-battle-participant.js";
 export type { CreateBattleParticipantInput } from "./pokemon/battles/pokemon-battle-participant.js";
 export { createBattlePokemonState } from "./pokemon/battles/pokemon-battle-pokemon-state.js";
+export type {
+  BattleMajorStatusCondition,
+  BattlePokemonMajorStatusState,
+  BattlePokemonConfusionState,
+  BattlePokemonStatusState,
+} from "./pokemon/battles/pokemon-battle-status.js";
+export {
+  createEmptyBattlePokemonStatusState,
+  createBattlePokemonStatusStateFromPersistent,
+  createBattleMajorStatusFromPersistent,
+  createPersistentMajorStatusFromBattle,
+  ensureBattlePokemonStatusState,
+  hasBattlePokemonMajorStatus,
+  clearBattlePokemonConfusion,
+  resetBattlePokemonBadPoisonCounter,
+  isBattleMajorStatusCondition,
+  isBattlePokemonStatusState,
+} from "./pokemon/battles/pokemon-battle-status.js";
+export type {
+  BattleMoveStatusCondition,
+  BattleStatusMoveTarget,
+  BattleStatusMoveRollScope,
+  BattleDirectStatusMoveEffect,
+  BattleRandomStatusMoveEffect,
+  BattleDeferredStatusMoveMechanic,
+  BattleDeferredStatusMoveEffect,
+  BattleStatusMoveEffect,
+  BattleStatusMoveDefinition,
+} from "./pokemon/battles/pokemon-battle-status-move.types.js";
+export {
+  getBattleStatusMoveDefinition,
+  getAllBattleStatusMoveDefinitions,
+  getBattleStatusMoveDefinitionCount,
+  hasBattleStatusMoveDefinition,
+  getBattleExecutableStatusMoveEffects,
+  getBattleDeferredStatusMoveEffects,
+} from "./pokemon/battles/pokemon-battle-status-move.registry.js";
+export {
+  applyBattleMoveStatusEffects,
+} from "./pokemon/battles/pokemon-battle-status-infliction.js";
+export {
+  resolveBattleStatusAction,
+} from "./pokemon/battles/pokemon-battle-status-action.js";
+export type {
+  BattleStatusActionRandomSource,
+  BattleActionBlockingStatus,
+  BattleStatusActionClearedStatus,
+  BattleStatusActionEffect,
+  BattleStatusActionResolution,
+} from "./pokemon/battles/pokemon-battle-status-action.js";
+export {
+  BATTLE_BAD_POISON_MAX_COUNTER,
+  applyBattleStatusAttackModifier,
+  applyBattleStatusSpeedModifier,
+  applyBattleEndTurnStatusEffects,
+} from "./pokemon/battles/pokemon-battle-status-effects.js";
+export type {
+  BattleResidualStatusCondition,
+  BattleEndTurnStatusDamageEffect,
+  BattleEndTurnStatusEffect,
+} from "./pokemon/battles/pokemon-battle-status-effects.js";
+export type {
+  BattleStatusInflictionRandomSource,
+  BattleStatusInflictionBlockedReason,
+  BattleStatusInflictionAppliedResult,
+  BattleStatusInflictionBlockedResult,
+  BattleStatusInflictionResult,
+  ApplyBattleMoveStatusEffectsInput,
+} from "./pokemon/battles/pokemon-battle-status-infliction.js";
 export {
   PERSISTENT_BATTLEFIELD_MOVE_IDS,
   createEmptyBattleSideHazards,
@@ -380,6 +461,11 @@ export type {
   BattleMoveUsedEvent,
   BattleMoveMissedEvent,
   BattleDamageAppliedEvent,
+  BattleStatusInflictedEvent,
+  BattleStatusClearedEvent,
+  BattleStatusActionPreventedEvent,
+  BattleConfusionSelfDamageEvent,
+  BattleStatusResidualDamageEvent,
   BattlePokemonFaintedEvent,
   BattlePokemonSwitchedEvent,
   BattleRunFailedEvent,
@@ -509,6 +595,11 @@ export {
 export type { PokemonDerivedStats } from "./pokemon/pokemon-stat.js";
 export { planBattleHealingItemUse } from "./pokemon/inventory/pokemon-battle-healing-item.js";
 export type { BattleHealingItemPlan } from "./pokemon/inventory/pokemon-battle-healing-item.js";
+export { planBattleTrainerMedicineItemUse } from "./pokemon/inventory/pokemon-battle-medicine-item.js";
+export type {
+  BattleStatusCureItemPlan,
+  BattleTrainerMedicineItemPlan,
+} from "./pokemon/inventory/pokemon-battle-medicine-item.js";
 export {
   POKEMON_OVERWORLD_ITEM_EVENTS,
   isPokemonOverworldItemUseInput,

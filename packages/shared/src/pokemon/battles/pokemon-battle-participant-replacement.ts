@@ -1,4 +1,8 @@
 import { isBattlePokemonFainted } from "./pokemon-battle-faint.js";
+import {
+  clearBattlePokemonConfusion,
+  resetBattlePokemonBadPoisonCounter,
+} from "./pokemon-battle-status.js";
 
 import { getActiveBattlePokemon } from "./pokemon-battle-participant.js";
 
@@ -84,6 +88,11 @@ export function replaceFaintedTrainerBattlePokemon(
       `Replacement Pokémon at index "${replacementPokemonIndex}" is fainted for participant "${participant.id}"`
     );
   }
+
+  // Confusion is volatile and ends when the fainted Pokémon leaves the
+  // active slot. Major status conditions remain on the Pokémon.
+  clearBattlePokemonConfusion(previousActivePokemon);
+  resetBattlePokemonBadPoisonCounter(previousActivePokemon);
 
   participant.activePokemonIndex = replacementPokemonIndex;
 

@@ -9,6 +9,7 @@ import {
 import { PrismaService } from '../../database/prisma.service';
 
 import type { PokemonTrainerId } from '../pokemon-trainer-identity';
+import { fromPokemonMajorStatusPersistenceFields } from '../status/pokemon-major-status.persistence';
 
 export type PokemonStoragePersistenceErrorCode =
   'PARTY_FULL' | 'LAST_PARTY_POKEMON' | 'INVALID_POKEMON' | 'STALE_COMMAND';
@@ -32,6 +33,8 @@ interface PokemonStorageRow {
   readonly experience: number;
   readonly currentHp: number;
   readonly abilityId: number;
+  readonly majorStatus: string | null;
+  readonly statusTurnsRemaining: number | null;
 
   readonly moves: readonly {
     readonly moveId: number;
@@ -53,6 +56,10 @@ function mapPokemonInstance(row: PokemonStorageRow): PokemonInstance {
     experience: row.experience,
     currentHp: row.currentHp,
     abilityId: row.abilityId,
+    majorStatus: fromPokemonMajorStatusPersistenceFields(
+      row.majorStatus,
+      row.statusTurnsRemaining,
+    ),
     moves: row.moves.map((move) => ({
       moveId: move.moveId,
       currentPp: move.currentPp,

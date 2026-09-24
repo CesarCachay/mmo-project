@@ -36,6 +36,7 @@ export function planPokemonCenterHealing(party: PokemonParty): PokemonCenterHeal
 
     if (
       currentPokemon.currentHp !== maxHp ||
+      currentPokemon.majorStatus != null ||
       moves.some(
         (move, index) => move.currentPp !== currentPokemon.moves[index]?.currentPp
       )
@@ -83,6 +84,7 @@ function restorePokemon(
   return {
     ...pokemon,
     currentHp: maxHp,
+    ...(pokemon.majorStatus !== undefined ? { majorStatus: null } : {}),
     moves,
   };
 }

@@ -51,6 +51,36 @@ export const POKEMON_ITEM_ECONOMY_REGISTRY = {
     buyPrice: null,
     sellPrice: 2_000,
   },
+  antidote: {
+    itemId: "antidote",
+    buyPrice: 100,
+    sellPrice: 50,
+  },
+  "burn-heal": {
+    itemId: "burn-heal",
+    buyPrice: 250,
+    sellPrice: 125,
+  },
+  "ice-heal": {
+    itemId: "ice-heal",
+    buyPrice: 250,
+    sellPrice: 125,
+  },
+  awakening: {
+    itemId: "awakening",
+    buyPrice: 250,
+    sellPrice: 125,
+  },
+  "paralyze-heal": {
+    itemId: "paralyze-heal",
+    buyPrice: 200,
+    sellPrice: 100,
+  },
+  "full-heal": {
+    itemId: "full-heal",
+    buyPrice: 600,
+    sellPrice: 300,
+  },
   "rare-candy": {
     itemId: "rare-candy",
     buyPrice: null,

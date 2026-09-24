@@ -4,6 +4,7 @@ import "./ui/modern/battle-ui.css";
 import "./ui/modern/mobile-battle-ui.css";
 import "./ui/modern/animations.css";
 import "./ui/modern/move-vfx.css";
+import "./ui/modern/status-vfx.css";
 import "./ui/modern/items.css";
 import "./ui/modern/progression.css";
 import "./ui/modern/evolution.css";

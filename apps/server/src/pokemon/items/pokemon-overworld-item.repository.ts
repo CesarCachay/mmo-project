@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 
-import type { PokemonItemId } from '@cesar-mmo/shared';
+import type {
+  PokemonItemId,
+  PokemonPersistentMajorStatusState,
+} from '@cesar-mmo/shared';
 
 import { PrismaService } from '../../database/prisma.service';
 
 import type { PokemonTrainerId } from '../pokemon-trainer-identity';
+import { toPokemonMajorStatusPersistenceFields } from '../status/pokemon-major-status.persistence';
 
 export type PokemonOverworldItemPersistenceConflictCode =
   'ITEM_NOT_AVAILABLE' | 'INVALID_TARGET';
@@ -17,6 +21,17 @@ export class PokemonOverworldItemPersistenceConflictError extends Error {
     super(message);
     this.name = 'PokemonOverworldItemPersistenceConflictError';
   }
+}
+
+export interface ApplyPokemonStatusCureItemInput {
+  readonly trainerId: PokemonTrainerId;
+  readonly itemId: PokemonItemId;
+  readonly targetPokemonInstanceId: string;
+  readonly expectedMajorStatus:
+    | PokemonPersistentMajorStatusState
+    | null
+    | undefined;
+  readonly clearMajorStatus: boolean;
 }
 
 export interface ApplyPokemonOverworldHpItemInput {
@@ -102,4 +117,97 @@ export class PokemonOverworldItemRepository {
       });
     });
   }
+  public async applyStatusCureItemUse(
+    input: ApplyPokemonStatusCureItemInput,
+  ): Promise<void> {
+    const {
+      trainerId,
+      itemId,
+      targetPokemonInstanceId,
+      expectedMajorStatus,
+      clearMajorStatus,
+    } = input;
+
+    const expectedStatus = toPokemonMajorStatusPersistenceFields(
+      expectedMajorStatus,
+    );
+
+    await this.prisma.$transaction(async (tx) => {
+      const consumed = await tx.pokemonTrainerInventoryItem.updateMany({
+        where: {
+          trainerId,
+          itemId,
+          quantity: {
+            gt: 0,
+          },
+        },
+        data: {
+          quantity: {
+            decrement: 1,
+          },
+        },
+      });
+
+      if (consumed.count !== 1) {
+        throw new PokemonOverworldItemPersistenceConflictError(
+          'ITEM_NOT_AVAILABLE',
+          `Pokémon item "${itemId}" is not available for trainer "${trainerId}"`,
+        );
+      }
+
+      if (clearMajorStatus) {
+        const updated = await tx.pokemonInstance.updateMany({
+          where: {
+            id: targetPokemonInstanceId,
+            trainerId,
+            partyPosition: {
+              not: null,
+            },
+            majorStatus: expectedStatus.majorStatus,
+            statusTurnsRemaining: expectedStatus.statusTurnsRemaining,
+          },
+          data: {
+            majorStatus: null,
+            statusTurnsRemaining: null,
+          },
+        });
+
+        if (updated.count !== 1) {
+          throw new PokemonOverworldItemPersistenceConflictError(
+            'INVALID_TARGET',
+            `Pokémon "${targetPokemonInstanceId}" status changed before item use`,
+          );
+        }
+      } else {
+        const target = await tx.pokemonInstance.findFirst({
+          where: {
+            id: targetPokemonInstanceId,
+            trainerId,
+            partyPosition: {
+              not: null,
+            },
+          },
+          select: {
+            id: true,
+          },
+        });
+
+        if (!target) {
+          throw new PokemonOverworldItemPersistenceConflictError(
+            'INVALID_TARGET',
+            `Pokémon "${targetPokemonInstanceId}" is not an active Party Pokémon for trainer "${trainerId}"`,
+          );
+        }
+      }
+
+      await tx.pokemonTrainerInventoryItem.deleteMany({
+        where: {
+          trainerId,
+          itemId,
+          quantity: 0,
+        },
+      });
+    });
+  }
+
 }

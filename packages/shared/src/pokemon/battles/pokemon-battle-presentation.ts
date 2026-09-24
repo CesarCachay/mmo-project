@@ -2,6 +2,8 @@ import type { BattleParticipantId } from "./pokemon-battle.types.js";
 import { isPokemonItemId } from "../inventory/pokemon-inventory.js";
 import type { PokemonItemId } from "../inventory/pokemon-inventory.js";
 import type { PokemonInstanceMove } from "../pokemon.types.js";
+import { isBattleMajorStatusCondition } from "./pokemon-battle-status.js";
+import type { BattleMoveStatusCondition } from "./pokemon-battle-status-move.types.js";
 
 // moves
 export interface BattleMoveUsedEvent {
@@ -41,6 +43,51 @@ export interface BattlePokemonFaintedEvent {
   readonly type: "pokemon-fainted";
   readonly participantId: BattleParticipantId;
   readonly pokemonInstanceId: string;
+}
+
+export interface BattleStatusInflictedEvent {
+  readonly type: "status-inflicted";
+  readonly participantId: BattleParticipantId;
+  readonly pokemonInstanceId: string;
+  readonly status: BattleMoveStatusCondition;
+  readonly sourceParticipantId: BattleParticipantId;
+  readonly sourcePokemonInstanceId: string;
+  readonly moveId: number;
+}
+
+
+export interface BattleStatusClearedEvent {
+  readonly type: "status-cleared";
+  readonly participantId: BattleParticipantId;
+  readonly pokemonInstanceId: string;
+  readonly status: BattleMoveStatusCondition;
+}
+
+export interface BattleStatusActionPreventedEvent {
+  readonly type: "status-action-prevented";
+  readonly participantId: BattleParticipantId;
+  readonly pokemonInstanceId: string;
+  readonly status: "sleep" | "freeze" | "paralysis";
+}
+
+export interface BattleConfusionSelfDamageEvent {
+  readonly type: "confusion-self-damage";
+  readonly participantId: BattleParticipantId;
+  readonly pokemonInstanceId: string;
+  readonly previousHp: number;
+  readonly currentHp: number;
+  readonly appliedDamage: number;
+}
+
+export interface BattleStatusResidualDamageEvent {
+  readonly type: "status-residual-damage";
+  readonly participantId: BattleParticipantId;
+  readonly pokemonInstanceId: string;
+  readonly status: "burn" | "poison" | "badly-poisoned";
+  readonly previousHp: number;
+  readonly currentHp: number;
+  readonly appliedDamage: number;
+  readonly toxicCounter?: number;
 }
 
 export interface BattlePokemonSwitchedEvent {
@@ -156,6 +203,11 @@ export type BattlePresentationEvent =
   | BattleMoveUsedEvent
   | BattleMoveMissedEvent
   | BattleDamageAppliedEvent
+  | BattleStatusInflictedEvent
+  | BattleStatusClearedEvent
+  | BattleStatusActionPreventedEvent
+  | BattleConfusionSelfDamageEvent
+  | BattleStatusResidualDamageEvent
   | BattlePokemonFaintedEvent
   | BattlePokemonSwitchedEvent
   | BattleRunFailedEvent
@@ -184,6 +236,94 @@ function isMoveUsedEvent(value: Record<string, unknown>): boolean {
     (value.hitCount === undefined ||
       (isPositiveInteger(value.hitCount) && (value.hitCount as number) <= 10))
   );
+}
+
+function isStatusInflictedEvent(value: Record<string, unknown>): boolean {
+  return (
+    isNonEmptyString(value.participantId) &&
+    isNonEmptyString(value.pokemonInstanceId) &&
+    (value.status === "confusion" || isBattleMajorStatusCondition(value.status)) &&
+    isNonEmptyString(value.sourceParticipantId) &&
+    isNonEmptyString(value.sourcePokemonInstanceId) &&
+    isPositiveInteger(value.moveId)
+  );
+}
+
+function isStatusClearedEvent(value: Record<string, unknown>): boolean {
+  return (
+    isNonEmptyString(value.participantId) &&
+    isNonEmptyString(value.pokemonInstanceId) &&
+    (value.status === "confusion" || isBattleMajorStatusCondition(value.status))
+  );
+}
+
+function isStatusActionPreventedEvent(
+  value: Record<string, unknown>,
+): boolean {
+  return (
+    isNonEmptyString(value.participantId) &&
+    isNonEmptyString(value.pokemonInstanceId) &&
+    (value.status === "sleep" ||
+      value.status === "freeze" ||
+      value.status === "paralysis")
+  );
+}
+
+function isConfusionSelfDamageEvent(
+  value: Record<string, unknown>,
+): boolean {
+  if (
+    !isNonEmptyString(value.participantId) ||
+    !isNonEmptyString(value.pokemonInstanceId) ||
+    !isNonNegativeInteger(value.previousHp) ||
+    !isNonNegativeInteger(value.currentHp) ||
+    !isPositiveInteger(value.appliedDamage)
+  ) {
+    return false;
+  }
+
+  if (value.currentHp >= value.previousHp) {
+    return false;
+  }
+
+  return value.appliedDamage === value.previousHp - value.currentHp;
+}
+
+function isStatusResidualDamageEvent(
+  value: Record<string, unknown>,
+): boolean {
+  if (
+    !isNonEmptyString(value.participantId) ||
+    !isNonEmptyString(value.pokemonInstanceId) ||
+    (value.status !== "burn" &&
+      value.status !== "poison" &&
+      value.status !== "badly-poisoned") ||
+    !isNonNegativeInteger(value.previousHp) ||
+    !isNonNegativeInteger(value.currentHp) ||
+    !isPositiveInteger(value.appliedDamage)
+  ) {
+    return false;
+  }
+
+  if (value.currentHp >= value.previousHp) {
+    return false;
+  }
+
+  if (
+    value.status === "badly-poisoned" &&
+    !isPositiveInteger(value.toxicCounter)
+  ) {
+    return false;
+  }
+
+  if (
+    value.status !== "badly-poisoned" &&
+    value.toxicCounter !== undefined
+  ) {
+    return false;
+  }
+
+  return value.appliedDamage === value.previousHp - value.currentHp;
 }
 
 function isDamageAppliedEvent(value: Record<string, unknown>): boolean {
@@ -307,6 +447,21 @@ export function isBattlePresentationEvent(
 
     case "damage-applied":
       return isDamageAppliedEvent(value);
+
+    case "status-inflicted":
+      return isStatusInflictedEvent(value);
+
+    case "status-cleared":
+      return isStatusClearedEvent(value);
+
+    case "status-action-prevented":
+      return isStatusActionPreventedEvent(value);
+
+    case "confusion-self-damage":
+      return isConfusionSelfDamageEvent(value);
+
+    case "status-residual-damage":
+      return isStatusResidualDamageEvent(value);
 
     case "pokemon-fainted":
       return (

@@ -23,6 +23,7 @@ const expectedParty: PokemonParty = {
       experience: 1728,
       currentHp: 7,
       abilityId: 66,
+      majorStatus: null,
 
       moves: [
         {
@@ -44,6 +45,7 @@ const expectedParty: PokemonParty = {
       experience: 1000,
       currentHp: 0,
       abilityId: 67,
+      majorStatus: null,
 
       moves: [
         {
@@ -94,6 +96,8 @@ const persistedParty = [
     formId: 4,
     level: 12,
     currentHp: 7,
+    majorStatus: null,
+    statusTurnsRemaining: null,
 
     moves: [
       {
@@ -115,6 +119,8 @@ const persistedParty = [
     formId: 7,
     level: 10,
     currentHp: 0,
+    majorStatus: null,
+    statusTurnsRemaining: null,
 
     moves: [
       {
@@ -186,7 +192,7 @@ function createRepositoryHarness(options: RepositoryHarnessOptions = {}) {
 }
 
 describe('PokemonCenterHealingRepository', () => {
-  it('persists full-Party healing by changing only currentHp and currentPp', async () => {
+  it('persists full-Party healing across HP, PP, and major-status persistence fields', async () => {
     const harness = createRepositoryHarness();
 
     await harness.repository.applyHealing({
@@ -212,6 +218,8 @@ describe('PokemonCenterHealingRepository', () => {
         formId: true,
         level: true,
         currentHp: true,
+        majorStatus: true,
+        statusTurnsRemaining: true,
 
         moves: {
           orderBy: {
@@ -242,10 +250,14 @@ describe('PokemonCenterHealingRepository', () => {
         formId: 4,
         level: 12,
         currentHp: 7,
+        majorStatus: null,
+        statusTurnsRemaining: null,
       },
 
       data: {
         currentHp: 34,
+        majorStatus: null,
+        statusTurnsRemaining: null,
       },
     });
 

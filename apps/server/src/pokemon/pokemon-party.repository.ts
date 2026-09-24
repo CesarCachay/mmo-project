@@ -5,6 +5,10 @@ import { MAX_POKEMON_PARTY_SIZE, type PokemonParty } from '@cesar-mmo/shared';
 import { PrismaService } from '../database/prisma.service';
 
 import type { PokemonTrainerId } from './pokemon-trainer-identity';
+import {
+  fromPokemonMajorStatusPersistenceFields,
+  toPokemonMajorStatusPersistenceFields,
+} from './status/pokemon-major-status.persistence';
 
 @Injectable()
 export class PokemonPartyRepository {
@@ -82,6 +86,10 @@ export class PokemonPartyRepository {
           );
         }
 
+        const statusPersistence = toPokemonMajorStatusPersistenceFields(
+          pokemon.majorStatus,
+        );
+
         const pokemonData = {
           speciesId: pokemon.speciesId,
           formId: pokemon.formId,
@@ -90,6 +98,8 @@ export class PokemonPartyRepository {
           experience: pokemon.experience,
           currentHp: pokemon.currentHp,
           abilityId: pokemon.abilityId,
+          majorStatus: statusPersistence.majorStatus,
+          statusTurnsRemaining: statusPersistence.statusTurnsRemaining,
           partyPosition,
         };
 
@@ -268,6 +278,10 @@ export class PokemonPartyRepository {
         experience: entry.experience,
         currentHp: entry.currentHp,
         abilityId: entry.abilityId,
+        majorStatus: fromPokemonMajorStatusPersistenceFields(
+          entry.majorStatus,
+          entry.statusTurnsRemaining,
+        ),
 
         moves: entry.moves.map((move) => ({
           moveId: move.moveId,

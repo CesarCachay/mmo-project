@@ -4,7 +4,10 @@ import {
   MAX_POKEMON_LEVEL,
 } from "@cesar-mmo/shared";
 
-import type { BattlePokemonState } from "@cesar-mmo/shared";
+import type {
+  BattleMajorStatusCondition,
+  BattlePokemonState,
+} from "@cesar-mmo/shared";
 
 import {
   getPokemonDisplayName,
@@ -14,6 +17,8 @@ import {
 import { getPokemonSpriteAsset } from "../../../pokemon/pokemon-sprite.registry";
 import { getPokemonBattleSpriteAsset } from "../../../pokemon/pokemon-battle-sprite.registry";
 import type { BattleMoveVfxContactMotionRequest } from "../../vfx/battle-move-vfx.types";
+import { getBattleMajorStatusUiDefinition } from "./battle-status-ui";
+import { ModernBattleStatusVfxLayer } from "./ModernBattleStatusVfxLayer";
 
 const SWITCH_OUT_DURATION_MS = 260;
 const SWITCH_IN_DURATION_MS = 340;
@@ -44,6 +49,7 @@ export class ModernBattlePokemonHud {
 
   private readonly hitSprite: HTMLImageElement;
   private readonly healFx: HTMLDivElement;
+  private readonly statusVfx: ModernBattleStatusVfxLayer;
   private healFxTimer?: number;
   private healFxResolve?: () => void;
 
@@ -52,6 +58,7 @@ export class ModernBattlePokemonHud {
 
   private readonly hpText: HTMLSpanElement;
   private readonly hpFill: HTMLDivElement;
+  private readonly statusBadge: HTMLSpanElement;
 
   private readonly progression: HTMLDivElement;
   private readonly experienceText: HTMLSpanElement;
@@ -99,6 +106,8 @@ export class ModernBattlePokemonHud {
       this.healFx.appendChild(particle);
     }
 
+    this.statusVfx = new ModernBattleStatusVfxLayer(this.root);
+
     this.card = document.createElement("div");
     this.card.className = [
       "battle-modern-hud__card",
@@ -119,14 +128,23 @@ export class ModernBattlePokemonHud {
     const hpHeader = document.createElement("div");
     hpHeader.className = "battle-modern-hud__hp-header";
 
+    const hpMeta = document.createElement("div");
+    hpMeta.className = "battle-modern-hud__hp-meta";
+
     const hpLabel = document.createElement("span");
     hpLabel.className = "battle-modern-hud__hp-label";
     hpLabel.textContent = "HP";
 
+    this.statusBadge = document.createElement("span");
+    this.statusBadge.className = "battle-modern-hud__status battle-status-badge";
+    this.statusBadge.hidden = true;
+
+    hpMeta.append(hpLabel, this.statusBadge);
+
     this.hpText = document.createElement("span");
     this.hpText.className = "battle-modern-hud__hp-text";
 
-    hpHeader.append(hpLabel, this.hpText);
+    hpHeader.append(hpMeta, this.hpText);
 
     const hpTrack = document.createElement("div");
     hpTrack.className = "battle-modern-hud__hp-track";
@@ -185,6 +203,7 @@ export class ModernBattlePokemonHud {
     this.root.style.width = `${(bounds.width / viewport.width) * 100}%`;
 
     this.root.style.height = `${(bounds.height / viewport.height) * 100}%`;
+    this.scheduleStatusVfxLayoutSync();
   }
 
   public setPokemon(state: BattlePokemonState): void {
@@ -223,6 +242,10 @@ export class ModernBattlePokemonHud {
       battleSpriteSide,
     );
 
+    this.sprite.onload = () => {
+      this.scheduleStatusVfxLayoutSync();
+    };
+
     this.sprite.onerror = () => {
       this.sprite.onerror = null;
       this.sprite.classList.remove("battle-modern-hud__sprite--battle");
@@ -240,6 +263,12 @@ export class ModernBattlePokemonHud {
     this.name.textContent = getPokemonDisplayName(pokemon);
     this.level.textContent = `Lv. ${pokemon.level}`;
     this.renderHp(currentHp, maxHp);
+    this.renderMajorStatus(
+      state.statusState?.major?.type ?? pokemon.majorStatus?.type ?? null,
+    );
+    this.statusVfx.setConfused(Boolean(state.statusState?.confusion));
+    this.statusVfx.setVisible(currentHp > 0);
+    this.scheduleStatusVfxLayoutSync();
     this.renderExperience(pokemon.speciesId, pokemon.experience, pokemon.level);
 
     if (currentHp === 0) {
@@ -271,6 +300,8 @@ export class ModernBattlePokemonHud {
     this.name.textContent = "";
     this.level.textContent = "";
     this.hpText.textContent = "";
+    this.renderMajorStatus(null);
+    this.statusVfx.clear();
 
     this.hpFill.style.width = "0%";
 
@@ -313,6 +344,7 @@ export class ModernBattlePokemonHud {
 
   public destroy(): void {
     this.clear();
+    this.statusVfx.destroy();
     this.root.remove();
   }
 
@@ -348,6 +380,27 @@ export class ModernBattlePokemonHud {
     }
   }
 
+  private renderMajorStatus(status: BattleMajorStatusCondition | null): void {
+    this.statusBadge.className = "battle-modern-hud__status battle-status-badge";
+    this.statusVfx.setMajorStatus(status);
+    this.scheduleStatusVfxLayoutSync();
+
+    if (status === null) {
+      this.statusBadge.hidden = true;
+      this.statusBadge.textContent = "";
+      this.statusBadge.removeAttribute("title");
+      this.statusBadge.removeAttribute("aria-label");
+      return;
+    }
+
+    const definition = getBattleMajorStatusUiDefinition(status);
+    this.statusBadge.hidden = false;
+    this.statusBadge.textContent = definition.label;
+    this.statusBadge.title = definition.title;
+    this.statusBadge.setAttribute("aria-label", definition.title);
+    this.statusBadge.classList.add(definition.className);
+  }
+
   private renderExperience(
     speciesId: number,
     experience: number,
@@ -369,6 +422,42 @@ export class ModernBattlePokemonHud {
 
   public isDisplayingPokemon(pokemonInstanceId: string): boolean {
     return this.pokemonState?.pokemon.instanceId === pokemonInstanceId;
+  }
+
+  public setMajorStatus(
+    pokemonInstanceId: string,
+    status: BattleMajorStatusCondition | null,
+  ): void {
+    if (!this.isDisplayingPokemon(pokemonInstanceId)) {
+      return;
+    }
+
+    this.renderMajorStatus(status);
+  }
+
+  public setConfusion(
+    pokemonInstanceId: string,
+    confused: boolean,
+  ): void {
+    if (!this.isDisplayingPokemon(pokemonInstanceId)) {
+      return;
+    }
+
+    this.statusVfx.setConfused(confused);
+    this.scheduleStatusVfxLayoutSync();
+  }
+
+  public playStatusVfxBurst(
+    pokemonInstanceId: string,
+    status: BattleMajorStatusCondition | "confusion",
+    kind: "inflict" | "clear" | "blocked" | "residual" | "self-hit",
+  ): Promise<void> {
+    if (!this.isDisplayingPokemon(pokemonInstanceId)) {
+      return Promise.resolve();
+    }
+
+    this.scheduleStatusVfxLayoutSync();
+    return this.statusVfx.playBurst(status, kind);
   }
 
   public animateHp(
@@ -784,6 +873,8 @@ export class ModernBattlePokemonHud {
       return;
     }
 
+    this.statusVfx.setVisible(false);
+
     await this.playSpriteAnimation(
       "battle-modern-hud__sprite--switching-out",
       SWITCH_OUT_DURATION_MS,
@@ -803,10 +894,17 @@ export class ModernBattlePokemonHud {
       return;
     }
 
+    this.statusVfx.setVisible(false);
+
     await this.playSpriteAnimation(
       "battle-modern-hud__sprite--switching-in",
       SWITCH_IN_DURATION_MS,
     );
+
+    if (this.isDisplayingPokemon(state.pokemon.instanceId)) {
+      this.statusVfx.setVisible(true);
+      this.scheduleStatusVfxLayoutSync();
+    }
   }
 
   public async animateHit(pokemonInstanceId: string): Promise<void> {
@@ -843,6 +941,8 @@ export class ModernBattlePokemonHud {
       return;
     }
 
+    this.statusVfx.setVisible(false);
+
     await this.playSpriteAnimation(
       "battle-modern-hud__sprite--fainting",
       FAINT_DURATION_MS,
@@ -859,6 +959,7 @@ export class ModernBattlePokemonHud {
     if (!this.isDisplayingPokemon(pokemonInstanceId)) {
       return;
     }
+    this.statusVfx.setVisible(false);
     await this.playSpriteAnimation(
       "battle-modern-hud__sprite--capture-absorbing",
       CAPTURE_ABSORB_DURATION_MS,
@@ -880,6 +981,10 @@ export class ModernBattlePokemonHud {
       "battle-modern-hud__sprite--capture-breaking-free",
       CAPTURE_BREAK_FREE_DURATION_MS,
     );
+    if (this.isDisplayingPokemon(pokemonInstanceId)) {
+      this.statusVfx.setVisible(true);
+      this.scheduleStatusVfxLayoutSync();
+    }
   }
 
   private playSpriteAnimation(
@@ -952,6 +1057,15 @@ export class ModernBattlePokemonHud {
   private delay(durationMs: number): Promise<void> {
     return new Promise((resolve) => {
       window.setTimeout(resolve, durationMs);
+    });
+  }
+
+  private scheduleStatusVfxLayoutSync(): void {
+    window.requestAnimationFrame(() => {
+      if (!this.pokemonState || this.root.hidden) {
+        return;
+      }
+      this.statusVfx.syncToSprite(this.sprite);
     });
   }
 

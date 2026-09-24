@@ -72,6 +72,37 @@ describe('applyPokemonTrainerBattleSwitch - Trainer Battle', () => {
     expect(playerParticipant.activePokemonIndex).toBe(1);
   });
 
+  it('clears confusion and resets Bad Poison escalation on voluntary switch', () => {
+    const { session, playerParticipant } = createSession();
+    playerParticipant.pokemon[0]!.statusState = {
+      major: { type: 'badly-poisoned', toxicCounter: 5 },
+      confusion: { turnsRemaining: 3 },
+    };
+
+    const command = createBattleCommand(session.battle, {
+      participantId: playerParticipant.id,
+      action: {
+        type: 'switch-pokemon',
+        pokemonIndex: 1,
+      },
+    });
+
+    const entry: BattleTurnResolutionEntry = {
+      command,
+      actionPriority: 1,
+      movePriority: 0,
+      speed: 1,
+      tieBreaker: 0,
+    };
+
+    applyPokemonTrainerBattleSwitch({ session, entry });
+
+    expect(playerParticipant.pokemon[0]!.statusState).toEqual({
+      major: { type: 'badly-poisoned', toxicCounter: 1 },
+      confusion: null,
+    });
+  });
+
   it('rejects voluntary switch when the active local Pokémon has fainted', () => {
     const { session, playerParticipant } = createSession();
     playerParticipant.pokemon[0]!.currentHp = 0;

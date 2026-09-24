@@ -6,6 +6,7 @@ import {
   createPokemonInstance,
   type BattleInstance,
   type BattlePokemonSwitchedEvent,
+  type BattleMoveStatusCondition,
 } from "@cesar-mmo/shared";
 
 import { formatBattlePresentationMessage } from "./battle-presentation-message";
@@ -120,5 +121,92 @@ describe("formatBattlePresentationMessage Trainer Battle switch messages", () =>
         "local-trainer",
       ),
     ).toBe("The opposing Trainer sent out Pidgey!");
+  });
+});
+
+describe("formatBattlePresentationMessage status conditions", () => {
+  it.each([
+    ["burn", "Bulbasaur was burned!"],
+    ["poison", "Bulbasaur was poisoned!"],
+    ["badly-poisoned", "Bulbasaur was badly poisoned!"],
+    ["paralysis", "Bulbasaur is paralyzed! It may be unable to move!"],
+    ["sleep", "Bulbasaur fell asleep!"],
+    ["freeze", "Bulbasaur was frozen solid!"],
+    ["confusion", "Bulbasaur became confused!"],
+  ] as const)(
+    "formats %s infliction",
+    (status: BattleMoveStatusCondition, expected: string) => {
+      const battle = createTrainerBattle();
+      const local = battle.participants[0]!;
+      const pokemon = local.pokemon[0]!;
+
+      expect(
+        formatBattlePresentationMessage(
+          battle,
+          {
+            type: "status-inflicted",
+            participantId: local.id,
+            pokemonInstanceId: pokemon.pokemon.instanceId,
+            status,
+            sourceParticipantId: battle.participants[1]!.id,
+            sourcePokemonInstanceId:
+              battle.participants[1]!.pokemon[0]!.pokemon.instanceId,
+            moveId: 1,
+          },
+          local.id,
+        ),
+      ).toBe(expected);
+    },
+  );
+
+  it("formats natural status recovery", () => {
+    const battle = createTrainerBattle();
+    const local = battle.participants[0]!;
+    const pokemon = local.pokemon[0]!;
+
+    expect(
+      formatBattlePresentationMessage(battle, {
+        type: "status-cleared",
+        participantId: local.id,
+        pokemonInstanceId: pokemon.pokemon.instanceId,
+        status: "sleep",
+      }),
+    ).toBe("Bulbasaur woke up!");
+
+    expect(
+      formatBattlePresentationMessage(battle, {
+        type: "status-cleared",
+        participantId: local.id,
+        pokemonInstanceId: pokemon.pokemon.instanceId,
+        status: "confusion",
+      }),
+    ).toBe("Bulbasaur snapped out of confusion!");
+  });
+
+  it("formats action prevention and residual damage", () => {
+    const battle = createTrainerBattle();
+    const local = battle.participants[0]!;
+    const pokemon = local.pokemon[0]!;
+
+    expect(
+      formatBattlePresentationMessage(battle, {
+        type: "status-action-prevented",
+        participantId: local.id,
+        pokemonInstanceId: pokemon.pokemon.instanceId,
+        status: "paralysis",
+      }),
+    ).toBe("Bulbasaur is paralyzed! It can't move!");
+
+    expect(
+      formatBattlePresentationMessage(battle, {
+        type: "status-residual-damage",
+        participantId: local.id,
+        pokemonInstanceId: pokemon.pokemon.instanceId,
+        status: "burn",
+        previousHp: 30,
+        currentHp: 26,
+        appliedDamage: 4,
+      }),
+    ).toBe("Bulbasaur is hurt by its burn!");
   });
 });

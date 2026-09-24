@@ -1,4 +1,5 @@
 import type { PokemonItemId } from "../inventory/pokemon-inventory.js";
+import type { PokemonMajorStatusCondition } from "../pokemon-status.js";
 
 export type PokemonItemCategory =
   | "medicine"
@@ -28,6 +29,11 @@ export type PokemonItemEffect =
   | {
       readonly type: "revive";
       readonly mode: "full";
+    }
+  | {
+      readonly type: "cure-status";
+      readonly statuses: readonly PokemonMajorStatusCondition[];
+      readonly cureConfusion?: boolean;
     }
   | {
       readonly type: "level-up";
@@ -141,6 +147,93 @@ export const POKEMON_ITEM_REGISTRY = {
     effect: {
       type: "revive",
       mode: "full",
+    },
+  },
+
+
+  antidote: {
+    id: "antidote",
+    name: "Antidote",
+    category: "medicine",
+    battleUsable: true,
+    overworldUsable: true,
+    battleTarget: "trainer-pokemon",
+    effect: {
+      type: "cure-status",
+      statuses: ["poison", "badly-poisoned"],
+    },
+  },
+
+  "burn-heal": {
+    id: "burn-heal",
+    name: "Burn Heal",
+    category: "medicine",
+    battleUsable: true,
+    overworldUsable: true,
+    battleTarget: "trainer-pokemon",
+    effect: {
+      type: "cure-status",
+      statuses: ["burn"],
+    },
+  },
+
+  "ice-heal": {
+    id: "ice-heal",
+    name: "Ice Heal",
+    category: "medicine",
+    battleUsable: true,
+    overworldUsable: true,
+    battleTarget: "trainer-pokemon",
+    effect: {
+      type: "cure-status",
+      statuses: ["freeze"],
+    },
+  },
+
+  awakening: {
+    id: "awakening",
+    name: "Awakening",
+    category: "medicine",
+    battleUsable: true,
+    overworldUsable: true,
+    battleTarget: "trainer-pokemon",
+    effect: {
+      type: "cure-status",
+      statuses: ["sleep"],
+    },
+  },
+
+  "paralyze-heal": {
+    id: "paralyze-heal",
+    name: "Paralyze Heal",
+    category: "medicine",
+    battleUsable: true,
+    overworldUsable: true,
+    battleTarget: "trainer-pokemon",
+    effect: {
+      type: "cure-status",
+      statuses: ["paralysis"],
+    },
+  },
+
+  "full-heal": {
+    id: "full-heal",
+    name: "Full Heal",
+    category: "medicine",
+    battleUsable: true,
+    overworldUsable: true,
+    battleTarget: "trainer-pokemon",
+    effect: {
+      type: "cure-status",
+      statuses: [
+        "burn",
+        "poison",
+        "badly-poisoned",
+        "paralysis",
+        "sleep",
+        "freeze",
+      ],
+      cureConfusion: true,
     },
   },
 

@@ -9,10 +9,14 @@ import {
   applyPersistentBattlefieldMove,
   getBattleMoveMultiHitRule,
   resolveBattleMoveHitCount,
+  applyBattleMoveStatusEffects,
+  resolveBattleStatusAction,
 } from '@cesar-mmo/shared';
 
 import type {
+  BattleMoveExecutionContext,
   BattlePresentationEvent,
+  BattleStatusActionEffect,
   BattleTurnResolutionEntry,
   PokemonTrainerState,
 } from '@cesar-mmo/shared';
@@ -25,7 +29,8 @@ import { resolvePokemonWildBattleRun } from './run/pokemon-wild-battle-run.runti
 
 import { executePokemonWildBattleCapture } from './capture/pokemon-wild-battle-capture.runtime';
 
-import { applyPokemonTrainerBattleHealingItem } from '../items/pokemon-trainer-battle-healing-item.runtime';
+import { applyPokemonTrainerBattleMedicineItem } from '../items/pokemon-trainer-battle-medicine-item.runtime';
+import type { PokemonOverworldItemRepository } from '../items/pokemon-overworld-item.repository';
 
 import { PokemonTrainerStateStore } from '../pokemon-trainer-state.store';
 
@@ -45,6 +50,7 @@ export interface PokemonBattleTurnExecutorOptions {
   readonly trainerStateStore: PokemonTrainerStateStore;
   readonly trainerService: PokemonTrainerService;
   readonly captureService: PokemonCaptureService;
+  readonly medicineRepository?: PokemonOverworldItemRepository;
   readonly random?: () => number;
 }
 
@@ -52,12 +58,14 @@ export class PokemonBattleTurnExecutor {
   private readonly trainerStateStore: PokemonTrainerStateStore;
   private readonly trainerService: PokemonTrainerService;
   private readonly captureService: PokemonCaptureService;
+  private readonly medicineRepository?: PokemonOverworldItemRepository;
   private readonly random: () => number;
 
   constructor(options: PokemonBattleTurnExecutorOptions) {
     this.trainerStateStore = options.trainerStateStore;
     this.trainerService = options.trainerService;
     this.captureService = options.captureService;
+    this.medicineRepository = options.medicineRepository;
     this.random = options.random ?? Math.random;
   }
 
@@ -202,12 +210,13 @@ export class PokemonBattleTurnExecutor {
           };
         }
 
-        const result = await applyPokemonTrainerBattleHealingItem({
+        const result = await applyPokemonTrainerBattleMedicineItem({
           session,
           entry,
           playerId,
           trainerStateStore: this.trainerStateStore,
           trainerService: this.trainerService,
+          medicineRepository: this.medicineRepository,
         });
 
         const itemUsedEvent: BattlePresentationEvent = {
@@ -217,17 +226,45 @@ export class PokemonBattleTurnExecutor {
           targetPokemonInstanceId: result.targetPokemonInstanceId,
         };
 
-        const hpRestoredEvent: BattlePresentationEvent = {
-          type: 'hp-restored',
-          participantId: result.participantId,
-          pokemonInstanceId: result.targetPokemonInstanceId,
-          previousHp: result.previousHp,
-          currentHp: result.currentHp,
-          appliedHealing: result.appliedHealing,
-        };
+        if (result.kind === 'hp') {
+          const hpRestoredEvent: BattlePresentationEvent = {
+            type: 'hp-restored',
+            participantId: result.participantId,
+            pokemonInstanceId: result.targetPokemonInstanceId,
+            previousHp: result.previousHp,
+            currentHp: result.currentHp,
+            appliedHealing: result.appliedHealing,
+          };
+
+          return {
+            events: [itemUsedEvent, hpRestoredEvent],
+            terminalOutcome: null,
+            trainerStateUpdate: result.trainerState,
+          };
+        }
+
+        const statusClearedEvents: BattlePresentationEvent[] = [];
+
+        if (result.curedMajorStatus !== null) {
+          statusClearedEvents.push({
+            type: 'status-cleared',
+            participantId: result.participantId,
+            pokemonInstanceId: result.targetPokemonInstanceId,
+            status: result.curedMajorStatus,
+          });
+        }
+
+        if (result.curedConfusion) {
+          statusClearedEvents.push({
+            type: 'status-cleared',
+            participantId: result.participantId,
+            pokemonInstanceId: result.targetPokemonInstanceId,
+            status: 'confusion',
+          });
+        }
 
         return {
-          events: [itemUsedEvent, hpRestoredEvent],
+          events: [itemUsedEvent, ...statusClearedEvents],
           terminalOutcome: null,
           trainerStateUpdate: result.trainerState,
         };
@@ -255,6 +292,31 @@ export class PokemonBattleTurnExecutor {
       entry,
     );
 
+    const statusAction = resolveBattleStatusAction(
+      executionContext,
+      this.random,
+    );
+
+    const statusActionEvents = this.createStatusActionEvents(
+      executionContext,
+      statusAction.effects,
+    );
+
+    if (!statusAction.canExecuteMove) {
+      if (executionContext.actorPokemon.currentHp === 0) {
+        statusActionEvents.push({
+          type: 'pokemon-fainted',
+          participantId: executionContext.actorParticipantId,
+          pokemonInstanceId: executionContext.actorPokemon.pokemon.instanceId,
+        });
+      }
+
+      return {
+        events: statusActionEvents,
+        terminalOutcome: null,
+      };
+    }
+
     if (entry.command.action.type === 'use-move') {
       consumeBattleMovePp(executionContext);
     }
@@ -274,6 +336,7 @@ export class PokemonBattleTurnExecutor {
     if (!accuracyResult.hit) {
       return {
         events: [
+          ...statusActionEvents,
           baseMoveUsedEvent,
           {
             type: 'move-missed',
@@ -306,7 +369,11 @@ export class PokemonBattleTurnExecutor {
 
     if (!resolvesDirectDamage) {
       return {
-        events: [baseMoveUsedEvent],
+        events: [
+          ...statusActionEvents,
+          baseMoveUsedEvent,
+          ...this.createStatusInflictedEvents(executionContext, 1),
+        ],
         terminalOutcome: null,
       };
     }
@@ -321,9 +388,10 @@ export class PokemonBattleTurnExecutor {
         break;
       }
 
-      const damageResult = multiHitRule
-        ? calculateBattleMoveDamage(executionContext, this.random)
-        : calculateBattleMoveDamage(executionContext);
+      const damageResult = calculateBattleMoveDamage(
+        executionContext,
+        this.random,
+      );
 
       if (hitIndex === 0) {
         typeEffectiveness = damageResult.typeEffectiveness;
@@ -343,7 +411,10 @@ export class PokemonBattleTurnExecutor {
       ? { ...baseMoveUsedEvent, hitCount: actualHitCount }
       : baseMoveUsedEvent;
 
-    const events: BattlePresentationEvent[] = [moveUsedEvent];
+    const events: BattlePresentationEvent[] = [
+      ...statusActionEvents,
+      moveUsedEvent,
+    ];
     const targetPokemonInstanceId =
       executionContext.targetPokemon.pokemon.instanceId;
 
@@ -370,6 +441,10 @@ export class PokemonBattleTurnExecutor {
       typeEffectiveness,
     });
 
+    events.push(
+      ...this.createStatusInflictedEvents(executionContext, actualHitCount),
+    );
+
     if (targetPreviousHp > 0 && currentHp === 0) {
       events.push({
         type: 'pokemon-fainted',
@@ -382,5 +457,64 @@ export class PokemonBattleTurnExecutor {
       events,
       terminalOutcome: null,
     };
+  }
+
+  private createStatusActionEvents(
+    context: BattleMoveExecutionContext,
+    effects: readonly BattleStatusActionEffect[],
+  ): BattlePresentationEvent[] {
+    const participantId = context.actorParticipantId;
+    const pokemonInstanceId = context.actorPokemon.pokemon.instanceId;
+
+    return effects.map((effect): BattlePresentationEvent => {
+      switch (effect.type) {
+        case 'status-cleared':
+          return {
+            type: 'status-cleared',
+            participantId,
+            pokemonInstanceId,
+            status: effect.status,
+          };
+
+        case 'action-prevented':
+          return {
+            type: 'status-action-prevented',
+            participantId,
+            pokemonInstanceId,
+            status: effect.status,
+          };
+
+        case 'confusion-self-damage':
+          return {
+            type: 'confusion-self-damage',
+            participantId,
+            pokemonInstanceId,
+            previousHp: effect.previousHp,
+            currentHp: effect.currentHp,
+            appliedDamage: effect.appliedDamage,
+          };
+      }
+    });
+  }
+
+  private createStatusInflictedEvents(
+    context: BattleMoveExecutionContext,
+    successfulHitCount: number,
+  ): BattlePresentationEvent[] {
+    return applyBattleMoveStatusEffects({
+      context,
+      successfulHitCount,
+      random: this.random,
+    })
+      .filter((result) => result.type === 'applied')
+      .map((result) => ({
+        type: 'status-inflicted' as const,
+        participantId: result.targetParticipantId,
+        pokemonInstanceId: result.targetPokemonInstanceId,
+        status: result.status,
+        sourceParticipantId: context.actorParticipantId,
+        sourcePokemonInstanceId: context.actorPokemon.pokemon.instanceId,
+        moveId: context.move.id,
+      }));
   }
 }

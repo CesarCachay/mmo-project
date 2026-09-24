@@ -5,8 +5,10 @@ import type {
   BattleParticipantId,
   BattlePokemonState,
 } from "./pokemon-battle.types.js";
+import { isBattlePokemonStatusState } from "./pokemon-battle-status.js";
 import type { BattleCommandAction } from "./pokemon-battle-command.js";
 import { isPokemonItemId } from "../inventory/pokemon-inventory.js";
+import { isPokemonPersistentMajorStatusState } from "../pokemon-status.js";
 import {
   getPokemonTrainerBattleDefinition,
   isPokemonTrainerBattleId,
@@ -267,6 +269,16 @@ function isBattlePokemonState(value: unknown): value is BattlePokemonState {
     return false;
   }
 
+  // Step 1 keeps legacy payloads valid while every newly-created battle state
+  // already carries statusState. Once older fixtures/snapshots are retired,
+  // this may be tightened to require the field.
+  if (
+    value.statusState !== undefined &&
+    !isBattlePokemonStatusState(value.statusState)
+  ) {
+    return false;
+  }
+
   return isBattlePokemonInstance(value.pokemon);
 }
 
@@ -304,6 +316,14 @@ function isBattlePokemonInstance(value: unknown): boolean {
   }
 
   if (!Number.isInteger(value.abilityId) || (value.abilityId as number) <= 0) {
+    return false;
+  }
+
+  if (
+    value.majorStatus !== undefined &&
+    value.majorStatus !== null &&
+    !isPokemonPersistentMajorStatusState(value.majorStatus)
+  ) {
     return false;
   }
 

@@ -135,6 +135,27 @@ describe("planPokemonCenterHealing", () => {
     );
   });
 
+  it("clears a major status even when HP and PP are already full", () => {
+    const base = createCharmander({
+      moves: [
+        { moveId: 10, currentPp: getMaxPp(10) },
+        { moveId: 52, currentPp: getMaxPp(52) },
+      ],
+      majorStatus: { type: "burn" },
+    });
+    const pokemon = {
+      ...base,
+      currentHp: calculatePokemonMaxHp(base),
+    };
+
+    const result = planPokemonCenterHealing({ pokemon: [pokemon] });
+
+    expect(result.updatedParty.pokemon[0]?.majorStatus).toBeNull();
+    expect(result.restoredPokemonCount).toBe(1);
+    expect(result.totalHpRestored).toBe(0);
+    expect(result.totalPpRestored).toBe(0);
+  });
+
   it("leaves an already healthy party functionally unchanged", () => {
     const pokemon = createCharmander({
       currentHp: calculatePokemonMaxHp(createCharmander()),

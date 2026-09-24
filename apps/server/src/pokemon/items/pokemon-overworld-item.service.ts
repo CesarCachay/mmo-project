@@ -95,14 +95,15 @@ export class PokemonOverworldItemService {
       );
     }
 
-    /* Overworld HP items soportados actualmente: heal-hp */
     if (
       !item.effect ||
-      (item.effect.type !== 'heal-hp' && item.effect.type !== 'revive')
+      (item.effect.type !== 'heal-hp' &&
+        item.effect.type !== 'revive' &&
+        item.effect.type !== 'cure-status')
     ) {
       throw new PokemonOverworldItemUseError(
         'ITEM_NOT_USABLE',
-        `Pokémon item "${itemId}" is not a supported overworld HP item`,
+        `Pokémon item "${itemId}" is not supported in the overworld`,
       );
     }
 
@@ -139,6 +140,7 @@ export class PokemonOverworldItemService {
     const previousHp = target.currentHp;
 
     let currentHp: number;
+    let clearedMajorStatus = false;
 
     if (item.effect.type === 'heal-hp') {
       /* Potion / Super Potion / Hyper Potion / Max Potion nunca pueden revivir */
@@ -161,7 +163,7 @@ export class PokemonOverworldItemService {
       } else {
         currentHp = Math.min(maxHp, previousHp + item.effect.amount);
       }
-    } else {
+    } else if (item.effect.type === 'revive') {
       /* Revive / Max Revive solamente pueden utilizarse sobre un Pokémon debilitado. */
       if (previousHp > 0) {
         throw new PokemonOverworldItemUseError(
@@ -175,6 +177,28 @@ export class PokemonOverworldItemService {
       } else {
         currentHp = Math.max(1, Math.floor(maxHp / 2));
       }
+    } else {
+      if (previousHp <= 0) {
+        throw new PokemonOverworldItemUseError(
+          'TARGET_FAINTED',
+          `Pokémon "${targetPokemonInstanceId}" is fainted`,
+        );
+      }
+
+      const majorStatus = target.majorStatus ?? null;
+
+      if (
+        majorStatus === null ||
+        !item.effect.statuses.includes(majorStatus.type)
+      ) {
+        throw new PokemonOverworldItemUseError(
+          'TARGET_STATUS_NOT_APPLICABLE',
+          `Pokémon "${targetPokemonInstanceId}" has no status curable by "${itemId}"`,
+        );
+      }
+
+      currentHp = previousHp;
+      clearedMajorStatus = true;
     }
 
     const appliedHealing = currentHp - previousHp;
@@ -186,6 +210,11 @@ export class PokemonOverworldItemService {
           ? {
               ...pokemon,
               currentHp,
+              ...(clearedMajorStatus
+                ? {
+                    majorStatus: null,
+                  }
+                : {}),
             }
           : pokemon,
       ),
@@ -199,12 +228,22 @@ export class PokemonOverworldItemService {
 
     /* 7. PostgreSQL FIRST. Item dec + HP mutation belong to one transaction */
     try {
-      await this.repository.applyHpItemUse({
-        trainerId,
-        itemId,
-        targetPokemonInstanceId,
-        currentHp,
-      });
+      if (clearedMajorStatus) {
+        await this.repository.applyStatusCureItemUse({
+          trainerId,
+          itemId,
+          targetPokemonInstanceId,
+          expectedMajorStatus: target.majorStatus,
+          clearMajorStatus: true,
+        });
+      } else {
+        await this.repository.applyHpItemUse({
+          trainerId,
+          itemId,
+          targetPokemonInstanceId,
+          currentHp,
+        });
+      }
     } catch (error: unknown) {
       if (error instanceof PokemonOverworldItemPersistenceConflictError) {
         throw new PokemonOverworldItemUseError(error.code, error.message);

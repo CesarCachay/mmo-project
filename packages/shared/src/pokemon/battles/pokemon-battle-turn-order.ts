@@ -3,6 +3,7 @@ import { getPokemonFormsBySpecies } from "../pokemon-form.registry.js";
 import { getPokemonMove } from "../pokemon-move.registry.js";
 
 import { getActiveBattlePokemon } from "./pokemon-battle-participant.js";
+import { applyBattleStatusSpeedModifier } from "./pokemon-battle-status-effects.js";
 
 import { isBattleTurnReady, type BattleTurn } from "./pokemon-battle-turn.js";
 
@@ -11,7 +12,7 @@ import {
   type BattleCommand,
 } from "./pokemon-battle-command.js";
 
-import type { BattleId, BattleInstance } from "./pokemon-battle.types.js";
+import type { BattleId, BattleInstance, BattlePokemonState } from "./pokemon-battle.types.js";
 
 export type BattleTurnOrderRandomSource = () => number;
 
@@ -78,11 +79,7 @@ function createResolutionEntry(
 
   const movePriority = getCommandMovePriority(command);
 
-  const speed = getBattlePokemonSpeed(
-    activePokemon.pokemon.speciesId,
-    activePokemon.pokemon.formId,
-    activePokemon.pokemon.level
-  );
+  const speed = getBattlePokemonSpeed(activePokemon);
 
   const tieBreaker = random();
 
@@ -139,18 +136,20 @@ function getCommandMovePriority(command: BattleCommand): number {
   }
 }
 
-function getBattlePokemonSpeed(speciesId: number, formId: number, level: number): number {
-  const forms = getPokemonFormsBySpecies(speciesId);
+function getBattlePokemonSpeed(pokemonState: BattlePokemonState): number {
+  const { pokemon } = pokemonState;
+  const forms = getPokemonFormsBySpecies(pokemon.speciesId);
 
-  const form = forms.find((candidate) => candidate.formId === formId);
+  const form = forms.find((candidate) => candidate.formId === pokemon.formId);
 
   if (!form) {
     throw new Error(
-      `Pokémon form "${formId}" not found for species "${speciesId}" while resolving battle Speed`
+      `Pokémon form "${pokemon.formId}" not found for species "${pokemon.speciesId}" while resolving battle Speed`
     );
   }
 
-  return calculateBattleSpeed(form.baseStats.speed, level);
+  const speed = calculateBattleSpeed(form.baseStats.speed, pokemon.level);
+  return applyBattleStatusSpeedModifier(pokemonState, speed);
 }
 
 function calculateBattleSpeed(baseSpeed: number, level: number): number {

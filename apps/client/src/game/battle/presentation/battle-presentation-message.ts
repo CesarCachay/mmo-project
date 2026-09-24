@@ -47,6 +47,92 @@ export function formatBattlePresentationMessage(
       return null;
     }
 
+    case "status-inflicted": {
+      const pokemonName = getBattlePokemonDisplayName(
+        battle,
+        event.participantId,
+        event.pokemonInstanceId,
+      );
+
+      switch (event.status) {
+        case "burn":
+          return `${pokemonName} was burned!`;
+        case "poison":
+          return `${pokemonName} was poisoned!`;
+        case "badly-poisoned":
+          return `${pokemonName} was badly poisoned!`;
+        case "paralysis":
+          return `${pokemonName} is paralyzed! It may be unable to move!`;
+        case "sleep":
+          return `${pokemonName} fell asleep!`;
+        case "freeze":
+          return `${pokemonName} was frozen solid!`;
+        case "confusion":
+          return `${pokemonName} became confused!`;
+      }
+    }
+
+    case "status-cleared": {
+      const pokemonName = getBattlePokemonDisplayName(
+        battle,
+        event.participantId,
+        event.pokemonInstanceId,
+      );
+
+      switch (event.status) {
+        case "sleep":
+          return `${pokemonName} woke up!`;
+        case "freeze":
+          return `${pokemonName} thawed out!`;
+        case "confusion":
+          return `${pokemonName} snapped out of confusion!`;
+        case "burn":
+        case "poison":
+        case "badly-poisoned":
+        case "paralysis":
+          return `${pokemonName} was cured of its status condition!`;
+      }
+    }
+
+    case "status-action-prevented": {
+      const pokemonName = getBattlePokemonDisplayName(
+        battle,
+        event.participantId,
+        event.pokemonInstanceId,
+      );
+
+      switch (event.status) {
+        case "sleep":
+          return `${pokemonName} is fast asleep.`;
+        case "freeze":
+          return `${pokemonName} is frozen solid!`;
+        case "paralysis":
+          return `${pokemonName} is paralyzed! It can't move!`;
+      }
+    }
+
+    case "confusion-self-damage": {
+      const pokemonName = getBattlePokemonDisplayName(
+        battle,
+        event.participantId,
+        event.pokemonInstanceId,
+      );
+
+      return `${pokemonName} hurt itself in its confusion!`;
+    }
+
+    case "status-residual-damage": {
+      const pokemonName = getBattlePokemonDisplayName(
+        battle,
+        event.participantId,
+        event.pokemonInstanceId,
+      );
+
+      return event.status === "burn"
+        ? `${pokemonName} is hurt by its burn!`
+        : `${pokemonName} is hurt by poison!`;
+    }
+
     case "pokemon-fainted": {
       const pokemonName = getBattlePokemonDisplayName(
         battle,

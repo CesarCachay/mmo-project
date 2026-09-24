@@ -33,6 +33,7 @@ export type PokemonInstanceAvgAggregateOutputType = {
   experience: number | null
   currentHp: number | null
   abilityId: number | null
+  statusTurnsRemaining: number | null
   partyPosition: number | null
 }
 
@@ -43,6 +44,7 @@ export type PokemonInstanceSumAggregateOutputType = {
   experience: number | null
   currentHp: number | null
   abilityId: number | null
+  statusTurnsRemaining: number | null
   partyPosition: number | null
 }
 
@@ -56,6 +58,8 @@ export type PokemonInstanceMinAggregateOutputType = {
   experience: number | null
   currentHp: number | null
   abilityId: number | null
+  majorStatus: string | null
+  statusTurnsRemaining: number | null
   partyPosition: number | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -71,6 +75,8 @@ export type PokemonInstanceMaxAggregateOutputType = {
   experience: number | null
   currentHp: number | null
   abilityId: number | null
+  majorStatus: string | null
+  statusTurnsRemaining: number | null
   partyPosition: number | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -86,6 +92,8 @@ export type PokemonInstanceCountAggregateOutputType = {
   experience: number
   currentHp: number
   abilityId: number
+  majorStatus: number
+  statusTurnsRemaining: number
   partyPosition: number
   createdAt: number
   updatedAt: number
@@ -100,6 +108,7 @@ export type PokemonInstanceAvgAggregateInputType = {
   experience?: true
   currentHp?: true
   abilityId?: true
+  statusTurnsRemaining?: true
   partyPosition?: true
 }
 
@@ -110,6 +119,7 @@ export type PokemonInstanceSumAggregateInputType = {
   experience?: true
   currentHp?: true
   abilityId?: true
+  statusTurnsRemaining?: true
   partyPosition?: true
 }
 
@@ -123,6 +133,8 @@ export type PokemonInstanceMinAggregateInputType = {
   experience?: true
   currentHp?: true
   abilityId?: true
+  majorStatus?: true
+  statusTurnsRemaining?: true
   partyPosition?: true
   createdAt?: true
   updatedAt?: true
@@ -138,6 +150,8 @@ export type PokemonInstanceMaxAggregateInputType = {
   experience?: true
   currentHp?: true
   abilityId?: true
+  majorStatus?: true
+  statusTurnsRemaining?: true
   partyPosition?: true
   createdAt?: true
   updatedAt?: true
@@ -153,6 +167,8 @@ export type PokemonInstanceCountAggregateInputType = {
   experience?: true
   currentHp?: true
   abilityId?: true
+  majorStatus?: true
+  statusTurnsRemaining?: true
   partyPosition?: true
   createdAt?: true
   updatedAt?: true
@@ -255,6 +271,8 @@ export type PokemonInstanceGroupByOutputType = {
   experience: number
   currentHp: number
   abilityId: number
+  majorStatus: string | null
+  statusTurnsRemaining: number | null
   partyPosition: number | null
   createdAt: Date
   updatedAt: Date
@@ -293,6 +311,8 @@ export type PokemonInstanceWhereInput = {
   experience?: Prisma.IntFilter<"PokemonInstance"> | number
   currentHp?: Prisma.IntFilter<"PokemonInstance"> | number
   abilityId?: Prisma.IntFilter<"PokemonInstance"> | number
+  majorStatus?: Prisma.StringNullableFilter<"PokemonInstance"> | string | null
+  statusTurnsRemaining?: Prisma.IntNullableFilter<"PokemonInstance"> | number | null
   partyPosition?: Prisma.IntNullableFilter<"PokemonInstance"> | number | null
   createdAt?: Prisma.DateTimeFilter<"PokemonInstance"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PokemonInstance"> | Date | string
@@ -312,6 +332,8 @@ export type PokemonInstanceOrderByWithRelationInput = {
   experience?: Prisma.SortOrder
   currentHp?: Prisma.SortOrder
   abilityId?: Prisma.SortOrder
+  majorStatus?: Prisma.SortOrderInput | Prisma.SortOrder
+  statusTurnsRemaining?: Prisma.SortOrderInput | Prisma.SortOrder
   partyPosition?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -335,6 +357,8 @@ export type PokemonInstanceWhereUniqueInput = Prisma.AtLeast<{
   experience?: Prisma.IntFilter<"PokemonInstance"> | number
   currentHp?: Prisma.IntFilter<"PokemonInstance"> | number
   abilityId?: Prisma.IntFilter<"PokemonInstance"> | number
+  majorStatus?: Prisma.StringNullableFilter<"PokemonInstance"> | string | null
+  statusTurnsRemaining?: Prisma.IntNullableFilter<"PokemonInstance"> | number | null
   partyPosition?: Prisma.IntNullableFilter<"PokemonInstance"> | number | null
   createdAt?: Prisma.DateTimeFilter<"PokemonInstance"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PokemonInstance"> | Date | string
@@ -354,6 +378,8 @@ export type PokemonInstanceOrderByWithAggregationInput = {
   experience?: Prisma.SortOrder
   currentHp?: Prisma.SortOrder
   abilityId?: Prisma.SortOrder
+  majorStatus?: Prisma.SortOrderInput | Prisma.SortOrder
+  statusTurnsRemaining?: Prisma.SortOrderInput | Prisma.SortOrder
   partyPosition?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -377,6 +403,8 @@ export type PokemonInstanceScalarWhereWithAggregatesInput = {
   experience?: Prisma.IntWithAggregatesFilter<"PokemonInstance"> | number
   currentHp?: Prisma.IntWithAggregatesFilter<"PokemonInstance"> | number
   abilityId?: Prisma.IntWithAggregatesFilter<"PokemonInstance"> | number
+  majorStatus?: Prisma.StringNullableWithAggregatesFilter<"PokemonInstance"> | string | null
+  statusTurnsRemaining?: Prisma.IntNullableWithAggregatesFilter<"PokemonInstance"> | number | null
   partyPosition?: Prisma.IntNullableWithAggregatesFilter<"PokemonInstance"> | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PokemonInstance"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PokemonInstance"> | Date | string
@@ -391,6 +419,8 @@ export type PokemonInstanceCreateInput = {
   experience: number
   currentHp: number
   abilityId: number
+  majorStatus?: string | null
+  statusTurnsRemaining?: number | null
   partyPosition?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -410,6 +440,8 @@ export type PokemonInstanceUncheckedCreateInput = {
   experience: number
   currentHp: number
   abilityId: number
+  majorStatus?: string | null
+  statusTurnsRemaining?: number | null
   partyPosition?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -427,6 +459,8 @@ export type PokemonInstanceUpdateInput = {
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   currentHp?: Prisma.IntFieldUpdateOperationsInput | number
   abilityId?: Prisma.IntFieldUpdateOperationsInput | number
+  majorStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusTurnsRemaining?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partyPosition?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -446,6 +480,8 @@ export type PokemonInstanceUncheckedUpdateInput = {
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   currentHp?: Prisma.IntFieldUpdateOperationsInput | number
   abilityId?: Prisma.IntFieldUpdateOperationsInput | number
+  majorStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusTurnsRemaining?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partyPosition?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -464,6 +500,8 @@ export type PokemonInstanceCreateManyInput = {
   experience: number
   currentHp: number
   abilityId: number
+  majorStatus?: string | null
+  statusTurnsRemaining?: number | null
   partyPosition?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -478,6 +516,8 @@ export type PokemonInstanceUpdateManyMutationInput = {
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   currentHp?: Prisma.IntFieldUpdateOperationsInput | number
   abilityId?: Prisma.IntFieldUpdateOperationsInput | number
+  majorStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusTurnsRemaining?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partyPosition?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -493,6 +533,8 @@ export type PokemonInstanceUncheckedUpdateManyInput = {
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   currentHp?: Prisma.IntFieldUpdateOperationsInput | number
   abilityId?: Prisma.IntFieldUpdateOperationsInput | number
+  majorStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusTurnsRemaining?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partyPosition?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -523,6 +565,8 @@ export type PokemonInstanceCountOrderByAggregateInput = {
   experience?: Prisma.SortOrder
   currentHp?: Prisma.SortOrder
   abilityId?: Prisma.SortOrder
+  majorStatus?: Prisma.SortOrder
+  statusTurnsRemaining?: Prisma.SortOrder
   partyPosition?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -535,6 +579,7 @@ export type PokemonInstanceAvgOrderByAggregateInput = {
   experience?: Prisma.SortOrder
   currentHp?: Prisma.SortOrder
   abilityId?: Prisma.SortOrder
+  statusTurnsRemaining?: Prisma.SortOrder
   partyPosition?: Prisma.SortOrder
 }
 
@@ -548,6 +593,8 @@ export type PokemonInstanceMaxOrderByAggregateInput = {
   experience?: Prisma.SortOrder
   currentHp?: Prisma.SortOrder
   abilityId?: Prisma.SortOrder
+  majorStatus?: Prisma.SortOrder
+  statusTurnsRemaining?: Prisma.SortOrder
   partyPosition?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -563,6 +610,8 @@ export type PokemonInstanceMinOrderByAggregateInput = {
   experience?: Prisma.SortOrder
   currentHp?: Prisma.SortOrder
   abilityId?: Prisma.SortOrder
+  majorStatus?: Prisma.SortOrder
+  statusTurnsRemaining?: Prisma.SortOrder
   partyPosition?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -575,6 +624,7 @@ export type PokemonInstanceSumOrderByAggregateInput = {
   experience?: Prisma.SortOrder
   currentHp?: Prisma.SortOrder
   abilityId?: Prisma.SortOrder
+  statusTurnsRemaining?: Prisma.SortOrder
   partyPosition?: Prisma.SortOrder
 }
 
@@ -684,6 +734,8 @@ export type PokemonInstanceCreateWithoutTrainerInput = {
   experience: number
   currentHp: number
   abilityId: number
+  majorStatus?: string | null
+  statusTurnsRemaining?: number | null
   partyPosition?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -701,6 +753,8 @@ export type PokemonInstanceUncheckedCreateWithoutTrainerInput = {
   experience: number
   currentHp: number
   abilityId: number
+  majorStatus?: string | null
+  statusTurnsRemaining?: number | null
   partyPosition?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -748,6 +802,8 @@ export type PokemonInstanceScalarWhereInput = {
   experience?: Prisma.IntFilter<"PokemonInstance"> | number
   currentHp?: Prisma.IntFilter<"PokemonInstance"> | number
   abilityId?: Prisma.IntFilter<"PokemonInstance"> | number
+  majorStatus?: Prisma.StringNullableFilter<"PokemonInstance"> | string | null
+  statusTurnsRemaining?: Prisma.IntNullableFilter<"PokemonInstance"> | number | null
   partyPosition?: Prisma.IntNullableFilter<"PokemonInstance"> | number | null
   createdAt?: Prisma.DateTimeFilter<"PokemonInstance"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PokemonInstance"> | Date | string
@@ -762,6 +818,8 @@ export type PokemonInstanceCreateWithoutMovesInput = {
   experience: number
   currentHp: number
   abilityId: number
+  majorStatus?: string | null
+  statusTurnsRemaining?: number | null
   partyPosition?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -780,6 +838,8 @@ export type PokemonInstanceUncheckedCreateWithoutMovesInput = {
   experience: number
   currentHp: number
   abilityId: number
+  majorStatus?: string | null
+  statusTurnsRemaining?: number | null
   partyPosition?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -812,6 +872,8 @@ export type PokemonInstanceUpdateWithoutMovesInput = {
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   currentHp?: Prisma.IntFieldUpdateOperationsInput | number
   abilityId?: Prisma.IntFieldUpdateOperationsInput | number
+  majorStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusTurnsRemaining?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partyPosition?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -830,6 +892,8 @@ export type PokemonInstanceUncheckedUpdateWithoutMovesInput = {
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   currentHp?: Prisma.IntFieldUpdateOperationsInput | number
   abilityId?: Prisma.IntFieldUpdateOperationsInput | number
+  majorStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusTurnsRemaining?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partyPosition?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -846,6 +910,8 @@ export type PokemonInstanceCreateWithoutPendingMoveLearningInput = {
   experience: number
   currentHp: number
   abilityId: number
+  majorStatus?: string | null
+  statusTurnsRemaining?: number | null
   partyPosition?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -864,6 +930,8 @@ export type PokemonInstanceUncheckedCreateWithoutPendingMoveLearningInput = {
   experience: number
   currentHp: number
   abilityId: number
+  majorStatus?: string | null
+  statusTurnsRemaining?: number | null
   partyPosition?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -896,6 +964,8 @@ export type PokemonInstanceUpdateWithoutPendingMoveLearningInput = {
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   currentHp?: Prisma.IntFieldUpdateOperationsInput | number
   abilityId?: Prisma.IntFieldUpdateOperationsInput | number
+  majorStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusTurnsRemaining?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partyPosition?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -914,6 +984,8 @@ export type PokemonInstanceUncheckedUpdateWithoutPendingMoveLearningInput = {
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   currentHp?: Prisma.IntFieldUpdateOperationsInput | number
   abilityId?: Prisma.IntFieldUpdateOperationsInput | number
+  majorStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusTurnsRemaining?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partyPosition?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -930,6 +1002,8 @@ export type PokemonInstanceCreateWithoutPendingEvolutionInput = {
   experience: number
   currentHp: number
   abilityId: number
+  majorStatus?: string | null
+  statusTurnsRemaining?: number | null
   partyPosition?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -948,6 +1022,8 @@ export type PokemonInstanceUncheckedCreateWithoutPendingEvolutionInput = {
   experience: number
   currentHp: number
   abilityId: number
+  majorStatus?: string | null
+  statusTurnsRemaining?: number | null
   partyPosition?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -980,6 +1056,8 @@ export type PokemonInstanceUpdateWithoutPendingEvolutionInput = {
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   currentHp?: Prisma.IntFieldUpdateOperationsInput | number
   abilityId?: Prisma.IntFieldUpdateOperationsInput | number
+  majorStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusTurnsRemaining?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partyPosition?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -998,6 +1076,8 @@ export type PokemonInstanceUncheckedUpdateWithoutPendingEvolutionInput = {
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   currentHp?: Prisma.IntFieldUpdateOperationsInput | number
   abilityId?: Prisma.IntFieldUpdateOperationsInput | number
+  majorStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusTurnsRemaining?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partyPosition?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1014,6 +1094,8 @@ export type PokemonInstanceCreateManyTrainerInput = {
   experience: number
   currentHp: number
   abilityId: number
+  majorStatus?: string | null
+  statusTurnsRemaining?: number | null
   partyPosition?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1028,6 +1110,8 @@ export type PokemonInstanceUpdateWithoutTrainerInput = {
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   currentHp?: Prisma.IntFieldUpdateOperationsInput | number
   abilityId?: Prisma.IntFieldUpdateOperationsInput | number
+  majorStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusTurnsRemaining?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partyPosition?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1045,6 +1129,8 @@ export type PokemonInstanceUncheckedUpdateWithoutTrainerInput = {
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   currentHp?: Prisma.IntFieldUpdateOperationsInput | number
   abilityId?: Prisma.IntFieldUpdateOperationsInput | number
+  majorStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusTurnsRemaining?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partyPosition?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1062,6 +1148,8 @@ export type PokemonInstanceUncheckedUpdateManyWithoutTrainerInput = {
   experience?: Prisma.IntFieldUpdateOperationsInput | number
   currentHp?: Prisma.IntFieldUpdateOperationsInput | number
   abilityId?: Prisma.IntFieldUpdateOperationsInput | number
+  majorStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusTurnsRemaining?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   partyPosition?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1108,6 +1196,8 @@ export type PokemonInstanceSelect<ExtArgs extends runtime.Types.Extensions.Inter
   experience?: boolean
   currentHp?: boolean
   abilityId?: boolean
+  majorStatus?: boolean
+  statusTurnsRemaining?: boolean
   partyPosition?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1128,6 +1218,8 @@ export type PokemonInstanceSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   experience?: boolean
   currentHp?: boolean
   abilityId?: boolean
+  majorStatus?: boolean
+  statusTurnsRemaining?: boolean
   partyPosition?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1144,6 +1236,8 @@ export type PokemonInstanceSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   experience?: boolean
   currentHp?: boolean
   abilityId?: boolean
+  majorStatus?: boolean
+  statusTurnsRemaining?: boolean
   partyPosition?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1160,12 +1254,14 @@ export type PokemonInstanceSelectScalar = {
   experience?: boolean
   currentHp?: boolean
   abilityId?: boolean
+  majorStatus?: boolean
+  statusTurnsRemaining?: boolean
   partyPosition?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PokemonInstanceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "trainerId" | "speciesId" | "formId" | "nickname" | "level" | "experience" | "currentHp" | "abilityId" | "partyPosition" | "createdAt" | "updatedAt", ExtArgs["result"]["pokemonInstance"]>
+export type PokemonInstanceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "trainerId" | "speciesId" | "formId" | "nickname" | "level" | "experience" | "currentHp" | "abilityId" | "majorStatus" | "statusTurnsRemaining" | "partyPosition" | "createdAt" | "updatedAt", ExtArgs["result"]["pokemonInstance"]>
 export type PokemonInstanceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   trainer?: boolean | Prisma.PokemonTrainerDefaultArgs<ExtArgs>
   moves?: boolean | Prisma.PokemonInstance$movesArgs<ExtArgs>
@@ -1198,6 +1294,8 @@ export type $PokemonInstancePayload<ExtArgs extends runtime.Types.Extensions.Int
     experience: number
     currentHp: number
     abilityId: number
+    majorStatus: string | null
+    statusTurnsRemaining: number | null
     partyPosition: number | null
     createdAt: Date
     updatedAt: Date
@@ -1637,6 +1735,8 @@ export interface PokemonInstanceFieldRefs {
   readonly experience: Prisma.FieldRef<"PokemonInstance", 'Int'>
   readonly currentHp: Prisma.FieldRef<"PokemonInstance", 'Int'>
   readonly abilityId: Prisma.FieldRef<"PokemonInstance", 'Int'>
+  readonly majorStatus: Prisma.FieldRef<"PokemonInstance", 'String'>
+  readonly statusTurnsRemaining: Prisma.FieldRef<"PokemonInstance", 'Int'>
   readonly partyPosition: Prisma.FieldRef<"PokemonInstance", 'Int'>
   readonly createdAt: Prisma.FieldRef<"PokemonInstance", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"PokemonInstance", 'DateTime'>

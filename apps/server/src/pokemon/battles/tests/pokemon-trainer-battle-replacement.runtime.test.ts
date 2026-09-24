@@ -116,6 +116,37 @@ describe('applyPokemonTrainerBattleReplacement - Trainer Battle', () => {
     ).toContain(replacementPokemon.pokemon.instanceId);
   });
 
+  it('clears confusion and resets Bad Poison escalation during forced replacement', () => {
+    const { session, playerParticipant, opponentParticipant } = createSession();
+    const turnStore = new PokemonBattleTurnStore();
+
+    createResolvedTurn(
+      turnStore,
+      session,
+      playerParticipant.id,
+      opponentParticipant.id,
+    );
+
+    const outgoing = playerParticipant.pokemon[0]!;
+    outgoing.currentHp = 0;
+    outgoing.statusState = {
+      major: { type: 'badly-poisoned', toxicCounter: 4 },
+      confusion: { turnsRemaining: 2 },
+    };
+
+    applyPokemonTrainerBattleReplacement({
+      session,
+      playerId: 'player-a',
+      replacementPokemonIndex: 1,
+      battleTurnStore: turnStore,
+    });
+
+    expect(outgoing.statusState).toEqual({
+      major: { type: 'badly-poisoned', toxicCounter: 1 },
+      confusion: null,
+    });
+  });
+
   it('rejects a replacement outside the server-computed candidates', () => {
     const { session, playerParticipant, opponentParticipant } = createSession();
     const turnStore = new PokemonBattleTurnStore();

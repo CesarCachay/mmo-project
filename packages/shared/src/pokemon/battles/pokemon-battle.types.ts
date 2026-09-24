@@ -1,4 +1,5 @@
 import type { PokemonInstance } from "../pokemon.types.js";
+import type { BattlePokemonStatusState } from "./pokemon-battle-status.js";
 
 export type BattleId = string;
 
@@ -48,6 +49,13 @@ export interface BattleFieldState {
 export interface BattlePokemonState {
   readonly pokemon: PokemonInstance;
   currentHp: number;
+
+  /**
+   * Battle-runtime status state. Optional only for backwards compatibility
+   * with historical fixtures/snapshots created before Status Conditions V1.
+   * New battle states created by createBattlePokemonState always initialize it.
+   */
+  statusState?: BattlePokemonStatusState;
 }
 
 /**

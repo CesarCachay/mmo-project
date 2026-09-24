@@ -31,6 +31,7 @@ export type PokemonOverworldItemErrorCode =
   | "TARGET_FAINTED"
   | "TARGET_NOT_FAINTED"
   | "TARGET_FULL_HP"
+  | "TARGET_STATUS_NOT_APPLICABLE"
   | "INCOMPATIBLE_STATE"
   | "PERSISTENCE_FAILED";
 
@@ -106,7 +107,7 @@ export function isPokemonOverworldItemUsedPayload(
     return false;
   }
 
-  if (value.currentHp <= value.previousHp) {
+  if (value.currentHp < value.previousHp) {
     return false;
   }
 
@@ -132,6 +133,7 @@ export function isPokemonOverworldItemErrorPayload(
     case "TARGET_FAINTED":
     case "TARGET_NOT_FAINTED":
     case "TARGET_FULL_HP":
+    case "TARGET_STATUS_NOT_APPLICABLE":
     case "INCOMPATIBLE_STATE":
     case "PERSISTENCE_FAILED":
       return true;

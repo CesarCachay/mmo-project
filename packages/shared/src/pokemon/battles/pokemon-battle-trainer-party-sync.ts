@@ -1,6 +1,10 @@
 import type { PokemonParty } from "../pokemon.types.js";
 
 import type { BattleParticipant } from "./pokemon-battle.types.js";
+import {
+  createPersistentMajorStatusFromBattle,
+  ensureBattlePokemonStatusState,
+} from "./pokemon-battle-status.js";
 
 export function syncPokemonPartyFromBattleParticipant(
   party: PokemonParty,
@@ -79,6 +83,9 @@ export function syncPokemonPartyFromBattleParticipant(
       // HP authority during Battle lives in BattlePokemonState.currentHp.
       // Do not use: battlePokemon.pokemon.currentHp
       currentHp: battlePokemon.currentHp,
+      majorStatus: createPersistentMajorStatusFromBattle(
+        ensureBattlePokemonStatusState(battlePokemon).major,
+      ),
       moves: updatedMoves,
     };
   });
